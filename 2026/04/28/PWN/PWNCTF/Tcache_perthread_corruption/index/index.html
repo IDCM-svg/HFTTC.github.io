@@ -1,0 +1,538 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Tcache_perthread_corruption参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Theffth-blog&#x2F;p&#x2F;12790720.html Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地址的方法是泄露 unsortedbin 中的 fd 和 bk 指针。而在严格限制 chunk 大小的堆题当中，如果有 Tcachebin 机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Tcache_perthread_corruption/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="Tcache_perthread_corruption参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Theffth-blog&#x2F;p&#x2F;12790720.html Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地址的方法是泄露 unsortedbin 中的 fd 和 bk 指针。而在严格限制 chunk 大小的堆题当中，如果有 Tcachebin 机">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/0dJbSbkYuX_jLnuA/1777220121320-5d405e87-664b-44cc-9f1a-09d90946eb24-158648.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/0dJbSbkYuX_jLnuA/1775651582536-ca2871da-66c2-4539-bc48-98f40cd66a94-884959.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/0dJbSbkYuX_jLnuA/1775651598478-21f22176-7ed7-458b-bad3-f40c31163f0b-568789.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/0dJbSbkYuX_jLnuA/1775651620614-fa4a1de2-d630-4dd5-ab0c-af9328b47a0e-310965.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.395Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.414Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/0dJbSbkYuX_jLnuA/1777220121320-5d405e87-664b-44cc-9f1a-09d90946eb24-158648.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Tcache-perthread-corruption"><span class="toc-number">1.</span> <span class="toc-text">Tcache_perthread_corruption</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tcache-perthread-corruption-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">Tcache_perthread_corruption 概述</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#tcache-perthread-struct"><span class="toc-number">1.1.1.</span> <span class="toc-text">tcache_perthread_struct</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-counts"><span class="toc-number">1.1.2.</span> <span class="toc-text">1. counts </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-entries"><span class="toc-number">1.1.3.</span> <span class="toc-text">2. entries </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#glibc-2-26-2-29"><span class="toc-number">1.1.4.</span> <span class="toc-text">glibc 2.26-2.29</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#glibc-2-30-%E5%8F%8A%E4%BB%A5%E4%B8%8A"><span class="toc-number">1.1.5.</span> <span class="toc-text">glibc 2.30 及以上</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#a-little-demo"><span class="toc-number">1.1.6.</span> <span class="toc-text">a little demo</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/Tcache_perthread_corruption/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.395Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Tcache-perthread-corruption"><a href="#Tcache-perthread-corruption" class="headerlink" title="Tcache_perthread_corruption"></a>Tcache_perthread_corruption</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/Theffth-blog/p/12790720.html">https://www.cnblogs.com/Theffth-blog/p/12790720.html</a></p>
+<h3 id="Tcache-perthread-corruption-概述"><a href="#Tcache-perthread-corruption-概述" class="headerlink" title="Tcache_perthread_corruption 概述"></a>Tcache_perthread_corruption 概述</h3><p>在堆题中，我们常见的一种泄露地址的方法是泄露 unsortedbin 中的 fd 和 bk 指针。而在严格限制 chunk 大小的堆题当中，如果有 Tcachebin 机制的影响，我们必须先将 Tcachebin 填满才能把释放的 chunk 放入 UnSortedbin 当中进行地址泄露 main_arena + 固定偏移。此时如果题目堆 malloc 和 free 的次数进行限制，我们就无法堆 Tcachebin 填充满，从而难以获取 UnSortedbin。</p>
+<p>这个时候我们可以考虑伪造 Tcachebion 基址的 tcache_perthread_struct 结构体。</p>
+<h4 id="tcache-perthread-struct"><a href="#tcache-perthread-struct" class="headerlink" title="tcache_perthread_struct"></a>tcache_perthread_struct</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* We overlay this structure on the user-data portion of a chunk when</span></span><br><span class="line"><span class="comment">   the chunk is stored in the per-thread cache.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tcache_entry</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">tcache_entry</span> *<span class="title">next</span>;</span>        </span><br><span class="line">&#125; tcache_entry;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* There is one of these for each thread, which contains the</span></span><br><span class="line"><span class="comment">   per-thread cache (hence &quot;tcache_perthread_struct&quot;).  Keeping</span></span><br><span class="line"><span class="comment">   overall size low is mildly important.  Note that COUNTS and ENTRIES</span></span><br><span class="line"><span class="comment">   are redundant (we could have just counted the linked list each</span></span><br><span class="line"><span class="comment">   time), this is for performance reasons.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tcache_perthread_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="type">char</span> counts[TCACHE_MAX_BINS];             <span class="comment">//数组counts用于存放每个bins中的chunk数量</span></span><br><span class="line">  tcache_entry *entries[TCACHE_MAX_BINS];   <span class="comment">//数组entries用于放置64个bins</span></span><br><span class="line">&#125; tcache_perthread_struct;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> __thread tcache_perthread_struct *tcache = <span class="literal">NULL</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>可以看到 tcache_perthread_struct 结构体首先是类型为 char(1 个字节)的 counts 数组，用于存放 64 个 bins 中 chunk 的数量，随后一次是对应 size 大小 0x20-0x410 的 64 个 entries(8 个字节)，用于存放 64 个 bins 的 bin 的头地址</li>
+</ul>
+<h4 id="1-counts"><a href="#1-counts" class="headerlink" title="1. counts "></a><font style="background-color:#FFFFFF;">1. counts </font></h4><p><font style="background-color:#FFFFFF;">它是一个数组，数组的每个元素对应一个特定大小的 Tcache 链表。</font></p>
+<ul>
+<li><font style="background-color:#FFFFFF;">作用：记录对应链表中当前缓存了多少个空闲 chunk。本质上是一个整数</font></li>
+<li><strong><font style="background-color:#FFFFFF;">位置含义</font></strong><font style="background-color:#FFFFFF;">：counts[0] 对应大小为 0x20 的链表，counts[1] 对应 0x30……以此类推。counts[i] 的值为 0 到 7，表示对应链表里的 chunk 数量。</font></li>
+</ul>
+<hr>
+<h4 id="2-entries"><a href="#2-entries" class="headerlink" title="2. entries "></a><font style="background-color:#FFFFFF;">2. entries </font></h4><p><font style="background-color:#FFFFFF;">它也是一个数组，每个元素是一个指针，指向对应大小链表的第一个空闲 chunk。</font></p>
+<ul>
+<li><font style="background-color:#FFFFFF;">是每条 Tcache 单向链表的头指针。系统分配或回收 chunk 时，都是通过这个指针找到对应的链表。</font></li>
+<li><strong><font style="background-color:#FFFFFF;">类型</font></strong><font style="background-color:#FFFFFF;">：tcache_entry *，在 64 位系统下是 8 字节指针。</font></li>
+<li><strong><font style="background-color:#FFFFFF;">位置含义</font></strong><font style="background-color:#FFFFFF;">：entries[0] 指针指向大小为 0x20 的链表头部，entries[1] 指向大小为 0x30 的链表头部……如果某链表为空，对应的指针就是 NULL。</font></li>
+</ul>
+<h4 id="glibc-2-26-2-29"><a href="#glibc-2-26-2-29" class="headerlink" title="glibc 2.26-2.29"></a>glibc 2.26-2.29</h4><p>在早期的 glibc-2.26-2.29 版本中 tcache_perthread_struct 自身大小是 0x250。其 counts 元素类型为 uint8_t（1 字节），其结构体内容大小为 0x40(counts) + 0x200(entries)，实际大小还要加上 chunk 头，是 0x250。</p>
+<h4 id="glibc-2-30-及以上"><a href="#glibc-2-30-及以上" class="headerlink" title="glibc 2.30 及以上"></a>glibc 2.30 及以上</h4><p>由于 counts 元素类型变为 unit16_t 成为了 2 字节大小，对应结构体也就变成了 0x80 + 0x200 + 0x10 &#x3D; 0x290</p>
+<p><img src="/HFTTC.github.io/./img/0dJbSbkYuX_jLnuA/1777220121320-5d405e87-664b-44cc-9f1a-09d90946eb24-158648.png" alt="1777220121320-5d405e87-664b-44cc-9f1a-09d90946eb24.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">heap_base + <span class="number">0x00</span>   prev_size &amp; size          chunk_header</span><br><span class="line">heap_base + <span class="number">0x10</span>   count[<span class="number">0</span>]                  计数数组</span><br><span class="line">heap_base + <span class="number">0x90</span>   count[<span class="number">63</span>]                 <span class="number">64</span>*<span class="number">2</span> = <span class="number">0x80</span></span><br><span class="line">heap_base + <span class="number">0x290</span>  下一个堆块的header</span><br></pre></td></tr></table></figure>
+
+<h4 id="a-little-demo"><a href="#a-little-demo" class="headerlink" title="a little demo"></a>a little demo</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *ptr1,*ptr2,*ptr3;</span><br><span class="line">    ptr1=<span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    ptr2=<span class="built_in">malloc</span>(<span class="number">0x80</span>);</span><br><span class="line">    ptr3=<span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">    <span class="built_in">free</span>(ptr2);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="built_in">free</span>(ptr1);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/0dJbSbkYuX_jLnuA/1775651582536-ca2871da-66c2-4539-bc48-98f40cd66a94-884959.png" alt="1775651582536-ca2871da-66c2-4539-bc48-98f40cd66a94.png"></p>
+<p><img src="/HFTTC.github.io/./img/0dJbSbkYuX_jLnuA/1775651598478-21f22176-7ed7-458b-bad3-f40c31163f0b-568789.png" alt="1775651598478-21f22176-7ed7-458b-bad3-f40c31163f0b.png"><img src="/HFTTC.github.io/./img/0dJbSbkYuX_jLnuA/1775651620614-fa4a1de2-d630-4dd5-ab0c-af9328b47a0e-310965.png" alt="1775651620614-fa4a1de2-d630-4dd5-ab0c-af9328b47a0e.png"></p>
+<p>emmmm 结构体大概就是这么一回事儿，看看调试过程应该就可以理解。</p>
+<blockquote>
+<p>更新: 2026-04-27 00:30:36<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/yw8p14qr7wfoh8hz">https://www.yuque.com/idcm/wnemg9/yw8p14qr7wfoh8hz</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN2021初赛]lonelywolf" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="前一篇: [CISCN2021初赛]lonelywolf" title="前一篇: [CISCN2021初赛]lonelywolf"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [CISCN2021初赛]lonelywolf
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="栈迁移SROP" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/%E6%A0%88%E8%BF%81%E7%A7%BBSROP/" aria-label="后一篇: 栈迁移SROP"  title="后一篇: 栈迁移SROP"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          栈迁移SROP
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Tcache-perthread-corruption"><span class="toc-number">1.</span> <span class="toc-text">Tcache_perthread_corruption</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Tcache-perthread-corruption-%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">Tcache_perthread_corruption 概述</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#tcache-perthread-struct"><span class="toc-number">1.1.1.</span> <span class="toc-text">tcache_perthread_struct</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-counts"><span class="toc-number">1.1.2.</span> <span class="toc-text">1. counts </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-entries"><span class="toc-number">1.1.3.</span> <span class="toc-text">2. entries </span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#glibc-2-26-2-29"><span class="toc-number">1.1.4.</span> <span class="toc-text">glibc 2.26-2.29</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#glibc-2-30-%E5%8F%8A%E4%BB%A5%E4%B8%8A"><span class="toc-number">1.1.5.</span> <span class="toc-text">glibc 2.30 及以上</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#a-little-demo"><span class="toc-number">1.1.6.</span> <span class="toc-text">a little demo</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Tcache_perthread_corruption/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "Tcache_perthread_corruption参考资料：https://www.cnblogs.com/Theffth-blog/p/12790720.html Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地址的方法是泄露 unsortedbin 中的 fd 和 bk 指针。而在严格限制 chunk 大小的堆题当中，如果有 Tcachebin 机制的影响，我们必须先将 Tcachebin 填满才能把释放的 chunk 放入 UnSortedbi",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

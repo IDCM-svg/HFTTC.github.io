@@ -1,0 +1,569 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    内存空间的开辟与释放 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="内存空间的开辟与释放程序运行时的标准内存布局：代码段（.text )存放编译后的机器指令，只读，不可修改。CPU 会从这里读取指令执行 数据段（.data）已初始化的全局变量、静态变量。在程序运行前就分配好，生命周期是整个程序。 bss 段（.bss）存放未初始化的全局变量、静态变量。特点：系统自动清 0，在运行分配。 栈（stack）存放局部变量，函数参数，返回地址。自动分配自动释放。 堆（he">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存空间的开辟与释放">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="内存空间的开辟与释放程序运行时的标准内存布局：代码段（.text )存放编译后的机器指令，只读，不可修改。CPU 会从这里读取指令执行 数据段（.data）已初始化的全局变量、静态变量。在程序运行前就分配好，生命周期是整个程序。 bss 段（.bss）存放未初始化的全局变量、静态变量。特点：系统自动清 0，在运行分配。 栈（stack）存放局部变量，函数参数，返回地址。自动分配自动释放。 堆（he">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-28T10:25:56.965Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.387Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="内存空间的开辟与释放">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">内存空间的开辟与释放</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE"><span class="toc-number">1.</span> <span class="toc-text">内存空间的开辟与释放</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E6%97%B6%E7%9A%84%E6%A0%87%E5%87%86%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序运行时的标准内存布局：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E6%AE%B5%EF%BC%88-text"><span class="toc-number">1.1.1.</span> <span class="toc-text">代码段（.text )</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%AE%B5%EF%BC%88-data%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">数据段（.data）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bss-%E6%AE%B5%EF%BC%88-bss%EF%BC%89"><span class="toc-number">1.1.3.</span> <span class="toc-text">bss 段（.bss）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%EF%BC%88stack%EF%BC%89"><span class="toc-number">1.1.4.</span> <span class="toc-text">栈（stack）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%EF%BC%88heap%EF%BC%89"><span class="toc-number">1.1.5.</span> <span class="toc-text">堆（heap）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bin-%E7%9A%84%E5%88%86%E7%B1%BB%E4%BD%93%E7%B3%BB%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">bin 的分类体系：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tcache-bin%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">Tcache bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fast-bin%EF%BC%9A"><span class="toc-number">1.2.2.</span> <span class="toc-text">Fast bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSorted-bin%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">UnSorted bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Small-bin%EF%BC%9A"><span class="toc-number">1.2.4.</span> <span class="toc-text">Small bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Large-bin%EF%BC%9A"><span class="toc-number">1.2.5.</span> <span class="toc-text">Large bin：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%BC%80%E8%BE%9F%E7%A9%BA%E9%97%B4%E7%9A%84%E6%AD%A5%E9%AA%A4%EF%BC%9Amalloc"><span class="toc-number">1.3.</span> <span class="toc-text">程序开辟空间的步骤：malloc</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%A5%E5%8F%A3%E8%BD%AC%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">入口转换：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tchache-%E5%BF%AB%E9%80%9F%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.2.</span> <span class="toc-text">Tchache 快速检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.3.</span> <span class="toc-text">Fastbin 检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Smallbin-%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.4.</span> <span class="toc-text">Smallbin 检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSortedbin-%E5%A4%84%E7%90%86%EF%BC%9A"><span class="toc-number">1.3.5.</span> <span class="toc-text">UnSortedbin 处理：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Largebin-%E6%9F%A5%E6%89%BE%EF%BC%9A"><span class="toc-number">1.3.6.</span> <span class="toc-text">Largebin 查找：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Top-chunk-%E5%88%86%E9%85%8D%EF%BC%9A"><span class="toc-number">1.3.7.</span> <span class="toc-text">Top_chunk 分配：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%91%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%94%B3%E8%AF%B7%E7%A9%BA%E9%97%B4%EF%BC%88sysmalloc%EF%BC%89%EF%BC%9A"><span class="toc-number">1.3.8.</span> <span class="toc-text">向操作系统申请空间（sysmalloc）：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%EF%BC%9Afree"><span class="toc-number">1.4.</span> <span class="toc-text">释放内存空间：free</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%A5%E5%8F%A3%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.4.1.</span> <span class="toc-text">入口检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%84%E7%90%86-mmap-%E5%86%85%E5%AD%98%EF%BC%9A"><span class="toc-number">1.4.2.</span> <span class="toc-text">处理 mmap 内存：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">安全检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tchachebin-%E4%BC%98%E5%85%88%EF%BC%9A"><span class="toc-number">1.4.4.</span> <span class="toc-text">Tchachebin 优先：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-%E5%A4%84%E7%90%86%EF%BC%9A"><span class="toc-number">1.4.5.</span> <span class="toc-text">Fastbin 处理：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%88%E5%B9%B6%E4%B8%8E%E5%BD%92%E4%BD%8D%EF%BC%9A"><span class="toc-number">1.4.6.</span> <span class="toc-text">合并与归位：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8B%A5%E7%9B%B8%E9%82%BB-chunk-%E6%98%AF-top-chunk"><span class="toc-number">1.4.6.1.</span> <span class="toc-text">若相邻 chunk 是 top_chunk</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8B%A5%E7%9B%B8%E9%82%BB%E7%9A%84-chunk-%E7%A9%BA%E9%97%B2%E4%B8%94%E9%9D%9E-Top"><span class="toc-number">1.4.6.2.</span> <span class="toc-text">若相邻的 chunk 空闲且非 Top</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%92%E8%BF%98%E7%B3%BB%E7%BB%9F%EF%BC%9A"><span class="toc-number">1.4.7.</span> <span class="toc-text">归还系统：</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/内存空间的开辟与释放" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.965Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="内存空间的开辟与释放"><a href="#内存空间的开辟与释放" class="headerlink" title="内存空间的开辟与释放"></a>内存空间的开辟与释放</h1><h3 id="程序运行时的标准内存布局："><a href="#程序运行时的标准内存布局：" class="headerlink" title="程序运行时的标准内存布局："></a>程序运行时的标准内存布局：</h3><h4 id="代码段（-text"><a href="#代码段（-text" class="headerlink" title="代码段（.text )"></a>代码段（.text )</h4><p>存放编译后的机器指令，只读，不可修改。CPU 会从这里读取指令执行</p>
+<h4 id="数据段（-data）"><a href="#数据段（-data）" class="headerlink" title="数据段（.data）"></a>数据段（.data）</h4><p>已初始化的全局变量、静态变量。在程序运行前就分配好，生命周期是整个程序。</p>
+<h4 id="bss-段（-bss）"><a href="#bss-段（-bss）" class="headerlink" title="bss 段（.bss）"></a>bss 段（.bss）</h4><p>存放未初始化的全局变量、静态变量。特点：系统自动清 0，在运行分配。</p>
+<h4 id="栈（stack）"><a href="#栈（stack）" class="headerlink" title="栈（stack）"></a>栈（stack）</h4><p>存放局部变量，函数参数，返回地址。自动分配自动释放。</p>
+<h4 id="堆（heap）"><a href="#堆（heap）" class="headerlink" title="堆（heap）"></a>堆（heap）</h4><p>是程序员手动申请的动态内存，不连续、空间大、手动管理、易泄露</p>
+<h3 id="bin-的分类体系："><a href="#bin-的分类体系：" class="headerlink" title="bin 的分类体系："></a>bin 的分类体系：</h3><h4 id="Tcache-bin："><a href="#Tcache-bin：" class="headerlink" title="Tcache bin："></a>Tcache bin：</h4><ul>
+<li>大小范围：0x20-0x410</li>
+<li>单链表</li>
+<li>线程私有缓存，LIFO，几乎无 size 检查，版本要求 libc&gt;&#x3D;2.26</li>
+<li>tcache poisoning（修改 fd 实现任意地址分配）、tcache dup（多次释放同一块）、tcachehouse of spirit</li>
+</ul>
+<h4 id="Fast-bin："><a href="#Fast-bin：" class="headerlink" title="Fast bin："></a>Fast bin：</h4><ul>
+<li>大小范围：0x20-0x80</li>
+<li>单链表</li>
+<li>LIFO，不合并相邻空闲块，PREV_INUSE 位始终为 1，fastbin 会检查 size 位的大小</li>
+<li>double free、fastbin poisoning、house of spirit</li>
+</ul>
+<h4 id="UnSorted-bin："><a href="#UnSorted-bin：" class="headerlink" title="UnSorted bin："></a>UnSorted bin：</h4><ul>
+<li>大小范围：任意大小</li>
+<li>双链表</li>
+<li>除了 fastbin&amp;tcachebin，释放的 chunk 先进入这里，FIFO，分配时会遍历并切割或归类</li>
+<li>unsortedbin attack 修改 bk 写大数、利用 main_arena 泄露 libc 基地址</li>
+</ul>
+<h4 id="Small-bin："><a href="#Small-bin：" class="headerlink" title="Small bin："></a>Small bin：</h4><ul>
+<li>大小范围：&lt;0x400</li>
+<li>双链表</li>
+<li>FIFO，释放时前后合并</li>
+<li>house of lore</li>
+</ul>
+<h4 id="Large-bin："><a href="#Large-bin：" class="headerlink" title="Large bin："></a>Large bin：</h4><ul>
+<li>大小范围：&gt;&#x3D;0x400 </li>
+<li>双链表，包含 fd_nextsize&#x2F;bk_nextsize</li>
+<li>同一 bin 大小不固定，按照 Size 降序排列，LIFO</li>
+<li>largebin_attack 修改指针实现任意地址写</li>
+</ul>
+<h3 id="程序开辟空间的步骤：malloc"><a href="#程序开辟空间的步骤：malloc" class="headerlink" title="程序开辟空间的步骤：malloc"></a>程序开辟空间的步骤：malloc</h3><h4 id="入口转换："><a href="#入口转换：" class="headerlink" title="入口转换："></a>入口转换：</h4><p>__libc_malloc 将用户请求的 size 转换为内部 chunk 大小 ，获取当前现成的分配区 arena</p>
+<h4 id="Tchache-快速检查："><a href="#Tchache-快速检查：" class="headerlink" title="Tchache 快速检查："></a>Tchache 快速检查：</h4><p>在 libc&gt;&#x3D;2.26 时，如果 size 在 tcachebin 范围（0x20-0x410）且对应链表非空，直接从 tcachebin 当中取出 </p>
+<h4 id="Fastbin-检查："><a href="#Fastbin-检查：" class="headerlink" title="Fastbin 检查："></a>Fastbin 检查：</h4><p>如果对应 tcachebin 不符合标准，就检查 fastbin 范围（&lt;&#x3D;0x80）且对应链表非空，从 Fastbin 中取出</p>
+<h4 id="Smallbin-检查："><a href="#Smallbin-检查：" class="headerlink" title="Smallbin 检查："></a>Smallbin 检查：</h4><p>如果不符合 Fastbin，就检查 size 是否在 Smallbin 范围（&lt;0x400）且对应链表非空，从 smallbin 链尾取出</p>
+<h4 id="UnSortedbin-处理："><a href="#UnSortedbin-处理：" class="headerlink" title="UnSortedbin 处理："></a>UnSortedbin 处理：</h4><p>如果依旧不符合 Smallbin，就进入主循环，遍历 UnSortedbin 中的所有 chunk</p>
+<ul>
+<li>如果大小恰好等于 UnSortedbin 当中的 chunk，直接分配</li>
+<li>如果 UnSortedbin 大于请求内存，就切割一部分进行分配，剩余依旧放回 UnSortedbin</li>
+<li>如果 UnSortedbin 小于请求内存，即大小不匹配，就会将其从 UnSortedbin 当中移除，根据大小选择放入 Smallbin 或者 Largebin 当中。</li>
+</ul>
+<h4 id="Largebin-查找："><a href="#Largebin-查找：" class="headerlink" title="Largebin 查找："></a>Largebin 查找：</h4><p>利用 binmap 快速定位非空 Largebin，取出最小能满足的 chunk 进行切割分配，剩余的放入 UnSortedbin 当中</p>
+<h4 id="Top-chunk-分配："><a href="#Top-chunk-分配：" class="headerlink" title="Top_chunk 分配："></a>Top_chunk 分配：</h4><p>假如上述所有 bins 都未找到合适的空闲区块，检查 Top_chunk 剩余空间，若 Top_chunk 足够大，就从中切割一块并返回，其余部分依旧是 top_chunk</p>
+<h4 id="向操作系统申请空间（sysmalloc）："><a href="#向操作系统申请空间（sysmalloc）：" class="headerlink" title="向操作系统申请空间（sysmalloc）："></a>向操作系统申请空间（sysmalloc）：</h4><p>假如 Top_chunk 也不够用，就会调用 sysmalloc</p>
+<ul>
+<li>大内存：&gt;mmap_threshold 默认 128KB，直接使用 mmap 映射匿名内存，并设置 MMAP 标志</li>
+<li>主线程小内存：使用 brk 扩展堆顶，扩大 top_chunk 后再切割，若 brk 失败（如堆顶被 mmap 区域占据），则退化为 mmap</li>
+</ul>
+<h3 id="释放内存空间：free"><a href="#释放内存空间：free" class="headerlink" title="释放内存空间：free"></a>释放内存空间：free</h3><p>释放过程是分配过程的逆操作，核心是将内存块归还到合适的 bin 但这个，并可能触发合并甚至归还系统。</p>
+<h4 id="入口检查："><a href="#入口检查：" class="headerlink" title="入口检查："></a>入口检查：</h4><p>__libc_free 首先检查 __free_hook，然后通过 mem2chunk 将用户指针转回 chunk 指针 p</p>
+<h4 id="处理-mmap-内存："><a href="#处理-mmap-内存：" class="headerlink" title="处理 mmap 内存："></a>处理 mmap 内存：</h4><p>检查 chunk 的 MMAP 标志，若是由 mmap 分配的，调用 munmap_chunk 直接归还给操作系统</p>
+<h4 id="安全检查："><a href="#安全检查：" class="headerlink" title="安全检查："></a>安全检查：</h4><p>_int_free 进行对齐检查、size 合法性检查，并检测 double free</p>
+<h4 id="Tchachebin-优先："><a href="#Tchachebin-优先：" class="headerlink" title="Tchachebin 优先："></a>Tchachebin 优先：</h4><p>如果 Tcache 已启用且对应大小链表未满，将 chunk 放入 tcachebin 当中</p>
+<h4 id="Fastbin-处理："><a href="#Fastbin-处理：" class="headerlink" title="Fastbin 处理："></a>Fastbin 处理：</h4><p>如果 chunk 大小在 fastbin 范围内且未放入 tcachebin 当中，则插入对应 fastbin 链表头部</p>
+<h4 id="合并与归位："><a href="#合并与归位：" class="headerlink" title="合并与归位："></a>合并与归位：</h4><p>对于非 Fastbin&amp;Tcachebin 的 chunk，进行物理相邻合并：</p>
+<ul>
+<li>后向合并：检查低地址相邻 chunk，若空闲则从原链表中取出并合并</li>
+<li>前向合并：检查高地址相邻 chunk：</li>
+</ul>
+<h5 id="若相邻-chunk-是-top-chunk"><a href="#若相邻-chunk-是-top-chunk" class="headerlink" title="若相邻 chunk 是 top_chunk"></a>若相邻 chunk 是 top_chunk</h5><p>直接合并到 top_chunk 当中，释放结束。</p>
+<h5 id="若相邻的-chunk-空闲且非-Top"><a href="#若相邻的-chunk-空闲且非-Top" class="headerlink" title="若相邻的 chunk 空闲且非 Top"></a>若相邻的 chunk 空闲且非 Top</h5><p>从原链表中取出合并，然后将合并后的新 chunk 放入 UnSortedbin 中</p>
+<h4 id="归还系统："><a href="#归还系统：" class="headerlink" title="归还系统："></a>归还系统：</h4><p>若合并后的 Top_chunk 过大，会触发 malloc_consolidate 或者 systrim，尝试通过 brk 将部分内存归还给操作系统。</p>
+<blockquote>
+<p>更新: 2026-04-23 15:00:03<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/vogi00ckmfqd3ewq">https://www.yuque.com/idcm/wnemg9/vogi00ckmfqd3ewq</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="可见字符shellcode" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode/" aria-label="前一篇: 可见字符shellcode" title="前一篇: 可见字符shellcode"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            可见字符shellcode
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="关于是否进行栈对齐的分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E5%85%B3%E4%BA%8E%E6%98%AF%E5%90%A6%E8%BF%9B%E8%A1%8C%E6%A0%88%E5%AF%B9%E9%BD%90%E7%9A%84%E5%88%86%E6%9E%90/" aria-label="后一篇: 关于是否进行栈对齐的分析"  title="后一篇: 关于是否进行栈对齐的分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          关于是否进行栈对齐的分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE"><span class="toc-number">1.</span> <span class="toc-text">内存空间的开辟与释放</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E6%97%B6%E7%9A%84%E6%A0%87%E5%87%86%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序运行时的标准内存布局：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E6%AE%B5%EF%BC%88-text"><span class="toc-number">1.1.1.</span> <span class="toc-text">代码段（.text )</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%AE%B5%EF%BC%88-data%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">数据段（.data）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bss-%E6%AE%B5%EF%BC%88-bss%EF%BC%89"><span class="toc-number">1.1.3.</span> <span class="toc-text">bss 段（.bss）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%EF%BC%88stack%EF%BC%89"><span class="toc-number">1.1.4.</span> <span class="toc-text">栈（stack）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%EF%BC%88heap%EF%BC%89"><span class="toc-number">1.1.5.</span> <span class="toc-text">堆（heap）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bin-%E7%9A%84%E5%88%86%E7%B1%BB%E4%BD%93%E7%B3%BB%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">bin 的分类体系：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Tcache-bin%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">Tcache bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fast-bin%EF%BC%9A"><span class="toc-number">1.2.2.</span> <span class="toc-text">Fast bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSorted-bin%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">UnSorted bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Small-bin%EF%BC%9A"><span class="toc-number">1.2.4.</span> <span class="toc-text">Small bin：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Large-bin%EF%BC%9A"><span class="toc-number">1.2.5.</span> <span class="toc-text">Large bin：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%BC%80%E8%BE%9F%E7%A9%BA%E9%97%B4%E7%9A%84%E6%AD%A5%E9%AA%A4%EF%BC%9Amalloc"><span class="toc-number">1.3.</span> <span class="toc-text">程序开辟空间的步骤：malloc</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%A5%E5%8F%A3%E8%BD%AC%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">入口转换：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tchache-%E5%BF%AB%E9%80%9F%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.2.</span> <span class="toc-text">Tchache 快速检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.3.</span> <span class="toc-text">Fastbin 检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Smallbin-%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.3.4.</span> <span class="toc-text">Smallbin 检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UnSortedbin-%E5%A4%84%E7%90%86%EF%BC%9A"><span class="toc-number">1.3.5.</span> <span class="toc-text">UnSortedbin 处理：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Largebin-%E6%9F%A5%E6%89%BE%EF%BC%9A"><span class="toc-number">1.3.6.</span> <span class="toc-text">Largebin 查找：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Top-chunk-%E5%88%86%E9%85%8D%EF%BC%9A"><span class="toc-number">1.3.7.</span> <span class="toc-text">Top_chunk 分配：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%91%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%94%B3%E8%AF%B7%E7%A9%BA%E9%97%B4%EF%BC%88sysmalloc%EF%BC%89%EF%BC%9A"><span class="toc-number">1.3.8.</span> <span class="toc-text">向操作系统申请空间（sysmalloc）：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8A%E6%94%BE%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%EF%BC%9Afree"><span class="toc-number">1.4.</span> <span class="toc-text">释放内存空间：free</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%A5%E5%8F%A3%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.4.1.</span> <span class="toc-text">入口检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%84%E7%90%86-mmap-%E5%86%85%E5%AD%98%EF%BC%9A"><span class="toc-number">1.4.2.</span> <span class="toc-text">处理 mmap 内存：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%A3%80%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">安全检查：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tchachebin-%E4%BC%98%E5%85%88%EF%BC%9A"><span class="toc-number">1.4.4.</span> <span class="toc-text">Tchachebin 优先：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-%E5%A4%84%E7%90%86%EF%BC%9A"><span class="toc-number">1.4.5.</span> <span class="toc-text">Fastbin 处理：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%88%E5%B9%B6%E4%B8%8E%E5%BD%92%E4%BD%8D%EF%BC%9A"><span class="toc-number">1.4.6.</span> <span class="toc-text">合并与归位：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8B%A5%E7%9B%B8%E9%82%BB-chunk-%E6%98%AF-top-chunk"><span class="toc-number">1.4.6.1.</span> <span class="toc-text">若相邻 chunk 是 top_chunk</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8B%A5%E7%9B%B8%E9%82%BB%E7%9A%84-chunk-%E7%A9%BA%E9%97%B2%E4%B8%94%E9%9D%9E-Top"><span class="toc-number">1.4.6.2.</span> <span class="toc-text">若相邻的 chunk 空闲且非 Top</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%92%E8%BF%98%E7%B3%BB%E7%BB%9F%EF%BC%9A"><span class="toc-number">1.4.7.</span> <span class="toc-text">归还系统：</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "内存空间的开辟与释放",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE/",
+          excerpt: "",
+          description: "",
+          stripContent: "内存空间的开辟与释放程序运行时的标准内存布局：代码段（.text )存放编译后的机器指令，只读，不可修改。CPU 会从这里读取指令执行 数据段（.data）已初始化的全局变量、静态变量。在程序运行前就分配好，生命周期是整个程序。 bss 段（.bss）存放未初始化的全局变量、静态变量。特点：系统自动清 0，在运行分配。 栈（stack）存放局部变量，函数参数，返回地址。自动分配自动释放。 堆（heap）是程序员手动申请的动态内存，不连续、空间大、手动管理、易泄露 bin 的分类体系：Tcache",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

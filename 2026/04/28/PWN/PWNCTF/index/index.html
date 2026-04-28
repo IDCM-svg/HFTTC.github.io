@@ -1,0 +1,587 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="PWN CTF寄存器知识保存语雀笔记到本地pwndbg的使用程序员的基本素养pwn小知识库glibc-all-in-one_给程序修改libc简单栈溢出原理和攻击手段Shellcode利用原理及方法可见字符shellcoderet2textret2syscall ret2libc关于是否进行栈对齐的分析对于send和sendline的思考绕过防御之击败canary保护绕过防御之击败PIE保护格式化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="PWN CTF寄存器知识保存语雀笔记到本地pwndbg的使用程序员的基本素养pwn小知识库glibc-all-in-one_给程序修改libc简单栈溢出原理和攻击手段Shellcode利用原理及方法可见字符shellcoderet2textret2syscall ret2libc关于是否进行栈对齐的分析对于send和sendline的思考绕过防御之击败canary保护绕过防御之击败PIE保护格式化">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-28T10:25:56.910Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.377Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PWN-CTF"><span class="toc-number">1.</span> <span class="toc-text">PWN CTF</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">寄存器知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%9D%E5%AD%98%E8%AF%AD%E9%9B%80%E7%AC%94%E8%AE%B0%E5%88%B0%E6%9C%AC%E5%9C%B0"><span class="toc-number">1.2.</span> <span class="toc-text">保存语雀笔记到本地</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">1.3.</span> <span class="toc-text">pwndbg的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%B4%A0%E5%85%BB"><span class="toc-number">1.4.</span> <span class="toc-text">程序员的基本素养</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pwn%E5%B0%8F%E7%9F%A5%E8%AF%86%E5%BA%93"><span class="toc-number">1.5.</span> <span class="toc-text">pwn小知识库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#glibc-all-in-one-%E7%BB%99%E7%A8%8B%E5%BA%8F%E4%BF%AE%E6%94%B9libc"><span class="toc-number">1.6.</span> <span class="toc-text">glibc-all-in-one_给程序修改libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BA%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E6%89%8B%E6%AE%B5"><span class="toc-number">1.7.</span> <span class="toc-text">简单栈溢出原理和攻击手段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shellcode%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%B9%E6%B3%95"><span class="toc-number">1.8.</span> <span class="toc-text">Shellcode利用原理及方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode"><span class="toc-number">1.9.</span> <span class="toc-text">可见字符shellcode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2textret2syscall-ret2libc"><span class="toc-number">1.10.</span> <span class="toc-text">ret2textret2syscall ret2libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E6%98%AF%E5%90%A6%E8%BF%9B%E8%A1%8C%E6%A0%88%E5%AF%B9%E9%BD%90%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-number">1.11.</span> <span class="toc-text">关于是否进行栈对齐的分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83"><span class="toc-number">1.12.</span> <span class="toc-text">对于send和sendline的思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.13.</span> <span class="toc-text">绕过防御之击败canary保护</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.14.</span> <span class="toc-text">绕过防御之击败PIE保护</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.15.</span> <span class="toc-text">格式化字符串利用方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.16.</span> <span class="toc-text">特殊的栈溢出-整数溢出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%88%E4%BF%9D%E6%8A%A4%E5%85%A8%E5%BC%80%E7%9A%84%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95-%E4%BE%8B"><span class="toc-number">1.17.</span> <span class="toc-text">栈保护全开的攻击手法(例)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#One-gadgets"><span class="toc-number">1.18.</span> <span class="toc-text">One-gadgets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.19.</span> <span class="toc-text">栈迁移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2csucsu-%E9%93%BE%E5%88%A9%E7%94%A8"><span class="toc-number">1.20.</span> <span class="toc-text">ret2csucsu 链利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.21.</span> <span class="toc-text">一些常用函数的调用总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SeccompOrw%E8%AF%BB%E5%86%99%E6%9D%83%E9%99%90%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-number">1.22.</span> <span class="toc-text">SeccompOrw读写权限漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFFork"><span class="toc-number">1.23.</span> <span class="toc-text">什么是Fork</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSPLeak-libc2-27"><span class="toc-number">1.24.</span> <span class="toc-text">SSPLeak _ libc2.27</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#environ%E5%88%A9%E7%94%A8"><span class="toc-number">1.25.</span> <span class="toc-text">environ利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#libc-start-main"><span class="toc-number">1.26.</span> <span class="toc-text">libc_start_main</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.27.</span> <span class="toc-text">SROP利用技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.28.</span> <span class="toc-text">条件竞争漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#dl-runtime-resolve%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.29.</span> <span class="toc-text">dl_runtime_resolve动态链接重定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%80%94BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.30.</span> <span class="toc-text">—BROP利用技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8%E7%9A%84%E6%80%BB%E7%BB%93%E2%80%93"><span class="toc-number">1.31.</span> <span class="toc-text">堆利用的总结–_</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8-glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.32.</span> <span class="toc-text">堆利用_glibc内存管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE"><span class="toc-number">1.33.</span> <span class="toc-text">内存空间的开辟与释放</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-%E7%B3%BB%E5%88%97%E6%80%BB%E7%BB%93"><span class="toc-number">1.34.</span> <span class="toc-text">Houseof 系列总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UAF-useafter-free"><span class="toc-number">1.35.</span> <span class="toc-text">UAF_useafter free</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FastbinDOUBLE-FREE"><span class="toc-number">1.36.</span> <span class="toc-text">FastbinDOUBLE FREE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbinMisalignment-Attack-%E9%94%99%E4%BD%8D%E4%BC%AA%E9%80%A0-chunk"><span class="toc-number">1.37.</span> <span class="toc-text">fastbinMisalignment Attack 错位伪造 chunk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8"><span class="toc-number">1.38.</span> <span class="toc-text">Off-By-One漏洞原理及利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA"><span class="toc-number">1.39.</span> <span class="toc-text">对于got和hook的讨论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Heap%E4%B8%8E-Bins-%E5%91%BD%E4%BB%A4"><span class="toc-number">1.40.</span> <span class="toc-text">Heap与 Bins 命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ChunkExtend-Overlapping"><span class="toc-number">1.41.</span> <span class="toc-text">ChunkExtend &amp; Overlapping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89"><span class="toc-number">1.42.</span> <span class="toc-text">Unlink漏洞原理及利用（Unsortedbin）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#House-of-Spirit%EF%BC%88FastbinAttack%EF%BC%89"><span class="toc-number">1.43.</span> <span class="toc-text">House_of_Spirit（FastbinAttack）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Alloc-to-Stack-ArbitaryAlloc"><span class="toc-number">1.44.</span> <span class="toc-text">Alloc_to_Stack&amp;ArbitaryAlloc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HouseOf-Force%EF%BC%88topchunk%EF%BC%89"><span class="toc-number">1.45.</span> <span class="toc-text">HouseOf Force（topchunk）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UnsortedbinAttack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.46.</span> <span class="toc-text">UnsortedbinAttack 基本介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UnSortedbin-leak-libc-base"><span class="toc-number">1.47.</span> <span class="toc-text">UnSortedbin_leak_libc_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main-arena%E7%BB%93%E6%9E%84"><span class="toc-number">1.48.</span> <span class="toc-text">main_arena结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SmallbinAttack"><span class="toc-number">1.49.</span> <span class="toc-text">SmallbinAttack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LargebinAttack"><span class="toc-number">1.50.</span> <span class="toc-text">LargebinAttack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="toc-number">1.51.</span> <span class="toc-text">__IO_FILE结构分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E4%B9%8BFSOP%E9%93%BE"><span class="toc-number">1.52.</span> <span class="toc-text">__IO_FILE之FSOP链</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E4%BC%AA%E9%80%A0vtable%E5%8A%AB%E6%8C%81"><span class="toc-number">1.53.</span> <span class="toc-text">__IO_FILE伪造vtable劫持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Orange-glibc-2-23"><span class="toc-number">1.54.</span> <span class="toc-text">Houseof Orange glibc-2.23</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Orange-%E5%8E%9F%E7%90%86"><span class="toc-number">1.55.</span> <span class="toc-text">Houseof Orange 原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TcachebinAttack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.56.</span> <span class="toc-text">TcachebinAttack 基本介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tcachedup"><span class="toc-number">1.57.</span> <span class="toc-text">Tcachedup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TcachePoisoning"><span class="toc-number">1.58.</span> <span class="toc-text">TcachePoisoning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tcache-perthread-corruption"><span class="toc-number">1.59.</span> <span class="toc-text">Tcache_perthread_corruption</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#glibc-2-35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6"><span class="toc-number">1.60.</span> <span class="toc-text">glibc-2.35新增保护机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%E8%AE%A1%E7%AE%97main-arena%E5%92%8Cenviron%E4%B9%8B%E9%97%B4%E7%9A%84%E5%81%8F%E7%A7%BB"><span class="toc-number">1.61.</span> <span class="toc-text">两种方法计算main_arena和environ之间的偏移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#realloc-hook%E5%8A%AB%E6%8C%81%E7%AF%A1%E6%94%B9-gadgets"><span class="toc-number">1.62.</span> <span class="toc-text">__realloc_hook劫持篡改 gadgets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Apple2-libc-2-35"><span class="toc-number">1.63.</span> <span class="toc-text">Houseof Apple2 libc-2.35</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-2-1-stdout%E6%B3%84%E9%9C%B2libc"><span class="toc-number">1.64.</span> <span class="toc-text">_IO_2_1_stdout泄露libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Roman"><span class="toc-number">1.65.</span> <span class="toc-text">Houseof Roman</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#malloc-stateHijacking-%E5%8A%AB%E6%8C%81"><span class="toc-number">1.66.</span> <span class="toc-text">malloc_stateHijacking 劫持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SetContentShellcode"><span class="toc-number">1.67.</span> <span class="toc-text">SetContentShellcode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SetContentORW-libc-2-27"><span class="toc-number">1.68.</span> <span class="toc-text">SetContentORW libc-2.27</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Einherjar"><span class="toc-number">1.69.</span> <span class="toc-text">Houseof Einherjar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Botcake"><span class="toc-number">1.70.</span> <span class="toc-text">Houseof Botcake</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseof-Kiwi"><span class="toc-number">1.71.</span> <span class="toc-text">IO利用之Houseof Kiwi</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseof-Emma"><span class="toc-number">1.72.</span> <span class="toc-text">IO利用之Houseof Emma</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Pig"><span class="toc-number">1.73.</span> <span class="toc-text">Houseof Pig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Cat"><span class="toc-number">1.74.</span> <span class="toc-text">Houseof Cat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Banana"><span class="toc-number">1.75.</span> <span class="toc-text">Houseof Banana</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Rabbit"><span class="toc-number">1.76.</span> <span class="toc-text">Houseof Rabbit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ARMpwn"><span class="toc-number">1.77.</span> <span class="toc-text">ARMpwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MipsPwn"><span class="toc-number">1.78.</span> <span class="toc-text">MipsPwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RustPwn"><span class="toc-number">1.79.</span> <span class="toc-text">RustPwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VMpwn-%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%80%83%E9%80%B8"><span class="toc-number">1.80.</span> <span class="toc-text">VMpwn-虚拟机逃逸</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.910Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="PWN-CTF"><a href="#PWN-CTF" class="headerlink" title="PWN CTF"></a>PWN CTF</h1><h2 id="寄存器知识"><a href="#寄存器知识" class="headerlink" title="寄存器知识"></a><a href="%E5%AF%84%E5%AD%98%E5%99%A8%E7%9F%A5%E8%AF%86.md">寄存器知识</a></h2><h2 id="保存语雀笔记到本地"><a href="#保存语雀笔记到本地" class="headerlink" title="保存语雀笔记到本地"></a><a href="%E4%BF%9D%E5%AD%98%E8%AF%AD%E9%9B%80%E7%AC%94%E8%AE%B0%E5%88%B0%E6%9C%AC%E5%9C%B0.md">保存语雀笔记到本地</a></h2><h2 id="pwndbg的使用"><a href="#pwndbg的使用" class="headerlink" title="pwndbg的使用"></a><a href="pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8.md">pwndbg的使用</a></h2><h2 id="程序员的基本素养"><a href="#程序员的基本素养" class="headerlink" title="程序员的基本素养"></a><a href="%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%B4%A0%E5%85%BB.md">程序员的基本素养</a></h2><h2 id="pwn小知识库"><a href="#pwn小知识库" class="headerlink" title="pwn小知识库"></a><a href="pwn%E5%B0%8F%E7%9F%A5%E8%AF%86%E5%BA%93.md">pwn小知识库</a></h2><h2 id="glibc-all-in-one-给程序修改libc"><a href="#glibc-all-in-one-给程序修改libc" class="headerlink" title="glibc-all-in-one_给程序修改libc"></a><a href="glibc-all-in-one_%E7%BB%99%E7%A8%8B%E5%BA%8F%E4%BF%AE%E6%94%B9libc.md">glibc-all-in-one_给程序修改libc</a></h2><h2 id="简单栈溢出原理和攻击手段"><a href="#简单栈溢出原理和攻击手段" class="headerlink" title="简单栈溢出原理和攻击手段"></a><a href="%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BA%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E6%89%8B%E6%AE%B5.md">简单栈溢出原理和攻击手段</a></h2><h2 id="Shellcode利用原理及方法"><a href="#Shellcode利用原理及方法" class="headerlink" title="Shellcode利用原理及方法"></a><a href="Shellcode%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%B9%E6%B3%95.md">Shellcode利用原理及方法</a></h2><h2 id="可见字符shellcode"><a href="#可见字符shellcode" class="headerlink" title="可见字符shellcode"></a><a href="%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode.md">可见字符shellcode</a></h2><h2 id="ret2textret2syscall-ret2libc"><a href="#ret2textret2syscall-ret2libc" class="headerlink" title="ret2textret2syscall ret2libc"></a><a href="ret2textret2syscallret2libc.md">ret2textret2syscall ret2libc</a></h2><h2 id="关于是否进行栈对齐的分析"><a href="#关于是否进行栈对齐的分析" class="headerlink" title="关于是否进行栈对齐的分析"></a><a href="%E5%85%B3%E4%BA%8E%E6%98%AF%E5%90%A6%E8%BF%9B%E8%A1%8C%E6%A0%88%E5%AF%B9%E9%BD%90%E7%9A%84%E5%88%86%E6%9E%90.md">关于是否进行栈对齐的分析</a></h2><h2 id="对于send和sendline的思考"><a href="#对于send和sendline的思考" class="headerlink" title="对于send和sendline的思考"></a><a href="%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83.md">对于send和sendline的思考</a></h2><h2 id="绕过防御之击败canary保护"><a href="#绕过防御之击败canary保护" class="headerlink" title="绕过防御之击败canary保护"></a><a href="%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4.md">绕过防御之击败canary保护</a></h2><h2 id="绕过防御之击败PIE保护"><a href="#绕过防御之击败PIE保护" class="headerlink" title="绕过防御之击败PIE保护"></a><a href="%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4.md">绕过防御之击败PIE保护</a></h2><h2 id="格式化字符串利用方式"><a href="#格式化字符串利用方式" class="headerlink" title="格式化字符串利用方式"></a><a href="%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/index.md">格式化字符串利用方式</a></h2><ul>
+<li><a href="%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/axb_2019_fmt64(%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%8D%95%E5%AD%97%E8%8A%82%E4%BF%AE%E6%94%B9--_x00%E6%88%AA%E6%96%AD%EF%BC%89.md">axb_2019_fmt64(格式化单字节修改–_x00截断）</a></li>
+<li><a href="%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/fmtstr__%5BHDCTF2023%5DMinions.md">fmtstr__[HDCTF2023]Minions</a></li>
+</ul>
+<h2 id="特殊的栈溢出-整数溢出"><a href="#特殊的栈溢出-整数溢出" class="headerlink" title="特殊的栈溢出-整数溢出"></a><a href="%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA.md">特殊的栈溢出-整数溢出</a></h2><h2 id="栈保护全开的攻击手法-例"><a href="#栈保护全开的攻击手法-例" class="headerlink" title="栈保护全开的攻击手法(例)"></a><a href="%E6%A0%88%E4%BF%9D%E6%8A%A4%E5%85%A8%E5%BC%80%E7%9A%84%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95(%E4%BE%8B).md">栈保护全开的攻击手法(例)</a></h2><h2 id="One-gadgets"><a href="#One-gadgets" class="headerlink" title="One-gadgets"></a><a href="One-gadgets.md">One-gadgets</a></h2><h2 id="栈迁移"><a href="#栈迁移" class="headerlink" title="栈迁移"></a><a href="%E6%A0%88%E8%BF%81%E7%A7%BB/index.md">栈迁移</a></h2><ul>
+<li><a href="%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90.md">栈迁移利用方法分析</a></li>
+<li><a href="%E6%A0%88%E8%BF%81%E7%A7%BB/%5BHDCTF2023%5DMakewish.md">[HDCTF2023]Makewish</a></li>
+</ul>
+<h2 id="ret2csucsu-链利用"><a href="#ret2csucsu-链利用" class="headerlink" title="ret2csucsu 链利用"></a><a href="ret2csucsu%E9%93%BE%E5%88%A9%E7%94%A8/index.md">ret2csucsu 链利用</a></h2><ul>
+<li><a href="ret2csucsu%E9%93%BE%E5%88%A9%E7%94%A8/%5BSWPUCTF2024%E7%A7%8B%E5%AD%A3%E6%96%B0%E7%94%9F%E8%B5%9B%5D%E5%87%BA%E9%A2%98%E4%BA%BA%E4%BD%A0%E5%88%B0%E5%BA%95%E5%B9%B2%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F.md">[SWPUCTF2024 秋季新生赛]出题人你到底干了什么？</a></li>
+</ul>
+<h2 id="一些常用函数的调用总结"><a href="#一些常用函数的调用总结" class="headerlink" title="一些常用函数的调用总结"></a><a href="%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E6%80%BB%E7%BB%93.md">一些常用函数的调用总结</a></h2><h2 id="SeccompOrw读写权限漏洞利用"><a href="#SeccompOrw读写权限漏洞利用" class="headerlink" title="SeccompOrw读写权限漏洞利用"></a><a href="SeccompOrw%E8%AF%BB%E5%86%99%E6%9D%83%E9%99%90%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/index.md">SeccompOrw读写权限漏洞利用</a></h2><ul>
+<li><a href="SeccompOrw%E8%AF%BB%E5%86%99%E6%9D%83%E9%99%90%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/pwnable.tworw%E4%BE%8B%E9%A2%98.md">pwnable.tworw 例题</a></li>
+<li><a href="SeccompOrw%E8%AF%BB%E5%86%99%E6%9D%83%E9%99%90%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/%5BSWPUCTF2024%E7%A7%8B%E5%AD%A3%E6%96%B0%E7%94%9F%E8%B5%9B%5D%E4%B8%8D%E5%8F%AF%E5%90%8D%E7%8A%B6%E7%9A%84%E4%B8%9C%E8%A5%BF.md">[SWPUCTF2024 秋季新生赛]不可名状的东西</a></li>
+</ul>
+<h2 id="什么是Fork"><a href="#什么是Fork" class="headerlink" title="什么是Fork"></a><a href="%E4%BB%80%E4%B9%88%E6%98%AFFork.md">什么是Fork</a></h2><h2 id="SSPLeak-libc2-27"><a href="#SSPLeak-libc2-27" class="headerlink" title="SSPLeak _ libc2.27"></a><a href="SSPLeak_libc2.27.md">SSPLeak _ libc2.27</a></h2><h2 id="environ利用"><a href="#environ利用" class="headerlink" title="environ利用"></a><a href="environ%E5%88%A9%E7%94%A8/index.md">environ利用</a></h2><ul>
+<li><a href="environ%E5%88%A9%E7%94%A8/SSPLeak&Fork.md">SSPLeak &amp; Fork</a></li>
+</ul>
+<h2 id="libc-start-main"><a href="#libc-start-main" class="headerlink" title="libc_start_main"></a><a href="libc_start_main.md">libc_start_main</a></h2><h2 id="SROP利用技巧"><a href="#SROP利用技巧" class="headerlink" title="SROP利用技巧"></a><a href="SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/index.md">SROP利用技巧</a></h2><ul>
+<li><a href="SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/SROP%E9%93%BE%E5%88%A9%E7%94%A8.md">SROP链利用</a></li>
+<li><a href="SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/%E6%A0%88%E8%BF%81%E7%A7%BBSROP.md">栈迁移SROP</a></li>
+<li><a href="SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/ORW+%E6%A0%88%E8%BF%81%E7%A7%BBSROP.md">ORW+栈迁移SROP</a></li>
+</ul>
+<h2 id="条件竞争漏洞"><a href="#条件竞争漏洞" class="headerlink" title="条件竞争漏洞"></a><a href="%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/index.md">条件竞争漏洞</a></h2><ul>
+<li><a href="%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/%5BNepCTF2025%5Dtime%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A0%88.md">[NepCTF2025] time 多线程栈</a></li>
+</ul>
+<h2 id="dl-runtime-resolve动态链接重定位"><a href="#dl-runtime-resolve动态链接重定位" class="headerlink" title="dl_runtime_resolve动态链接重定位"></a><a href="dl_runtime_resolve%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E4%BD%8D.md">dl_runtime_resolve动态链接重定位</a></h2><h2 id="—BROP利用技巧"><a href="#—BROP利用技巧" class="headerlink" title="—BROP利用技巧"></a><a href="---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/index.md">—BROP利用技巧</a></h2><ul>
+<li><a href="---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/---BlindROP%E7%9B%B2%E6%89%93%E4%BE%8B%E9%A2%98.md">—BlindROP盲打例题</a></li>
+</ul>
+<h2 id="堆利用的总结–"><a href="#堆利用的总结–" class="headerlink" title="堆利用的总结–_"></a><a href="%E5%A0%86%E5%88%A9%E7%94%A8%E7%9A%84%E6%80%BB%E7%BB%93--_.md">堆利用的总结–_</a></h2><h2 id="堆利用-glibc内存管理"><a href="#堆利用-glibc内存管理" class="headerlink" title="堆利用_glibc内存管理"></a><a href="%E5%A0%86%E5%88%A9%E7%94%A8_glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md">堆利用_glibc内存管理</a></h2><h2 id="内存空间的开辟与释放"><a href="#内存空间的开辟与释放" class="headerlink" title="内存空间的开辟与释放"></a><a href="%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE.md">内存空间的开辟与释放</a></h2><h2 id="Houseof-系列总结"><a href="#Houseof-系列总结" class="headerlink" title="Houseof 系列总结"></a><a href="Houseof%E7%B3%BB%E5%88%97%E6%80%BB%E7%BB%93.md">Houseof 系列总结</a></h2><h2 id="UAF-useafter-free"><a href="#UAF-useafter-free" class="headerlink" title="UAF_useafter free"></a><a href="UAF_useafterfree/index.md">UAF_useafter free</a></h2><ul>
+<li><a href="UAF_useafterfree/UseAfterFree%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90.md">UseAfter Free 例题分析</a></li>
+</ul>
+<h2 id="FastbinDOUBLE-FREE"><a href="#FastbinDOUBLE-FREE" class="headerlink" title="FastbinDOUBLE FREE"></a><a href="FastbinDOUBLEFREE.md">FastbinDOUBLE FREE</a></h2><h2 id="fastbinMisalignment-Attack-错位伪造-chunk"><a href="#fastbinMisalignment-Attack-错位伪造-chunk" class="headerlink" title="fastbinMisalignment Attack 错位伪造 chunk"></a><a href="fastbinMisalignmentAttack%E9%94%99%E4%BD%8D%E4%BC%AA%E9%80%A0chunk.md">fastbinMisalignment Attack 错位伪造 chunk</a></h2><h2 id="Off-By-One漏洞原理及利用"><a href="#Off-By-One漏洞原理及利用" class="headerlink" title="Off-By-One漏洞原理及利用"></a><a href="Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/index.md">Off-By-One漏洞原理及利用</a></h2><ul>
+<li><a href="Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-ONE%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90.md">OFF-BY-ONE例题分析</a></li>
+<li><a href="Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-NULLTcachebin.md">OFF-BY-NULLTcachebin</a></li>
+</ul>
+<h2 id="对于got和hook的讨论"><a href="#对于got和hook的讨论" class="headerlink" title="对于got和hook的讨论"></a><a href="%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA.md">对于got和hook的讨论</a></h2><h2 id="Heap与-Bins-命令"><a href="#Heap与-Bins-命令" class="headerlink" title="Heap与 Bins 命令"></a><a href="Heap%E4%B8%8EBins%E5%91%BD%E4%BB%A4.md">Heap与 Bins 命令</a></h2><h2 id="ChunkExtend-Overlapping"><a href="#ChunkExtend-Overlapping" class="headerlink" title="ChunkExtend &amp; Overlapping"></a><a href="ChunkExtend&Overlapping/index.md">ChunkExtend &amp; Overlapping</a></h2><ul>
+<li><a href="ChunkExtend&Overlapping/Overlap2.23libc%E4%BE%8B%E9%A2%98.md">Overlap2.23libc 例题</a></li>
+</ul>
+<h2 id="Unlink漏洞原理及利用（Unsortedbin）"><a href="#Unlink漏洞原理及利用（Unsortedbin）" class="headerlink" title="Unlink漏洞原理及利用（Unsortedbin）"></a><a href="Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/index.md">Unlink漏洞原理及利用（Unsortedbin）</a></h2><ul>
+<li><a href="Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90.md">Unlink例题分析</a></li>
+</ul>
+<h2 id="House-of-Spirit（FastbinAttack）"><a href="#House-of-Spirit（FastbinAttack）" class="headerlink" title="House_of_Spirit（FastbinAttack）"></a><a href="House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/index.md">House_of_Spirit（FastbinAttack）</a></h2><ul>
+<li><a href="House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/LCTF_2016Pwn200.md">LCTF_2016Pwn200</a></li>
+<li><a href="House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/libc-2.35.md">libc-2.35</a></li>
+</ul>
+<h2 id="Alloc-to-Stack-ArbitaryAlloc"><a href="#Alloc-to-Stack-ArbitaryAlloc" class="headerlink" title="Alloc_to_Stack&amp;ArbitaryAlloc"></a><a href="Alloc_to_Stack&ArbitaryAlloc.md">Alloc_to_Stack&amp;ArbitaryAlloc</a></h2><h2 id="HouseOf-Force（topchunk）"><a href="#HouseOf-Force（topchunk）" class="headerlink" title="HouseOf Force（topchunk）"></a><a href="HouseOfForce%EF%BC%88topchunk%EF%BC%89/index.md">HouseOf Force（topchunk）</a></h2><ul>
+<li><a href="HouseOfForce%EF%BC%88topchunk%EF%BC%89/HouseOfForce%E4%BE%8B%E9%A2%98.md">HouseOf Force 例题</a></li>
+</ul>
+<h2 id="UnsortedbinAttack-基本介绍"><a href="#UnsortedbinAttack-基本介绍" class="headerlink" title="UnsortedbinAttack 基本介绍"></a><a href="UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/index.md">UnsortedbinAttack 基本介绍</a></h2><ul>
+<li><a href="UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90.md">UnSortedbinAttack 例题分析</a></li>
+</ul>
+<h2 id="UnSortedbin-leak-libc-base"><a href="#UnSortedbin-leak-libc-base" class="headerlink" title="UnSortedbin_leak_libc_base"></a><a href="UnSortedbin_leak_libc_base.md">UnSortedbin_leak_libc_base</a></h2><h2 id="main-arena结构"><a href="#main-arena结构" class="headerlink" title="main_arena结构"></a><a href="main_arena%E7%BB%93%E6%9E%84.md">main_arena结构</a></h2><h2 id="SmallbinAttack"><a href="#SmallbinAttack" class="headerlink" title="SmallbinAttack"></a><a href="SmallbinAttack/index.md">SmallbinAttack</a></h2><ul>
+<li><a href="SmallbinAttack/HouseOfLore.md">HouseOf Lore</a></li>
+</ul>
+<h2 id="LargebinAttack"><a href="#LargebinAttack" class="headerlink" title="LargebinAttack"></a><a href="LargebinAttack/index.md">LargebinAttack</a></h2><ul>
+<li><a href="LargebinAttack/0ctf_2018_heapstorm2.md">0ctf_2018_heapstorm2</a></li>
+</ul>
+<h2 id="IO-FILE结构分析"><a href="#IO-FILE结构分析" class="headerlink" title="__IO_FILE结构分析"></a><a href="__IO_FILE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90.md">__IO_FILE结构分析</a></h2><h2 id="IO-FILE之FSOP链"><a href="#IO-FILE之FSOP链" class="headerlink" title="__IO_FILE之FSOP链"></a><a href="__IO_FILE%E4%B9%8BFSOP%E9%93%BE.md">__IO_FILE之FSOP链</a></h2><h2 id="IO-FILE伪造vtable劫持"><a href="#IO-FILE伪造vtable劫持" class="headerlink" title="__IO_FILE伪造vtable劫持"></a><a href="__IO_FILE%E4%BC%AA%E9%80%A0vtable%E5%8A%AB%E6%8C%81.md">__IO_FILE伪造vtable劫持</a></h2><h2 id="Houseof-Orange-glibc-2-23"><a href="#Houseof-Orange-glibc-2-23" class="headerlink" title="Houseof Orange glibc-2.23"></a><a href="HouseofOrangeglibc-2.23/index.md">Houseof Orange glibc-2.23</a></h2><ul>
+<li><a href="HouseofOrangeglibc-2.23/houseoforange_hitcon_2016.md">houseoforange_hitcon_2016</a></li>
+</ul>
+<h2 id="Houseof-Orange-原理"><a href="#Houseof-Orange-原理" class="headerlink" title="Houseof Orange 原理"></a><a href="HouseofOrange%E5%8E%9F%E7%90%86.md">Houseof Orange 原理</a></h2><h2 id="TcachebinAttack-基本介绍"><a href="#TcachebinAttack-基本介绍" class="headerlink" title="TcachebinAttack 基本介绍"></a><a href="TcachebinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D.md">TcachebinAttack 基本介绍</a></h2><h2 id="Tcachedup"><a href="#Tcachedup" class="headerlink" title="Tcachedup"></a><a href="Tcachedup.md">Tcachedup</a></h2><h2 id="TcachePoisoning"><a href="#TcachePoisoning" class="headerlink" title="TcachePoisoning"></a><a href="TcachePoisoning.md">TcachePoisoning</a></h2><h2 id="Tcache-perthread-corruption"><a href="#Tcache-perthread-corruption" class="headerlink" title="Tcache_perthread_corruption"></a><a href="Tcache_perthread_corruption/index.md">Tcache_perthread_corruption</a></h2><ul>
+<li><a href="Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf.md">[CISCN2021 初赛]lonelywolf</a></li>
+</ul>
+<h2 id="glibc-2-35新增保护机制"><a href="#glibc-2-35新增保护机制" class="headerlink" title="glibc-2.35新增保护机制"></a><a href="glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/index.md">glibc-2.35新增保护机制</a></h2><ul>
+<li><a href="glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88).md">[ISCC2024] chaos_plus(堆栈结合)</a></li>
+<li><a href="glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/glibc-2.32malloc()_unalignedtcachechunkdetected.md">glibc-2.32malloc()_ unaligned tcache chunk detected</a></li>
+</ul>
+<h2 id="两种方法计算main-arena和environ之间的偏移"><a href="#两种方法计算main-arena和environ之间的偏移" class="headerlink" title="两种方法计算main_arena和environ之间的偏移"></a><a href="%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%E8%AE%A1%E7%AE%97main_arena%E5%92%8Cenviron%E4%B9%8B%E9%97%B4%E7%9A%84%E5%81%8F%E7%A7%BB.md">两种方法计算main_arena和environ之间的偏移</a></h2><h2 id="realloc-hook劫持篡改-gadgets"><a href="#realloc-hook劫持篡改-gadgets" class="headerlink" title="__realloc_hook劫持篡改 gadgets"></a><a href="__realloc_hook%E5%8A%AB%E6%8C%81%E7%AF%A1%E6%94%B9gadgets.md">__realloc_hook劫持篡改 gadgets</a></h2><h2 id="Houseof-Apple2-libc-2-35"><a href="#Houseof-Apple2-libc-2-35" class="headerlink" title="Houseof Apple2 libc-2.35"></a><a href="HouseofApple2libc-2.35/index.md">Houseof Apple2 libc-2.35</a></h2><ul>
+<li><a href="HouseofApple2libc-2.35/LitCTF2024heap-2.35.md">LitCTF2024heap-2.35</a></li>
+</ul>
+<h2 id="IO-2-1-stdout泄露libc"><a href="#IO-2-1-stdout泄露libc" class="headerlink" title="_IO_2_1_stdout泄露libc"></a><a href="_IO_2_1_stdout%E6%B3%84%E9%9C%B2libc/index.md">_IO_2_1_stdout泄露libc</a></h2><ul>
+<li><a href="_IO_2_1_stdout%E6%B3%84%E9%9C%B2libc/%5B2021%E9%95%BF%E5%9F%8E%E6%9D%AF%5DK1ng_in_h3Ap_I.md">[2021长城杯 ]K1ng_in_h3Ap_I</a></li>
+</ul>
+<h2 id="Houseof-Roman"><a href="#Houseof-Roman" class="headerlink" title="Houseof Roman"></a><a href="HouseofRoman/index.md">Houseof Roman</a></h2><ul>
+<li><a href="HouseofRoman/npuctf_2020_bad_guy.md">npuctf_2020_bad_guy</a></li>
+<li><a href="HouseofRoman/de1ctf_2019_weapon.md">de1ctf_2019_weapon</a></li>
+</ul>
+<h2 id="malloc-stateHijacking-劫持"><a href="#malloc-stateHijacking-劫持" class="headerlink" title="malloc_stateHijacking 劫持"></a><a href="malloc_stateHijacking%E5%8A%AB%E6%8C%81/index.md">malloc_stateHijacking 劫持</a></h2><ul>
+<li><a href="malloc_stateHijacking%E5%8A%AB%E6%8C%81/%5BISCC2024%5Dshopping%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86libc-2.31.md">[ISCC2024] shopping 多线程堆 libc-2.31</a></li>
+</ul>
+<h2 id="SetContentShellcode"><a href="#SetContentShellcode" class="headerlink" title="SetContentShellcode"></a><a href="SetContentShellcode.md">SetContentShellcode</a></h2><h2 id="SetContentORW-libc-2-27"><a href="#SetContentORW-libc-2-27" class="headerlink" title="SetContentORW libc-2.27"></a><a href="SetContentORWlibc-2.27.md">SetContentORW libc-2.27</a></h2><h2 id="Houseof-Einherjar"><a href="#Houseof-Einherjar" class="headerlink" title="Houseof Einherjar"></a><a href="HouseofEinherjar/index.md">Houseof Einherjar</a></h2><ul>
+<li><a href="HouseofEinherjar/CTFHubHouseofEinherjar.md">CTFHubHouse of Einherjar</a></li>
+</ul>
+<h2 id="Houseof-Botcake"><a href="#Houseof-Botcake" class="headerlink" title="Houseof Botcake"></a><a href="HouseofBotcake.md">Houseof Botcake</a></h2><h2 id="IO利用之Houseof-Kiwi"><a href="#IO利用之Houseof-Kiwi" class="headerlink" title="IO利用之Houseof Kiwi"></a><a href="IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseofKiwi/index.md">IO利用之Houseof Kiwi</a></h2><ul>
+<li><a href="IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseofKiwi/nepctf-2021NULL_FXCK.md">nepctf-2021NULL_FXCK</a></li>
+</ul>
+<h2 id="IO利用之Houseof-Emma"><a href="#IO利用之Houseof-Emma" class="headerlink" title="IO利用之Houseof Emma"></a><a href="IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseofEmma.md">IO利用之Houseof Emma</a></h2><h2 id="Houseof-Pig"><a href="#Houseof-Pig" class="headerlink" title="Houseof Pig"></a><a href="HouseofPig.md">Houseof Pig</a></h2><h2 id="Houseof-Cat"><a href="#Houseof-Cat" class="headerlink" title="Houseof Cat"></a><a href="HouseofCat.md">Houseof Cat</a></h2><h2 id="Houseof-Banana"><a href="#Houseof-Banana" class="headerlink" title="Houseof Banana"></a><a href="HouseofBanana.md">Houseof Banana</a></h2><h2 id="Houseof-Rabbit"><a href="#Houseof-Rabbit" class="headerlink" title="Houseof Rabbit"></a><a href="HouseofRabbit.md">Houseof Rabbit</a></h2><h2 id="ARMpwn"><a href="#ARMpwn" class="headerlink" title="ARMpwn"></a><a href="ARMpwn.md">ARMpwn</a></h2><h2 id="MipsPwn"><a href="#MipsPwn" class="headerlink" title="MipsPwn"></a><a href="MipsPwn.md">MipsPwn</a></h2><h2 id="RustPwn"><a href="#RustPwn" class="headerlink" title="RustPwn"></a><a href="RustPwn.md">RustPwn</a></h2><h2 id="VMpwn-虚拟机逃逸"><a href="#VMpwn-虚拟机逃逸" class="headerlink" title="VMpwn-虚拟机逃逸"></a><a href="VMpwn-%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%80%83%E9%80%B8.md">VMpwn-虚拟机逃逸</a></h2>
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="IO利用之HouseofEmma" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseofEmma/" aria-label="前一篇: IO利用之HouseofEmma" title="前一篇: IO利用之HouseofEmma"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            IO利用之HouseofEmma
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Houseof系列总结" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Houseof%E7%B3%BB%E5%88%97%E6%80%BB%E7%BB%93/" aria-label="后一篇: Houseof系列总结"  title="后一篇: Houseof系列总结"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Houseof系列总结
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#PWN-CTF"><span class="toc-number">1.</span> <span class="toc-text">PWN CTF</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">寄存器知识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%9D%E5%AD%98%E8%AF%AD%E9%9B%80%E7%AC%94%E8%AE%B0%E5%88%B0%E6%9C%AC%E5%9C%B0"><span class="toc-number">1.2.</span> <span class="toc-text">保存语雀笔记到本地</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">1.3.</span> <span class="toc-text">pwndbg的使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%B4%A0%E5%85%BB"><span class="toc-number">1.4.</span> <span class="toc-text">程序员的基本素养</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pwn%E5%B0%8F%E7%9F%A5%E8%AF%86%E5%BA%93"><span class="toc-number">1.5.</span> <span class="toc-text">pwn小知识库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#glibc-all-in-one-%E7%BB%99%E7%A8%8B%E5%BA%8F%E4%BF%AE%E6%94%B9libc"><span class="toc-number">1.6.</span> <span class="toc-text">glibc-all-in-one_给程序修改libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BA%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E6%89%8B%E6%AE%B5"><span class="toc-number">1.7.</span> <span class="toc-text">简单栈溢出原理和攻击手段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Shellcode%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%B9%E6%B3%95"><span class="toc-number">1.8.</span> <span class="toc-text">Shellcode利用原理及方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode"><span class="toc-number">1.9.</span> <span class="toc-text">可见字符shellcode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2textret2syscall-ret2libc"><span class="toc-number">1.10.</span> <span class="toc-text">ret2textret2syscall ret2libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E6%98%AF%E5%90%A6%E8%BF%9B%E8%A1%8C%E6%A0%88%E5%AF%B9%E9%BD%90%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-number">1.11.</span> <span class="toc-text">关于是否进行栈对齐的分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83"><span class="toc-number">1.12.</span> <span class="toc-text">对于send和sendline的思考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.13.</span> <span class="toc-text">绕过防御之击败canary保护</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.14.</span> <span class="toc-text">绕过防御之击败PIE保护</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.15.</span> <span class="toc-text">格式化字符串利用方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.16.</span> <span class="toc-text">特殊的栈溢出-整数溢出</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%88%E4%BF%9D%E6%8A%A4%E5%85%A8%E5%BC%80%E7%9A%84%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95-%E4%BE%8B"><span class="toc-number">1.17.</span> <span class="toc-text">栈保护全开的攻击手法(例)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#One-gadgets"><span class="toc-number">1.18.</span> <span class="toc-text">One-gadgets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.19.</span> <span class="toc-text">栈迁移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ret2csucsu-%E9%93%BE%E5%88%A9%E7%94%A8"><span class="toc-number">1.20.</span> <span class="toc-text">ret2csucsu 链利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0%E7%9A%84%E8%B0%83%E7%94%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.21.</span> <span class="toc-text">一些常用函数的调用总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SeccompOrw%E8%AF%BB%E5%86%99%E6%9D%83%E9%99%90%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-number">1.22.</span> <span class="toc-text">SeccompOrw读写权限漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFFork"><span class="toc-number">1.23.</span> <span class="toc-text">什么是Fork</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SSPLeak-libc2-27"><span class="toc-number">1.24.</span> <span class="toc-text">SSPLeak _ libc2.27</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#environ%E5%88%A9%E7%94%A8"><span class="toc-number">1.25.</span> <span class="toc-text">environ利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#libc-start-main"><span class="toc-number">1.26.</span> <span class="toc-text">libc_start_main</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.27.</span> <span class="toc-text">SROP利用技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.28.</span> <span class="toc-text">条件竞争漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#dl-runtime-resolve%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.29.</span> <span class="toc-text">dl_runtime_resolve动态链接重定位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%80%94BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.30.</span> <span class="toc-text">—BROP利用技巧</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8%E7%9A%84%E6%80%BB%E7%BB%93%E2%80%93"><span class="toc-number">1.31.</span> <span class="toc-text">堆利用的总结–_</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8-glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.32.</span> <span class="toc-text">堆利用_glibc内存管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE"><span class="toc-number">1.33.</span> <span class="toc-text">内存空间的开辟与释放</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-%E7%B3%BB%E5%88%97%E6%80%BB%E7%BB%93"><span class="toc-number">1.34.</span> <span class="toc-text">Houseof 系列总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UAF-useafter-free"><span class="toc-number">1.35.</span> <span class="toc-text">UAF_useafter free</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#FastbinDOUBLE-FREE"><span class="toc-number">1.36.</span> <span class="toc-text">FastbinDOUBLE FREE</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fastbinMisalignment-Attack-%E9%94%99%E4%BD%8D%E4%BC%AA%E9%80%A0-chunk"><span class="toc-number">1.37.</span> <span class="toc-text">fastbinMisalignment Attack 错位伪造 chunk</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8"><span class="toc-number">1.38.</span> <span class="toc-text">Off-By-One漏洞原理及利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA"><span class="toc-number">1.39.</span> <span class="toc-text">对于got和hook的讨论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Heap%E4%B8%8E-Bins-%E5%91%BD%E4%BB%A4"><span class="toc-number">1.40.</span> <span class="toc-text">Heap与 Bins 命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ChunkExtend-Overlapping"><span class="toc-number">1.41.</span> <span class="toc-text">ChunkExtend &amp; Overlapping</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89"><span class="toc-number">1.42.</span> <span class="toc-text">Unlink漏洞原理及利用（Unsortedbin）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#House-of-Spirit%EF%BC%88FastbinAttack%EF%BC%89"><span class="toc-number">1.43.</span> <span class="toc-text">House_of_Spirit（FastbinAttack）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Alloc-to-Stack-ArbitaryAlloc"><span class="toc-number">1.44.</span> <span class="toc-text">Alloc_to_Stack&amp;ArbitaryAlloc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HouseOf-Force%EF%BC%88topchunk%EF%BC%89"><span class="toc-number">1.45.</span> <span class="toc-text">HouseOf Force（topchunk）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UnsortedbinAttack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.46.</span> <span class="toc-text">UnsortedbinAttack 基本介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#UnSortedbin-leak-libc-base"><span class="toc-number">1.47.</span> <span class="toc-text">UnSortedbin_leak_libc_base</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#main-arena%E7%BB%93%E6%9E%84"><span class="toc-number">1.48.</span> <span class="toc-text">main_arena结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SmallbinAttack"><span class="toc-number">1.49.</span> <span class="toc-text">SmallbinAttack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#LargebinAttack"><span class="toc-number">1.50.</span> <span class="toc-text">LargebinAttack</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90"><span class="toc-number">1.51.</span> <span class="toc-text">__IO_FILE结构分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E4%B9%8BFSOP%E9%93%BE"><span class="toc-number">1.52.</span> <span class="toc-text">__IO_FILE之FSOP链</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-FILE%E4%BC%AA%E9%80%A0vtable%E5%8A%AB%E6%8C%81"><span class="toc-number">1.53.</span> <span class="toc-text">__IO_FILE伪造vtable劫持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Orange-glibc-2-23"><span class="toc-number">1.54.</span> <span class="toc-text">Houseof Orange glibc-2.23</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Orange-%E5%8E%9F%E7%90%86"><span class="toc-number">1.55.</span> <span class="toc-text">Houseof Orange 原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TcachebinAttack-%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.56.</span> <span class="toc-text">TcachebinAttack 基本介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tcachedup"><span class="toc-number">1.57.</span> <span class="toc-text">Tcachedup</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TcachePoisoning"><span class="toc-number">1.58.</span> <span class="toc-text">TcachePoisoning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Tcache-perthread-corruption"><span class="toc-number">1.59.</span> <span class="toc-text">Tcache_perthread_corruption</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#glibc-2-35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6"><span class="toc-number">1.60.</span> <span class="toc-text">glibc-2.35新增保护机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%E8%AE%A1%E7%AE%97main-arena%E5%92%8Cenviron%E4%B9%8B%E9%97%B4%E7%9A%84%E5%81%8F%E7%A7%BB"><span class="toc-number">1.61.</span> <span class="toc-text">两种方法计算main_arena和environ之间的偏移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#realloc-hook%E5%8A%AB%E6%8C%81%E7%AF%A1%E6%94%B9-gadgets"><span class="toc-number">1.62.</span> <span class="toc-text">__realloc_hook劫持篡改 gadgets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Apple2-libc-2-35"><span class="toc-number">1.63.</span> <span class="toc-text">Houseof Apple2 libc-2.35</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO-2-1-stdout%E6%B3%84%E9%9C%B2libc"><span class="toc-number">1.64.</span> <span class="toc-text">_IO_2_1_stdout泄露libc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Roman"><span class="toc-number">1.65.</span> <span class="toc-text">Houseof Roman</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#malloc-stateHijacking-%E5%8A%AB%E6%8C%81"><span class="toc-number">1.66.</span> <span class="toc-text">malloc_stateHijacking 劫持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SetContentShellcode"><span class="toc-number">1.67.</span> <span class="toc-text">SetContentShellcode</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SetContentORW-libc-2-27"><span class="toc-number">1.68.</span> <span class="toc-text">SetContentORW libc-2.27</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Einherjar"><span class="toc-number">1.69.</span> <span class="toc-text">Houseof Einherjar</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Botcake"><span class="toc-number">1.70.</span> <span class="toc-text">Houseof Botcake</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseof-Kiwi"><span class="toc-number">1.71.</span> <span class="toc-text">IO利用之Houseof Kiwi</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IO%E5%88%A9%E7%94%A8%E4%B9%8BHouseof-Emma"><span class="toc-number">1.72.</span> <span class="toc-text">IO利用之Houseof Emma</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Pig"><span class="toc-number">1.73.</span> <span class="toc-text">Houseof Pig</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Cat"><span class="toc-number">1.74.</span> <span class="toc-text">Houseof Cat</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Banana"><span class="toc-number">1.75.</span> <span class="toc-text">Houseof Banana</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Houseof-Rabbit"><span class="toc-number">1.76.</span> <span class="toc-text">Houseof Rabbit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ARMpwn"><span class="toc-number">1.77.</span> <span class="toc-text">ARMpwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MipsPwn"><span class="toc-number">1.78.</span> <span class="toc-text">MipsPwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RustPwn"><span class="toc-number">1.79.</span> <span class="toc-text">RustPwn</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VMpwn-%E8%99%9A%E6%8B%9F%E6%9C%BA%E9%80%83%E9%80%B8"><span class="toc-number">1.80.</span> <span class="toc-text">VMpwn-虚拟机逃逸</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "PWN CTF寄存器知识保存语雀笔记到本地pwndbg的使用程序员的基本素养pwn小知识库glibc-all-in-one_给程序修改libc简单栈溢出原理和攻击手段Shellcode利用原理及方法可见字符shellcoderet2textret2syscall ret2libc关于是否进行栈对齐的分析对于send和sendline的思考绕过防御之击败canary保护绕过防御之击败PIE保护格式化字符串利用方式 axb_2019_fmt64(格式化单字节修改–_x00截断） fmtstr__[H",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

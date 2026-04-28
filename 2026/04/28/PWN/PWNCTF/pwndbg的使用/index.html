@@ -1,0 +1,532 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    pwndbg的使用 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="pwndbg的使用 这个界面是pwndbg（GDB 的 CTF 专用插件）的调试界面，用于分析 32 位程序（你的pp_32），我会分区域拆解每一部分的含义： 一、顶部命令行区域12345pwndbg&gt; b main  # 你执行的GDB命令：在main函数处下断点Breakpoint 1 at 0x565555c6  # 断点成功设置在地址0x565555c6（main函数的起始位置）pw">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwndbg的使用">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="pwndbg的使用 这个界面是pwndbg（GDB 的 CTF 专用插件）的调试界面，用于分析 32 位程序（你的pp_32），我会分区域拆解每一部分的含义： 一、顶部命令行区域12345pwndbg&gt; b main  # 你执行的GDB命令：在main函数处下断点Breakpoint 1 at 0x565555c6  # 断点成功设置在地址0x565555c6（main函数的起始位置）pw">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_Rc5wxmfCW7pWtvhC/1765684947737-26792032-06fa-4347-ad2f-daf84207332c-496967.png">
+<meta property="article:published_time" content="2026-04-28T10:25:56.923Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.379Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_Rc5wxmfCW7pWtvhC/1765684947737-26792032-06fa-4347-ad2f-daf84207332c-496967.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="pwndbg的使用">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">pwndbg的使用</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">pwndbg的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B6%E9%83%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8C%BA%E5%9F%9F"><span class="toc-number">1.1.</span> <span class="toc-text">一、顶部命令行区域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E9%A1%B6%E9%83%A8%E7%8A%B6%E6%80%81%E6%A0%8F"><span class="toc-number">1.2.</span> <span class="toc-text">二、顶部状态栏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%AF%84%E5%AD%98%E5%99%A8%E5%8C%BA%E5%9F%9F%EF%BC%88REGISTERS%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">三、寄存器区域（REGISTERS）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%8F%8D%E6%B1%87%E7%BC%96%E5%8C%BA%E5%9F%9F%EF%BC%88DISASM%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">四、反汇编区域（DISASM）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%A0%88%E5%8C%BA%E5%9F%9F%EF%BC%88STACK%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">五、栈区域（STACK）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%B0%83%E7%94%A8%E6%A0%88%E5%8C%BA%E5%9F%9F%EF%BC%88BACKTRACE%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">六、调用栈区域（BACKTRACE）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/pwndbg的使用" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.923Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="pwndbg的使用"><a href="#pwndbg的使用" class="headerlink" title="pwndbg的使用"></a>pwndbg的使用</h1><p><img src="/HFTTC.github.io/./img/73098186_Rc5wxmfCW7pWtvhC/1765684947737-26792032-06fa-4347-ad2f-daf84207332c-496967.png" alt="1765684947737-26792032-06fa-4347-ad2f-daf84207332c.png"></p>
+<p><font style="color:rgb(0, 0, 0);">这个界面是</font><strong><font style="color:rgb(0, 0, 0) !important;">pwndbg</font></strong><font style="color:rgb(0, 0, 0);">（GDB 的 CTF 专用插件）的调试界面，用于分析 32 位程序（你的</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">pp_32</font></code><font style="color:rgb(0, 0, 0);">），我会分区域拆解每一部分的含义：</font></p>
+<h3 id="一、顶部命令行区域"><a href="#一、顶部命令行区域" class="headerlink" title="一、顶部命令行区域"></a><font style="color:rgb(0, 0, 0);">一、顶部命令行区域</font></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; b main  # 你执行的GDB命令：在main函数处下断点</span><br><span class="line">Breakpoint 1 at 0x565555c6  # 断点成功设置在地址0x565555c6（main函数的起始位置）</span><br><span class="line">pwndbg&gt; r  # 你执行的GDB命令：运行程序（run）</span><br><span class="line">Starting program: /home/pwn/Desktop/pp_32  # 正在调试的程序路径</span><br><span class="line">[Thread debugging using libthread_db enabled]  # 启用了线程调试（这里是单线程程序，可忽略）</span><br></pre></td></tr></table></figure>
+
+<h3 id="二、顶部状态栏"><a href="#二、顶部状态栏" class="headerlink" title="二、顶部状态栏"></a><font style="color:rgb(0, 0, 0);">二、顶部状态栏</font></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LEGEND: STACK | HEAP | CODE | DATA | RWX | RODATA  # pwndbg的颜色图例：不同内存段的颜色标识</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code><font style="color:rgb(0, 0, 0);">STACK</font></code><font style="color:rgb(0, 0, 0);">：栈内存（黄色 &#x2F; 橙色）</font></li>
+<li><code><font style="color:rgb(0, 0, 0);">HEAP</font></code><font style="color:rgb(0, 0, 0);">：堆内存（绿色）</font></li>
+<li><code><font style="color:rgb(0, 0, 0);">CODE</font></code><font style="color:rgb(0, 0, 0);">：代码段（紫色）</font></li>
+<li><code><font style="color:rgb(0, 0, 0);">DATA</font></code><font style="color:rgb(0, 0, 0);">：数据段（蓝色）</font></li>
+<li><code><font style="color:rgb(0, 0, 0);">RWX</font></code><font style="color:rgb(0, 0, 0);">：可读写可执行内存（红色）</font></li>
+<li><code><font style="color:rgb(0, 0, 0);">RODATA</font></code><font style="color:rgb(0, 0, 0);">：只读数据段（青色）</font></li>
+</ul>
+<h3 id="三、寄存器区域（REGISTERS）"><a href="#三、寄存器区域（REGISTERS）" class="headerlink" title="三、寄存器区域（REGISTERS）"></a><font style="color:rgb(0, 0, 0);">三、寄存器区域（</font><code><font style="color:rgb(0, 0, 0);">REGISTERS</font></code><font style="color:rgb(0, 0, 0);">）</font></h3><p><font style="color:rgb(0, 0, 0);">显示当前 CPU 寄存器的值（32 位程序用 EAX&#x2F;EBX 等寄存器）：</font></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">EAX: 0x565555b7 (main+0)  # EAX寄存器：当前值是main函数的起始地址（+0表示偏移）</span><br><span class="line">EBX: 0xf7fa3000 (_GLOBAL_OFFSET_TABLE_)  # EBX：指向全局偏移表（GOT）的地址</span><br><span class="line">ECX: 0xffffd150 → -1  # ECX：值是0xffffd150，对应数值-1（32位有符号数）</span><br><span class="line">EDX: 0xffffd170 → 0xf7fa3000 (_GLOBAL_OFFSET_TABLE_)  # EDX：指向GOT表</span><br><span class="line">EDI: 0xf7ffcb00 (rtld_global_ro) → 0  # EDI：指向动态链接器的全局只读结构</span><br><span class="line">ESI: 0xffffd024 → &quot;/home/pwn/Desktop/pp_32&quot;  # ESI：指向程序路径字符串</span><br><span class="line">EBP: 0xffffd138 → 0xffffd150 → -1  # EBP：栈基址寄存器，指向当前栈帧的基地址</span><br><span class="line">ESP: 0xffffd130 → 0xffffd150 → -1  # ESP：栈顶寄存器，指向当前栈顶地址</span><br><span class="line">EIP: 0x565555c6 (main+15) → sub esp, 0x10  # EIP：指令指针寄存器，指向当前要执行的指令（main函数偏移+15处）</span><br></pre></td></tr></table></figure>
+
+<h3 id="四、反汇编区域（DISASM）"><a href="#四、反汇编区域（DISASM）" class="headerlink" title="四、反汇编区域（DISASM）"></a><font style="color:rgb(0, 0, 0);">四、反汇编区域（</font><code><font style="color:rgb(0, 0, 0);">DISASM</font></code><font style="color:rgb(0, 0, 0);">）</font></h3><p><font style="color:rgb(0, 0, 0);">显示当前 EIP 指向的</font><strong><font style="color:rgb(0, 0, 0) !important;">代码段指令</font></strong><font style="color:rgb(0, 0, 0);">（紫色是代码段）：</font></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">地址       偏移         指令内容</span><br><span class="line">0x565555c6 &lt;main+15&gt;    sub    esp, 0x10  # 当前要执行的指令：栈顶指针ESP减0x10（分配16字节栈空间）</span><br><span class="line">0x565555c9 &lt;main+18&gt;    call   __x86.get_pc_thunk.bx  # 调用一个辅助函数，用于获取当前PC地址（32位PIC程序常用）</span><br><span class="line">0x565555ce &lt;main+23&gt;    add    ebx, 0x1a32  # 计算GOT表的基地址（调整EBX寄存器）</span><br><span class="line">0x565555d4 &lt;main+29&gt;    mov    dword ptr [ebp - 0xc], 4  # 把数值4存入EBP-0xC的栈地址（局部变量）</span><br><span class="line">0x565555db &lt;main+36&gt;    mov    dword ptr [ebp - 0x10], 5  # 把数值5存入EBP-0x10的栈地址（另一个局部变量）</span><br><span class="line">0x565555e2 &lt;main+43&gt;    push   dword ptr [ebp - 0x10]  # 把EBP-0x10的值（5）压入栈（函数参数）</span><br><span class="line">0x565555e5 &lt;main+46&gt;    push   dword ptr [ebp - 0xc]  # 把EBP-0xC的值（4）压入栈（函数参数）</span><br><span class="line">0x565555e8 &lt;main+49&gt;    call   add  # 调用add函数（计算4+5）</span><br><span class="line">0x565555ed &lt;main+54&gt;    add    esp, 8  # 调用完add后，平衡栈（释放2个参数的8字节空间）</span><br><span class="line">0x565555f0 &lt;main+57&gt;    mov    dword ptr [ebp - 0x14], eax  # 把add的返回值（存在EAX）存入EBP-0x14的栈地址</span><br><span class="line">0x565555f3 &lt;main+60&gt;    sub    esp, 8  # 再分配8字节栈空间</span><br></pre></td></tr></table></figure>
+
+<h3 id="五、栈区域（STACK）"><a href="#五、栈区域（STACK）" class="headerlink" title="五、栈区域（STACK）"></a><font style="color:rgb(0, 0, 0);">五、栈区域（</font><code><font style="color:rgb(0, 0, 0);">STACK</font></code><font style="color:rgb(0, 0, 0);">）</font></h3><p><font style="color:rgb(0, 0, 0);">显示当前</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">ESP</font></code><font style="color:rgb(0, 0, 0);">指向的</font><strong><font style="color:rgb(0, 0, 0) !important;">栈内存内容</font></strong><font style="color:rgb(0, 0, 0);">（黄色是栈段）：</font></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">行号相对偏移 | 内存地址  → 存储内容         # 注释（pwndbg自动补充的解释）</span><br><span class="line">00:0000| esp 0xffffd130 → 0xffffd150 → -1  # 栈顶地址0xffffd130，内容是0xffffd150（对应数值-1）</span><br><span class="line">01:0004|     0xffffd134 → 0xf7fa3000 (_GLOBAL_OFFSET_TABLE_)  # 栈偏移+4的地址，内容是GOT表地址</span><br><span class="line">02:0008|     0xffffd138 → 0xffffd020 (rtld_global) → 0xf7ffda40 → 0x56555000  # 栈偏移+8的地址，内容是动态链接器结构</span><br><span class="line">03:000c|     0xffffd13c → &quot;/home/pwn/Desktop/pp_32&quot;  # 栈偏移+12的地址，内容是程序路径字符串</span><br><span class="line">04:0010| +004 0xffffd140 → 0xffffd359 &lt;__libc_start_call_main+121&gt;  # 栈偏移+16的地址，内容是libc函数地址</span><br><span class="line">05:0014| +008 0xffffd144 → 0x70 (*p)  # 栈偏移+20的地址，内容是字符&#x27;p&#x27;（ASCII码0x70）</span><br><span class="line">06:0018| +010 0xffffd148 → 0xf7d00000 ( _GLOBAL_OFFSET_TABLE_ )  # 栈偏移+24的地址，内容是GOT表地址</span><br><span class="line">07:001c| +014 0xffffd14c → 0xf7d9a519 &lt;__libc_start_call_main+121&gt;  # 栈偏移+28的地址，内容是libc函数地址</span><br></pre></td></tr></table></figure>
+
+<h3 id="六、调用栈区域（BACKTRACE）"><a href="#六、调用栈区域（BACKTRACE）" class="headerlink" title="六、调用栈区域（BACKTRACE）"></a><font style="color:rgb(0, 0, 0);">六、调用栈区域（</font><code><font style="color:rgb(0, 0, 0);">BACKTRACE</font></code><font style="color:rgb(0, 0, 0);">）</font></h3><p><font style="color:rgb(0, 0, 0);">显示当前程序的</font><strong><font style="color:rgb(0, 0, 0) !important;">函数调用关系</font></strong><font style="color:rgb(0, 0, 0);">（从当前函数回溯到入口）：</font></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">行 地址	      函数 + 偏移</span><br><span class="line">0  0x565555c6 main+15  # 当前在main函数偏移+15处</span><br><span class="line">1  0xf7d9a519 __libc_start_call_main+121  # main函数的调用者：行号	地址	函数 + 偏移libc的启动函数</span><br><span class="line">2  0xf7d9a5f3 __libc_start_main+147  # 更上层的libc启动函数</span><br><span class="line">3  0x56555461 _start+49  # 程序的入口函数_start</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><font style="color:rgb(0, 0, 0);">总结</font></h3><p><font style="color:rgb(0, 0, 0);">这是</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">pp_32</font></code><font style="color:rgb(0, 0, 0);">程序在</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">main</font></code><font style="color:rgb(0, 0, 0);">函数内的调试状态：程序刚进入</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">main</font></code><font style="color:rgb(0, 0, 0);">，正在初始化局部变量（存了 4 和 5），准备调用</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">add</font></code><font style="color:rgb(0, 0, 0);">函数计算 4+5。</font></p>
+<blockquote>
+<p>更新: 2026-01-14 22:34:28<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/wkgopvm4q7qe01ib">https://www.yuque.com/idcm/wnemg9/wkgopvm4q7qe01ib</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="pwn小知识库" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/pwn%E5%B0%8F%E7%9F%A5%E8%AF%86%E5%BA%93/" aria-label="前一篇: pwn小知识库" title="前一篇: pwn小知识库"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            pwn小知识库
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/progress/" aria-label="后一篇: no title"  title="后一篇: no title"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          (no title)
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">pwndbg的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E9%A1%B6%E9%83%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8C%BA%E5%9F%9F"><span class="toc-number">1.1.</span> <span class="toc-text">一、顶部命令行区域</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E9%A1%B6%E9%83%A8%E7%8A%B6%E6%80%81%E6%A0%8F"><span class="toc-number">1.2.</span> <span class="toc-text">二、顶部状态栏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%AF%84%E5%AD%98%E5%99%A8%E5%8C%BA%E5%9F%9F%EF%BC%88REGISTERS%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">三、寄存器区域（REGISTERS）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%8F%8D%E6%B1%87%E7%BC%96%E5%8C%BA%E5%9F%9F%EF%BC%88DISASM%EF%BC%89"><span class="toc-number">1.4.</span> <span class="toc-text">四、反汇编区域（DISASM）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E6%A0%88%E5%8C%BA%E5%9F%9F%EF%BC%88STACK%EF%BC%89"><span class="toc-number">1.5.</span> <span class="toc-text">五、栈区域（STACK）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%B0%83%E7%94%A8%E6%A0%88%E5%8C%BA%E5%9F%9F%EF%BC%88BACKTRACE%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">六、调用栈区域（BACKTRACE）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.7.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "pwndbg的使用",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/pwndbg%E7%9A%84%E4%BD%BF%E7%94%A8/",
+          excerpt: "",
+          description: "",
+          stripContent: "pwndbg的使用 这个界面是pwndbg（GDB 的 CTF 专用插件）的调试界面，用于分析 32 位程序（你的pp_32），我会分区域拆解每一部分的含义： 一、顶部命令行区域12345pwndbg&amp;gt; b main  # 你执行的GDB命令：在main函数处下断点Breakpoint 1 at 0x565555c6  # 断点成功设置在地址0x565555c6（main函数的起始位置）pwndbg&amp;gt; r  # 你执行的GDB命令：运行程序（run）Starting program:",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

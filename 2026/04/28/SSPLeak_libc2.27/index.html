@@ -1,0 +1,568 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    SSPLeak_libc2.27 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="SSP Leak &lt; libc2.27什么是 SSP 漏洞？_**Stack Smashing Protector （SSP） **_是一个著名的缓冲区溢出漏洞缓解措施。当一个函数检测栈上的 Canary 被破坏的时候，就会转到 __stack_chk_fial()函数终止程序运行并抛出错误信息。改错误信息包含了 argv[0] 指向的字符串，如果我们能够控制 argv[0]，那么将可能造成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSPLeak_libc2.27">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/SSPLeak_libc2.27/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="SSP Leak &lt; libc2.27什么是 SSP 漏洞？_**Stack Smashing Protector （SSP） **_是一个著名的缓冲区溢出漏洞缓解措施。当一个函数检测栈上的 Canary 被破坏的时候，就会转到 __stack_chk_fial()函数终止程序运行并抛出错误信息。改错误信息包含了 argv[0] 指向的字符串，如果我们能够控制 argv[0]，那么将可能造成">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-28T11:14:15.288Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.358Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="SSPLeak_libc2.27">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">SSPLeak_libc2.27</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SSP-Leak-libc2-27"><span class="toc-number">1.</span> <span class="toc-text">SSP Leak &lt; libc2.27</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-SSP-%E6%BC%8F%E6%B4%9E%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 SSP 漏洞？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libc2-23"><span class="toc-number">1.2.</span> <span class="toc-text">libc2.23 :\</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libc2-25"><span class="toc-number">1.3.</span> <span class="toc-text">libc2.25 :\</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%BE%E6%88%90-SSP-Leak-%E7%9A%84%E8%8B%9B%E5%88%BB%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.</span> <span class="toc-text">达成 SSP Leak 的苛刻条件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-stderr%EF%BC%88%E6%A0%87%E5%87%86%E9%94%99%E8%AF%AF%EF%BC%89%EF%BC%9F"><span class="toc-number">1.4.1.</span> <span class="toc-text">什么是 stderr（标准错误）？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E7%9A%84%E8%B0%A2%E5%B9%95-Patch"><span class="toc-number">1.5.</span> <span class="toc-text">漏洞的谢幕 (Patch)</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-SSPLeak_libc2.27" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.288Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="SSP-Leak-libc2-27"><a href="#SSP-Leak-libc2-27" class="headerlink" title="SSP Leak &lt; libc2.27"></a>SSP Leak &lt; libc2.27</h1><h3 id="什么是-SSP-漏洞？"><a href="#什么是-SSP-漏洞？" class="headerlink" title="什么是 SSP 漏洞？"></a>什么是 SSP 漏洞？</h3><p>_**Stack Smashing Protector （SSP） **_是一个著名的缓冲区溢出漏洞缓解措施。当一个函数检测栈上的 Canary 被破坏的时候，就会转到 __stack_chk_fial()函数终止程序运行并抛出错误信息。改错误信息包含了 argv[0] 指向的字符串，如果我们能够控制 argv[0]，那么将可能造成信息泄露，这一技术称之为 SSP Leak。</p>
+<p>先举个简单的例子：</p>
+<p>默认情况下 argv[0] 是指向程序路径及名称的指针，当检查到栈溢出时，在标准错误中打印出了这个字符串：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc,<span class="type">char</span> **argv)</span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;argv[0]: %s\n&quot;</span>,argv[<span class="number">0</span>]);</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">10</span>];</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,buf);</span><br><span class="line">    <span class="comment">// argv[0] = &quot;Hello World!&quot;;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// gcc -fstack-protector-strong -o a.out SSP_leak.c</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">┌──(pwn_env)─(root㉿kali)-[/home/kali/Desktop]</span><br><span class="line">└─<span class="meta"># checksec ./a.out</span></span><br><span class="line">[*] <span class="string">&#x27;/home/kali/Desktop/a.out&#x27;</span></span><br><span class="line">    Arch:       amd64<span class="number">-64</span>-little</span><br><span class="line">    RELRO:      Partial RELRO</span><br><span class="line">    Stack:      Canary found</span><br><span class="line">    NX:         NX enabled</span><br><span class="line">    PIE:        PIE enabled</span><br><span class="line">    Stripped:   No</span><br><span class="line">                                                                                                                     </span><br><span class="line">┌──(pwn_env)─(root㉿kali)-[/home/kali/Desktop]</span><br><span class="line">└─<span class="meta"># python -c <span class="string">&#x27;print(b&quot;A&quot;*50)&#x27;</span> | ./a.out            </span></span><br><span class="line">argv[<span class="number">0</span>]: ./a.out</span><br><span class="line">*** <span class="built_in">stack</span> smashing detected ***: terminated</span><br><span class="line">zsh: done             python -c <span class="string">&#x27;print(b&quot;A&quot;*50)&#x27;</span> | </span><br><span class="line">zsh: IOT instruction  ./a.out</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>接下来加上注释不分的代码，手动修改 argv[0]，然后再次编译运行。</p>
+<p>可以看到，标准错误中打印出了字符串 “Hello World!”</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">┌──(pwn_env)─(root㉿kali)-[/home/kali/Desktop]</span><br><span class="line">└─<span class="meta"># python -c <span class="string">&#x27;print(b&quot;A&quot;*50)&#x27;</span> | ./a.out            </span></span><br><span class="line">argv[<span class="number">0</span>]: ./a.out</span><br><span class="line">*** <span class="built_in">stack</span> smashing detected ***: Hello World！ terminated</span><br><span class="line">zsh: done             python -c <span class="string">&#x27;print(b&quot;A&quot;*50)&#x27;</span> | </span><br><span class="line">zsh: IOT instruction  ./a2.out</span><br></pre></td></tr></table></figure>
+
+<p>当存在 Canary 保护，错误溢出时程序先从栈 rbp-0x30 上取出 Canary，将其与初始 Canary(fs:0x28)相比较，如果两者不相同，说明发生了错误栈溢出。此时程序不能正常返回，而是调用 __stack_chk_fail()函数，打印出 argv[0] 指向的字符串。</p>
+<p>栈是从高地址向低地址增长的，而缓冲区却是从低地址到高地址增长的，所以 argv 数组位于栈中高地址的位置，只要读入字符串足够长，就可以覆盖到 argv[0] 处：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x400634</span> &lt;main+<span class="number">62</span>&gt;      mov    edi, <span class="number">0x4006f1</span></span><br><span class="line"><span class="number">0x400639</span> &lt;main+<span class="number">67</span>&gt;      mov    eax, <span class="number">0x0</span></span><br><span class="line"><span class="number">0x40063e</span> &lt;main+<span class="number">72</span>&gt;      call   <span class="number">0x4004e0</span> &lt;__isoc99_scanf@plt&gt;</span><br><span class="line">→   <span class="number">0x4004e0</span> &lt;__isoc99_scanf@plt+<span class="number">0</span>&gt; jmp    QWORD PTR [rip+<span class="number">0x200b4a</span>]  # <span class="number">0x601030</span></span><br><span class="line">    <span class="number">0x4004e6</span> &lt;__isoc99_scanf@plt+<span class="number">6</span>&gt; push   <span class="number">0x3</span></span><br><span class="line">    <span class="number">0x4004eb</span> &lt;__isoc99_scanf@plt+<span class="number">11</span>&gt; jmp    <span class="number">0x4004a0</span></span><br><span class="line">---- arguments (guessed) ----</span><br><span class="line">__isoc99_scanf@plt (</span><br><span class="line">  $rdi = <span class="number">0x00000000004006f1</span> → <span class="number">0x303b031b01007325</span> (<span class="string">&quot;%s&quot;</span>?),</span><br><span class="line">  $rsi = <span class="number">0x00007fffffdfdb40</span> → <span class="number">0x0000000000400660</span> ← &lt;__libc_csu_init+<span class="number">0</span>&gt; push r15</span><br><span class="line">)</span><br><span class="line">gef➤  dereference $rsp <span class="number">3</span></span><br><span class="line"><span class="number">0x00007fffffdfdb30</span>|+<span class="number">0x00</span>: <span class="number">0x00007fffffdc48</span> → <span class="number">0x00007fffffe03f</span> → <span class="string">&quot;/xxx/a.out&quot;</span></span><br><span class="line"><span class="number">0x00007fffffdfdb38</span>|+<span class="number">0x08</span>: <span class="number">0x0000000100000000</span></span><br><span class="line"><span class="number">0x00007fffffdfdb40</span>|+<span class="number">0x10</span>: <span class="number">0x0000000000400660</span> ← &lt;__libc_csu_init+<span class="number">0</span>&gt; push r15</span><br><span class="line">gef➤  $ <span class="number">0x00007fffffdfdb40</span> <span class="number">0x00007fffffdc48</span></span><br><span class="line"><span class="number">264</span></span><br></pre></td></tr></table></figure>
+
+<p>所以栈顶到 argv[0] 距离 buf 有 264 个字节，修改我们的 payload：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ python -c <span class="string">&#x27;print &quot;A&quot;*264&#x27;</span> | ./a.out</span><br><span class="line">argv[<span class="number">0</span>]: ./a.out</span><br><span class="line">*** <span class="built_in">stack</span> smashing detected ***: terminated</span><br><span class="line"><span class="title function_">Aborted</span> <span class="params">(core dumped)</span></span><br><span class="line">$ python -c &#x27;print &quot;A&quot;*265&#x27; | ./a.out</span><br></pre></td></tr></table></figure>
+
+<h3 id="libc2-23"><a href="#libc2-23" class="headerlink" title="libc2.23 :\"></a>libc2.23 :\</h3><p>Ubuntu 16.04 使用的是 libc-2.23，__stack_chk_fail()函数调用 __fortify_fail()函数，再由 __fortify_fail()调用 __libc_message()函数，将标准错误和 argv[0] 打印出来。</p>
+<h3 id="libc2-25"><a href="#libc2-25" class="headerlink" title="libc2.25 :\"></a>libc2.25 :\</h3><p>libc-2.25 启用了一个新的函数 __fortify_fail_about()，试图对该泄露问题进行修复。函数的第一个参数为 false 时，将不再进行栈回溯，而是直接打印出字符串”<unknown>“，那么也就无法输出 argv[0] 了。</p>
+<h3 id="达成-SSP-Leak-的苛刻条件"><a href="#达成-SSP-Leak-的苛刻条件" class="headerlink" title="达成 SSP Leak 的苛刻条件"></a><strong>达成 SSP Leak 的苛刻条件</strong></h3><p>要成功利用这个漏洞，题目通常需要满足以下几个条件：</p>
+<ul>
+<li><strong>溢出长度必须足够大：</strong> 你的溢出数据必须能跨越茫茫栈空间，精准摸到 argv[0] 的位置。通常需要几百个字节。如果溢出长度只有几十个字节（Off-by-one 或只能刚好覆盖返回地址），就无法使用此漏洞。</li>
+<li><strong>必须能看到程序的报错输出：</strong> 程序崩溃时的报错信息默认输出到 stderr。如果题目环境把 stderr 重定向到了 &#x2F;dev&#x2F;null（丢弃报错），或者切断了报错回显，攻击也会失效。</li>
+</ul>
+<p><font style="color:#74B602;">“””</font></p>
+<h4 id="什么是-stderr（标准错误）？"><a href="#什么是-stderr（标准错误）？" class="headerlink" title="什么是 stderr（标准错误）？"></a><font style="color:#74B602;">什么是 stderr（标准错误）？</font></h4><p><font style="color:#74B602;">在 Linux 环境下，当一个程序跑起来（变成进程）时，操作系统默认会给它分配三条“管道”：</font></p>
+<ul>
+<li><strong><font style="color:#74B602;">stdin (标准输入，代号 0)：</font></strong><font style="color:#74B602;"> 程序用来读取你输入数据的管道（比如 gets、scanf 用的就是这条）。</font></li>
+<li><strong><font style="color:#74B602;">stdout (标准输出，代号 1)：</font></strong><font style="color:#74B602;"> 程序用来打印正常结果的管道（比如 printf(“Hello”) 用的就是这条）。</font></li>
+<li><strong><font style="color:#74B602;">stderr (标准错误，代号 2)：</font></strong><font style="color:#74B602;"> 程序专门用来打印</font><strong><font style="color:#74B602;">警告、崩溃、报错信息</font></strong><font style="color:#74B602;">的管道。</font></li>
+<li>如果出题人不想让你利用 SSP Leak 这个漏洞，他会在启动程序的脚本里加上这样一段魔法指令：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./GUESS 2&gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><font style="color:#000000;">这里的 </font><code><font style="color:#000000;">2&gt;</font></code><font style="color:#000000;"> 意思就是：</font><strong><font style="color:#000000;">把代号为 2 的管道（即 </font></strong><code><strong><font style="color:#000000;">stderr</font></strong></code><strong><font style="color:#000000;"> 报错信息）重定向。</font></strong></li>
+<li><font style="color:#000000;">连起来的意思是：程序正常运行的输出（</font><code><font style="color:#000000;">stdout</font></code><font style="color:#000000;">）正常返回给玩家，但如果程序发生了崩溃或报错，</font><strong><font style="color:#000000;">把报错信息全部倒进黑洞（</font></strong><code><strong><font style="color:#000000;">/dev/null</font></strong></code><strong><font style="color:#000000;">）里。</font></strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">你看到了报错字符串（<span class="built_in">stderr</span> 没关）</span><br><span class="line">如果你在终端里看到了类似这样的输出：</span><br><span class="line">*** <span class="built_in">stack</span> smashing detected ***: ./GUESS terminated</span><br><span class="line">结论： 恭喜你！这说明服务器的 <span class="built_in">stderr</span> 管道是向你敞开的。</span><br><span class="line">你可以放心地继续往下写 SSP Leak 的脚本，去篡改 argv[<span class="number">0</span>] 偷数据。</span><br><span class="line"></span><br><span class="line">当<span class="built_in">stderr</span> 被关了：</span><br><span class="line">如果你只看到 pwntools 提示 Got EOF <span class="keyword">while</span> reading in interactive（读取时遇到文件结束符），</span><br><span class="line">或者脚本什么都没打印就直接结束了，连接被服务器瞬间无情掐断。</span><br><span class="line">结论：出题人把 <span class="built_in">stderr</span> 重定向到 /dev/null 了。</span><br><span class="line">你的报错信息被丢进了黑洞。在这种环境下，SSP Leak 攻击绝对无法成功。</span><br></pre></td></tr></table></figure>
+
+<p><strong><font style="color:#74B602;">为什么攻击会失效？</font></strong></p>
+<p><font style="color:#74B602;">假设你现在写了一个极其完美的 SSP Leak 攻击脚本，精确计算了偏移，把 </font><code><font style="color:#74B602;">argv[0]</font></code><font style="color:#74B602;"> 成功指向了内存里的真实 Flag。</font></p>
+<p><font style="color:#74B602;">如果服务器</font><strong><font style="color:#74B602;">没有</font></strong><font style="color:#74B602;">重定向 </font><code><font style="color:#74B602;">stderr</font></code><font style="color:#74B602;">：</font></p>
+<ol>
+<li><font style="color:#74B602;">程序崩溃。</font></li>
+<li><code><font style="color:#74B602;">__stack_chk_fail</font></code><font style="color:#74B602;"> 拿着你的假指针去读取 Flag。</font></li>
+<li><font style="color:#74B602;">它把带有 Flag 的报错信息发到 </font><code><font style="color:#74B602;">stderr</font></code><font style="color:#74B602;">。</font></li>
+<li><code><font style="color:#74B602;">stderr</font></code><font style="color:#74B602;"> 顺着网线传回你的电脑，你在屏幕上看到了 Flag，攻击成功！</font></li>
+</ol>
+<p><font style="color:#74B602;">如果服务器</font><strong><font style="color:#74B602;">把 </font></strong><code><strong><font style="color:#74B602;">stderr</font></strong></code><strong><font style="color:#74B602;"> 重定向到了 </font></strong><code><strong><font style="color:#74B602;">/dev/null</font></strong></code><font style="color:#74B602;">：</font></p>
+<ol>
+<li><font style="color:#74B602;">程序崩溃。</font></li>
+<li><code><font style="color:#74B602;">__stack_chk_fail</font></code><font style="color:#74B602;"> 拿着你的假指针去读取 Flag。</font></li>
+<li><font style="color:#74B602;">它把带有 Flag 的报错信息发到 </font><code><font style="color:#74B602;">stderr</font></code><font style="color:#74B602;">。</font></li>
+<li><strong><font style="color:#74B602;">服务器直接把这句带有 Flag 的报错信息扔进了垃圾桶（</font></strong><code><strong><font style="color:#74B602;">/dev/null</font></strong></code><strong><font style="color:#74B602;">）。</font></strong></li>
+<li><font style="color:#74B602;">你的网络连接瞬间断开，屏幕上什么报错都没看到（也就是所谓的“盲”状态）。</font></li>
+<li><font style="color:#74B602;">虽然你成功控制了程序的执行逻辑，但你看不到输出结果，</font><strong><font style="color:#74B602;">攻击宣告失败</font></strong><font style="color:#74B602;">。</font></li>
+</ol>
+<p><font style="color:#74B602;">“””</font></p>
+<ul>
+<li><strong>老版本的靶机环境：</strong> 必须是较老的 glibc 版本（如 2.23 或 2.27 的早期版本）。</li>
+</ul>
+<h3 id="漏洞的谢幕-Patch"><a href="#漏洞的谢幕-Patch" class="headerlink" title="漏洞的谢幕 (Patch)"></a><strong>漏洞的谢幕 (Patch)</strong></h3><p>由于这个漏洞在过去的 CTF 和真实网络攻击中被滥用，glibc 官方最终痛下杀手。</p>
+<p>在后来的更新中（大约从 glibc 2.27 后期和 2.30 开始），开发者直接删除了 __stack_chk_fail 中打印 argv[0] 的代码逻辑。现在的系统如果触发 Canary 报警，只会冷冰冰地输出： *** stack smashing detected ***: terminated 不再附带任何指针解引用的操作，SSP Leak 漏洞从此在现代系统中彻底绝迹。</p>
+<blockquote>
+<p>更新: 2026-03-29 17:57:24<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/rx2t9alqyfw719g5">https://www.yuque.com/idcm/wnemg9/rx2t9alqyfw719g5</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="TcachePoisoning" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/TcachePoisoning/" aria-label="前一篇: TcachePoisoning" title="前一篇: TcachePoisoning"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            TcachePoisoning
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="RustPwn" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/RustPwn/" aria-label="后一篇: RustPwn"  title="后一篇: RustPwn"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          RustPwn
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SSP-Leak-libc2-27"><span class="toc-number">1.</span> <span class="toc-text">SSP Leak &lt; libc2.27</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-SSP-%E6%BC%8F%E6%B4%9E%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 SSP 漏洞？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libc2-23"><span class="toc-number">1.2.</span> <span class="toc-text">libc2.23 :\</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#libc2-25"><span class="toc-number">1.3.</span> <span class="toc-text">libc2.25 :\</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%BE%E6%88%90-SSP-Leak-%E7%9A%84%E8%8B%9B%E5%88%BB%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.</span> <span class="toc-text">达成 SSP Leak 的苛刻条件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-stderr%EF%BC%88%E6%A0%87%E5%87%86%E9%94%99%E8%AF%AF%EF%BC%89%EF%BC%9F"><span class="toc-number">1.4.1.</span> <span class="toc-text">什么是 stderr（标准错误）？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E7%9A%84%E8%B0%A2%E5%B9%95-Patch"><span class="toc-number">1.5.</span> <span class="toc-text">漏洞的谢幕 (Patch)</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "SSPLeak_libc2.27",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/SSPLeak_libc2.27/",
+          excerpt: "",
+          description: "",
+          stripContent: "SSP Leak &amp;lt; libc2.27什么是 SSP 漏洞？_**Stack Smashing Protector （SSP） **_是一个著名的缓冲区溢出漏洞缓解措施。当一个函数检测栈上的 Canary 被破坏的时候，就会转到 __stack_chk_fial()函数终止程序运行并抛出错误信息。改错误信息包含了 argv[0] 指向的字符串，如果我们能够控制 argv[0]，那么将可能造成信息泄露，这一技术称之为 SSP Leak。 先举个简单的例子： 默认情况下 argv[0] 是指向",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

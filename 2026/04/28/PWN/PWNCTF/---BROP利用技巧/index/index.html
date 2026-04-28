@@ -1,0 +1,621 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="—BROP 利用技巧参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;stackoverflow&#x2F;x86&#x2F;medium-rop&#x2F;#brop 什么是 BROP_**BROP（Blind Return-Oriented Programming，盲向返回导向编程）也可以说是 Blind ROP **_是一种在没有目标二进制文件、无法静态分析的场景下，通过暴力试探">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="—BROP 利用技巧参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;stackoverflow&#x2F;x86&#x2F;medium-rop&#x2F;#brop 什么是 BROP_**BROP（Blind Return-Oriented Programming，盲向返回导向编程）也可以说是 Blind ROP **_是一种在没有目标二进制文件、无法静态分析的场景下，通过暴力试探">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-04-28T10:25:56.990Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.391Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E2%80%94BROP-%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.</span> <span class="toc-text">—BROP 利用技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-BROP"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 BROP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BROP-%E7%9A%84%E6%94%BB%E5%87%BB%E6%9D%A1%E4%BB%B6%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">BROP 的攻击条件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BROP-%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">BROP 攻击原理：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BROP-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">BROP 的基本思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E6%A0%88%E6%BA%A2%E5%87%BA%E9%95%BF%E5%BA%A6%EF%BC%9A"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">获取栈溢出长度：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9A%B4%E5%8A%9B%E8%8E%B7%E5%8F%96-Canary"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">暴力获取 Canary</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#saved-frame-pointer%EF%BC%88SFP%EF%BC%8C%E4%BF%9D%E5%AD%98%E7%9A%84%E5%B8%A7%E6%8C%87%E9%92%88%EF%BC%89"><span class="toc-number">1.3.1.2.1.</span> <span class="toc-text">saved frame pointer（SFP，保存的帧指针）</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#BlindROP"><span class="toc-number">1.3.1.3.</span> <span class="toc-text">BlindROP</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#BROP-gadgets%EF%BC%9A"><span class="toc-number">1.3.1.3.1.</span> <span class="toc-text">BROP gadgets：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-gedgets"><span class="toc-number">1.3.1.3.2.</span> <span class="toc-text">寻找 gedgets</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-PLT"><span class="toc-number">1.3.1.3.3.</span> <span class="toc-text">寻找 PLT</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6-rdx%EF%BC%9A"><span class="toc-number">1.3.1.3.4.</span> <span class="toc-text">控制 rdx：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.1.3.5.</span> <span class="toc-text">寻找输出函数</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.1.4.</span> <span class="toc-text">攻击总结</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/---BROP利用技巧/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.990Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="—BROP-利用技巧"><a href="#—BROP-利用技巧" class="headerlink" title="—BROP 利用技巧"></a>—BROP 利用技巧</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/user-mode/stackoverflow/x86/medium-rop/#brop">https://ctf-wiki.org/pwn/linux/user-mode/stackoverflow/x86/medium-rop/#brop</a></p>
+<h3 id="什么是-BROP"><a href="#什么是-BROP" class="headerlink" title="什么是 BROP"></a>什么是 BROP</h3><p>_**BROP（Blind Return-Oriented Programming，盲向返回导向编程）也可以说是 Blind ROP **_是一种<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">在没有目标二进制文件、无法静态分析</font>的场景下，通过<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">暴力试探 + 崩溃反馈</font>远程构造 ROP 链的 PWN 技术，核心是 盲打探出关键 gadget 与函数地址，最终实现代码执行。</p>
+<h3 id="BROP-的攻击条件："><a href="#BROP-的攻击条件：" class="headerlink" title="BROP 的攻击条件："></a>BROP 的攻击条件：</h3><ol>
+<li>源程序必须存在栈溢出漏洞，以便于攻击者可以控制程序流程</li>
+<li>服务器端的进程在崩溃之后会重新启动，并且重新启动的进程的地址与先前的地址一样，即开启了<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">开启了持久化 ASLR 关闭 &#x2F; 固定地址</font>。</li>
+</ol>
+<h3 id="BROP-攻击原理："><a href="#BROP-攻击原理：" class="headerlink" title="BROP 攻击原理："></a>BROP 攻击原理：</h3><p>目前来说，大部分应用都会开启 ASLR、NX、Canary 保护。这里我们分别讲解在 BROP 当中如何绕过这些保护，以及如何对这些保护进行攻击。</p>
+<h4 id="BROP-的基本思路："><a href="#BROP-的基本思路：" class="headerlink" title="BROP 的基本思路："></a>BROP 的基本思路：</h4><p>在 BROP 中，我们其实是有迹可循的，基本遵循的道路如下：</p>
+<ol>
+<li>判断栈溢出长度–暴力枚举</li>
+<li>Stack Reading–获取栈上的数据来泄露 Canary 以及 ebp 和返回地址</li>
+<li>BlindROP–找到足够多的 gadgets 来控制输出函数的参数，并且对其进行调用，比如常见的 write 函数。</li>
+<li>Build the exploit–利用输出函数来 dump 出程序以便来找到更多的 gadgets，从而写出最后的 exploit。</li>
+</ol>
+<h5 id="获取栈溢出长度："><a href="#获取栈溢出长度：" class="headerlink" title="获取栈溢出长度："></a>获取栈溢出长度：</h5><p>我们通常利用暴力枚举的方法，直到发现程序崩溃来获取栈溢出的长度。</p>
+<h5 id="暴力获取-Canary"><a href="#暴力获取-Canary" class="headerlink" title="暴力获取 Canary"></a>暴力获取 Canary</h5><p>栈（Stack）是程序运行时用于存储局部变量、函数调用上下文的内存区域，<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">生长方向是从高地址向低地址</font>。当一个函数被调用时，会在栈上创建一个栈帧（Stack Frame），如下是我们当前经典的栈布局：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">高地址</span><br><span class="line">┌─────────────────────────────────┐</span><br><span class="line">│  saved returned address         │  ← 返回地址-函数执行完要跳回的地址</span><br><span class="line">├─────────────────────────────────┤</span><br><span class="line">│  saved frame pointer            │  ← ebp/rbp-保存上一级栈帧的基址</span><br><span class="line">├─────────────────────────────────┤</span><br><span class="line">│  canary                         │  ← 栈溢出检测的保护机制</span><br><span class="line">├─────────────────────────────────┤</span><br><span class="line">│  buffer                         │  ← 缓冲区-局部变量存储区</span><br><span class="line">└─────────────────────────────────┘</span><br><span class="line">低地址</span><br></pre></td></tr></table></figure>
+
+<h6 id="saved-frame-pointer（SFP，保存的帧指针）"><a href="#saved-frame-pointer（SFP，保存的帧指针）" class="headerlink" title="saved frame pointer（SFP，保存的帧指针）"></a><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">saved frame pointer（SFP，保存的帧指针）</font></h6><ul>
+<li><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">本质</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">：也叫 EBP（32 位）&#x2F; RBP（64 位），是栈帧的「基址指针」，存放的是上一级函数栈帧的帧指针地址。</font></li>
+<li><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">作用</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">：定位栈帧内的变量 —— 因为栈是动态生长的，用 RBP 作为基准，能准确找到 buffer、局部变量、返回地址的位置（比如 </font><code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">[RBP-0x80]</font></code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);"> 对应 buffer 的起始地址）。</font></li>
+<li><strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">溢出影响</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">：缓冲区溢出会先覆盖 canary，再覆盖 SFP；篡改 SFP 会导致函数返回时栈帧回溯出错，程序崩溃，但这不是攻击者的核心目标。</font></li>
+</ul>
+<p>要想得到 Canary 之后的变量，我们所需要解决的第一个问题就是：如何获取溢出缓冲区的长度。这个我们可以通过不断尝试来获取 overflow 的长度。</p>
+<p>之后就到了 canary 以及之后的变量，我们采取的方法一致，这里以 Canary 来当做示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xx xx xx xx xx xx xx xx(x64) <span class="number">256</span>*<span class="number">8</span></span><br><span class="line">xx xx xx xx(x32)             <span class="number">256</span>*<span class="number">4</span></span><br></pre></td></tr></table></figure>
+
+<p>让每个字节从 00 逐次+1 进行爆破，每位最多爆破 16*16&#x3D;256 次</p>
+<h5 id="BlindROP"><a href="#BlindROP" class="headerlink" title="BlindROP"></a>BlindROP</h5><p>最朴素地执行 write 函数的方法就是构造系统调用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pop rdi; ret <span class="comment"># socket</span></span><br><span class="line">pop rsi; ret <span class="comment"># buffer</span></span><br><span class="line">pop rdx; ret <span class="comment"># length</span></span><br><span class="line">pop rax; ret <span class="comment"># write syscall number</span></span><br><span class="line">syscall</span><br></pre></td></tr></table></figure>
+
+<p>不过通常来说，这样的方法都是比较困难的，因为想要找到一个 syscall 的地址基本不可能。我们通过找 write 的方式来获取。</p>
+<h6 id="BROP-gadgets："><a href="#BROP-gadgets：" class="headerlink" title="BROP gadgets："></a>BROP gadgets：</h6><p>首先，在 liibc_csu_init 的结尾异常穿的 gadgets，我们可以通过偏移来获取 write 调用的前两个参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![1772627736471-837fe1e0-0395-4a98-86c7-33626c152de2.png](./img/IbpGCkEJXk8yoDtk/1772627736471-837fe1e0-0395-4a98-86c7-33626c152de2-229878.png)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以通过 plt 表来获取 write 的地址。</p>
+<p>值得注意的是 Lrdx 只是我们用来输出程序字节长度的遍历那个，只要不为 0 即可。一般来说程序中的 rdx 经常性不是 0，但是为了更好地控制程序输出，我们仍然尽量可以控制这个值，但是在程序中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pop rdx; ret</span><br></pre></td></tr></table></figure>
+
+<p>这样的指令几乎没有。那我们又该怎么去控制 rdx 的数值呢？这里说明执行 strcmp 的时候，rdx 会被设置为将要被比较的字符串长度，所以我们可以找到 strcmp 函数，从而来控制 rdx。</p>
+<p>那么接下来的问题，我们就可以分为两项：1. 寻找 gadgets 2. 寻找 plt 表（write 入口、strcmp 入口）</p>
+<h6 id="寻找-gedgets"><a href="#寻找-gedgets" class="headerlink" title="寻找 gedgets"></a>寻找 gedgets</h6><p>首先我们来想办法去寻找 gadgets。此时由于尚未直到程序具体长什么样子，所以我们只能通过简单控制程序的返回地址为自己设置的值，从而来猜测相应的 gadgets。而当我们控制程序的返回地址时，有以下几种情况：</p>
+<ol>
+<li>程序直接崩溃</li>
+<li>程序运行一段时间后崩溃</li>
+<li>程序一直运行而不崩溃</li>
+</ol>
+<p>为了寻找合理地 gadgets，我们可以分为以下两步：</p>
+<p><strong>寻找 stop gadgets：</strong></p>
+<p>所谓寻找 stop gadgets 一般指的是这样一段代码：当程序执行这段代码时，程序会进行无限循环，这样似的攻击者能够一直报纸连接状态。其根本目的是在告诉攻击者，所测试的返回地址是一个 gadgets。</p>
+<p>之所以要寻找 gadgets，是因为当我们猜到某个 gadgets 后，如果我们仅仅是将其布置在栈上，由于执行完这个 gadget 之后，程序还会跳到栈上的下一个地址。如果该地址是非法地址，那么程序就会 crash。这样的话，在攻击者看来程序只是单纯的 crash 了。因此攻击者就会认为在这个过程中并没有直行道任何有用的 gadgets，从而放弃它，我们可以参考下图：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![1772628781253-4dc41e79-60ce-4d1f-a1f7-29798466d673.png](./img/IbpGCkEJXk8yoDtk/1772628781253-4dc41e79-60ce-4d1f-a1f7-29798466d673-815474.png)</span><br></pre></td></tr></table></figure>
+
+<p>但是，如果我们不制冷 stop gadget，那么对于我们所要尝试的每一个地址，如果他是一个 gadget 的话，程序就不会崩溃。接下来就是去想：怎么识别这些 gadgets？</p>
+<p><strong>识别 gadgets</strong></p>
+<p>那么我们该如何识别这些 gadgets 呢？我们可以通过栈布局以及程序的行为来识别。为了更加容易地进行介绍，这里定义栈上的三种地址：</p>
+<ol>
+<li>Probe 探针</li>
+</ol>
+<ul>
+<li>探针，也就是我们想要探测的代码地址。一般来说都是 64 位程序，可以直接从 0x400000 尝试，如果不成功，有可能是程序开启了 PIE 保护，要么就是 32 位程序了。</li>
+</ul>
+<ol start="2">
+<li>Stop</li>
+</ol>
+<ul>
+<li>不会使得程序崩溃的 Stop gatgets 的地址</li>
+</ul>
+<ol start="3">
+<li>Trap</li>
+</ol>
+<ul>
+<li>可以导致程序崩溃的地址</li>
+</ul>
+<p>我们可以通过在栈上摆放不同顺序的 Stop 与 Trap 从而来识别出正在执行的指令。因为 Stop 意味着程序不会崩溃，执行 Trap 意味着程序会立即崩溃：</p>
+<p>**例：**<em><strong>Probe,Stop,Traps(Traps,Traps)</strong></em></p>
+<p>我们可以通过程序崩溃与否，可以找到不会对栈进行 pop 操作的 gadgets，如 –ret；–xor eax，eax；ret；</p>
+<p>**例：**<em><strong>Probe,Traps,Stop,Traps</strong></em></p>
+<p>我们可以通过这样的布局来找到只是弹出一个栈变量的 gadgets ，如–pop rax；ret –pop rdi；ret</p>
+<p>**例：**<em><strong>probe, trap, trap, trap, trap, trap, trap, stop, traps</strong></em></p>
+<p>我们可以通过这样的布局来找到弹出 6 个栈变量的 gadget，也就是与 brop gadget 相似的 gadget。</p>
+<p>之所以要在每个布局的后面都放上 trap，是为了能够识别出当我们的 Probe 处对应的地址执行的指令跳过了 Stop，造成了程序立马崩溃的行为。</p>
+<p>但是即使是这样，我们仍然难以识别出正在执行的 gadgets 到底是在对那个寄存器进行操作。</p>
+<p><strong>不过需要注意的是：像 BROP 这样的一下子弹出 6 个寄存器的 gadgets，程序中并不经常出现。所以如果我们发现了这样的 gadgets，那么有很大的可能性，这个 gadgets 就是 brop gadgets</strong></p>
+<p>此外，这个 gadgets 通过错位还可以生成 pop rsp 等这样的 gadgets，可以使得程序崩溃也可以作为识别这个 gadgets 的标志。   根据我们之前学的 ret2libc_csu_init 可以知道该地址减去 0x1a 就会得到其上一个 gadgets。可以供我们调用其它函数 。</p>
+<h6 id="寻找-PLT"><a href="#寻找-PLT" class="headerlink" title="寻找 PLT"></a>寻找 PLT</h6><p>如下图：程序的 PLT 表具有比较规整的结构，每一个 plt 表项都是 16 字节。而且在每一个表项的 6 字节偏移处，是该表项对应的函数的解析路径，即程序最初执行该函数的时候，会执行该路径对函数的 got地址进行解析：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">![1772631176850-22b2f0a2-8d05-4e36-85f9-7344eb1a26f2.png](./img/IbpGCkEJXk8yoDtk/1772631176850-22b2f0a2-8d05-4e36-85f9-7344eb1a26f2-969616.png)</span><br></pre></td></tr></table></figure>
+
+<p>此外，对大多数 plt 调用来说，一般都不容易崩溃，即使是使用了比较奇怪的参数。所以说如果我们发现了一系列长度为 16 的没有使得程序崩溃的代码段，那么我们有一定的里有相信我们遇到了 plt 表。除此之外，我们还可以通过前后偏移 6 字节，来判断我们是处于 plt 表项中间还是说处于开头。</p>
+<h6 id="控制-rdx："><a href="#控制-rdx：" class="headerlink" title="控制 rdx："></a>控制 rdx：</h6><p>当我们找到 plt 表之后，我们就该想办法来控制 rdx 的数值了。那么该如何确认 strcmp 的位置呢？需要提前说的是，并不是所有的程序都会调用 strcmp 函数，所以在没有调用 strcmp 函数的情况下，我们就得利用其他方式来控制 rdx 的值了。这里给出程序中使用 strcmp 函数的情况：</p>
+<p>之前我们已经找到了 brop 的 gadgets，所以我们可以控制函数的前两个参数了。与此同时，我们定义以下两种地址：</p>
+<ol>
+<li>readable –可读的地址</li>
+<li>bad –非法地址，不可访问，比如说 0x0</li>
+</ol>
+<p>那么我们如果控制传递的参数为这两种地址的组合，会出现以下四种情况：<strong>只有最后一种格式程序才会正常运行。</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">strcmp(bad,bad)</span><br><span class="line">strcmp(bad,readable)</span><br><span class="line">strcmp(readable,bad)</span><br><span class="line">strcmp(readable,readable)</span><br></pre></td></tr></table></figure>
+
+<p><strong>注</strong>：在没有 PIE 保护的时候，64 位程序的 ELF 文件的 0x400000 处有 7 个非零字节。</p>
+<p>那么我们该如何具体地去做呢？有一种比较直接的方法就是从头到尾依次扫描每个 plt 表项，但是这个却比较麻烦。我们可以选择如下的一种方法</p>
+<ul>
+<li>利用 plt 表项的慢路径</li>
+<li>并且利用下一个表项的慢路径的地址来覆盖返回地址</li>
+</ul>
+<p>这样，我们就不用来回控制相应的变量了。</p>
+<p>当然，我们也可能碰巧找到 strncmp 或者 strcasecmp 函数，它们具有和 strcmp 一样的效果。</p>
+<h6 id="寻找输出函数"><a href="#寻找输出函数" class="headerlink" title="寻找输出函数"></a>寻找输出函数</h6><p>寻找输出函数既可以寻找 write，也可以寻找 puts 函数。</p>
+<p><strong>寻找 write@plt：</strong></p>
+<p>当我们可以控制 write 函数的三个参数的时候，我们就可以再次遍历所有的 plt 表，根据 write 函数将会输出的内容来寻找到相应的函数。这的注意的是，这里有个比较麻烦的地方在于我们需要找到文件描述符的值。一般情况下，我们有两种方法来找到这个值：</p>
+<ul>
+<li>使用 rop chain，同时使得每个 rop 对应的文件描述符不一样</li>
+<li>同时打开多个连接，并且我们使用相对较高的数值来试一试。</li>
+</ul>
+<p><strong>寻找 puts@plt：</strong></p>
+<p>寻找 puts@plt 函数，我们自然需要控制 rdi 参数。此时我们已经找到了 BROP gadgets。那么更具 brop gadget 偏移就可以得到相应的 gadgets （由 ret2libc_csu_init 中后续可得）。同时在程序还没有开启 PIE 保护的情况下，0x400000 处为 ELF 文件的头部，其内容为 \ x7fELF。所以我们可以根据这个来进行判断。一般来说，其 payload 如下  ：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">&#x27;A&#x27;</span>*length +p64(pop_rdi_ret)+p64(<span class="number">0x400000</span>)+p64(addr)+p64(stop_gadget)</span><br></pre></td></tr></table></figure>
+
+<h5 id="攻击总结"><a href="#攻击总结" class="headerlink" title="攻击总结"></a>攻击总结</h5><p>此时攻击者已经可以控制输出函数来，那么攻击者就可以输出.text 段更多的内容以便于找到更多合适的 gadgets。同时，攻击者还可以找到一些其他函数，如 execve 函数。剩下的就是想办法构造 exp 获取后门函数了。</p>
+<blockquote>
+<p>更新: 2026-03-04 22:03:35<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/gkvhgik94ti3nkhr">https://www.yuque.com/idcm/wnemg9/gkvhgik94ti3nkhr</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/ChunkExtend&Overlapping/index/" aria-label="前一篇: index" title="前一篇: index"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            index
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="---BlindROP盲打例题" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/---BlindROP%E7%9B%B2%E6%89%93%E4%BE%8B%E9%A2%98/" aria-label="后一篇: ---BlindROP盲打例题"  title="后一篇: ---BlindROP盲打例题"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          ---BlindROP盲打例题
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E2%80%94BROP-%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7"><span class="toc-number">1.</span> <span class="toc-text">—BROP 利用技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-BROP"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 BROP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BROP-%E7%9A%84%E6%94%BB%E5%87%BB%E6%9D%A1%E4%BB%B6%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">BROP 的攻击条件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BROP-%E6%94%BB%E5%87%BB%E5%8E%9F%E7%90%86%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">BROP 攻击原理：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BROP-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">BROP 的基本思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E6%A0%88%E6%BA%A2%E5%87%BA%E9%95%BF%E5%BA%A6%EF%BC%9A"><span class="toc-number">1.3.1.1.</span> <span class="toc-text">获取栈溢出长度：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9A%B4%E5%8A%9B%E8%8E%B7%E5%8F%96-Canary"><span class="toc-number">1.3.1.2.</span> <span class="toc-text">暴力获取 Canary</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#saved-frame-pointer%EF%BC%88SFP%EF%BC%8C%E4%BF%9D%E5%AD%98%E7%9A%84%E5%B8%A7%E6%8C%87%E9%92%88%EF%BC%89"><span class="toc-number">1.3.1.2.1.</span> <span class="toc-text">saved frame pointer（SFP，保存的帧指针）</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#BlindROP"><span class="toc-number">1.3.1.3.</span> <span class="toc-text">BlindROP</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#BROP-gadgets%EF%BC%9A"><span class="toc-number">1.3.1.3.1.</span> <span class="toc-text">BROP gadgets：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-gedgets"><span class="toc-number">1.3.1.3.2.</span> <span class="toc-text">寻找 gedgets</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-PLT"><span class="toc-number">1.3.1.3.3.</span> <span class="toc-text">寻找 PLT</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6-rdx%EF%BC%9A"><span class="toc-number">1.3.1.3.4.</span> <span class="toc-text">控制 rdx：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.1.3.5.</span> <span class="toc-text">寻找输出函数</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.1.4.</span> <span class="toc-text">攻击总结</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "—BROP 利用技巧参考资料：https://ctf-wiki.org/pwn/linux/user-mode/stackoverflow/x86/medium-rop/#brop 什么是 BROP_**BROP（Blind Return-Oriented Programming，盲向返回导向编程）也可以说是 Blind ROP **_是一种在没有目标二进制文件、无法静态分析的场景下，通过暴力试探 + 崩溃反馈远程构造 ROP 链的 PWN 技术，核心是 盲打探出关键 gadget 与函数地址，",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

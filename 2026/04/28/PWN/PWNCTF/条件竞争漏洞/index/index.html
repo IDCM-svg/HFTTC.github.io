@@ -1,0 +1,608 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="条件竞争漏洞条件竞争：系统中，最小的运算调度单位是线程，而每个线程又依附于一个进程，条件竞争则是多进程或多线程对一个共享资源操作，因为操作顺序不受控的时候所产生的问题。 进程：在计算机操作系统中，进程是指一个正在运行的程序的实例。它是操作系统进行资源分配和调度的基本单位。 进程的内存空间布局：当操作系统启动一个进程时，会为它分配独立的虚拟内存空间。这个空间通常被划分为以下几个主要部分：  代码段（">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="条件竞争漏洞条件竞争：系统中，最小的运算调度单位是线程，而每个线程又依附于一个进程，条件竞争则是多进程或多线程对一个共享资源操作，因为操作顺序不受控的时候所产生的问题。 进程：在计算机操作系统中，进程是指一个正在运行的程序的实例。它是操作系统进行资源分配和调度的基本单位。 进程的内存空间布局：当操作系统启动一个进程时，会为它分配独立的虚拟内存空间。这个空间通常被划分为以下几个主要部分：  代码段（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/rYaApCGIXBeBewep/1776509591109-60bc7db5-f780-404c-b01a-e0e6fbbe1d45-506699.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.691Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.420Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/rYaApCGIXBeBewep/1776509591109-60bc7db5-f780-404c-b01a-e0e6fbbe1d45-506699.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.</span> <span class="toc-text">条件竞争漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">条件竞争：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">进程：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E5%B8%83%E5%B1%80%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">进程的内存空间布局：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E7%AE%A1%E7%90%86%E8%BF%9B%E7%A8%8B%EF%BC%9F"><span class="toc-number">1.4.</span> <span class="toc-text">操作系统如何管理进程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.5.</span> <span class="toc-text">线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E7%A8%8B"><span class="toc-number">1.6.</span> <span class="toc-text">协程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="toc-number">1.7.</span> <span class="toc-text">并发编程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pthread-create-%E4%B8%8E-pthread-join"><span class="toc-number">1.8.</span> <span class="toc-text">pthread_create 与 pthread_join</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86%EF%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="toc-number">1.8.1.</span> <span class="toc-text">1. 生命周期管理：创建与回收</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%EF%BC%9A%E5%BC%82%E6%AD%A5%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%BC%BA%E5%88%B6%E7%AD%89%E5%BE%85"><span class="toc-number">1.8.2.</span> <span class="toc-text">2. 执行流程的同步：异步并发与强制等待</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E7%9A%84%E4%BC%A0%E9%80%92%EF%BC%9A%E8%8E%B7%E5%8F%96%E5%AD%90%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">1.8.3.</span> <span class="toc-text">3. 数据的传递：获取子线程的执行结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E4%BA%A7%E7%94%9F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.9.</span> <span class="toc-text">条件竞争产生的条件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%AF%A6%E7%BB%86%E8%BF%90%E8%A1%8C%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.9.1.</span> <span class="toc-text">程序详细运行过程：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E4%BF%9D%E6%8A%A4%EF%BC%9A"><span class="toc-number">1.10.</span> <span class="toc-text">互斥锁保护：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/条件竞争漏洞/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.691Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="条件竞争漏洞"><a href="#条件竞争漏洞" class="headerlink" title="条件竞争漏洞"></a>条件竞争漏洞</h1><h3 id="条件竞争："><a href="#条件竞争：" class="headerlink" title="条件竞争："></a>条件竞争：</h3><p>系统中，最小的运算调度单位是线程，而每个线程又依附于一个进程，条件竞争则是多进程或多线程对一个共享资源操作，因为操作顺序不受控的时候所产生的问题。</p>
+<h3 id="进程："><a href="#进程：" class="headerlink" title="进程："></a>进程：</h3><p>在计算机操作系统中，<strong>进程是指一个正在运行的程序的实例</strong>。它是操作系统进行资源分配和调度的基本单位。</p>
+<h3 id="进程的内存空间布局："><a href="#进程的内存空间布局：" class="headerlink" title="进程的内存空间布局："></a>进程的内存空间布局：</h3><p>当操作系统启动一个进程时，会为它分配独立的虚拟内存空间。这个空间通常被划分为以下几个主要部分：</p>
+<ul>
+<li><strong>代码段（Text&#x2F;Code Segment）：</strong> 存储程序执行的机器指令。这部分通常是只读的，以防止程序意外修改自己的指令。</li>
+<li><strong>数据段（Data Segment）：</strong> 存储程序中已经初始化的全局变量和静态变量。</li>
+<li><strong>BSS 段（BSS Segment）：</strong> 存储程序中未初始化的全局变量和静态变量。在程序开始执行前，操作系统会将这块区域清零。</li>
+<li><strong>堆（Heap）：</strong> 用于程序运行时的动态内存分配堆的大小不固定，通常向高地址方向增长。</li>
+<li><strong>栈（Stack）：</strong> 用于存储局部变量、函数参数、局部代码块的上下文以及函数的返回地址。栈通常向低地址方向增长，由编译器自动分配和释放。</li>
+</ul>
+<h3 id="操作系统如何管理进程？"><a href="#操作系统如何管理进程？" class="headerlink" title="操作系统如何管理进程？"></a>操作系统如何管理进程？</h3><p>为了管理数量繁多的进程，操作系统会为每一个进程创建一个数据结构，称为 进程控制块 PCB。在 Linux 系统中，这个结构被称为 task_struct。PCB 包含了操作系统管理该进程所需的所有信息，主要包括：</p>
+<ul>
+<li><strong>进程标识符（PID, Process ID）：</strong> 每个进程独一无二的数字编号。</li>
+<li><strong>进程状态（State）：</strong> 记录进程当前处于什么阶段（如：运行中、就绪、阻塞&#x2F;等待、终止）。</li>
+<li><strong>CPU 寄存器状态：</strong> 当进程被暂停执行，发生上下文切换时，它的 CPU 寄存器（包括程序计数器 PC、栈指针 SP 等）的值会被保存在这里，以便下次恢复运行时能接着断点继续执行。</li>
+<li><strong>内存管理信息：</strong> 页表指针等，用于将进程的虚拟地址映射到物理内存。</li>
+<li><strong>资源清单：</strong> 进程打开的文件描述符（File Descriptors）、网络连接等。</li>
+</ul>
+<h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">线程</font></h3><p><strong>线程（Thread）是操作系统调度和分配 CPU 执行时间的最小单位</strong>。你可以把它理解为进程内部的一条独立执行流，可称为“轻量级进程（Lightweight Process）”</p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">线程的是为了降低上下文切换的消耗，提高系统的并发性，并突破一个进程只能干一样事的缺陷，使到进程内并发成为可能；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">线程是进程的一个实体，是 CPU 调度和分派的基本单位，它是比进程更小的能独立运行的基本单位；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">线程自己基本上不拥有系统资源，只拥有在运行中必不可少的资源 (如程序计数器、一组寄存器和栈)，但是它可与同属一个进程的其他的线程共享进程所拥有的全部资源；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">线程间通信主要通过共享内存，上下文切换很快，资源开销较少，但相比进程不够稳定容易丢失数据；</font></li>
+</ul>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">协程</font></h3><p><strong>协程（Coroutine）</strong>，又称为微线程，是一种<strong>用户态的轻量级线程</strong>。</p>
+<p>如果说进程和线程的调度都是由操作系统（OS）内核强制接管的，那么协程的调度则是完全交由程序代码本身来控制的。</p>
+<p>让我们继续用“工厂”来打比方：</p>
+<ul>
+<li><strong>进程（Process）</strong>：工厂。</li>
+<li><strong>线程（Thread）</strong>：工厂里的工人。操作系统负责分配工人去哪个流水线。</li>
+<li><strong>协程（Coroutine）</strong>：当一个工人在烤箱前等待零件加热（I&#x2F;O 阻塞）时，他不会傻站着，而是主动放下当前的活，转头去另一条流水线上拧螺丝；等烤箱“叮”了一声（I&#x2F;O 完成），他再回来接着处理加热好的零件。</li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">协程通过在线程中实现调度，避免了陷入内核级别的上下文切换造成的性能损失，进而突破了线程在 IO 上的性能瓶颈；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">协程拥有自己的寄存器上下文和栈；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">协程调度切换时，将寄存器上下文和栈保存到其他地方，在切回来的时候，恢复先前保存的寄存器上下文和栈，直接操作栈则基本没有内核切换的开销；</font></li>
+</ul>
+<h3 id="并发编程"><a href="#并发编程" class="headerlink" title="并发编程"></a><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">并发编程</font></h3><ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">目的：并发编程在实际情况是为了提高执行效率，提高系统的利用率；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">CPU 的速度远快于各种 IO，而这也导致了 CPU 在很多时候，都是在持续等待中；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">然而如果利用分时的机制，这样可以让 CPU 将不同时间片分发给不同的 task，这样就能大大的提示 CPU 的利用率；</font></li>
+</ul>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">而且这种机制也可以让多个程序分开执行不同任务；</font></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">从整个程序执行角度来看，程序执行时可以看作是对输入的数据进行计算处理然后输出到特定的设备中</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">当其中的一个环节正在执行的时候其他环节就会挂起；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">一旦输入阻塞，即 IO 等待读入数据，那么已读入的数据也不能得到处理，已处理的数据也不能输出，这就造成了 CPU 的闲置；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">如果这三个步骤可以并发执行的话，即使 IO 在等待输入，CPU 仍然可以对已在内存中的数据做计算处理，结果也可以正常输出；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">这就提高了 CPU 的利用率，不会因为输入输出的阻塞，导致 CPU 的计算能力被浪费；</font></li>
+<li><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">当有多种类型的任务执行时，为每种任务单独编写程序，比编写混杂在一起的所有任务的程序，要简单的多；</font></li>
+</ul>
+<h3 id="pthread-create-与-pthread-join"><a href="#pthread-create-与-pthread-join" class="headerlink" title="pthread_create 与 pthread_join"></a>pthread_create 与 pthread_join</h3><p>这两个函数在多线程编程中是形影不离的搭档。简单来说，它们的关联就像是”分配任务”与”等待汇报并清理工位”</p>
+<p>我们可以从以下三个核心维度来理解它们之间密不可分的关联：</p>
+<h4 id="1-生命周期管理：创建与回收"><a href="#1-生命周期管理：创建与回收" class="headerlink" title="1. 生命周期管理：创建与回收"></a>1. 生命周期管理：创建与回收</h4><ul>
+<li><strong>pthread_create (产生)</strong>：它的作用是向操作系统申请资源（比如分配线程栈、TLS 线程局部存储等），并<font style="color:#DF2A3F;">启动一个新的线程</font>去独立执行指定的函数。</li>
+<li><strong>pthread_join (回收)</strong>：当子线程执行完毕退出后，它其实并没有彻底消失，而是会进入一种类似进程中的“僵尸 Zombie 状态”，保留着它的退出状态码和部分系统资源。pthread_join 的核心作用之一就是去收集这个退出状态，并<font style="color:#DF2A3F;">彻底释放该线程占用的所有残留系统资源</font>。</li>
+<li><strong>关联</strong>：就像 <code>malloc</code> 对应 <code>free</code>，或者是多进程里的 <code>fork</code> 对应 <code>waitpid</code> 一样。如果一个线程被 pthread_create 出来，主线程就必须调用 pthread_join，否则会导致内存和系统资源泄漏。</li>
+</ul>
+<h4 id="2-执行流程的同步：异步并发与强制等待"><a href="#2-执行流程的同步：异步并发与强制等待" class="headerlink" title="2. 执行流程的同步：异步并发与强制等待"></a>2. 执行流程的同步：异步并发与强制等待</h4><ul>
+<li>pthread_create 调用后会立刻返回，主线程和新创建的子线程会开始并发且异步执行，各跑各的。</li>
+<li>但是在很多业务场景下，主线程需要等待子线程把活干完，才能继续往下走。这时候主线程调用 pthread_join (目标线程ID)，主线程就会阻塞，暂停执行在这个函数上。直到目标线程彻底运行结束，pthread_join 才会返回，主线程才会继续执行下一行代码。</li>
+<li><strong>关联</strong>：pthread_join 是协调多个并发线程执行顺序的最基础手段，把并行的乱序执行强行拉回到同步轨道上</li>
+</ul>
+<h4 id="3-数据的传递：获取子线程的执行结果"><a href="#3-数据的传递：获取子线程的执行结果" class="headerlink" title="3. 数据的传递：获取子线程的执行结果"></a>3. 数据的传递：获取子线程的执行结果</h4><ul>
+<li>pthread_create 可以通过最后一个参数向子线程传递参数。</li>
+<li>子线程执行完毕时，可以通过 return 或者 pthread_exit() 返回一个指针（通常指向运算结果）。</li>
+<li>pthread_join 的第二个参数（一个二级指针）就是用来<strong>接收子线程返回的这个结果指针</strong>的。</li>
+</ul>
+<hr>
+<p>例举一个有关两个函数的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( pthread_create(&amp;newthread, <span class="number">0</span>, start_routine, <span class="number">0</span>) &lt; <span class="number">0</span> )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Internal error, contact admin.&quot;</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line">pthread_join(newthread, <span class="number">0</span>);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// main 函数结束</span></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><strong>分配任务</strong>：主线程通过 <code>pthread_create</code> 创建了 <code>newthread</code>，让它去执行 <code>start_routine</code>函数</li>
+<li><strong>强制等待</strong>：紧接着主线程立刻调用了 <code>pthread_join(newthread, 0)</code>。这意味着主线程啥也不干了，就死死卡在这里，等待函数操作完毕并退出。</li>
+<li><strong>防止程序提前崩溃</strong>：如果这里没有 <code>pthread_join</code>，主线程在 <code>pthread_create</code> 后会直接执行 return 0，导致整个进程直接退出。进程一旦退出，里面的所有子线程不管有没有执行完，都会被操作系统直接强行杀死。所以这里的 <code>join</code> 是为了保证程序的菜单能够持续运行并接收用户输入。</li>
+</ol>
+<h3 id="条件竞争产生的条件"><a href="#条件竞争产生的条件" class="headerlink" title="条件竞争产生的条件"></a><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">条件竞争产生的条件</font></h3><p><strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">并发</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">，即至少存在两个并发执行流，这里的执行流包括线程、进程、任务等级别的执行流；</font></p>
+<p><strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">共享对象</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">，即多个并发流会访问同一对象</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">常见的共享对象有共享内存、文件系统、信号，这些共享对象是用来使得多个程序执行流相互交流</font></p>
+<p><strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">改变对象</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.3);">，即至少有一个控制流会改变竞争对象的状态；如果程序只是对对象进行读操作，那么并不会产生条件竞争；</font></p>
+<p>这里例举一个例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 引入 POSIX 线程（Pthreads）库的头文件。</span></span><br><span class="line"><span class="comment">  告诉编译器我们将使用与线程相关的函数（如 pthread_create 和 pthread_join）和数据类型。 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 声明了一个全局整型变量。</span></span><br><span class="line"><span class="comment">   它被存放在 BSS 段（未初始化数据段），默认初始化为 0。</span></span><br><span class="line"><span class="comment">   这个变量存在于全局内存中，所有稍后创建的线程都将共享、读取和修改这同一个内存地址*/</span></span><br><span class="line"><span class="type">int</span> counter;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义了线程启动后要执行的工作函数。</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">IncreaseCounter</span><span class="params">(<span class="type">void</span> *args)</span> &#123;</span><br><span class="line"></span><br><span class="line">  counter += <span class="number">1</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">/*  C 标准库的 sleep() 只接受无符号整数。</span></span><br><span class="line"><span class="comment">      传入浮点数 0.1 会发生隐式类型转换，被截断为 sleep(0)。</span></span><br><span class="line"><span class="comment">      这实际上起到了 Yield（主动让出 CPU 时间片）的作用，放大了并发冲突的概率 */</span></span><br><span class="line">  sleep(<span class="number">0.1</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 打印当前执行状态。</span></span><br><span class="line">  <span class="comment">// pthread_self() 获取当前线程的 ID，将其强制转换为 unsigned int 匹配 %d 打印。</span></span><br><span class="line">  <span class="comment">// 此时读取到的 counter 往往已经被其他并发线程修改过了。</span></span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Thread %d has counter value %d\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">int</span>)pthread_self(),</span><br><span class="line">         counter);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 主线程</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 声明了一个包含 10 个元素的数组，用于保存即将创建的 10 个子线程的唯一标识符（ID）。</span></span><br><span class="line">  <span class="type">pthread_t</span> p[<span class="number">10</span>];</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 循环 10 次，向操作系统申请创建 10 个新线程。</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">    <span class="comment">// &amp;p[i]           : 将新创建的线程 ID 保存到数组中。</span></span><br><span class="line">    <span class="comment">// NULL            : 线程属性，传 NULL 表示使用系统默认属性。</span></span><br><span class="line">    <span class="comment">// IncreaseCounter : 指定新线程启动后要去执行的函数指针。</span></span><br><span class="line">    <span class="comment">// NULL            : 传递给 IncreaseCounter 函数的参数（此处无需传参）。</span></span><br><span class="line">    pthread_create(&amp;p[i], <span class="literal">NULL</span>, IncreaseCounter, <span class="literal">NULL</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 再次循环 10 次，阻塞主线程，等待所有子线程执行完毕。</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">    <span class="comment">// p[i] : 要等待的子线程 ID。</span></span><br><span class="line">    <span class="comment">// NULL : 用于接收子线程退出时的返回值（此处不关心，填 NULL）。</span></span><br><span class="line">    <span class="comment">// 如果没有 join，主线程可能会在子线程执行完之前就直接退出，导致整个进程被销毁。</span></span><br><span class="line">    pthread_join(p[i], <span class="literal">NULL</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.87);">一般来说，我们可能希望按如下方式输出：</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="number">005</span>race_condition ./example1</span><br><span class="line">Thread <span class="number">1859024640</span> has counter value <span class="number">1</span></span><br><span class="line">Thread <span class="number">1841583872</span> has counter value <span class="number">2</span></span><br><span class="line">Thread <span class="number">1832863488</span> has counter value <span class="number">3</span></span><br><span class="line">Thread <span class="number">1824143104</span> has counter value <span class="number">4</span></span><br><span class="line">Thread <span class="number">1744828160</span> has counter value <span class="number">5</span></span><br><span class="line">Thread <span class="number">1736107776</span> has counter value <span class="number">6</span></span><br><span class="line">Thread <span class="number">1727387392</span> has counter value <span class="number">7</span></span><br><span class="line">Thread <span class="number">1850304256</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1709946624</span> has counter value <span class="number">9</span></span><br><span class="line">Thread <span class="number">1718667008</span> has counter value <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.87);">但是，由于条件竞争的存在，最后输出的结果往往不尽人意：</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">➜  <span class="number">005</span>race_condition ./example1</span><br><span class="line">Thread <span class="number">1417475840</span> has counter value <span class="number">2</span></span><br><span class="line">Thread <span class="number">1408755456</span> has counter value <span class="number">2</span></span><br><span class="line">Thread <span class="number">1391314688</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1356433152</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1365153536</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1373873920</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1382594304</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1400035072</span> has counter value <span class="number">8</span></span><br><span class="line">Thread <span class="number">1275066112</span> has counter value <span class="number">9</span></span><br><span class="line">Thread <span class="number">1266345728</span> has counter value <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">之所以会出现这么多 <span class="number">8</span>，</span><br><span class="line">    核心原因在于：<span class="built_in">printf</span> 打印的不是“刚才我加完之后的那个数字”，</span><br><span class="line">    而是“此时此刻全局共享内存里 counter 的最新状态”。</span><br><span class="line">    </span><br><span class="line">假设这 <span class="number">6</span> 个打印出 <span class="number">8</span> 的线程是线程 C、D、E、F、G、H。</span><br><span class="line"></span><br><span class="line">第一步: 加数字，但都不马上打印</span><br><span class="line"></span><br><span class="line">    线程 C 被 CPU 叫醒，执行了 counter += <span class="number">1</span>。此时内存里的 counter 可能变成了 <span class="number">3</span>。</span><br><span class="line">    紧接着，线程 C 碰到了 sleep(<span class="number">0</span>)，它主动放弃了 CPU：“我休息一下，你们先上”。</span><br><span class="line">    随后，线程 D、E、F、G、H 像接力赛一样，快速地被 CPU 调度。它们每个人都跑过去把 counter 加了 <span class="number">1</span>，然后立刻 sleep(<span class="number">0</span>) 挂起。</span><br><span class="line">    在这个短暂的瞬间，由于大家都在疯狂做加法，全局变量 counter 的值被迅速推高到了 <span class="number">8</span>。</span><br><span class="line"></span><br><span class="line">第二步: 集体醒来</span><br><span class="line"></span><br><span class="line">    现在，这 <span class="number">6</span> 个刚才被挂起的线程（C 到 H）陆续醒来了，准备执行下一行代码，也就是 <span class="built_in">printf</span>。</span><br><span class="line">    <span class="built_in">printf</span> 函数需要读取 counter 的值。于是，线程 C 跑去看全局内存（黑板），发现上面的数字已经是 <span class="number">8</span> 了，于是它诚实地打印出：“我的 counter 值是 <span class="number">8</span>”。</span><br><span class="line">    接着，线程 D 醒来，也跑去看内存。因为这期间没有别的线程去修改 counter（或者别的线程还没赶到加法那一步），内存里依然是 <span class="number">8</span>，于是 D 也打印：“我的也是 <span class="number">8</span>”。</span><br><span class="line">    依此类推，这 <span class="number">6</span> 个线程在打印时，读取到的是同一个“已经长大的”全局变量，所以它们都整整齐齐地输出了 <span class="number">8</span>。</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.87);">仔细思考一下条件竞争为什么可能会发生呢？以下面的为具体的例子</font></p>
+<ul>
+<li><font style="color:rgba(0, 0, 0, 0.87);">程序首先执行了 action1，然后执行了 action2。其中 action 可能是应用级别的，也可能是操作系统级别的。正常来说，我们希望程序在执行 action2 时，action1 所产生的条件仍然是满足的。</font></li>
+<li><font style="color:rgba(0, 0, 0, 0.87);">但是由于程序的并发性，攻击者很有可能可以在 action2 执行之前的这个短暂的时间窗口中破坏 action1 所产生的条件。这时候攻击者的操作与 action2 产生了条件竞争，所以可能会影响程序的执行效果。</font></li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/rYaApCGIXBeBewep/1776509591109-60bc7db5-f780-404c-b01a-e0e6fbbe1d45-506699.png" alt="1776509591109-60bc7db5-f780-404c-b01a-e0e6fbbe1d45.png"></p>
+<p><font style="color:rgba(0, 0, 0, 0.87);">所以我认为问题的根源在于程序员虽然假设某个条件在相应时间段应该是满足的，但是往往条件可能会在这个很小的时间窗口中被修改。</font><strong><font style="color:rgba(0, 0, 0, 0.87);">虽然这个时间的间隔可能非常小，但是攻击者仍然可能可以通过执行某些操作（如计算密集型操作，Dos 攻击）使得受害机器的处理速度变得相对慢一些。</font></strong></p>
+<h4 id="程序详细运行过程："><a href="#程序详细运行过程：" class="headerlink" title="程序详细运行过程："></a><font style="color:rgba(0, 0, 0, 0.87);">程序详细运行过程：</font></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">数据竞争（Data Race）</span><br><span class="line"></span><br><span class="line">这个程序的运行过程并不是线性的，而是充满着不确定性。以下是该程序从启动到结束的详细运行图景：</span><br><span class="line"></span><br><span class="line"><span class="number">1.</span> 程序的启动与初始化</span><br><span class="line">- 当程序开始运行时，操作系统会为其分配内存。全局变量 `counter` 被放置在 BSS 段，并自动初始化为 `<span class="number">0</span>`。</span><br><span class="line">- 操作系统的进程调度器启动主线程（Main Thread），也就是开始执行 main() 函数。</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> 子线程的批量诞生</span><br><span class="line">- 主线程进入第一个 `<span class="keyword">for</span>` 循环。它连续 <span class="number">10</span> 次调用 `pthread_create` 向操作系统申请创建新的子线程。</span><br><span class="line">- 此时，操作系统内核会快速拉起 <span class="number">10</span> 个子线程。需要特别注意的是：线程一旦被创建，它就立刻进入了‘就绪’状态，随时可能被 CPU 调度执行。</span><br><span class="line">- 因此，当主线程还在循环创建第 <span class="number">5</span> 个、第 <span class="number">6</span> 个线程时，前面创建的第 <span class="number">1</span>、第 <span class="number">2</span> 个线程很可能已经开始执行 `IncreaseCounter` 函数了。它们是完全并发的。</span><br><span class="line"></span><br><span class="line"><span class="number">3.</span> 并发执行与“数据踩踏”</span><br><span class="line">这是整个代码中最关键、也最混乱的阶段。这 <span class="number">10</span> 个子线程都会去执行 `IncreaseCounter`。我们拆解一下在这个函数里到底发生了什么：</span><br><span class="line"></span><br><span class="line">* **读取与修改（隐患所在）：**</span><br><span class="line">    代码执行了 `counter += <span class="number">1</span>;`。在 CPU 看来，这不是一个一气呵成的操作，它分为三步：</span><br><span class="line">    <span class="number">1.</span> 从内存中读取 `counter` 的值到寄存器。</span><br><span class="line">    <span class="number">2.</span> 在寄存器中将该值加 <span class="number">1</span>。</span><br><span class="line">    <span class="number">3.</span> 将寄存器的新值写回到内存中的 `counter` 地址。</span><br><span class="line">    *如果线程 A 刚读出 <span class="number">0</span> 还没来得及加 <span class="number">1</span>，线程 B 也读出了 <span class="number">0</span>，那么它们最终都会把 <span class="number">1</span> 写回内存，导致一次加法操作丢失。</span><br><span class="line"></span><br><span class="line">* **主动让出 CPU（放大隐患）：**</span><br><span class="line">    代码调用了 `sleep(<span class="number">0.1</span>)`，由于类型截断变成了 `sleep(<span class="number">0</span>)`。这在操作系统中的语义通常是**“主动放弃当前剩余的 CPU 时间片（Yield）”**。</span><br><span class="line">    这意味着：线程 A 刚刚费劲地把 `counter` 加了 <span class="number">1</span>，还没来得及打印，就被迫挂起了。CPU 瞬间切换给线程 B、C、D 去执行。这大大增加了多个线程在同一时间段内读取和修改 `counter` 的概率。</span><br><span class="line"></span><br><span class="line">* **滞后的打印：**</span><br><span class="line">    等到线程 A 再次被操作系统唤醒，终于走到 `<span class="built_in">printf</span>` 这一行时，全局的 `counter` 可能已经被刚才趁机运行的线程 B、C、D 修改过好多次了。</span><br><span class="line">    **结果就是：** 线程 A 本来是在 `counter` 变成 <span class="number">1</span> 的时候执行的加法，但它打印出来的值可能是 <span class="number">4</span>，也可能是 <span class="number">10</span>。</span><br><span class="line"></span><br><span class="line"><span class="number">4.</span> 主线程的阻塞与等待</span><br><span class="line">- 当主线程完成 <span class="number">10</span> 次创建后，它进入第二个 `<span class="keyword">for</span>` 循环，调用 `pthread_join`。</span><br><span class="line">- `pthread_join` 是一个阻塞函数。主线程会在这里“停住”，死死盯着 `p[<span class="number">0</span>]` 这个线程，直到它彻底执行完毕才放行。然后接着等 `p[<span class="number">1</span>]`，依此类推。</span><br><span class="line">- 如果没有这一步，主线程的 `main` 函数可能会瞬间执行完毕并 `<span class="keyword">return</span> <span class="number">0</span>`。一旦主线程（即进程主体）退出，所有还没来得及干活的子线程也会被操作系统强行全部杀掉（销毁）。</span><br><span class="line"></span><br><span class="line"><span class="number">5.</span> 程序的落幕</span><br><span class="line">* 当这 <span class="number">10</span> 个子线程经历了混乱的读写、让出 CPU、乱序打印，并且全部退出后，主线程的 <span class="number">10</span> 次 `pthread_join` 也全部完成。</span><br><span class="line">* 主线程执行 `<span class="keyword">return</span> <span class="number">0</span>`，整个进程结束，操作系统回收所有相关的内存和资源。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">看到的现象：</span><br><span class="line">如果你运行这段代码，看到的终端输出绝对不是整齐的 `counter value <span class="number">1</span>` 到 `<span class="number">10</span>`。</span><br><span class="line">你会看到乱序的线程 ID，且打印出的 `counter` 值大概率有很多重复的数字（比如好几个线程都打印出 `<span class="number">10</span>`），这就是没有使用锁（Lock）保护共享资源所付出的代价。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="互斥锁保护："><a href="#互斥锁保护：" class="headerlink" title="互斥锁保护："></a>互斥锁保护：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> <span class="comment">// sleep 函数所在的头文件</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> counter;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 声明并初始化一个全局的互斥锁</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> lock = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">IncreaseCounter</span><span class="params">(<span class="type">void</span> *args)</span> &#123;</span><br><span class="line">    <span class="comment">// 2. 加锁（进入临界区）</span></span><br><span class="line">    <span class="comment">// 如果锁已经被别的线程拿走了，当前线程就会在这里阻塞（排队等待），直到锁被释放。</span></span><br><span class="line">    pthread_mutex_lock(&amp;lock);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* ---------------- 临界区开始 ---------------- */</span></span><br><span class="line">    </span><br><span class="line">    counter += <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 即使这里主动让出 CPU，其他线程依然进不来，因为当前线程手里死死攥着锁！</span></span><br><span class="line">    sleep(<span class="number">0</span>); </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 把打印也放在锁里，确保打印出的 counter 值是当前线程刚刚修改完的准确值</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread %u has counter value %d\n&quot;</span>, (<span class="type">unsigned</span> <span class="type">int</span>)pthread_self(), counter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* ---------------- 临界区结束 ---------------- */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 解锁（离开临界区）</span></span><br><span class="line">    <span class="comment">// 把锁还给操作系统，唤醒外面正在排队等待的其他线程。</span></span><br><span class="line">    pthread_mutex_unlock(&amp;lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> p[<span class="number">10</span>];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        pthread_create(&amp;p[i], <span class="literal">NULL</span>, IncreaseCounter, <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        pthread_join(p[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 销毁锁，释放资源（好习惯）</span></span><br><span class="line">    pthread_mutex_destroy(&amp;lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>更新: 2026-04-19 11:32:54<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/fk8msxuai0u2ggno">https://www.yuque.com/idcm/wnemg9/fk8msxuai0u2ggno</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[NepCTF2025]time多线程栈" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/%5BNepCTF2025%5Dtime%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A0%88/" aria-label="前一篇: [NepCTF2025]time多线程栈" title="前一篇: [NepCTF2025]time多线程栈"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [NepCTF2025]time多线程栈
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UnSortedbinAttack例题分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="后一篇: UnSortedbinAttack例题分析"  title="后一篇: UnSortedbinAttack例题分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          UnSortedbinAttack例题分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E"><span class="toc-number">1.</span> <span class="toc-text">条件竞争漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">条件竞争：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">进程：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E5%B8%83%E5%B1%80%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">进程的内存空间布局：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E7%AE%A1%E7%90%86%E8%BF%9B%E7%A8%8B%EF%BC%9F"><span class="toc-number">1.4.</span> <span class="toc-text">操作系统如何管理进程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.5.</span> <span class="toc-text">线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E7%A8%8B"><span class="toc-number">1.6.</span> <span class="toc-text">协程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B"><span class="toc-number">1.7.</span> <span class="toc-text">并发编程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#pthread-create-%E4%B8%8E-pthread-join"><span class="toc-number">1.8.</span> <span class="toc-text">pthread_create 与 pthread_join</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86%EF%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="toc-number">1.8.1.</span> <span class="toc-text">1. 生命周期管理：创建与回收</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E7%9A%84%E5%90%8C%E6%AD%A5%EF%BC%9A%E5%BC%82%E6%AD%A5%E5%B9%B6%E5%8F%91%E4%B8%8E%E5%BC%BA%E5%88%B6%E7%AD%89%E5%BE%85"><span class="toc-number">1.8.2.</span> <span class="toc-text">2. 执行流程的同步：异步并发与强制等待</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E6%95%B0%E6%8D%AE%E7%9A%84%E4%BC%A0%E9%80%92%EF%BC%9A%E8%8E%B7%E5%8F%96%E5%AD%90%E7%BA%BF%E7%A8%8B%E7%9A%84%E6%89%A7%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">1.8.3.</span> <span class="toc-text">3. 数据的传递：获取子线程的执行结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E4%BA%A7%E7%94%9F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="toc-number">1.9.</span> <span class="toc-text">条件竞争产生的条件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%AF%A6%E7%BB%86%E8%BF%90%E8%A1%8C%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.9.1.</span> <span class="toc-text">程序详细运行过程：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%92%E6%96%A5%E9%94%81%E4%BF%9D%E6%8A%A4%EF%BC%9A"><span class="toc-number">1.10.</span> <span class="toc-text">互斥锁保护：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "条件竞争漏洞条件竞争：系统中，最小的运算调度单位是线程，而每个线程又依附于一个进程，条件竞争则是多进程或多线程对一个共享资源操作，因为操作顺序不受控的时候所产生的问题。 进程：在计算机操作系统中，进程是指一个正在运行的程序的实例。它是操作系统进行资源分配和调度的基本单位。 进程的内存空间布局：当操作系统启动一个进程时，会为它分配独立的虚拟内存空间。这个空间通常被划分为以下几个主要部分：  代码段（Text&amp;#x2F;Code Segment）： 存储程序执行的机器指令。这部分通常是只读的，以防止",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

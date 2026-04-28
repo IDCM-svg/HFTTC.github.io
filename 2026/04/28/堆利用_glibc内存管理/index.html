@@ -1,0 +1,681 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    堆利用_glibc内存管理 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="堆利用&#x2F;glibc内存管理什么是堆？首先明确一下堆的概念，堆不同于栈，堆是（由操作系统内核或者堆管理器）动态分配的，**只有在程序需要时才会分配。**在CTFpwn程序中，栈是程序加载进内存后就会出现，而堆是由malloc，alloc，realloc函数分配内存之后才会出现。 堆（chunk）内存是一种允许程序在运行过程中动态分配和使用的内存区域。相比于栈内存和全局内存，堆内存没有固定的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="堆利用_glibc内存管理">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/%E5%A0%86%E5%88%A9%E7%94%A8_glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="堆利用&#x2F;glibc内存管理什么是堆？首先明确一下堆的概念，堆不同于栈，堆是（由操作系统内核或者堆管理器）动态分配的，**只有在程序需要时才会分配。**在CTFpwn程序中，栈是程序加载进内存后就会出现，而堆是由malloc，alloc，realloc函数分配内存之后才会出现。 堆（chunk）内存是一种允许程序在运行过程中动态分配和使用的内存区域。相比于栈内存和全局内存，堆内存没有固定的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767085710030-6816ab97-be07-4d48-afba-2311d9300fc6-653525.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767086157314-880ed830-43d2-4450-a4e1-bdbaf0532e5e-197052.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767089221046-790a23ce-1c6b-4567-9d52-a574d7df6758-178705.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767093016526-f8a9a7d4-e3be-4031-b78c-c03922fa2967-188302.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767093076201-3fe7f743-17fd-4b47-ae13-9e4a89200352-727803.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766971447234-163f703c-f348-4818-8de8-4f2980498813-537018.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767094929623-04276b28-5569-4fab-bd21-66667e43348a-647545.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767095689891-3107663f-8801-411a-8cde-78e7bde239b3-960826.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767096086570-fccf5560-1751-4174-a555-35d9cb59a460-139229.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766968771587-2b04fd41-94a2-4622-aae1-7329228d69d1-525118.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767098731749-d82422b4-754b-47c6-bc1f-8ffbe9776dc1-447977.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766971778106-2b6d013d-11e4-4443-8548-07e4e11285f5-147796.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767113017885-a9a9fb6a-2aad-46d4-92ee-ee4be12efd89-538164.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767112994037-995389a0-2979-4679-8a75-53ae9a66a48e-215787.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767113239260-d154d88f-6e53-497b-a080-8595684a5dbc-370301.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767112654856-5ef9eec1-5baa-4a3e-9326-88768de5a6c9-488949.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767113653432-3b5c4c3b-47b2-4e7b-be7a-103ff7435b85-782285.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766972262739-a20622ae-a681-4752-9bde-9265afdd81b4-748996.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766976211698-531cd758-e3b3-481f-bd1b-7ad8b47e4a9c-511479.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766976917263-7dbe844d-3717-466a-8102-bafa06b30d8c-463873.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766977490825-114048ea-d8e9-4f6b-8d53-e87700c92eb5-480253.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766977812511-8cef2e10-3061-46d3-9a3c-aea665ffe124-782329.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766981562636-2f696504-d4e3-4d0b-bc0d-8c59a9e236c9-146865.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766981725883-4d6fd270-3208-48a1-bb7e-4c526b384a66-017429.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766981905480-d67dde7d-1665-4c2b-b0e3-2f073d379baa-035942.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766981947486-a7887c7f-07df-4e12-9023-16f409a981b0-452869.png">
+<meta property="article:published_time" content="2026-04-28T11:14:15.295Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.368Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1767085710030-6816ab97-be07-4d48-afba-2311d9300fc6-653525.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="堆利用_glibc内存管理">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">堆利用_glibc内存管理</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8-glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">堆利用&#x2F;glibc内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%A0%86%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是堆？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E5%88%86%E9%85%8D"><span class="toc-number">1.2.</span> <span class="toc-text">堆分配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.3.</span> <span class="toc-text">chunk的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">1.4.</span> <span class="toc-text">堆的基本结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#malloc-chunk%E7%BB%93%E6%9E%84"><span class="toc-number">1.4.1.</span> <span class="toc-text">malloc_chunk结构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#prcv-size-%E5%AD%97%E6%AE%B5%EF%BC%9A"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">prcv_size 字段：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#size-%E5%AD%97%E6%AE%B5-AMP%EF%BC%9A"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">size 字段&#x2F;AMP：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#user-data-%E5%AD%97%E6%AE%B5%EF%BC%9A"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">user_data 字段：</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AD%98%E6%94%BE%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E5%A4%A7%E5%B0%8F%EF%BC%9A-%E4%BE%8B%E5%A6%82%E5%9C%A864%E4%BD%8D%E7%A8%8B%E5%BA%8F%E4%B8%AD%E7%94%B3%E8%AF%B7%E4%B8%80%E5%9D%97%E7%A9%BA%E9%97%B4"><span class="toc-number">1.4.1.3.1.</span> <span class="toc-text">_存放内存空间大小：  _例如在64位程序中申请一块空间</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A%E5%A0%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84%E5%8C%85%E6%8B%ACpre-size-size-%E5%A4%A7%E5%B0%8F%EF%BC%9Apre-size-size-userdata-userdata"><span class="toc-number">1.4.1.4.</span> <span class="toc-text">总结：堆的基本结构包括pre_size , size(大小：pre_size+size+userdata) , userdata</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="toc-number">1.4.2.</span> <span class="toc-text">具体结构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chunk%E4%BD%93%E5%88%86%E4%B8%BA%E4%B8%A4%E7%A7%8D%E6%83%85%E5%86%B5%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">chunk体分为两种情况：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fd-bk"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">fd &amp; bk</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%A0%86%E5%9D%97%E5%A4%A7%E5%B0%8F"><span class="toc-number">1.4.3.1.1.</span> <span class="toc-text">堆块大小</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk%E7%9A%84%E7%A9%BA%E9%97%B4%E5%A4%8D%E7%94%A8"><span class="toc-number">1.5.</span> <span class="toc-text">chunk的空间复用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E9%92%88%E4%B8%8E%E5%9C%B0%E5%9D%80"><span class="toc-number">1.6.</span> <span class="toc-text">指针与地址</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E6%8C%87%E9%92%88"><span class="toc-number">1.6.1.</span> <span class="toc-text">结构体指针</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98%E5%87%BD%E6%95%B0malloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">动态分配内存函数malloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%8A%A8%E6%80%81%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98calloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">连续动态分配内存calloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E8%B0%83%E6%95%B4%E5%87%BD%E6%95%B0realloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">内存分配调整函数realloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E9%87%8A%E6%94%BE%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4free"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">释放存储空间free</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%8C%87%E9%92%88%E5%86%85%E5%AD%98%E5%9B%BE"><span class="toc-number">1.6.1.5.</span> <span class="toc-text">指针内存图</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E9%92%88%E8%A1%A8%E7%A4%BA%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.7.</span> <span class="toc-text">IDA中常见的针表示形式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8%E8%A1%A8%E7%A4%BA"><span class="toc-number">1.7.1.</span> <span class="toc-text">链表表示</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B3%E8%AF%B7%E5%A0%86%E5%9D%97%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">1.8.</span> <span class="toc-text">申请堆块的本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#main-arena%E4%B8%8Etop-chunk"><span class="toc-number">1.9.</span> <span class="toc-text">main_arena与top chunk</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena"><span class="toc-number">1.9.1.</span> <span class="toc-text">main_arena</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#top-chunk"><span class="toc-number">1.9.2.</span> <span class="toc-text">top chunk</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#free%E5%87%BD%E6%95%B0%E4%B8%8Ebins"><span class="toc-number">1.10.</span> <span class="toc-text">free函数与bins</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#free%E5%87%BD%E6%95%B0"><span class="toc-number">1.10.1.</span> <span class="toc-text">free函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bin"><span class="toc-number">1.10.2.</span> <span class="toc-text">bin</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fastbin"><span class="toc-number">1.10.2.1.</span> <span class="toc-text">fastbin</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#fastbin%E7%89%B9%E6%80%A7"><span class="toc-number">1.10.2.1.1.</span> <span class="toc-text">fastbin特性</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Small-Bin"><span class="toc-number">1.10.2.2.</span> <span class="toc-text">Small Bin</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Unsorted-Bin"><span class="toc-number">1.10.2.3.</span> <span class="toc-text">Unsorted Bin</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sbrk%E5%92%8Cmmap"><span class="toc-number">1.11.</span> <span class="toc-text">sbrk和mmap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.12.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%9A%84%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="toc-number">1.13.</span> <span class="toc-text">内存的分配与回收</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%9A%84%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.13.1.</span> <span class="toc-text">内存分配的具体步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0"><span class="toc-number">1.13.2.</span> <span class="toc-text">内存回收概述</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-堆利用_glibc内存管理" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.295Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="堆利用-glibc内存管理"><a href="#堆利用-glibc内存管理" class="headerlink" title="堆利用&#x2F;glibc内存管理"></a>堆利用&#x2F;glibc内存管理</h1><h3 id="什么是堆？"><a href="#什么是堆？" class="headerlink" title="什么是堆？"></a>什么是堆？</h3><p>首先明确一下堆的概念，堆不同于栈，堆是（由操作系统内核或者堆管理器）动态分配的，**只有在程序需要时才会分配。**在CTFpwn程序中，栈是程序加载进内存后就会出现，而堆是由malloc，alloc，realloc函数分配内存之后才会出现。</p>
+<p>堆（chunk）内存是一种允许程序在运行过程中动态分配和使用的内存区域。相比于栈内存和全局内存，堆内存没有固定的生命周期和固定的内存区域，程序可以动态地申请和释放不同大小的内存。被分配后，如果没有进行明确的释放操作，该堆内存区域都是一直有效的。</p>
+<p>windows和linux下的堆分配，管理方式都不同，这里主要是linux的堆分配知识</p>
+<h3 id="堆分配"><a href="#堆分配" class="headerlink" title="堆分配"></a>堆分配</h3><p>首先需要明确堆在虚拟内存中的位置</p>
+<p><img src="/HFTTC.github.io/images/pwn/1767085710030-6816ab97-be07-4d48-afba-2311d9300fc6-653525.png" alt="1767085710030-6816ab97-be07-4d48-afba-2311d9300fc6.png" style="max-width: 100%; display: block; margin: 0 auto;">堆的生长方式是从低地址向高地址生长的，而栈是从高地址向低地址生长的。</p>
+<p>实际上堆可以申请到的内存空间比栈要大很多，在linux的4G虚拟内存空间里最高可以达到2.9G的空间</p>
+<h3 id="chunk的结构"><a href="#chunk的结构" class="headerlink" title="chunk的结构"></a>chunk的结构</h3><h3 id="堆的基本结构"><a href="#堆的基本结构" class="headerlink" title="堆的基本结构"></a>堆的基本结构</h3><p>pre_size和size统称为chunk头（chunk header），每一次malloc申请得到的内存指针其实都指向user data的起始处<img src="/HFTTC.github.io/images/pwn/1767086157314-880ed830-43d2-4450-a4e1-bdbaf0532e5e-197052.png" alt="1767086157314-880ed830-43d2-4450-a4e1-bdbaf0532e5e.png" style="max-width: 100%; display: block; margin: 0 auto;">堆的结构</p>
+<h4 id="malloc-chunk结构"><a href="#malloc-chunk结构" class="headerlink" title="malloc_chunk结构"></a>malloc_chunk结构</h4><p>每个程序分配的内存（这里指的是malloc函数）在内部被一个叫做“堆块”的东西所替代。一个堆块是由元数据和程序返回内存组成的（实际上内存是malloc的返回值）。所有的堆块都是保存在堆上，这块内存区域在申请新的内存时会不断地扩大。同样，当一定数量内存释放时，堆可以收缩，在glibc源码中定义的堆块如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>&#123;</span></span><br><span class="line">    <span class="type">size_t</span> prev_size;</span><br><span class="line">    <span class="type">size_t</span> size;<span class="comment">//低3位为A,M,P</span></span><br><span class="line">   </span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">fd</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">bk</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">fd_nextsize</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">malloc_chunk</span>* <span class="title">bk_nextsize</span>;</span> </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.8);background-color:#FFFFFF;">在计算机科学中，chunk 是一种用于管理内存的基本数据结构，特别是在堆内存分配中。chunk 结构在内存分配和释放过程中起着关键作用，尤其是在 </font><font style="color:rgba(0, 0, 0, 0.75);background-color:#FFFFFF;">malloc</font><font style="color:rgba(0, 0, 0, 0.8);background-color:#FFFFFF;"> 和 </font><font style="color:rgba(0, 0, 0, 0.75);background-color:#FFFFFF;">free</font><font style="color:rgba(0, 0, 0, 0.8);background-color:#FFFFFF;"> 函数的实现中。</font></p>
+<p>当进程动态分配内存时，系统会在堆中创建一个chunk(堆块)；chunk包含chunk头和chunk体两个部分。<font style="color:rgba(0, 0, 0, 0.8);background-color:#FFFFFF;">当一个chunk被释放后，它不会立即归还给操作系统，而是被保留以供后续使用。（空闲chunk）</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      Size of previous chunk, <span class="keyword">if</span> unallocated (P clear)         |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      Size of chunk, <span class="keyword">in</span> <span class="built_in">bytes</span> |A|M|P|                          | </span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      User data starts here...                                 |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">|      Size of <span class="built_in">next</span> chunk, <span class="keyword">in</span> <span class="built_in">bytes</span> |A|<span class="number">0</span>|<span class="number">1</span>|                     |</span><br><span class="line">+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">chunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">        |      Size of previous chunk, <span class="keyword">if</span> unallocated (P clear)         |</span><br><span class="line">        -------------------------------------------------------------------</span><br><span class="line">        |      Size of chunk, <span class="keyword">in</span> <span class="built_in">bytes</span> |A|<span class="number">0</span>|P|                          |</span><br><span class="line">        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">        |      Forward pointer to <span class="built_in">next</span> chunk <span class="keyword">in</span> <span class="built_in">list</span>                    |fd</span><br><span class="line">        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">        |      Back pointer to previous chunk <span class="keyword">in</span> <span class="built_in">list</span>                   |bk</span><br><span class="line">        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">        |      Unused space                                             |</span><br><span class="line">chunk-&gt; +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span><br><span class="line">        |      Size of <span class="built_in">next</span> chunk, <span class="keyword">in</span> <span class="built_in">bytes</span> |A|<span class="number">0</span>|<span class="number">0</span>|                     |</span><br><span class="line">        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+  </span><br></pre></td></tr></table></figure>
+
+<p>一般情况下，<strong>物理相邻的两个空闲chunk会被合并为一个chunk</strong>。堆管理器会通过prev_size字段以及size字段合并两个物理相邻的空闲chunk块.堆由低地址向高地址生长</p>
+<h5 id="prcv-size-字段："><a href="#prcv-size-字段：" class="headerlink" title="prcv_size 字段："></a><em>prcv_size 字段：</em></h5><p>也可以说是pre_size。如果该chunk的相邻物理的前一个地址chunk**<font style="color:#DF2A3F;">（两个指针的地址差为前一个chunk大小）</font>**是空闲的话，那么该字段记录的是前一个chunk的大小（包括chunk头）。否则该字段可以用来存储物理相邻的前一个chunk的数据。这里的前一个chunk指的是较低地址的chunk。前面一个堆块在使用时名且pre_size为储存前面chunk的数据时，它的值始终为0 </p>
+<h5 id="size-字段-AMP："><a href="#size-字段-AMP：" class="headerlink" title="size 字段&#x2F;AMP："></a><em>size 字段&#x2F;AMP：</em></h5><p>size字段是用来指示当前堆块大小的** [ 头部 (pre_size+size) + user_data_size ] **。</p>
+<p>size字段的低三位AMP不用于计算size内存大小</p>
+<ul>
+<li>其中_<strong>A（NON_MAIN_ARENA）</strong>_:为0表示该chunk属于主分配去（主线程）；为1表示非主分配区（非主线程）</li>
+<li><em><strong>M（IS_MAPPED）</strong></em>：表示当前chunk获取虚拟内存的内存区域。为1表示chunk从mmap去映射分配，否则从heap区域分配</li>
+<li>末位的_<strong>P（PREV_INUSE）</strong>_：字段表示前一堆块是否正在使用（1为使用0为空闲） ；一般来说，堆中第一个分配的内存块的size字段的P位都会被设置成1，以便于防止访问前面的非法内存。当一个chunk的size的P位为0时，我们能通过prev_size字段来获取上一个chunk的大小以及地址。这也方便进行空闲chunk之间的合并<img src="/HFTTC.github.io/images/pwn/1767089221046-790a23ce-1c6b-4567-9d52-a574d7df6758-178705.png" alt="1767089221046-790a23ce-1c6b-4567-9d52-a574d7df6758.png" style="max-width: 100%; display: block; margin: 0 auto;"><strong>所以前一个堆块的释放与否都和pre_size,size-&gt;prev_inuse这两个值有关，这是因为便于内存的释放操作free</strong></li>
+</ul>
+<h5 id="user-data-字段："><a href="#user-data-字段：" class="headerlink" title="user_data 字段："></a><em>user_data 字段：</em></h5><p>顾名思义就是来存放用户数据的，使用malloc函数分配到的内存返回值指针指向user_data（用户数据区），在后面的例子中也会讲到这个问题。</p>
+<h6 id="存放内存空间大小：-例如在64位程序中申请一块空间"><a href="#存放内存空间大小：-例如在64位程序中申请一块空间" class="headerlink" title="_存放内存空间大小：  _例如在64位程序中申请一块空间"></a>_存放内存空间大小：  _例如在64位程序中申请一块空间</h6><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">malloc(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>申请到的堆块总大小为</strong><em><strong>16+8+8+1&#x3D;0x21byte</strong></em></p>
+<p><em>16字节是系统最小分配内存，也就是说如果你想要申请的内存小于系统最小分配内存的话，就会按照最小的内存来分配，64位是16个字节，32位是八个字节，同样malloc( 0 )也会分配最小内存空间给你</em></p>
+<p><em>8字节是pre_size字段的大小（32位为4字节）</em></p>
+<p><em>8字节是size字段的大小（32位位4字节）</em></p>
+<p><em>最后一个1字节是PREV_INUSE的值，只有0或1两个值</em></p>
+<hr>
+<h5 id="总结：堆的基本结构包括pre-size-size-大小：pre-size-size-userdata-userdata"><a href="#总结：堆的基本结构包括pre-size-size-大小：pre-size-size-userdata-userdata" class="headerlink" title="总结：堆的基本结构包括pre_size , size(大小：pre_size+size+userdata) , userdata"></a>总结：堆的基本结构包括pre_size , size(大小：pre_size+size+userdata) , userdata</h5><h4 id="具体结构图"><a href="#具体结构图" class="headerlink" title="具体结构图"></a>具体结构图</h4><p>使用中（分配后）<img src="/HFTTC.github.io/images/pwn/1767093016526-f8a9a7d4-e3be-4031-b78c-c03922fa2967-188302.png" alt="1767093016526-f8a9a7d4-e3be-4031-b78c-c03922fa2967.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<hr>
+<p>空闲中（使用后）</p>
+<ul>
+<li>空闲中的chunk不存在M状态，只有A|  |P状态</li>
+<li>user_data头部被分配出两个成员-&gt;fd和bk</li>
+</ul>
+<img src="/HFTTC.github.io/images/pwn/1767093076201-3fe7f743-17fd-4b47-ae13-9e4a89200352-727803.png" alt="1767093076201-3fe7f743-17fd-4b47-ae13-9e4a89200352.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="chunk体分为两种情况："><a href="#chunk体分为两种情况：" class="headerlink" title="chunk体分为两种情况："></a>chunk体分为两种情况：</h4><ul>
+<li>对于非空闲&#x2F;正在使用的堆块，chunk体就是当前堆块存放的数据</li>
+</ul>
+<h5 id="fd-bk"><a href="#fd-bk" class="headerlink" title="fd &amp; bk"></a><em>fd &amp; bk</em></h5><ul>
+<li><p>空闲的堆块会被一个双向链表（空闲链表）连接：</p>
+<pre><code>      chunk体的前两个size_t的空间存放两个指针fd和bk
+
+     _** fd **_指向链表中后一个（非物理相邻）空闲chunk的起始地址，32位占4字节，64位占8字节
+
+     _** bk **_指向链表中前一个（非物理相邻）空闲chunk的起始地址，32位占4字节，64位占8字节
+</code></pre>
+</li>
+</ul>
+<p>_**fd[Forward pointer] 向前指针 **_指向下一个空闲chunk </p>
+<p>_**bk[Back pointer] 向后指针 **_指向前一个空闲chunk</p>
+<p>通过fd和bk可以将空闲的chunk块加入到空闲的chunk链进行统一管理</p>
+<h6 id="堆块大小"><a href="#堆块大小" class="headerlink" title="堆块大小"></a>堆块大小</h6><p><strong>32位操作系统：</strong></p>
+<p>用户分配到最小的堆块大小位17B：<em><strong><font style="color:#DF2A3F;">prev_size(4B)+size(4B)+fd(4B)+bk(4B)+next_chunk-&gt;p(1B)</font></strong></em></p>
+<p><em>若用户申请大小超过最小堆块大小，会与8B进行对齐</em></p>
+<p><strong>64位操作系统：</strong></p>
+<p>用户分配到最小的堆块大小位33B：<em><strong><font style="color:#DF2A3F;">prev_size(8B)+size(8B)+fd(8B)+bk(8B)+next_chunk-&gt;p(1B)</font></strong></em></p>
+<p><em>若用户申请大小超过最小堆块大小，会与16B进行对齐</em></p>
+<h3 id="chunk的空间复用"><a href="#chunk的空间复用" class="headerlink" title="chunk的空间复用"></a><em>chunk的空间复用</em></h3><p><em>描述：当一个chunk处于使用状态时，他的下一个chunk的prev_size无效。所以下一个chunk的prev_size也可以被当前chunk使用，这就是chunk的空间复用。</em></p>
+<p><img src="/HFTTC.github.io/images/pwn/1766971447234-163f703c-f348-4818-8de8-4f2980498813-537018.png" alt="1766971447234-163f703c-f348-4818-8de8-4f2980498813.png" style="max-width: 100%; display: block; margin: 0 auto;"><font style="color:rgba(0, 0, 0, 0.8);">chunk的的结构十分巧妙，通过空间复用，能在占用最少的空间的情况下实现malloc的内存管理算法。 空闲时，一个 chunk 中至少需要 4个size_t大小的空间，用来存储[mchunk最小空间]，mchunk_size，fd和bk。 当一个 chunk 处于使用状态时，它的下一个chunk的prev_size域肯定是无效的。 所以实际上，这个空间也可以被当前chunk使用。</font></p>
+<h3 id="指针与地址"><a href="#指针与地址" class="headerlink" title="指针与地址"></a>指针与地址</h3><h4 id="结构体指针"><a href="#结构体指针" class="headerlink" title="结构体指针"></a>结构体指针</h4><h6 id="动态分配内存函数malloc原型"><a href="#动态分配内存函数malloc原型" class="headerlink" title="动态分配内存函数malloc原型"></a><font style="color:rgba(0, 0, 0, 0.85);">动态分配内存函数malloc原型</font></h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">malloc</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> size)</span></span><br><span class="line"></span><br><span class="line">-&gt;<span class="type">int</span> *p=<span class="literal">NULL</span>;</span><br><span class="line">  p=(<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br></pre></td></tr></table></figure>
+
+<h6 id="连续动态分配内存calloc原型"><a href="#连续动态分配内存calloc原型" class="headerlink" title="连续动态分配内存calloc原型"></a>连续动态分配内存calloc原型</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">calloc</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> n, <span class="type">unsigned</span> nt size)</span></span><br><span class="line"></span><br><span class="line">-&gt;<span class="type">int</span> *p=<span class="literal">NULL</span>;</span><br><span class="line">  p=(<span class="type">int</span> *)<span class="built_in">calloc</span>(<span class="number">5</span>,<span class="keyword">sizeof</span>(<span class="type">int</span>));    <span class="comment">//申请5个int类型的大小内存空间</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="内存分配调整函数realloc原型"><a href="#内存分配调整函数realloc原型" class="headerlink" title="内存分配调整函数realloc原型"></a>内存分配调整函数realloc原型</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *<span class="title function_">realloc</span><span class="params">(<span class="type">void</span> *ptr<span class="comment">/*已经分配的首地址*/</span>, <span class="type">unsigned</span> <span class="type">int</span> size<span class="comment">/*存储空间的字节数*/</span>)</span></span><br><span class="line"></span><br><span class="line">-&gt;<span class="type">int</span> *p=(<span class="type">int</span> *)<span class="built_in">calloc</span>(<span class="number">10</span>, <span class="keyword">sizeof</span>(<span class="type">int</span>));   <span class="comment">//申请分配存放10个整数的内存空间</span></span><br><span class="line">  p=(<span class="type">int</span> *)<span class="built_in">realloc</span>(p, <span class="number">15</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));   <span class="comment">//拓展空间，存放15个整数</span></span><br><span class="line">  p=(<span class="type">int</span> *)<span class="built_in">realloc</span>(p, <span class="number">5</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));    <span class="comment">//缩小空间，存放5个整数</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="释放存储空间free"><a href="#释放存储空间free" class="headerlink" title="释放存储空间free"></a>释放存储空间free</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">free</span><span class="params">(<span class="type">void</span> *block)</span></span><br><span class="line"></span><br><span class="line">-&gt;<span class="type">int</span> *p=<span class="literal">NULL</span>;</span><br><span class="line">  p=(<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">  *p=<span class="number">10</span>;      <span class="comment">//通过指针p访问动态申请的储存空间</span></span><br><span class="line">  <span class="built_in">free</span>(p);</span><br></pre></td></tr></table></figure>
+
+<p>free函数只释放动态申请的储存空间，如果block为指针，则该指针仍然存在，即该指针占用的储存单元仍然存在，释放的是该指针指向的内存空间。</p>
+<h6 id="指针内存图"><a href="#指针内存图" class="headerlink" title="指针内存图"></a>指针内存图</h6><p>首先明确用户在调用malloc函数时返回的值为一个指针，指向分配到对空间（用户数据区）</p>
+<img src="/HFTTC.github.io/images/pwn/1767094929623-04276b28-5569-4fab-bd21-66667e43348a-647545.png" alt="1767094929623-04276b28-5569-4fab-bd21-66667e43348a.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p><em><strong>first_chunk&amp;second_chunk表示第一个和第二个结构，每个结构中都有一个point_heap指针来指向存储用户数据的堆块（chunk）</strong></em></p>
+<p>左边的本身就是一个堆块，用来存放一些全局信息，比如max_size存储了能够存储的最大结构数量；exit_num表示已经存储的结构的数量</p>
+<h3 id="IDA中常见的针表示形式"><a href="#IDA中常见的针表示形式" class="headerlink" title="IDA中常见的针表示形式"></a>IDA中常见的针表示形式</h3><p>在 IDA 伪代码中指针形式形如下面的情况：</p>
+<p>*(qword_6020A8 + 8)表示取到qword_6020A8这个地址加8偏移道德哪个地址存储的值</p>
+<p>汇编代码等同于：.text:00000000400F85     mov rax, cs:qword_6020A8</p>
+<pre><code>                       .text:00000000400F8C     mov rax, [rax+8]
+</code></pre>
+<p><em>简单转换一下也就是</em><em><font style="color:#DF2A3F;">*(addr) &#x3D; [addr]</font></em></p>
+<h4 id="链表表示"><a href="#链表表示" class="headerlink" title="链表表示"></a>链表表示</h4><p>在pwn的堆题目里面，经常会有像一些管理系统之类的题目例如<img src="/HFTTC.github.io/images/pwn/1767095689891-3107663f-8801-411a-8cde-78e7bde239b3-960826.png" alt="1767095689891-3107663f-8801-411a-8cde-78e7bde239b3.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<p>这种有最基本的增删改查的功能的数据结构通常就是使用链表连接起来的</p>
+<h3 id="申请堆块的本质"><a href="#申请堆块的本质" class="headerlink" title="申请堆块的本质"></a>申请堆块的本质</h3><p><em>堆管理器ptmalloc2主要是通过 malloc&#x2F;free 函数来分配和释放内存块</em></p>
+<p>通俗来讲ptmalloc2就相当于是一个中间商，当程序想要申请向程序申请堆空间时，这里的ptmalloc2就会申请一块很大的空间，并根据算法从这些内存中把空间真正的分配给程序</p>
+<img src="/HFTTC.github.io/images/pwn/1767096086570-fccf5560-1751-4174-a555-35d9cb59a460-139229.png" alt="1767096086570-fccf5560-1751-4174-a555-35d9cb59a460.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">char</span> *p;</span><br><span class="line">    p=<span class="built_in">malloc</span>(<span class="number">10</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里堆段会给132kB大小的的空间，一个地址就是1byte的内容</p>
+<p>这132kB的堆空间叫做arena，此时因为是主线程分配的，所以这个区域叫做<font style="color:#DF2A3F;">main arena</font></p>
+<p>（厂家）内核会批发给（中间商）ptmalloc2的货物，以便下次程序在向系统是申请小内存的时候，直接去中间商去取就可以了，它就会在这132kB中按照要申请的货物的多少进行分配下去，如果中间商缺货，ptmalloc就会继续去找（厂家）内核去取货</p>
+<h3 id="main-arena与top-chunk"><a href="#main-arena与top-chunk" class="headerlink" title="main_arena与top chunk"></a><em>main_arena与top chunk</em></h3><p>chunk 在 管 理 器 中 有 3 种 形 式 ， 分 别 为 allocated chunk 、 free chunk和top chunk。当用户申请一块内存后，堆管理器会返回一个allocated chunk ， 其 结 构 为mchunk_prev_size+mchunk_size+user_memory 。 user_memory 为 可 被用户使用的内存空间。free chunk为allocated chunk被释放后的存在形式。top chunk是一个非常大的free chunk，如果用户申请内存大小比top chunk小，则由top chunk分割产生。在64位系统中，chunk结构最小为32（0x20）字节。</p>
+<h4 id="main-arena"><a href="#main-arena" class="headerlink" title="main_arena"></a>main_arena</h4><img src="/HFTTC.github.io/images/pwn/1766968771587-2b04fd41-94a2-4622-aae1-7329228d69d1-525118.png" alt="1766968771587-2b04fd41-94a2-4622-aae1-7329228d69d1.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="top-chunk"><a href="#top-chunk" class="headerlink" title="top chunk"></a>top chunk</h4><p>顾名思义，就是堆中的第一个堆块，相当于一个带头大哥，程序以后分配到的内存要放在他的后面。当系统当前所有free chunk（无论那种bin）都无法满足用户请求的内存大小的时候，将此chunk当作一个应急消防员，分配给用户使用。</p>
+<p><strong><font style="color:#DF2A3F;">简单来说就是在程序向堆管理器申请内存的时候，没有合适的内存空间分配给他，此时就会从top chunk上剪切一部分作为chunk给他</font></strong>。</p>
+<h3 id="free函数与bins"><a href="#free函数与bins" class="headerlink" title="free函数与bins"></a><em>free函数与bins</em></h3><h4 id="free函数"><a href="#free函数" class="headerlink" title="free函数"></a>free函数</h4><p>free函数的使用是和bins的分配是息息相关的。</p>
+<p>调用完free函数以后程序做了两件事</p>
+<ul>
+<li>清空此堆块的user_data</li>
+<li>将此堆块的指针存储到了main_arena（或者fast bin）中了</li>
+</ul>
+<h4 id="bin"><a href="#bin" class="headerlink" title="bin"></a>bin</h4><p>bins这个改建适合内存回收相关的，也就是堆管理器会根据用户已经申请到的内存空间大小进行释放，来决定放入哪类bins。bins可以直译为垃圾桶的意思，所以系统在决定使用哪个bins的时候可以看作为“垃圾的分类”</p>
+<p><strong>描述：</strong></p>
+<p><strong>1.用户free掉的内存并不是都会马上归还给系统，ptmalloc会统一管理heap和mmap映射区域中空闲的chunk</strong></p>
+<p><strong>2.当用户进行下一次分配请求时，ptmalloc会首先试图在空闲的chunk中条船一块给用户，这样就避免了频繁的系统调用，降低了内存分配的开销</strong></p>
+<p><strong>3.ptmalloc将相似大小的chunk用双向链表连接起来，这样的一个链表被称为bin</strong></p>
+<p><strong>4.ptmalloc一共维护了128个bin，并使用一个数组来存储这些bin</strong></p>
+<p><strong>5.根据堆管理器的特点，将堆分为四种：fastbin | un</strong>__<strong>sortbin | smallbin | largebin</strong></p>
+<p><font style="color:rgba(0, 0, 0, 0.8);">为了高效地分配内存并尽量避免内存碎片，Ptmalloc2将不同大小的 free chunk 分 为 不 同 bin结构 ， 分别为Fast Bin 、Small Bin 、Unsorted Bin、Large Bin。</font></p>
+<p><em><strong><font style="color:#DF2A3F;">为了进一步提升速度还建立了fastbin这个特殊的容器</font></strong></em></p>
+<img src="/HFTTC.github.io/images/pwn/1767098731749-d82422b4-754b-47c6-bc1f-8ffbe9776dc1-447977.png" alt="1767098731749-d82422b4-754b-47c6-bc1f-8ffbe9776dc1.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h5 id="fastbin"><a href="#fastbin" class="headerlink" title="fastbin"></a><em>fastbin</em></h5><p>顾名思义，就是为了快速重新分配回内存而存在的一个结构</p>
+<img src="/HFTTC.github.io/images/pwn/1766971778106-2b6d013d-11e4-4443-8548-07e4e11285f5-147796.png" alt="1766971778106-2b6d013d-11e4-4443-8548-07e4e11285f5.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p><strong>描述：</strong></p>
+<p><strong>1）在32位操作系统中，当用户释放的堆块大小小于64B时使用fastbin进行管理，即chunk空间最大为80字节</strong></p>
+<p><strong>2）fastbin只使用了fd成员，他是一个单链表结构</strong></p>
+<p><strong>3）chunk并不改变fastbin的使用标志P，也就是说它不会主动进行合并；只有在某些特定条件下，堆管理器才会对fastbin进行合并</strong></p>
+<p><strong>4）fastbinY为管理fastbin的数组，每个成员分别管理不同大小的fastbin链表，且均指向量当前链表的尾节点，当尾节点被分配时，通过其fd指针指向前一个结点</strong></p>
+<p><strong>5）当用户申请chunk大小小于或等于MAX_FAST_SIZE时，有限从fastbins中查找相应的空闲块，且规则为后进先出</strong><img src="/HFTTC.github.io/images/pwn/1767113017885-a9a9fb6a-2aad-46d4-92ee-ee4be12efd89-538164.png" alt="1767113017885-a9a9fb6a-2aad-46d4-92ee-ee4be12efd89.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<ul>
+<li>这里横向排列的就是main_arene(fastbin)的内存地址</li>
+</ul>
+<p><img src="/HFTTC.github.io/images/pwn/1767112994037-995389a0-2979-4679-8a75-53ae9a66a48e-215787.png" alt="1767112994037-995389a0-2979-4679-8a75-53ae9a66a48e.png" style="max-width: 100%; display: block; margin: 0 auto;">加入此时0x804a000处的堆块已经被free了，那么它就会被存储在表示40bytes的fastbin的内存地址里</p>
+<h6 id="fastbin特性"><a href="#fastbin特性" class="headerlink" title="fastbin特性"></a>fastbin特性</h6><p><strong><font style="color:#DF2A3F;">1.使用单链表来维护释放的堆块</font></strong></p>
+<p>从main_arena到free第一个块的地方是采用单链表形式存储的，若还有free掉的堆块，则这个堆块的fk指针域就会指向前一个堆块<img src="/HFTTC.github.io/images/pwn/1767113239260-d154d88f-6e53-497b-a080-8595684a5dbc-370301.png" alt="1767113239260-d154d88f-6e53-497b-a080-8595684a5dbc.png" style="max-width: 100%; display: block; margin: 0 auto;"><strong>再次释放一个堆块</strong><img src="/HFTTC.github.io/images/pwn/1767112654856-5ef9eec1-5baa-4a3e-9326-88768de5a6c9-488949.png" alt="1767112654856-5ef9eec1-5baa-4a3e-9326-88768de5a6c9.png" style="max-width: 100%; display: block; margin: 0 auto;"><strong><font style="color:#DF2A3F;">2.采用后进先出的方式维护链表（类似于栈的结构）</font></strong></p>
+<p>当程序需要重新malloc内存并且需要从fastbin中挑选堆块时，后选择后面新加入的堆块拿来先进行内存分配</p>
+<p>如上图，如果程序请求和上面堆块大小一样的时候，堆管理器就会直接使用fastbin里的堆块</p>
+<p>这里的话时直接使用第二次释放的堆块，然后将这个堆块从链表里移除，接着根据堆块的fk指针找到这个堆块，此时main_arena就指向了这里，也就是恢复到了第一个图的情况</p>
+<h5 id="Small-Bin"><a href="#Small-Bin" class="headerlink" title="Small Bin"></a><em>Small Bin</em></h5><p>顾名思义这是一个small chunk，满足的内存空间比fastbin大一点。如果程序请求的内存范围不在fastbin内就会考虑smallbin。</p>
+<p><strong>描述：</strong></p>
+<p><strong>1）在32位操作系统中，当用户释放的堆块大小大于64B，小于等于512B时使用smallbin进行管理</strong></p>
+<p><strong>2）smallbin为双向循环链表，且使用先入先出算法</strong></p>
+<p><strong>3）当满足smallbin条件的chunk被释放后，会优先被放入unsorted bin，只有在一定情况下才会被分配到smallbin中</strong></p>
+<p><strong>4）相邻的free chunk将会被合并成一个更大的free chunk，增加内存利用率</strong><img src="/HFTTC.github.io/images/pwn/1767113653432-3b5c4c3b-47b2-4e7b-be7a-103ff7435b85-782285.png" alt="1767113653432-3b5c4c3b-47b2-4e7b-be7a-103ff7435b85.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<p>_**Large Bin **_大于1024（0x400）字节的的chunk使用Large Bin进行管理 。Large Bin的结构相对于其他Bin是最复杂的，速度也是最慢的，相同大小的Large Bin使用fd和bk指针连接，不同大小的Large Bin通过fd_nextsize和bk_nextsize按大小排序连接。<img src="/HFTTC.github.io/images/pwn/1766972262739-a20622ae-a681-4752-9bde-9265afdd81b4-748996.png" alt="1766972262739-a20622ae-a681-4752-9bde-9265afdd81b4.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<h5 id="Unsorted-Bin"><a href="#Unsorted-Bin" class="headerlink" title="Unsorted Bin"></a>Unsorted Bin</h5><p>相当于Ptmalloc2堆管理器的垃圾桶。chunk被释放后，会先加入Unsorted Bin中，等待下次分配使用。在堆管理器的Unsroted Bin 不 为 空 时 ， 用 户 申 请 非 Fast Bin 大 小的内存会先从Unsorted Bin中查找，如果找到符合该申请大小要求的chunk（等于或者大于），则直接分配或者分割该chunk。</p>
+<p><strong>描述：</strong></p>
+<p>1）释放较小或者较大的chunk的时候，为了增加分配效率，系统会先将最近释放的chunk添加到unsorted bin中</p>
+<p>2）unsorted bin为一个双向循环链表，对chunk的大小没有限制，任何大小的chunk都可以放入unsorted bin中</p>
+<p>3）当fastbin，smallbin中的chunk都不能满足用户请求chunk大小时，堆管理器就会考虑使用unsorted bin。他会在分配large chunk之前对堆中碎片chunk进行合并，以便减少堆中的碎片</p>
+<h3 id="sbrk和mmap"><a href="#sbrk和mmap" class="headerlink" title="sbrk和mmap"></a>sbrk和mmap</h3><h3 id=""><a href="#" class="headerlink" title=""></a><img src="/HFTTC.github.io/images/pwn/1766976211698-531cd758-e3b3-481f-bd1b-7ad8b47e4a9c-511479.png" alt="1766976211698-531cd758-e3b3-481f-bd1b-7ad8b47e4a9c.png" style="max-width: 100%; display: block; margin: 0 auto;"></h3><h3 id="内存的分配与回收"><a href="#内存的分配与回收" class="headerlink" title="内存的分配与回收"></a>内存的分配与回收</h3><h4 id="内存分配的具体步骤"><a href="#内存分配的具体步骤" class="headerlink" title="内存分配的具体步骤"></a>内存分配的具体步骤</h4><h4 id="内存回收概述"><a href="#内存回收概述" class="headerlink" title="内存回收概述"></a><img src="/HFTTC.github.io/images/pwn/1766976917263-7dbe844d-3717-466a-8102-bafa06b30d8c-463873.png" alt="1766976917263-7dbe844d-3717-466a-8102-bafa06b30d8c.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766977490825-114048ea-d8e9-4f6b-8d53-e87700c92eb5-480253.png" alt="1766977490825-114048ea-d8e9-4f6b-8d53-e87700c92eb5.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766977812511-8cef2e10-3061-46d3-9a3c-aea665ffe124-782329.png" alt="1766977812511-8cef2e10-3061-46d3-9a3c-aea665ffe124.png" style="max-width: 100%; display: block; margin: 0 auto;">内存回收概述</h4><p><img src="/HFTTC.github.io/images/pwn/1766981562636-2f696504-d4e3-4d0b-bc0d-8c59a9e236c9-146865.png" alt="1766981562636-2f696504-d4e3-4d0b-bc0d-8c59a9e236c9.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766981725883-4d6fd270-3208-48a1-bb7e-4c526b384a66-017429.png" alt="1766981725883-4d6fd270-3208-48a1-bb7e-4c526b384a66.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766981905480-d67dde7d-1665-4c2b-b0e3-2f073d379baa-035942.png" alt="1766981905480-d67dde7d-1665-4c2b-b0e3-2f073d379baa.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766981947486-a7887c7f-07df-4e12-9023-16f409a981b0-452869.png" alt="1766981947486-a7887c7f-07df-4e12-9023-16f409a981b0.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<blockquote>
+<p>更新: 2026-03-07 20:21:20<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/tnxcosgeyt8267gg">https://www.yuque.com/idcm/wnemg9/tnxcosgeyt8267gg</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="可见字符shellcode" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode/" aria-label="前一篇: 可见字符shellcode" title="前一篇: 可见字符shellcode"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            可见字符shellcode
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="保存语雀笔记到本地" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/%E4%BF%9D%E5%AD%98%E8%AF%AD%E9%9B%80%E7%AC%94%E8%AE%B0%E5%88%B0%E6%9C%AC%E5%9C%B0/" aria-label="后一篇: 保存语雀笔记到本地"  title="后一篇: 保存语雀笔记到本地"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          保存语雀笔记到本地
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A0%86%E5%88%A9%E7%94%A8-glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">堆利用&#x2F;glibc内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%A0%86%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是堆？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E5%88%86%E9%85%8D"><span class="toc-number">1.2.</span> <span class="toc-text">堆分配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.3.</span> <span class="toc-text">chunk的结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">1.4.</span> <span class="toc-text">堆的基本结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#malloc-chunk%E7%BB%93%E6%9E%84"><span class="toc-number">1.4.1.</span> <span class="toc-text">malloc_chunk结构</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#prcv-size-%E5%AD%97%E6%AE%B5%EF%BC%9A"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">prcv_size 字段：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#size-%E5%AD%97%E6%AE%B5-AMP%EF%BC%9A"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">size 字段&#x2F;AMP：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#user-data-%E5%AD%97%E6%AE%B5%EF%BC%9A"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">user_data 字段：</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%AD%98%E6%94%BE%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E5%A4%A7%E5%B0%8F%EF%BC%9A-%E4%BE%8B%E5%A6%82%E5%9C%A864%E4%BD%8D%E7%A8%8B%E5%BA%8F%E4%B8%AD%E7%94%B3%E8%AF%B7%E4%B8%80%E5%9D%97%E7%A9%BA%E9%97%B4"><span class="toc-number">1.4.1.3.1.</span> <span class="toc-text">_存放内存空间大小：  _例如在64位程序中申请一块空间</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%EF%BC%9A%E5%A0%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84%E5%8C%85%E6%8B%ACpre-size-size-%E5%A4%A7%E5%B0%8F%EF%BC%9Apre-size-size-userdata-userdata"><span class="toc-number">1.4.1.4.</span> <span class="toc-text">总结：堆的基本结构包括pre_size , size(大小：pre_size+size+userdata) , userdata</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B7%E4%BD%93%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="toc-number">1.4.2.</span> <span class="toc-text">具体结构图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chunk%E4%BD%93%E5%88%86%E4%B8%BA%E4%B8%A4%E7%A7%8D%E6%83%85%E5%86%B5%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">chunk体分为两种情况：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fd-bk"><span class="toc-number">1.4.3.1.</span> <span class="toc-text">fd &amp; bk</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%A0%86%E5%9D%97%E5%A4%A7%E5%B0%8F"><span class="toc-number">1.4.3.1.1.</span> <span class="toc-text">堆块大小</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk%E7%9A%84%E7%A9%BA%E9%97%B4%E5%A4%8D%E7%94%A8"><span class="toc-number">1.5.</span> <span class="toc-text">chunk的空间复用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E9%92%88%E4%B8%8E%E5%9C%B0%E5%9D%80"><span class="toc-number">1.6.</span> <span class="toc-text">指针与地址</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%93%E6%9E%84%E4%BD%93%E6%8C%87%E9%92%88"><span class="toc-number">1.6.1.</span> <span class="toc-text">结构体指针</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98%E5%87%BD%E6%95%B0malloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.1.</span> <span class="toc-text">动态分配内存函数malloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%BF%9E%E7%BB%AD%E5%8A%A8%E6%80%81%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98calloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.2.</span> <span class="toc-text">连续动态分配内存calloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E8%B0%83%E6%95%B4%E5%87%BD%E6%95%B0realloc%E5%8E%9F%E5%9E%8B"><span class="toc-number">1.6.1.3.</span> <span class="toc-text">内存分配调整函数realloc原型</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E9%87%8A%E6%94%BE%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4free"><span class="toc-number">1.6.1.4.</span> <span class="toc-text">释放存储空间free</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%8C%87%E9%92%88%E5%86%85%E5%AD%98%E5%9B%BE"><span class="toc-number">1.6.1.5.</span> <span class="toc-text">指针内存图</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84%E9%92%88%E8%A1%A8%E7%A4%BA%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.7.</span> <span class="toc-text">IDA中常见的针表示形式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8%E8%A1%A8%E7%A4%BA"><span class="toc-number">1.7.1.</span> <span class="toc-text">链表表示</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B3%E8%AF%B7%E5%A0%86%E5%9D%97%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="toc-number">1.8.</span> <span class="toc-text">申请堆块的本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#main-arena%E4%B8%8Etop-chunk"><span class="toc-number">1.9.</span> <span class="toc-text">main_arena与top chunk</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main-arena"><span class="toc-number">1.9.1.</span> <span class="toc-text">main_arena</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#top-chunk"><span class="toc-number">1.9.2.</span> <span class="toc-text">top chunk</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#free%E5%87%BD%E6%95%B0%E4%B8%8Ebins"><span class="toc-number">1.10.</span> <span class="toc-text">free函数与bins</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#free%E5%87%BD%E6%95%B0"><span class="toc-number">1.10.1.</span> <span class="toc-text">free函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#bin"><span class="toc-number">1.10.2.</span> <span class="toc-text">bin</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fastbin"><span class="toc-number">1.10.2.1.</span> <span class="toc-text">fastbin</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#fastbin%E7%89%B9%E6%80%A7"><span class="toc-number">1.10.2.1.1.</span> <span class="toc-text">fastbin特性</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Small-Bin"><span class="toc-number">1.10.2.2.</span> <span class="toc-text">Small Bin</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Unsorted-Bin"><span class="toc-number">1.10.2.3.</span> <span class="toc-text">Unsorted Bin</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sbrk%E5%92%8Cmmap"><span class="toc-number">1.11.</span> <span class="toc-text">sbrk和mmap</span></a></li><li class="toc-item toc-level-3"><a class="toc-link"><span class="toc-number">1.12.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%9A%84%E5%88%86%E9%85%8D%E4%B8%8E%E5%9B%9E%E6%94%B6"><span class="toc-number">1.13.</span> <span class="toc-text">内存的分配与回收</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E7%9A%84%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.13.1.</span> <span class="toc-text">内存分配的具体步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%9B%9E%E6%94%B6%E6%A6%82%E8%BF%B0"><span class="toc-number">1.13.2.</span> <span class="toc-text">内存回收概述</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "堆利用_glibc内存管理",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/%E5%A0%86%E5%88%A9%E7%94%A8_glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/",
+          excerpt: "",
+          description: "",
+          stripContent: "堆利用&amp;#x2F;glibc内存管理什么是堆？首先明确一下堆的概念，堆不同于栈，堆是（由操作系统内核或者堆管理器）动态分配的，**只有在程序需要时才会分配。**在CTFpwn程序中，栈是程序加载进内存后就会出现，而堆是由malloc，alloc，realloc函数分配内存之后才会出现。 堆（chunk）内存是一种允许程序在运行过程中动态分配和使用的内存区域。相比于栈内存和全局内存，堆内存没有固定的生命周期和固定的内存区域，程序可以动态地申请和释放不同大小的内存。被分配后，如果没有进行明确的释放操",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

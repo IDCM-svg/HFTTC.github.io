@@ -1,0 +1,588 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Chunk Extend &amp; Overlapping参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;heap&#x2F;ptmalloc2&#x2F;chunk-extend-overlapping&#x2F;              [https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43921239&#x2F;article&#x2F;details&#x2F;107841328](http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/ChunkExtend&Overlapping/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="Chunk Extend &amp; Overlapping参考资料：https:&#x2F;&#x2F;ctf-wiki.org&#x2F;pwn&#x2F;linux&#x2F;user-mode&#x2F;heap&#x2F;ptmalloc2&#x2F;chunk-extend-overlapping&#x2F;              [https:&#x2F;&#x2F;blog.csdn.net&#x2F;weixin_43921239&#x2F;article&#x2F;details&#x2F;107841328](http">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_1ZbWGahWTRj8Cgej/1767965933716-0aceef91-d48a-441b-9a35-d9e99992709b-323488.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_1ZbWGahWTRj8Cgej/1767964324618-c5d70ffb-8f2c-4a2f-b9df-b2c4476c80aa-989486.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_1ZbWGahWTRj8Cgej/1767976998169-ae491a10-5141-49e5-83e2-7248ca851e86-614066.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_1ZbWGahWTRj8Cgej/1768015720052-ac9cce41-1a7a-47a0-87f5-2c830ab9fd70-854048.png">
+<meta property="article:published_time" content="2026-04-28T10:25:57.032Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.392Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_1ZbWGahWTRj8Cgej/1767965933716-0aceef91-d48a-441b-9a35-d9e99992709b-323488.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Chunk-Extend-Overlapping"><span class="toc-number">1.</span> <span class="toc-text">Chunk Extend &amp; Overlapping</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFchunk-extend"><span class="toc-number">1.1.</span> <span class="toc-text">什么是chunk extend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk-extend%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">chunk extend原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9inuse%E7%9A%84fastbin%E8%BF%9B%E8%A1%8Cextend"><span class="toc-number">1.3.</span> <span class="toc-text">对inuse的fastbin进行extend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9-free-%E7%9A%84-smallbin-%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="toc-number">1.4.</span> <span class="toc-text">对 free 的 smallbin 进行操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chunk-Extend-%E5%8F%AF%E4%BB%A5%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">Chunk Extend 可以做什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87-extend-%E5%90%8E%E5%90%91-overlapping"><span class="toc-number">1.5.1.</span> <span class="toc-text">通过 extend 后向 overlapping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87-extend-%E5%89%8D%E5%90%91-overlapping"><span class="toc-number">1.5.2.</span> <span class="toc-text">通过 extend 前向 overlapping</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/ChunkExtend&amp;Overlapping/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:57.032Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Chunk-Extend-Overlapping"><a href="#Chunk-Extend-Overlapping" class="headerlink" title="Chunk Extend &amp; Overlapping"></a>Chunk Extend &amp; Overlapping</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/chunk-extend-overlapping/">https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/chunk-extend-overlapping/</a></p>
+<pre><code>             [https://blog.csdn.net/weixin_43921239/article/details/107841328](https://blog.csdn.net/weixin_43921239/article/details/107841328)
+</code></pre>
+<p>tip) 一开始程序运行没有及时更换 libc，可能导致 bin 类型有一点点出入，但是对于示例没有太大的影响</p>
+<h3 id="什么是chunk-extend"><a href="#什么是chunk-extend" class="headerlink" title="什么是chunk extend"></a>什么是chunk extend</h3><p>在日常的比赛中，常常会需要我们构造一个overlapping chunk，即一个重叠的chunk使chunk重叠</p>
+<p>作用是泄露地址（libc&#x2F;heap）泄露数据（泄露已经释放的堆中的数据&#x2F;泄露chunk中的内容），覆盖指针</p>
+<p>利用条件：1.程序中存在堆的漏洞 2.漏洞可以控制chunk header中的数据</p>
+<h3 id="chunk-extend原理"><a href="#chunk-extend原理" class="headerlink" title="chunk extend原理"></a>chunk extend原理</h3><p>chunk extend技术能够产生的原因在于**<font style="color:rgb(15, 17, 21);"> ptmalloc（glibc 的内存分配器）的堆块管理机制在设计上存在漏洞</font>**</p>
+<p><font style="color:rgb(15, 17, 21);">核心原因是通过修改chunk的size段，使得内存分配器对该堆块的大小认知与实际物理布局产生不一致。攻击者利用这种不一致，让一个堆块”扩展”到相邻堆块的空间，从而实现对相邻堆块内容的越界读写。</font></p>
+<p><em><font style="color:rgb(77, 77, 77);">ptmalloc 通过 chunk header 的数据判断 chunk 的使用情况和对 chunk 的前后块进行定位</font></em><font style="color:rgb(77, 77, 77);">。简而言之，</font><strong><font style="color:rgb(77, 77, 77);">chunk extend 就是通过控制 size 和 pre_size 域来实现跨越块操作从而导致 overlapping 的</font></strong><font style="color:rgb(77, 77, 77);">。</font></p>
+<h3 id="对inuse的fastbin进行extend"><a href="#对inuse的fastbin进行extend" class="headerlink" title="对inuse的fastbin进行extend"></a><font style="color:rgb(77, 77, 77);">对inuse的fastbin进行extend</font></h3><p><strong>先看一下示例的源码</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *ptr,*ptr1;</span><br><span class="line"></span><br><span class="line">    ptr=<span class="built_in">malloc</span>(<span class="number">0x10</span>);   <span class="comment">//分配第一个0x10的chunk</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x10</span>);       <span class="comment">//分配第二个0x10的chunk</span></span><br><span class="line"></span><br><span class="line">    *(<span class="type">long</span> <span class="type">long</span> *)((<span class="type">long</span> <span class="type">long</span>)ptr<span class="number">-0x8</span>)=<span class="number">0x41</span>;<span class="comment">// 修改第一个块的size域</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">free</span>(ptr);        <span class="comment">//ptr指向的值(内存地址)没有改变，但ptr指向的内存已被回收，可能被重新分配</span></span><br><span class="line">    ptr1=<span class="built_in">malloc</span>(<span class="number">0x30</span>);<span class="comment">// 实现 extend，控制了第二个块的内容</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">低地址                                                 高地址</span><br><span class="line">+------------------+--------------------+------------------+</span><br><span class="line">|   last_chunk     |      now_chunk     |   next_chunk     |</span><br><span class="line">|                  |                    |                  |</span><br><span class="line">+---------+--------+----------+---------+--------+---------+</span><br><span class="line">|prev_size| size   | user_data|prev_size|  size  | userdata|</span><br><span class="line">|  8byte  | 8byte  |          |  8byte  | 8byte  |         |</span><br><span class="line">+---------+--------+----------+---------+--------+---------+</span><br><span class="line">         ↑               ↑</span><br><span class="line">       chunk头部      ptr指向这里（用户数据开始）</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用户指针ptr指向用户数据区的开始</span><br><span class="line">ptr - 8 正好指向 size字段</span><br><span class="line">ptr - 16 则指向 prev_size字段</span><br><span class="line">------------------------------------------------------------------------------------------</span><br><span class="line">ptr-0x10       ptr-0x8         ptr</span><br><span class="line">    ↓              ↓            ↓</span><br><span class="line">+------------+------------+------------+</span><br><span class="line">| prev_size  |    size    | user_data  |</span><br><span class="line">| (8byte)    |  (8byte)   |            |</span><br><span class="line">+------------+------------+------------+</span><br></pre></td></tr></table></figure>
+
+<p><strong>图标实例</strong></p>
+<p>先用图表的形式来清晰地展示堆扩展，这样有助于去gdb的调试和理解</p>
+<p><img src="/HFTTC.github.io/./img/73098186_1ZbWGahWTRj8Cgej/1767965933716-0aceef91-d48a-441b-9a35-d9e99992709b-323488.png" alt="1767965933716-0aceef91-d48a-441b-9a35-d9e99992709b.png"></p>
+<p><img src="/HFTTC.github.io/./img/73098186_1ZbWGahWTRj8Cgej/1767964324618-c5d70ffb-8f2c-4a2f-b9df-b2c4476c80aa-989486.png" alt="1767964324618-c5d70ffb-8f2c-4a2f-b9df-b2c4476c80aa.png"></p>
+<p><strong>gdb调试查看程序运行过程</strong></p>
+<p>尽管图标已经把程序过程说的很清晰了，但是自己用gdb去动手调试是必不可少的，这样我们可以更清晰地理解堆的变化情况。下面我们用gdb进行调试并在第8行下断点运行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">------- tip of the day (disable <span class="keyword">with</span> <span class="built_in">set</span> show-tips off) -------</span><br><span class="line">Use the telescope command to dereference a given address/pointer multiple times (<span class="keyword">if</span> the dereferenced value <span class="keyword">is</span> a valid ptr; see config telescope to configure its behavior)</span><br><span class="line">pwndbg&gt; b <span class="number">8</span></span><br><span class="line">Breakpoint <span class="number">1</span> at <span class="number">0x400586</span>: file test1.c, line <span class="number">8.</span></span><br><span class="line">pwndbg&gt; r</span><br><span class="line">Starting program: /home/pwn/Desktop/test1 </span><br><span class="line">[Thread debugging using libthread_db enabled]</span><br><span class="line">Using host libthread_db library <span class="string">&quot;/lib/x86_64-linux-gnu/libthread_db.so.1&quot;</span>.</span><br><span class="line"></span><br><span class="line">Breakpoint <span class="number">1</span>, main () at test1.c:<span class="number">8</span></span><br><span class="line"><span class="number">8</span>	test1.c: No such file <span class="keyword">or</span> directory.</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | WX | RODATA</span><br><span class="line">──[ REGISTERS / show-flags off / show-compact-regs off ]──</span><br><span class="line"> RAX  <span class="number">0x6022c0</span> ◂— <span class="number">0</span></span><br><span class="line"> RBX  <span class="number">0</span></span><br><span class="line"> RCX  <span class="number">0x21</span></span><br><span class="line"> RDX  <span class="number">0</span></span><br><span class="line"> RDI  <span class="number">0</span></span><br><span class="line"> RSI  <span class="number">0x6022d0</span> ◂— <span class="number">0</span></span><br><span class="line"> R8   <span class="number">0x21001</span></span><br><span class="line"> R9   <span class="number">0x6022c0</span> ◂— <span class="number">0</span></span><br><span class="line"> R10  <span class="number">0xfffffffffffff000</span></span><br><span class="line"> R11  <span class="number">0x7ffff7e1ace0</span> (main_arena+<span class="number">96</span>) —▸ <span class="number">0x6022d0</span> ◂— <span class="number">0</span></span><br><span class="line"> R12  <span class="number">0x7fffffffe038</span> —▸ <span class="number">0x7fffffffe3a4</span> ◂— <span class="string">&#x27;/home/pwn/Desktop/test1&#x27;</span></span><br><span class="line"> R13  <span class="number">0x400566</span> (main) ◂— push rbp</span><br><span class="line"> R14  <span class="number">0</span></span><br><span class="line"> R15  <span class="number">0x7ffff7ffd040</span> (_rtld_global) —▸ <span class="number">0x7ffff7ffe2e0</span> ◂— <span class="number">0</span></span><br><span class="line"> RBP  <span class="number">0x7fffffffdf20</span> ◂— <span class="number">1</span></span><br><span class="line"> RSP  <span class="number">0x7fffffffdf10</span> —▸ <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line"> RIP  <span class="number">0x400586</span> (main+<span class="number">32</span>) ◂— mov rax, qword ptr [rbp - <span class="number">0x10</span>]</span><br><span class="line">───────────[ DISASM / x86-<span class="number">64</span> / <span class="built_in">set</span> emulate on ]───────────</span><br><span class="line"> ► <span class="number">0x400586</span> &lt;main+<span class="number">32</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40058a</span> &lt;main+<span class="number">36</span>&gt;    sub    rax, <span class="number">8</span>                          RAX =&gt; <span class="number">0x602298</span> (<span class="number">0x6022a0</span> - <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x40058e</span> &lt;main+<span class="number">40</span>&gt;    mov    qword ptr [rax], <span class="number">0x41</span>           [<span class="number">0x602298</span>] &lt;= <span class="number">0x41</span></span><br><span class="line">   <span class="number">0x400595</span> &lt;main+<span class="number">47</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x400599</span> &lt;main+<span class="number">51</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40059c</span> &lt;main+<span class="number">54</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0x30</span>                       EDI =&gt; <span class="number">0x30</span></span><br><span class="line">   <span class="number">0x4005a6</span> &lt;main+<span class="number">64</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005ab</span> &lt;main+<span class="number">69</span>&gt;    mov    qword ptr [rbp - <span class="number">8</span>], rax</span><br><span class="line">   <span class="number">0x4005af</span> &lt;main+<span class="number">73</span>&gt;    mov    eax, <span class="number">0</span>                          EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x4005b4</span> &lt;main+<span class="number">78</span>&gt;    leave  </span><br><span class="line">────────────────────────[ STACK ]─────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp <span class="number">0x7fffffffdf10</span> —▸ <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">01:0008│-008 <span class="number">0x7fffffffdf18</span> —▸ <span class="number">0x400470</span> (_start) ◂— xor ebp, ebp</span><br><span class="line">02:<span class="number">00</span>10│ rbp <span class="number">0x7fffffffdf20</span> ◂— <span class="number">1</span></span><br><span class="line">03:0018│+008 <span class="number">0x7fffffffdf28</span> —▸ <span class="number">0x7ffff7c29d90</span> (__libc_start_call_main+<span class="number">128</span>) ◂— mov edi, eax</span><br><span class="line">04:0020│+<span class="number">0</span>10 <span class="number">0x7fffffffdf30</span> ◂— <span class="number">0</span></span><br><span class="line">05:0028│+018 <span class="number">0x7fffffffdf38</span> —▸ <span class="number">0x400566</span> (main) ◂— push rbp</span><br><span class="line">06:0030│+020 <span class="number">0x7fffffffdf40</span> ◂— <span class="number">0x1ffffe020</span></span><br><span class="line">07:0038│+028 <span class="number">0x7fffffffdf48</span> —▸ <span class="number">0x7fffffffe038</span> —▸ <span class="number">0x7fffffffe3a4</span> ◂— <span class="string">&#x27;/home/pwn/Desktop/test1&#x27;</span></span><br><span class="line">──────────────────────[ BACKTRACE ]───────────────────────</span><br><span class="line"> ► <span class="number">0</span>         <span class="number">0x400586</span> main+<span class="number">32</span></span><br><span class="line">   <span class="number">1</span>   <span class="number">0x7ffff7c29d90</span> __libc_start_call_main+<span class="number">128</span></span><br><span class="line">   <span class="number">2</span>   <span class="number">0x7ffff7c29e40</span> __libc_start_main+<span class="number">128</span></span><br><span class="line">   <span class="number">3</span>         <span class="number">0x400499</span> _start+<span class="number">41</span></span><br><span class="line">──────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>查看一下新创建的heap的起始地址，我们可以看到0x62290是新创建的堆起始地址，接下来查看堆段的内存地址</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x290</span> (<span class="keyword">with</span> flag bits: <span class="number">0x291</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602290</span></span><br><span class="line">Size: <span class="number">0x20</span> (<span class="keyword">with</span> flag bits: <span class="number">0x21</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x6022b0</span></span><br><span class="line">Size: <span class="number">0x20</span> (<span class="keyword">with</span> flag bits: <span class="number">0x21</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x6022d0</span></span><br><span class="line">Size: <span class="number">0x20d30</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20d31</span>)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以直接来看一下heap，找到我们新分配的两个堆</p>
+<p><img src="/HFTTC.github.io/./img/73098186_1ZbWGahWTRj8Cgej/1767976998169-ae491a10-5141-49e5-83e2-7248ca851e86-614066.png" alt="1767976998169-ae491a10-5141-49e5-83e2-7248ca851e86.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/20gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span> |&lt;==chunk1</span><br><span class="line">            prev_size---------  size--------------</span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span> |</span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span> |&lt;==chunk2</span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span> |</span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020d31</span> &lt;==top_chunk</span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>程序执行力malloc(0x10)，并且prev_size和size部分各占8个字节，而size记录整个堆块大小,<strong>size最后一位用来记录前一个堆的状态</strong>，所以堆块的总大小为:</p>
+<p><strong>SIZE&#x3D;0x08(prev_size)+0x08(size)+0x10(malloc-user_data)+0x1(标志位)&#x3D;0x21</strong></p>
+<p>查看P指针指向的地址，执行info local可以看到p指针指向user_data的起始位置，这里和我们上面图标内容也是相符合的，即<strong>定义的指针是指向chunk的user_data的</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; info local</span><br><span class="line">p = <span class="number">0x6022a0</span></span><br><span class="line">q = <span class="number">0x400470</span> &lt;_start&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我们继续查看情况，我们在第九行下断点，continue执行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; b <span class="number">9</span></span><br><span class="line">Breakpoint <span class="number">3</span> at <span class="number">0x400595</span>: file test1.c, line <span class="number">9.</span></span><br><span class="line">pwndbg&gt; c</span><br><span class="line">Continuing.</span><br><span class="line"></span><br><span class="line">Breakpoint <span class="number">3</span>, main () at test1.c:<span class="number">9</span></span><br><span class="line"><span class="number">9</span>	<span class="keyword">in</span> test1.c</span><br><span class="line">LEGEND: STACK | HEAP | CODE | DATA | WX | RODATA</span><br><span class="line">────────────────[ REGISTERS / show-flags off / show-compact-regs off ]─────────────────</span><br><span class="line">*RAX  <span class="number">0x602298</span> ◂— <span class="number">0x41</span> /* <span class="string">&#x27;A&#x27;</span> */</span><br><span class="line"> RBX  <span class="number">0</span></span><br><span class="line"> RCX  <span class="number">0x21</span></span><br><span class="line"> RDX  <span class="number">0</span></span><br><span class="line"> RDI  <span class="number">0</span></span><br><span class="line"> RSI  <span class="number">0x6022d0</span> ◂— <span class="number">0</span></span><br><span class="line"> R8   <span class="number">0x21001</span></span><br><span class="line"> R9   <span class="number">0x6022c0</span> ◂— <span class="number">0</span></span><br><span class="line"> R10  <span class="number">0xfffffffffffff000</span></span><br><span class="line"> R11  <span class="number">0x7ffff7e1ace0</span> (main_arena+<span class="number">96</span>) —▸ <span class="number">0x6022d0</span> ◂— <span class="number">0</span></span><br><span class="line"> R12  <span class="number">0x7fffffffe038</span> —▸ <span class="number">0x7fffffffe3a3</span> ◂— <span class="string">&#x27;/home/pwn/Desktop/test1&#x27;</span></span><br><span class="line"> R13  <span class="number">0x400566</span> (main) ◂— push rbp</span><br><span class="line"> R14  <span class="number">0</span></span><br><span class="line"> R15  <span class="number">0x7ffff7ffd040</span> (_rtld_global) —▸ <span class="number">0x7ffff7ffe2e0</span> ◂— <span class="number">0</span></span><br><span class="line"> RBP  <span class="number">0x7fffffffdf20</span> ◂— <span class="number">1</span></span><br><span class="line"> RSP  <span class="number">0x7fffffffdf10</span> —▸ <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">*RIP  <span class="number">0x400595</span> (main+<span class="number">47</span>) ◂— mov rax, qword ptr [rbp - <span class="number">0x10</span>]</span><br><span class="line">─────────────────────────[ DISASM / x86-<span class="number">64</span> / <span class="built_in">set</span> emulate on ]──────────────────────────</span><br><span class="line">b+ <span class="number">0x40057c</span> &lt;main+<span class="number">22</span>&gt;    mov    edi, <span class="number">0x10</span>     EDI =&gt; <span class="number">0x10</span></span><br><span class="line">   <span class="number">0x400581</span> &lt;main+<span class="number">27</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">b+ <span class="number">0x400586</span> &lt;main+<span class="number">32</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40058a</span> &lt;main+<span class="number">36</span>&gt;    sub    rax, <span class="number">8</span>                          RAX =&gt; <span class="number">0x602298</span> (<span class="number">0x6022a0</span> - <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x40058e</span> &lt;main+<span class="number">40</span>&gt;    mov    qword ptr [rax], <span class="number">0x41</span>           [<span class="number">0x602298</span>] &lt;= <span class="number">0x41</span></span><br><span class="line"> ► <span class="number">0x400595</span> &lt;main+<span class="number">47</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x400599</span> &lt;main+<span class="number">51</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40059c</span> &lt;main+<span class="number">54</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0x30</span>                       EDI =&gt; <span class="number">0x30</span></span><br><span class="line">   <span class="number">0x4005a6</span> &lt;main+<span class="number">64</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005ab</span> &lt;main+<span class="number">69</span>&gt;    mov    qword ptr [rbp - <span class="number">8</span>], rax</span><br><span class="line">───────────────────────────────────────[ STACK ]───────────────────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rsp <span class="number">0x7fffffffdf10</span> —▸ <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">01:0008│-008 <span class="number">0x7fffffffdf18</span> —▸ <span class="number">0x400470</span> (_start) ◂— xor ebp, ebp</span><br><span class="line">02:<span class="number">00</span>10│ rbp <span class="number">0x7fffffffdf20</span> ◂— <span class="number">1</span></span><br><span class="line">03:0018│+008 <span class="number">0x7fffffffdf28</span> —▸ <span class="number">0x7ffff7c29d90</span> (__libc_start_call_main+<span class="number">128</span>) ◂— mov edi, eax</span><br><span class="line">04:0020│+<span class="number">0</span>10 <span class="number">0x7fffffffdf30</span> ◂— <span class="number">0</span></span><br><span class="line">05:0028│+018 <span class="number">0x7fffffffdf38</span> —▸ <span class="number">0x400566</span> (main) ◂— push rbp</span><br><span class="line">06:0030│+020 <span class="number">0x7fffffffdf40</span> ◂— <span class="number">0x1ffffe020</span></span><br><span class="line">07:0038│+028 <span class="number">0x7fffffffdf48</span> —▸ <span class="number">0x7fffffffe038</span> —▸ <span class="number">0x7fffffffe3a3</span> ◂— <span class="string">&#x27;/home/pwn/Desktop/test1&#x27;</span></span><br><span class="line">─────────────────────────────────────[ BACKTRACE ]─────────────────────────────────────</span><br><span class="line"> ► <span class="number">0</span>         <span class="number">0x400595</span> main+<span class="number">47</span></span><br><span class="line">   <span class="number">1</span>   <span class="number">0x7ffff7c29d90</span> __libc_start_call_main+<span class="number">128</span></span><br><span class="line">   <span class="number">2</span>   <span class="number">0x7ffff7c29e40</span> __libc_start_main+<span class="number">128</span></span><br><span class="line">   <span class="number">3</span>         <span class="number">0x400499</span> _start+<span class="number">41</span></span><br><span class="line">───────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个时候程序已经执行过了  *(long long *)((long long)ptr-0x8)&#x3D;0x41;代码，我们可以看一下堆内容</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/20gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000041</span>|&lt;==chunk1 |&lt;==chunk1实际覆盖范围</span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|          |</span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span>|&lt;==chunk2 |</span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|          |</span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020d31</span></span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>此时我们可以发现，size段已经被修改为41了，这就意味着除去prev_size和size段一共0x10个字节外剩下的全部都是user_data段，也就是0x30个字节，覆盖到0x6022c0处，也急速hi说chunk2被chunk1包含，造成了堆重叠</p>
+<p>我们再在第十行设置断点，单步ni执行到free(p)之后</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">   <span class="number">0x40058a</span> &lt;main+<span class="number">36</span>&gt;    sub    rax, <span class="number">8</span>                          RAX =&gt; <span class="number">0x602298</span> (<span class="number">0x6022a0</span> - <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x40058e</span> &lt;main+<span class="number">40</span>&gt;    mov    qword ptr [rax], <span class="number">0x41</span>           [<span class="number">0x602298</span>] &lt;= <span class="number">0x41</span></span><br><span class="line">b+ <span class="number">0x400595</span> &lt;main+<span class="number">47</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x400599</span> &lt;main+<span class="number">51</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40059c</span> &lt;main+<span class="number">54</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line"> ► <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0x30</span>                       EDI =&gt; <span class="number">0x30</span></span><br><span class="line">   <span class="number">0x4005a6</span> &lt;main+<span class="number">64</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005ab</span> &lt;main+<span class="number">69</span>&gt;    mov    qword ptr [rbp - <span class="number">8</span>], rax</span><br><span class="line">   <span class="number">0x4005af</span> &lt;main+<span class="number">73</span>&gt;    mov    eax, <span class="number">0</span>                          EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x4005b4</span> &lt;main+<span class="number">78</span>&gt;    leave  </span><br><span class="line">   <span class="number">0x4005b5</span> &lt;main+<span class="number">79</span>&gt;    ret    </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个时候已经执行过了free(p)，查看bin内容</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x290</span> (<span class="keyword">with</span> flag bits: <span class="number">0x291</span>)</span><br><span class="line"></span><br><span class="line">Free chunk (fastbins) | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602290</span></span><br><span class="line">Size: <span class="number">0x40</span> (<span class="keyword">with</span> flag bits: <span class="number">0x41</span>)</span><br><span class="line">fd: <span class="number">0x602</span></span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x6022d0</span></span><br><span class="line">Size: <span class="number">0x20d30</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20d31</span>)</span><br><span class="line"></span><br><span class="line">pwndbg&gt; x/20gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000041</span></span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000602</span>	<span class="number">0x55ef496a4a6f7a77</span></span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span></span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020d31</span></span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>这个时候我们可以看到<strong>堆中的内容并没有被清空</strong>，free(p)只是将目标的堆内存标记为释放状态，其内容并没有被清空，这个和我们在UAF中所学的知识是一样的，我们接下来可以看看第十一行执行后的情况，继续单步执行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">b+ <span class="number">0x400595</span>       &lt;main+<span class="number">47</span>&gt;                       mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x400599</span>       &lt;main+<span class="number">51</span>&gt;                       mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40059c</span>       &lt;main+<span class="number">54</span>&gt;                       call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line">b+ <span class="number">0x4005a1</span>       &lt;main+<span class="number">59</span>&gt;                       mov    edi, <span class="number">0x30</span>                       EDI =&gt; <span class="number">0x30</span></span><br><span class="line">   <span class="number">0x4005a6</span>       &lt;main+<span class="number">64</span>&gt;                       call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line"> ► <span class="number">0x4005ab</span>       &lt;main+<span class="number">69</span>&gt;                       mov    qword ptr [rbp - <span class="number">8</span>], rax        [<span class="number">0x7fffffffdf18</span>] &lt;= <span class="number">0x6022a0</span> ◂— <span class="number">0x602</span></span><br><span class="line">   <span class="number">0x4005af</span>       &lt;main+<span class="number">73</span>&gt;                       mov    eax, <span class="number">0</span>                          EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x4005b4</span>       &lt;main+<span class="number">78</span>&gt;                       leave  </span><br><span class="line">   <span class="number">0x4005b5</span>       &lt;main+<span class="number">79</span>&gt;                       ret                                &lt;__libc_start_call_main+<span class="number">128</span>&gt;</span><br><span class="line">    ↓</span><br><span class="line">   <span class="number">0x7ffff7c29d90</span> &lt;__libc_start_call_main+<span class="number">128</span>&gt;    mov    edi, eax     EDI =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x7ffff7c29d92</span> &lt;__libc_start_call_main+<span class="number">130</span>&gt;    call   exit                        &lt;exit&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; bins</span><br><span class="line">tcachebins</span><br><span class="line">empty</span><br><span class="line">fastbins</span><br><span class="line">empty</span><br><span class="line">unsortedbin</span><br><span class="line">empty</span><br><span class="line">smallbins</span><br><span class="line">empty</span><br><span class="line">largebins</span><br><span class="line">empty</span><br><span class="line"></span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x290</span> (<span class="keyword">with</span> flag bits: <span class="number">0x291</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602290</span></span><br><span class="line">Size: <span class="number">0x40</span> (<span class="keyword">with</span> flag bits: <span class="number">0x41</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x6022d0</span></span><br><span class="line">Size: <span class="number">0x20d30</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20d31</span>)</span><br><span class="line"></span><br><span class="line">pwndbg&gt; x/20gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000041</span></span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000602</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span></span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020d31</span></span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>当我们重新申请一个大小为0x30的chunk时，bin中刚好有大小合适的chunk，这时候chunk1与chunk2合并的新chunk1就会被重新启用，启用的同时chunk2中原有的数据也会连带着被启用，然后就可以直接通过这个新申请的块对chunk2中的内容进行操作了。</p>
+<h3 id="对-free-的-smallbin-进行操作"><a href="#对-free-的-smallbin-进行操作" class="headerlink" title="对 free 的 smallbin 进行操作"></a>对 free 的 smallbin 进行操作</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    void *ptr,*ptr1;</span><br><span class="line"></span><br><span class="line">    ptr=malloc(<span class="number">0x80</span>);//分配第一个<span class="number">0x80</span>的chunk1</span><br><span class="line">    malloc(<span class="number">0x10</span>);//分配第二个<span class="number">0x10</span>的chunk2</span><br><span class="line"></span><br><span class="line">    free(ptr);//首先进行释放，使得chunk1进入unsorted <span class="built_in">bin</span></span><br><span class="line"></span><br><span class="line">    *(<span class="built_in">int</span> *)((<span class="built_in">int</span>)ptr-<span class="number">0x8</span>)=<span class="number">0xb1</span>;</span><br><span class="line">    ptr1=malloc(<span class="number">0xa0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/73098186_1ZbWGahWTRj8Cgej/1768015720052-ac9cce41-1a7a-47a0-87f5-2c830ab9fd70-854048.png" alt="1768015720052-ac9cce41-1a7a-47a0-87f5-2c830ab9fd70.png"></p>
+<p>我们先在第一行下断点，然后单步执行到两次 malloc 执行之后</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">──────────────────────────────[ DISASM / x86-<span class="number">64</span> / <span class="built_in">set</span> emulate on ]──────────────────────────────</span><br><span class="line">   <span class="number">0x400573</span> &lt;main+<span class="number">13</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400578</span> &lt;main+<span class="number">18</span>&gt;    mov    qword ptr [rbp - <span class="number">0x10</span>], rax     [<span class="number">0x7fffffffdf10</span>] &lt;= <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40057c</span> &lt;main+<span class="number">22</span>&gt;    mov    edi, <span class="number">0x10</span>                       EDI =&gt; <span class="number">0x10</span></span><br><span class="line">   <span class="number">0x400581</span> &lt;main+<span class="number">27</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400586</span> &lt;main+<span class="number">32</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line"> ► <span class="number">0x40058a</span> &lt;main+<span class="number">36</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40058d</span> &lt;main+<span class="number">39</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400592</span> &lt;main+<span class="number">44</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]</span><br><span class="line">   <span class="number">0x400596</span> &lt;main+<span class="number">48</span>&gt;    sub    rax, <span class="number">8</span></span><br><span class="line">   <span class="number">0x40059a</span> &lt;main+<span class="number">52</span>&gt;    mov    qword ptr [rax], <span class="number">0xb1</span></span><br><span class="line">   <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0xa0</span>                       EDI =&gt; <span class="number">0xa0</span></span><br><span class="line"></span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x290</span> (<span class="keyword">with</span> flag bits: <span class="number">0x291</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602290</span></span><br><span class="line">Size: <span class="number">0x90</span> (<span class="keyword">with</span> flag bits: <span class="number">0x91</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602320</span></span><br><span class="line">Size: <span class="number">0x20</span> (<span class="keyword">with</span> flag bits: <span class="number">0x21</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602340</span></span><br><span class="line">Size: <span class="number">0x20cc0</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20cc1</span>)</span><br><span class="line">pwndbg&gt; x/30gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000091</span>&lt;==chunk1</span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span>|&lt;==chunk2</span><br><span class="line"><span class="number">0x602330</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602340</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020cc1</span>|&lt;==topchunk</span><br><span class="line"><span class="number">0x602350</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602360</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602370</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>我们继续单步执行到 free 执行之后看一看堆空间的分布情况</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────────────[ DISASM / x86-<span class="number">64</span> / <span class="built_in">set</span> emulate on ]────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">   <span class="number">0x40057c</span> &lt;main+<span class="number">22</span>&gt;    mov    edi, <span class="number">0x10</span>                       EDI =&gt; <span class="number">0x10</span></span><br><span class="line">   <span class="number">0x400581</span> &lt;main+<span class="number">27</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400586</span> &lt;main+<span class="number">32</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40058a</span> &lt;main+<span class="number">36</span>&gt;    mov    rdi, rax                        RDI =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0</span></span><br><span class="line">   <span class="number">0x40058d</span> &lt;main+<span class="number">39</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line"> ► <span class="number">0x400592</span> &lt;main+<span class="number">44</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0x602</span></span><br><span class="line">   <span class="number">0x400596</span> &lt;main+<span class="number">48</span>&gt;    sub    rax, <span class="number">8</span>                          RAX =&gt; <span class="number">0x602298</span> (<span class="number">0x6022a0</span> - <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x40059a</span> &lt;main+<span class="number">52</span>&gt;    mov    qword ptr [rax], <span class="number">0xb1</span>           [<span class="number">0x602298</span>] &lt;= <span class="number">0xb1</span></span><br><span class="line">   <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0xa0</span>                       EDI =&gt; <span class="number">0xa0</span></span><br><span class="line">   <span class="number">0x4005a6</span> &lt;main+<span class="number">64</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005ab</span> &lt;main+<span class="number">69</span>&gt;    mov    qword ptr [rbp - <span class="number">8</span>], rax</span><br><span class="line">─────────────────────────────────────────────────────────────────────────────────────────────────[ STACK ]─────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; bins</span><br><span class="line">fastbins</span><br><span class="line">empty</span><br><span class="line">unsortedbin</span><br><span class="line"><span class="built_in">all</span>: <span class="number">0x602000</span> —▸ <span class="number">0x7ffff7bc4b78</span> ◂— <span class="number">0x602000</span></span><br><span class="line">smallbins</span><br><span class="line">empty</span><br><span class="line">largebins</span><br><span class="line">empty</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Free chunk (unsortedbin) | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0xb0</span> (<span class="keyword">with</span> flag bits: <span class="number">0xb1</span>)</span><br><span class="line">fd: <span class="number">0x7ffff7bc4b78</span></span><br><span class="line">bk: <span class="number">0x7ffff7bc4b78</span></span><br><span class="line"></span><br><span class="line">Allocated chunk</span><br><span class="line">Addr: <span class="number">0x6020b0</span></span><br><span class="line">Size: <span class="number">0x20</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x6020d0</span></span><br><span class="line">Size: <span class="number">0x20f30</span> (<span class="keyword">with</span> flag bits: <span class="number">0x20f31</span>)</span><br><span class="line"></span><br><span class="line">pwndbg&gt; x/30gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000091</span>|&lt;==tcachebins</span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000602</span>	<span class="number">0x83b366d8bd637ac2</span>|</span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span>|</span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span>|&lt;==chunk2</span><br><span class="line"><span class="number">0x602330</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020cc1</span>|&lt;==top chunk</span><br><span class="line"><span class="number">0x602350</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602360</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602370</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>释放后的 chunk1 进入了 tcachebins，我们看一看执行完 *(int *)((int)ptr-0x8)&#x3D;0xb1;之后的堆内存，单步执行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">──────────────────────────────[ DISASM / x86-<span class="number">64</span> / <span class="built_in">set</span> emulate on ]──────────────────────────────</span><br><span class="line">   <span class="number">0x40058d</span> &lt;main+<span class="number">39</span>&gt;    call   free@plt                    &lt;free@plt&gt;</span><br><span class="line"> </span><br><span class="line">   <span class="number">0x400592</span> &lt;main+<span class="number">44</span>&gt;    mov    rax, qword ptr [rbp - <span class="number">0x10</span>]     RAX, [<span class="number">0x7fffffffdf10</span>] =&gt; <span class="number">0x6022a0</span> ◂— <span class="number">0x602</span></span><br><span class="line">   <span class="number">0x400596</span> &lt;main+<span class="number">48</span>&gt;    sub    rax, <span class="number">8</span>                          RAX =&gt; <span class="number">0x602298</span> (<span class="number">0x6022a0</span> - <span class="number">0x8</span>)</span><br><span class="line">   <span class="number">0x40059a</span> &lt;main+<span class="number">52</span>&gt;    mov    qword ptr [rax], <span class="number">0xb1</span>           [<span class="number">0x602298</span>] &lt;= <span class="number">0xb1</span></span><br><span class="line">   <span class="number">0x4005a1</span> &lt;main+<span class="number">59</span>&gt;    mov    edi, <span class="number">0xa0</span>                       EDI =&gt; <span class="number">0xa0</span></span><br><span class="line"> ► <span class="number">0x4005a6</span> &lt;main+<span class="number">64</span>&gt;    call   malloc@plt                  &lt;malloc@plt&gt;</span><br><span class="line">        size: <span class="number">0xa0</span></span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005ab</span> &lt;main+<span class="number">69</span>&gt;    mov    qword ptr [rbp - <span class="number">8</span>], rax</span><br><span class="line">   <span class="number">0x4005af</span> &lt;main+<span class="number">73</span>&gt;    mov    eax, <span class="number">0</span>                       EAX =&gt; <span class="number">0</span></span><br><span class="line">   <span class="number">0x4005b4</span> &lt;main+<span class="number">78</span>&gt;    leave  </span><br><span class="line">   <span class="number">0x4005b5</span> &lt;main+<span class="number">79</span>&gt;    ret    </span><br><span class="line"> </span><br><span class="line">   <span class="number">0x4005b6</span>              nop    word ptr cs:[rax + rax]</span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; x/30gx <span class="number">0x602290</span></span><br><span class="line"><span class="number">0x602290</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x00000000000000b1</span></span><br><span class="line"><span class="number">0x6022a0</span>:	<span class="number">0x0000000000000602</span>	<span class="number">0x83b366d8bd637ac2</span></span><br><span class="line"><span class="number">0x6022b0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022c0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022d0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022e0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6022f0</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602300</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602310</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000021</span></span><br><span class="line"><span class="number">0x602330</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000020cc1</span></span><br><span class="line"><span class="number">0x602350</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602360</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602370</span>:	<span class="number">0x0000000000000000</span>	<span class="number">0x0000000000000000</span></span><br><span class="line">pwndbg&gt; </span><br></pre></td></tr></table></figure>
+
+<p>执行完修改 size 如上，此时再进行 malloc 分配就可以得到 chunk1+chunk2 的堆块，从而控制 chunk2 的内容</p>
+<h3 id="Chunk-Extend-可以做什么？"><a href="#Chunk-Extend-可以做什么？" class="headerlink" title="Chunk Extend 可以做什么？"></a>Chunk Extend 可以做什么？</h3><p>当你可以控制 chunk 中的内容时，加入该 chunk 中存在字符串指针，函数指针等，就可以通过这些指针进行信息泄露和控制执行流程。此外 extend 可以实现 chunk overlapping，通过 overlapping 可以控制 chunk 的 fd&#x2F;bk 指针，从而实现 fastbin attack 等利用</p>
+<h4 id="通过-extend-后向-overlapping"><a href="#通过-extend-后向-overlapping" class="headerlink" title="通过 extend 后向 overlapping"></a>通过 extend 后向 overlapping</h4><p><font style="color:rgba(0, 0, 0, 0.87);">这里展示通过 extend 进行后向 overlapping，这也是在 CTF 中最常出现的情况，通过 overlapping 可以实现其它的一些利用。一下是示例源代码</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> main()</span><br><span class="line">&#123;</span><br><span class="line">    void *ptr,*ptr1;</span><br><span class="line"></span><br><span class="line">    ptr=malloc(<span class="number">0x10</span>);//分配第<span class="number">1</span>个 <span class="number">0x80</span> 的chunk1</span><br><span class="line">    malloc(<span class="number">0x10</span>); //分配第<span class="number">2</span>个 <span class="number">0x10</span> 的chunk2</span><br><span class="line">    malloc(<span class="number">0x10</span>); //分配第<span class="number">3</span>个 <span class="number">0x10</span> 的chunk3</span><br><span class="line">    malloc(<span class="number">0x10</span>); //分配第<span class="number">4</span>个 <span class="number">0x10</span> 的chunk4    </span><br><span class="line">    *(<span class="built_in">int</span> *)((<span class="built_in">int</span>)ptr-<span class="number">0x8</span>)=<span class="number">0x61</span>;</span><br><span class="line">    free(ptr);</span><br><span class="line">    ptr1=malloc(<span class="number">0x50</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.87);">在 malloc(0x50) 对 extend 区域重新占位后，其中 0x10 的 fastbin 块依然可以正常的分配和释放，此时已经构成 overlapping，通过对 overlapping 的进行操作可以实现 fastbin attack。</font></p>
+<h4 id="通过-extend-前向-overlapping"><a href="#通过-extend-前向-overlapping" class="headerlink" title="通过 extend 前向 overlapping"></a><font style="color:rgba(0, 0, 0, 0.87);">通过 extend 前向 overlapping</font></h4><p><font style="color:rgba(0, 0, 0, 0.87);">这里展示通过修改 pre_inuse 域和 pre_size 域实现合并前面的块</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> main(void)</span><br><span class="line">&#123;</span><br><span class="line">    void *ptr1,*ptr2,*ptr3,*ptr4;</span><br><span class="line">    ptr1=malloc(<span class="number">128</span>);              //smallbin1</span><br><span class="line">    ptr2=malloc(<span class="number">0x10</span>);             //fastbin1</span><br><span class="line">    ptr3=malloc(<span class="number">0x10</span>);             //fastbin2</span><br><span class="line">    ptr4=malloc(<span class="number">128</span>);              //smallbin2</span><br><span class="line">    malloc(<span class="number">0x10</span>);                  //防止与top合并</span><br><span class="line">    free(ptr1);</span><br><span class="line">    *(<span class="built_in">int</span> *)((long long)ptr4-<span class="number">0x8</span>)=<span class="number">0x90</span>;   //修改size的P(pre_inuse)域</span><br><span class="line">    *(<span class="built_in">int</span> *)((long long)ptr4-<span class="number">0x10</span>)=<span class="number">0xd0</span>;  //修改pre_size域</span><br><span class="line">    free(ptr4);//unlink进行前向extend</span><br><span class="line">    malloc(<span class="number">0x150</span>);//占位块</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgba(0, 0, 0, 0.87);">前向 extend 利用了 smallbin 的 unlink 机制，通过修改 pre_size 域可以跨越多个 chunk 进行合并实现 overlapping。</font></p>
+<p>pre_size, 如果该 chunk 的物理相邻的前一地址 chunk（两个指针的地址差值为前一chunk 大小）是空闲的话，那该字段记录的是前一个 chunk 的大小 (包括 chunk 头)。否则，该字段可以用来存储物理相邻的前一个 chunk 的数据。这里的前一chunk 指的是较低地址的 chunk 。前面一个堆块在使用时并且pre_size为储存前面chunk的数据时，他的值始终为 0</p>
+<p><font style="color:rgba(0, 0, 0, 0.87);">size字段中的P（PRE_INUSE）：记录前一个 chunk 块是否被分配。一般来说，堆中第一个被分配的内存块的 size 字段的 P 位都会被设置为 1，以便于防止访问前面的非法内存。当一个 chunk 的 size 的 P 位为 0 时，我们能通过 prev_size 字段来获取上一个 chunk 的大小以及地址。这也方便进行空闲 chunk 之间的合并。</font></p>
+<blockquote>
+<p>更新: 2026-01-11 17:49:55<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/fii6vgn27lmxk5qp">https://www.yuque.com/idcm/wnemg9/fii6vgn27lmxk5qp</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Overlap2.23libc例题" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/ChunkExtend&Overlapping/Overlap2.23libc%E4%BE%8B%E9%A2%98/" aria-label="前一篇: Overlap2.23libc例题" title="前一篇: Overlap2.23libc例题"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Overlap2.23libc例题
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="index" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/---BROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/index/" aria-label="后一篇: index"  title="后一篇: index"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          index
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Chunk-Extend-Overlapping"><span class="toc-number">1.</span> <span class="toc-text">Chunk Extend &amp; Overlapping</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFchunk-extend"><span class="toc-number">1.1.</span> <span class="toc-text">什么是chunk extend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#chunk-extend%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.</span> <span class="toc-text">chunk extend原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9inuse%E7%9A%84fastbin%E8%BF%9B%E8%A1%8Cextend"><span class="toc-number">1.3.</span> <span class="toc-text">对inuse的fastbin进行extend</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9-free-%E7%9A%84-smallbin-%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="toc-number">1.4.</span> <span class="toc-text">对 free 的 smallbin 进行操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Chunk-Extend-%E5%8F%AF%E4%BB%A5%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.5.</span> <span class="toc-text">Chunk Extend 可以做什么？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87-extend-%E5%90%8E%E5%90%91-overlapping"><span class="toc-number">1.5.1.</span> <span class="toc-text">通过 extend 后向 overlapping</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87-extend-%E5%89%8D%E5%90%91-overlapping"><span class="toc-number">1.5.2.</span> <span class="toc-text">通过 extend 前向 overlapping</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/ChunkExtend&amp;Overlapping/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "Chunk Extend &amp;amp; Overlapping参考资料：https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/chunk-extend-overlapping/              [https://blog.csdn.net/weixin_43921239/article/details/107841328](https://blog.csdn.net/weixin_43921239/article/details/",
+          date: "Tue Apr 28 2026 18:25:57 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

