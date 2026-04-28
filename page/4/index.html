@@ -154,7 +154,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">198</div>
+    <div class="sidebar-state-number">87</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -422,27 +422,64 @@ _**ESP&amp;#x2F;RSP  **_栈指针寄存器，其中存
 </div>
       <div class="post-wrapper">
   <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/04/28/%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA/" aria-label="对于got和hook的讨论" title="对于got和hook的讨论"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/04/28/%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83/" aria-label="对于send和sendline的思考" title="对于send和sendline的思考"></a>
     <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于got和hook的讨论" class="lazyload">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于send和sendline的思考" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-04-28</span>
-        <span><span class="icon-pencil"></span>879 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
+        <span><span class="icon-pencil"></span>222 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
       </div>
-      <h2 class="post-title">对于got和hook的讨论</h2>
+      <h2 class="post-title">对于send和sendline的思考</h2>
       <article class="post-article">
-          对于got和hook的讨论在 PWN 中，篡改 __free_hook 和 free@GOT 都是为了在程序执行堆内存释放操作时劫持控制流）。虽然目的相似，但它们在内存位置、受到的保护机制以及适用场景上有很大的区别。
-那么我们应该如何对 got 和 hook 进行选择呢：以下我们以 free 为例去分析
-@GOT Global Offset TableGOT 表存放在 ELF 文件的.got.plt 数据段中。他的用处是记录主程序外部函数的真实地址，篡改他会改变主程序对相关函数(例如 free)的跳转调用，它仅影响主程序内部发起的 free 调用，地址和程序的基址相关。受 RELRO (Rel
+          对于send和sendline的思考
+
+
+动作类型
+常用函数
+是否依赖&amp;#x2F;产生 \n
+攻击时的注意点
+
+
+
+输入 (Input)
+read(0, buf, n)
+不依赖
+只要发够 n 个字节就行，不加 \n 也能跑。
+
+
+输入 (Input)
+gets &amp;#x2F; scanf
+极度依赖
+必须加 \n，否则程序死等，脚本卡死。
+
+
+输出 (Output)
+printf
+不自动加
+泄露数据时，后面可能紧跟其他字符串，不好拆分。
+
+
+输出 (Output)
+puts
+自动加 \n
+泄露数据非常干净，因为 \n 会把数据“推”出来。
+
+
+
+
+
+特性
+send(data)
+sendline(d
       </article>
     </div>
   </div>
 </div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/3/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/20/">20</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/5/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/3/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/9/">9</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/5/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -464,10 +501,10 @@ _**ESP&amp;#x2F;RSP  **_栈指针寄存器，其中存
       </div>
       <div>
         <span class="icon-brush"></span>
-        292.6k
+        117.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        24:34
+        10:00
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -495,7 +532,7 @@ _**ESP&amp;#x2F;RSP  **_栈指针寄存器，其中存
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">198</div>
+    <div class="sidebar-state-number">87</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
