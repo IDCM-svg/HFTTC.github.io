@@ -1,0 +1,638 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    House Of Emma | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="House Of EmmaHouse Of Emma 的利用背景：学习 House Of Kiwi 大概是一个月之前了，中间由于学校的一些活动确实是有一段时间没怎么学习，回过神来还需要把前面的知识再重新复习一遍，感觉也不算是很扎实。 House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们通常在 _IO_file_jumps 可以写的情况下的利用 Kiwi ，那如果不可写呢">
+<meta property="og:type" content="article">
+<meta property="og:title" content="House Of Emma">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/HouseOfEmma/index/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="House Of EmmaHouse Of Emma 的利用背景：学习 House Of Kiwi 大概是一个月之前了，中间由于学校的一些活动确实是有一段时间没怎么学习，回过神来还需要把前面的知识再重新复习一遍，感觉也不算是很扎实。 House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们通常在 _IO_file_jumps 可以写的情况下的利用 Kiwi ，那如果不可写呢">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182310608-23c30acb-454f-41f8-a328-13dea26e5513-576711.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182709593-d8c664c8-359f-437a-9a44-7545aa30b748-839780.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182767381-b3f57a58-1331-46f0-b32f-3e138cf50f45-502161.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182892716-7c165986-44a2-48cc-84eb-f7378c48f5be-753644.png">
+<meta property="article:published_time" content="2026-05-22T18:46:24.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.459Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182310608-23c30acb-454f-41f8-a328-13dea26e5513-576711.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="House Of Emma">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">House Of Emma</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Emma"><span class="toc-number">1.</span> <span class="toc-text">House Of Emma</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Emma-%E7%9A%84%E5%88%A9%E7%94%A8%E8%83%8C%E6%99%AF%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">House Of Emma 的利用背景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Emma-%E7%9A%84%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">House Of Emma 的利用手法：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IO-cookie-jumps"><span class="toc-number">1.2.1.</span> <span class="toc-text">_IO_cookie_jumps</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-HouseOfEmma/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:24.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.459Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="House-Of-Emma"><a href="#House-Of-Emma" class="headerlink" title="House Of Emma"></a>House Of Emma</h1><h3 id="House-Of-Emma-的利用背景："><a href="#House-Of-Emma-的利用背景：" class="headerlink" title="House Of Emma 的利用背景："></a><font style="color:#262626;background-color:transparent;">House Of Emma 的利用背景：</font></h3><p><font style="color:#262626;background-color:transparent;">学习 House Of Kiwi 大概是一个月之前了，中间由于学校的一些活动确实是有一段时间没怎么学习，回过神来还需要把前面的知识再重新复习一遍，感觉也不算是很扎实。</font></p>
+<p><font style="color:#262626;background-color:transparent;">House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们通常</font><font style="color:#262626;background-color:transparent;">在 </font><font style="color:#262626;background-color:transparent;">_IO_file_jumps </font><font style="color:#262626;background-color:transparent;">可以写的情况下的利用 Kiwi ，那如果不可写呢，house of emma 就是对其的补充，也可以说是进阶。</font></p>
+<p><font style="color:#262626;background-color:transparent;">如果 </font><font style="color:#262626;background-color:transparent;">vtable</font><font style="color:#262626;background-color:transparent;"> 指向的 </font><font style="color:#262626;background-color:transparent;">_IO_file_jumps</font><font style="color:#262626;background-color:transparent;"> 不可写，那么 House of Kiwi 这种攻击手法就会失效。这时候就需要考虑劫持 vtable 。但在新版 glibc ，之前的劫持 vtable 的方法已经失效。</font></p>
+<ul>
+<li><font style="color:#262626;background-color:transparent;">由于自 libc-2.24 起对 vtable 指向的地址范围有检查，因此不能随便将 vtable 劫持到某块伪造了 </font><font style="color:#262626;background-color:transparent;">_IO_jump_t</font><font style="color:#262626;background-color:transparent;"> 的内存上。</font></li>
+<li><font style="color:#262626;background-color:transparent;">自 glibc-2.28 起，</font><font style="color:#262626;background-color:transparent;">_IO_str_jumps</font><font style="color:#262626;background-color:transparent;"> 上的 </font><font style="color:#262626;background-color:transparent;">_IO_str_finish</font><font style="color:#262626;background-color:transparent;"> 不再调用 </font><font style="color:#262626;background-color:transparent;">_IO_strfile</font><font style="color:#262626;background-color:transparent;">（IO_FILE 结构体） 上的函数指针。</font></li>
+</ul>
+<p><font style="color:#262626;background-color:transparent;">因此需要寻找其他的危险函数来劫持程序流。</font></p>
+<h3 id="House-Of-Emma-的利用手法："><a href="#House-Of-Emma-的利用手法：" class="headerlink" title="House Of Emma 的利用手法："></a><font style="color:#262626;background-color:transparent;">House Of Emma 的利用手法：</font></h3><h4 id="IO-cookie-jumps"><a href="#IO-cookie-jumps" class="headerlink" title="_IO_cookie_jumps"></a><font style="color:#262626;background-color:transparent;">_IO_cookie_jumps</font></h4><p><font style="color:#262626;background-color:transparent;">vtable 的合法范围内，还有另一个 </font><code><font style="color:#262626;background-color:transparent;">_IO_jump_t</font></code><font style="color:#262626;background-color:transparent;"> 类型的函数表叫做 </font><code><font style="color:#262626;background-color:transparent;">_IO_cookie_jumps</font></code><font style="color:#262626;background-color:transparent;"> ，其中有如下危险函数可供我们利用：</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span></span><br><span class="line">_IO_cookie_read (FILE *fp, <span class="type">void</span> *buf, <span class="type">ssize_t</span> size)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span> *<span class="title">cfile</span> =</span> (<span class="keyword">struct</span> _IO_cookie_file *) fp;</span><br><span class="line">    <span class="type">cookie_read_function_t</span> *read_cb = cfile-&gt;__io_functions.read;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">    PTR_DEMANGLE (read_cb);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (read_cb == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> read_cb (cfile-&gt;__cookie, buf, size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span></span><br><span class="line">_IO_cookie_write (FILE *fp, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">ssize_t</span> size)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span> *<span class="title">cfile</span> =</span> (<span class="keyword">struct</span> _IO_cookie_file *) fp;</span><br><span class="line">    <span class="type">cookie_write_function_t</span> *write_cb = cfile-&gt;__io_functions.write;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">    PTR_DEMANGLE (write_cb);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (write_cb == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        fp-&gt;_flags |= _IO_ERR_SEEN;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">ssize_t</span> n = write_cb (cfile-&gt;__cookie, buf, size);</span><br><span class="line">    <span class="keyword">if</span> (n &lt; size)</span><br><span class="line">        fp-&gt;_flags |= _IO_ERR_SEEN;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">off64_t</span></span><br><span class="line">_IO_cookie_seek (FILE *fp, <span class="type">off64_t</span> offset, <span class="type">int</span> dir)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span> *<span class="title">cfile</span> =</span> (<span class="keyword">struct</span> _IO_cookie_file *) fp;</span><br><span class="line">    <span class="type">cookie_seek_function_t</span> *seek_cb = cfile-&gt;__io_functions.seek;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">    PTR_DEMANGLE (seek_cb);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ((seek_cb == <span class="literal">NULL</span></span><br><span class="line">           || (seek_cb (cfile-&gt;__cookie, &amp;offset, dir)</span><br><span class="line">           == <span class="number">-1</span>)</span><br><span class="line">           || offset == (<span class="type">off64_t</span>) <span class="number">-1</span>)</span><br><span class="line">          ? _IO_pos_BAD : offset);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span></span><br><span class="line">_IO_cookie_close (FILE *fp)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span> *<span class="title">cfile</span> =</span> (<span class="keyword">struct</span> _IO_cookie_file *) fp;</span><br><span class="line">    <span class="type">cookie_close_function_t</span> *close_cb = cfile-&gt;__io_functions.close;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">    PTR_DEMANGLE (close_cb);</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (close_cb == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> close_cb (cfile-&gt;__cookie);</span><br><span class="line">    其中 _IO_cookie_file 有如下定义：</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Special file type for fopencookie function.  */</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span></span></span><br><span class="line"><span class="class">        &#123;</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> _<span class="title">IO_FILE_plus</span> __<span class="title">fp</span>;</span></span><br><span class="line">            <span class="type">void</span> *__cookie;</span><br><span class="line">            <span class="type">cookie_io_functions_t</span> __io_functions;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_io_functions_t</span></span></span><br><span class="line"><span class="class">    &#123;</span></span><br><span class="line">        <span class="type">cookie_read_function_t</span> *read;        <span class="comment">/* Read bytes.  */</span></span><br><span class="line">        <span class="type">cookie_write_function_t</span> *write;      <span class="comment">/* Write bytes.  */</span></span><br><span class="line">        <span class="type">cookie_seek_function_t</span> *seek;        <span class="comment">/* Seek/tell file position.  */</span></span><br><span class="line">        <span class="type">cookie_close_function_t</span> *close;      <span class="comment">/* Close file.  */</span></span><br><span class="line">    &#125; <span class="type">cookie_io_functions_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#262626;background-color:transparent;">其中 </font><code><font style="color:#262626;background-color:transparent;">_IO_cookie_file</font></code><font style="color:#262626;background-color:transparent;"> 有如下定义：</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Special file type for fopencookie function.  */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_file</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">IO_FILE_plus</span> __<span class="title">fp</span>;</span></span><br><span class="line">    <span class="type">void</span> *__cookie;</span><br><span class="line">    <span class="type">cookie_io_functions_t</span> __io_functions;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">IO_cookie_io_functions_t</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">cookie_read_function_t</span> *read;        <span class="comment">/* Read bytes.  */</span></span><br><span class="line">    <span class="type">cookie_write_function_t</span> *write;    <span class="comment">/* Write bytes.  */</span></span><br><span class="line">    <span class="type">cookie_seek_function_t</span> *seek;        <span class="comment">/* Seek/tell file position.  */</span></span><br><span class="line">    <span class="type">cookie_close_function_t</span> *close;    <span class="comment">/* Close file.  */</span></span><br><span class="line">&#125; <span class="type">cookie_io_functions_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#262626;background-color:transparent;">因</font><font style="color:#262626;background-color:transparent;">此攻击手法与前面的 </font><code><font style="color:#262626;background-color:transparent;">_IO_str_jumps</font></code><font style="color:#262626;background-color:transparent;"> 相似，不过需要绕过指针保护 </font><code><font style="color:#262626;background-color:transparent;">PTR_DEMANGLE</font></code><font style="color:#262626;background-color:transparent;"> 。</font></p>
+<p><font style="color:#262626;background-color:transparent;">分析汇编可知，这段宏定义的操作是将函数指针循环右移 11 位然后与 </font><font style="color:#262626;background-color:transparent;">fs:[0x30]</font><font style="color:#262626;background-color:transparent;"> 异或得到真正的函数地址。</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182310608-23c30acb-454f-41f8-a328-13dea26e5513-576711.png" alt="1779182310608-23c30acb-454f-41f8-a328-13dea26e5513.png"></p>
+<p><font style="color:#262626;background-color:transparent;">我们知道， </font><font style="color:#262626;background-color:transparent;">fs:[0x28]</font><font style="color:#262626;background-color:transparent;"> 是 tls 上存储的 canary，根据 </font><font style="color:#262626;background-color:transparent;">tcbhead_t</font><font style="color:#262626;background-color:transparent;"> 结构体的定义，</font><font style="color:#262626;background-color:transparent;">fs[0x30]</font><font style="color:#262626;background-color:transparent;"> 是 </font><font style="color:#262626;background-color:transparent;">pointer_guard</font><font style="color:#262626;background-color:transparent;"> ，用于对指针进行加密。</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//sysdeps/x86_64/nptl/tls.h</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">void</span> *tcb;    <span class="comment">/* 指向TCB */</span></span><br><span class="line">    <span class="type">dtv_t</span> *dtv;       <span class="comment">/* 指向dtv数组 */</span></span><br><span class="line">    <span class="type">void</span> *self;   <span class="comment">/* 指向自身  */</span></span><br><span class="line">    <span class="type">int</span> multiple_threads;</span><br><span class="line">    <span class="type">int</span> gscope_flag;</span><br><span class="line">    <span class="type">uintptr_t</span> sysinfo;</span><br><span class="line">    <span class="type">uintptr_t</span> stack_guard;    <span class="comment">/* canary值 */</span></span><br><span class="line">    <span class="type">uintptr_t</span> pointer_guard;  <span class="comment">/* 用于保护指针 */</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125; <span class="type">tcbhead_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#262626;background-color:transparent;">因此我们可以先泄露堆地址和 libc 基地址，然后利用 large bin attack 在 tls 对应 </font><font style="color:#262626;background-color:transparent;">pointer_guard</font><font style="color:#262626;background-color:transparent;"> 上写一个 chunk 地址，从而绕过指针保护。</font></p>
+<p><font style="color:#262626;background-color:transparent;">在实际调试时可以利用 canary 等方法查找 </font><font style="color:#262626;background-color:transparent;">pointer_guard</font><font style="color:#262626;background-color:transparent;"> 地址，然后在攻击时根据 libc 基地址定位 </font><font style="color:#262626;background-color:transparent;">pointer_guard</font><font style="color:#262626;background-color:transparent;"> 。</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182709593-d8c664c8-359f-437a-9a44-7545aa30b748-839780.png" alt="1779182709593-d8c664c8-359f-437a-9a44-7545aa30b748.png"></p>
+<p><font style="color:#262626;background-color:transparent;">与 house of kiwi 一样，house of emma 也是通过 </font><code><font style="color:#262626;background-color:transparent;">__malloc_assert</font></code><font style="color:#262626;background-color:transparent;"> 触发漏洞，但是由于 </font><code><font style="color:#262626;background-color:transparent;">pointer_guard</font></code><font style="color:#262626;background-color:transparent;"> 已被修改，原来受保护的函数指针都已经无法调用，因此要选择最早调用的 </font><code><font style="color:#262626;background-color:transparent;">vtable</font></code><font style="color:#262626;background-color:transparent;"> 中的函数进行触发，因此这里选择下面这个调用链：</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span></span><br><span class="line">__malloc_assert (<span class="type">const</span> <span class="type">char</span> *assertion, <span class="type">const</span> <span class="type">char</span> *file, <span class="type">unsigned</span> <span class="type">int</span> line,</span><br><span class="line">                 <span class="type">const</span> <span class="type">char</span> *function)</span><br><span class="line">&#123;</span><br><span class="line">    (<span class="type">void</span>) __fxprintf (<span class="literal">NULL</span>, <span class="string">&quot;%s%s%s:%u: %s%sAssertion `%s&#x27; failed.\n&quot;</span>,</span><br><span class="line">                     __progname, __progname[<span class="number">0</span>] ? <span class="string">&quot;: &quot;</span> : <span class="string">&quot;&quot;</span>,</span><br><span class="line">                     file, line,</span><br><span class="line">                     function ? function : <span class="string">&quot;&quot;</span>, function ? <span class="string">&quot;: &quot;</span> : <span class="string">&quot;&quot;</span>,</span><br><span class="line">                     assertion);</span><br><span class="line">    fflush (<span class="built_in">stderr</span>);</span><br><span class="line">    <span class="built_in">abort</span> ();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span></span><br><span class="line">__fxprintf (FILE *fp, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span><br><span class="line">&#123;</span><br><span class="line">    va_list ap;</span><br><span class="line">    va_start (ap, fmt);</span><br><span class="line">    <span class="type">int</span> res = __vfxprintf (fp, fmt, ap, <span class="number">0</span>);</span><br><span class="line">    va_end (ap);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span></span><br><span class="line">__vfxprintf (FILE *fp, <span class="type">const</span> <span class="type">char</span> *fmt, va_list ap,</span><br><span class="line">             <span class="type">unsigned</span> <span class="type">int</span> mode_flags)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (fp == <span class="literal">NULL</span>)</span><br><span class="line">        fp = <span class="built_in">stderr</span>;</span><br><span class="line">    _IO_flockfile (fp);</span><br><span class="line">    <span class="type">int</span> res = locked_vfxprintf (fp, fmt, ap, mode_flags);</span><br><span class="line">    _IO_funlockfile (fp);</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span></span><br><span class="line"><span class="title function_">locked_vfxprintf</span> <span class="params">(FILE *fp, <span class="type">const</span> <span class="type">char</span> *fmt, va_list ap,</span></span><br><span class="line"><span class="params">                  <span class="type">unsigned</span> <span class="type">int</span> mode_flags)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_IO_fwide (fp, <span class="number">0</span>) &lt;= <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> __vfprintf_internal (fp, fmt, ap, mode_flags);</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> vfprintf   __vfprintf_internal</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span></span><br><span class="line"><span class="title function_">vfprintf</span> <span class="params">(FILE *s, <span class="type">const</span> CHAR_T *format, va_list ap, <span class="type">unsigned</span> <span class="type">int</span> mode_flags)</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">        outstring ((<span class="type">const</span> UCHAR_T *) format,</span><br><span class="line">             lead_str_end - (<span class="type">const</span> UCHAR_T *) format);</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> outstring(String, Len)                          \</span></span><br><span class="line"><span class="meta">    do &#123;                                                \</span></span><br><span class="line"><span class="meta">        const void *string_ = (String);                 \</span></span><br><span class="line"><span class="meta">        done = outstring_func(s, string_, (Len), done); \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (done &lt; 0)                                   \</span></span><br><span class="line"><span class="meta">            goto all_done;                              \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># <span class="keyword">define</span> PUT(F, S, N)   _IO_sputn ((F), (S), (N)) </span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span></span><br><span class="line"><span class="title function_">outstring_func</span> <span class="params">(FILE *s, <span class="type">const</span> UCHAR_T *<span class="built_in">string</span>, <span class="type">size_t</span> length, <span class="type">int</span> done)</span></span><br><span class="line">&#123;</span><br><span class="line">    assert ((<span class="type">size_t</span>) done &lt;= (<span class="type">size_t</span>) INT_MAX);</span><br><span class="line">    <span class="keyword">if</span> ((<span class="type">size_t</span>) PUT (s, <span class="built_in">string</span>, length) != (<span class="type">size_t</span>) (length))</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">return</span> done_add_func (length, done);</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#262626;background-color:transparent;">具体利用流程：在利用 UAF 泄露 libc 和堆地址后，利用 2 次 large bin attack 分别覆盖 </font><code><font style="color:#262626;background-color:transparent;">pointer_guard</font></code><font style="color:#262626;background-color:transparent;"> 和 </font><code><font style="color:#262626;background-color:transparent;">stderr</font></code><font style="color:#262626;background-color:transparent;"> 指针为某 chunk 地址，然后作如下图所示构造。最后通过 </font><code><font style="color:#262626;background-color:transparent;">__malloc_asserrt</font></code><font style="color:#262626;background-color:transparent;"> 触发漏洞。</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182767381-b3f57a58-1331-46f0-b32f-3e138cf50f45-502161.png" alt="1779182767381-b3f57a58-1331-46f0-b32f-3e138cf50f45.png"></p>
+<p><font style="color:#262626;background-color:transparent;">需要注意的是，由于伪造的 IO_FILE 的 flag 的 </font><code><font style="color:#262626;background-color:transparent;">_IO_USER_LOCK</font></code><font style="color:#262626;background-color:transparent;">（0x8000）没有置位，因此在 </font><code><font style="color:#262626;background-color:transparent;">__vfxprintf</font></code><font style="color:#262626;background-color:transparent;"> 函数中会执行如下代码：</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/gtoj6aZrqoMrT7Jl/1779182892716-7c165986-44a2-48cc-84eb-f7378c48f5be-753644.png" alt="1779182892716-7c165986-44a2-48cc-84eb-f7378c48f5be.png"></p>
+<p><font style="color:#262626;background-color:transparent;">因此伪造的 IO_FILE 的</font><font style="color:#262626;background-color:transparent;"> </font><code><font style="color:#262626;background-color:transparent;">_lock</font></code><font style="color:#262626;background-color:transparent;"> </font><font style="color:#262626;background-color:transparent;">应该指向可读写的内存。</font></p>
+<p><font style="color:#262626;background-color:transparent;">glibc-2.36 的</font><font style="color:#262626;background-color:transparent;"> </font><code><font style="color:#262626;background-color:transparent;">__malloc_assert</font></code><font style="color:#262626;background-color:transparent;"> </font><font style="color:#262626;background-color:transparent;">发生重大改变，直接通过系统调用不走 IO，该方法失效。不过只要能够调用 vtable 中的函数我们就能够完成 House Of Emma 利用。</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">_Noreturn</span> <span class="type">static</span> <span class="type">void</span></span><br><span class="line">    __malloc_assert (<span class="type">const</span> <span class="type">char</span> *assertion, <span class="type">const</span> <span class="type">char</span> *file, <span class="type">unsigned</span> <span class="type">int</span> line,</span><br><span class="line">                     <span class="type">const</span> <span class="type">char</span> *function)</span><br><span class="line">&#123;</span><br><span class="line">    __libc_message (do_abort, <span class="string">&quot;\</span></span><br><span class="line"><span class="string">Fatal glibc error: malloc assertion failure in %s: %s\n&quot;</span>,</span><br><span class="line">                    function, assertion);</span><br><span class="line">    __builtin_unreachable ();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><font style="color:#262626;background-color:transparent;">参考资料：</font><font style="color:#262626;background-color:transparent;"><a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/15458">https://xz.aliyun.com/news/15458</a></font></p>
+<p><font style="color:#262626;background-color:transparent;"></font></p>
+<p><font style="color:#262626;background-color:transparent;"></font></p>
+<p><font style="color:#262626;background-color:transparent;"></font></p>
+<p><font style="color:#262626;"></font></p>
+<blockquote>
+<p>更新: 2026-05-19 17:29:42<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/qbrsyfxe1dilrnd9">https://www.yuque.com/idcm/wnemg9/qbrsyfxe1dilrnd9</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[湖湘杯 2021]house_of_emma" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/HouseOfEmma/%5B%E6%B9%96%E6%B9%98%E6%9D%AF2021%5Dhouse_of_emma/" aria-label="前一篇: [湖湘杯 2021]house_of_emma" title="前一篇: [湖湘杯 2021]house_of_emma"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [湖湘杯 2021]house_of_emma
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[强网杯 2022]House of Cat" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/HouseOfCat/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2022%5DHouseofCat/" aria-label="后一篇: [强网杯 2022]House of Cat"  title="后一篇: [强网杯 2022]House of Cat"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [强网杯 2022]House of Cat
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Emma"><span class="toc-number">1.</span> <span class="toc-text">House Of Emma</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Emma-%E7%9A%84%E5%88%A9%E7%94%A8%E8%83%8C%E6%99%AF%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">House Of Emma 的利用背景：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#House-Of-Emma-%E7%9A%84%E5%88%A9%E7%94%A8%E6%89%8B%E6%B3%95%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">House Of Emma 的利用手法：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IO-cookie-jumps"><span class="toc-number">1.2.1.</span> <span class="toc-text">_IO_cookie_jumps</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "House Of Emma",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/HouseOfEmma/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "House Of EmmaHouse Of Emma 的利用背景：学习 House Of Kiwi 大概是一个月之前了，中间由于学校的一些活动确实是有一段时间没怎么学习，回过神来还需要把前面的知识再重新复习一遍，感觉也不算是很扎实。 House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们通常在 _IO_file_jumps 可以写的情况下的利用 Kiwi ，那如果不可写呢，house of emma 就是对其的补充，也可以说是进阶。 如果 vtable 指向的 _IO_",
+          date: "Sat May 23 2026 02:46:24 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

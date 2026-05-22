@@ -1,0 +1,813 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    House Of Rabbit | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="House Of Rabbit前言：查找其他题目 wp 的时候偶尔看见了这种利用手法，由于好奇就来了解一下，也算是扩展自己的攻击手法和视野，不过没有碰见合适的题目，以后遇见了在对例题进行补充。 在低版本 glibc ，House of Rabbit 是一种极具破坏力的堆利用手法。它的核心思想是利用 malloc_consolidate 机制的盲目性，将受到严格大小限制的 Fastbin 堆块，强行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="House Of Rabbit">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/HouseOfRabbit/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="House Of Rabbit前言：查找其他题目 wp 的时候偶尔看见了这种利用手法，由于好奇就来了解一下，也算是扩展自己的攻击手法和视野，不过没有碰见合适的题目，以后遇见了在对例题进行补充。 在低版本 glibc ，House of Rabbit 是一种极具破坏力的堆利用手法。它的核心思想是利用 malloc_consolidate 机制的盲目性，将受到严格大小限制的 Fastbin 堆块，强行">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/Mfq--aW5gZI4CBlM/1777566709246-f2789d0a-d441-447b-98c1-e827b96b2046-057217.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/Mfq--aW5gZI4CBlM/1777566740189-36b11109-c08d-439b-b1d7-80087a0c7112-476769.png">
+<meta property="article:published_time" content="2026-05-22T18:46:10.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.277Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/Mfq--aW5gZI4CBlM/1777566709246-f2789d0a-d441-447b-98c1-e827b96b2046-057217.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="House Of Rabbit">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">House Of Rabbit</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Rabbit"><span class="toc-number">1.</span> <span class="toc-text">House Of Rabbit</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#malloc-consolidate-%E6%BC%8F%E6%B4%9E%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">malloc_consolidate 漏洞：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#house-of-rabbit-%E6%94%BB%E5%87%BB%E6%B5%81%E7%A8%8B-%E4%BB%A5-glibc-2-23-%E4%B8%BA%E4%BE%8B"><span class="toc-number">1.2.</span> <span class="toc-text">house of rabbit 攻击流程(以 glibc 2.23 为例)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8%E7%9B%AE%E6%A0%87%E5%9C%B0%E5%9D%80%E4%BC%AA%E9%80%A0-Chunk"><span class="toc-number">1.2.1.</span> <span class="toc-text">在目标地址伪造 Chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%AB%E6%8C%81-Fastbin-%E9%93%BE%E8%A1%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">劫持 Fastbin 链表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-malloc-consolidate"><span class="toc-number">1.2.3.</span> <span class="toc-text">触发 malloc_consolidate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E-Unsorted-Bin-%E4%B8%AD%E5%88%87%E5%89%B2%E5%8A%AB%E6%8C%81-chunk"><span class="toc-number">1.2.4.</span> <span class="toc-text">从 Unsorted Bin 中切割劫持 chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#demo1-modify-the-size-of-fastbin-chunk"><span class="toc-number">1.2.5.</span> <span class="toc-text">demo1 modify the size of fastbin chunk:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#demo2-modify-FD-pointer"><span class="toc-number">1.2.6.</span> <span class="toc-text">demo2 modify FD pointer:</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell"><span class="toc-number">1.3.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-number">1.4.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin"><span class="toc-number">1.4.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size"><span class="toc-number">1.4.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB"><span class="toc-number">1.4.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C"><span class="toc-number">1.4.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93"><span class="toc-number">1.5.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-1"><span class="toc-number">1.6.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-1"><span class="toc-number">1.7.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-1"><span class="toc-number">1.7.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-1"><span class="toc-number">1.7.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-1"><span class="toc-number">1.7.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-1"><span class="toc-number">1.7.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-1"><span class="toc-number">1.7.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-1"><span class="toc-number">1.7.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-1"><span class="toc-number">1.8.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-2"><span class="toc-number">1.9.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-2"><span class="toc-number">1.10.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-2"><span class="toc-number">1.10.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-2"><span class="toc-number">1.10.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-2"><span class="toc-number">1.10.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-2"><span class="toc-number">1.10.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-2"><span class="toc-number">1.10.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-2"><span class="toc-number">1.10.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-2"><span class="toc-number">1.11.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-3"><span class="toc-number">1.12.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-3"><span class="toc-number">1.13.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-3"><span class="toc-number">1.13.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-3"><span class="toc-number">1.13.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-3"><span class="toc-number">1.13.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-3"><span class="toc-number">1.13.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-3"><span class="toc-number">1.13.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-3"><span class="toc-number">1.13.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-3"><span class="toc-number">1.14.</span> <span class="toc-text">💡 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92"><span class="toc-number">1.14.1.</span> <span class="toc-text">6. Tcache 投毒</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-4"><span class="toc-number">1.15.</span> <span class="toc-text">💡 总结</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-HouseOfRabbit" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:10.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.277Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="House-Of-Rabbit"><a href="#House-Of-Rabbit" class="headerlink" title="House Of Rabbit"></a>House Of Rabbit</h1><p>前言：查找其他题目 wp 的时候偶尔看见了这种利用手法，由于好奇就来了解一下，也算是扩展自己的攻击手法和视野，不过没有碰见合适的题目，以后遇见了在对例题进行补充。</p>
+<p>在低版本 glibc ，House of Rabbit 是一种极具破坏力的堆利用手法。它的核心思想是利用 <code>malloc_consolidate</code> 机制的盲目性，将受到严格大小限制的 Fastbin 堆块，强行偷渡到审查宽松的 Unsorted Bin 中，从而实现任意地址分配或大规模堆重叠。</p>
+<p>在 glibc 2.23 中，由于缺少了高版本中严苛的 system_mem 等检查，House of Rabbit 的威力可以发挥到极致</p>
+<hr>
+<h3 id="malloc-consolidate-漏洞："><a href="#malloc-consolidate-漏洞：" class="headerlink" title="malloc_consolidate 漏洞："></a>malloc_consolidate 漏洞：</h3><p>Fastbin 以单链表形式存在，拥有非常严格的 <code>size</code> 检查。如果你想直接从 Fastbin 申请出你伪造的 chunk，你伪造的 <code>size</code> 必须与请求的大小精确匹配（<code>fastbin_index</code> 检查）。这在 BSS 段或栈上往往很难伪造。</p>
+<p><code>malloc_consolidate</code>：</p>
+<p>当程序申请 Large Bin 级别的内存（通常 &gt; 0x400），或者调用 <code>free</code> 导致 Unsorted Bin 里的 chunk 与 Top Chunk 合并时，glibc 就会触发 <code>malloc_consolidate</code>。</p>
+<p>这个函数会遍历所有的 Fastbin，清除这些 chunk 的 <code>PREV_INUSE</code> 标志位，尝试将相邻的空闲堆块合并，并将它们放入 Unsorted Bin。</p>
+<p>但是漏洞在于程序员开发 mallc_consolidate 函数的时候默认 fastbin_size 一定合法，因而 malloc_consolidate 遍历 Fastbin 时，完全没有检查 chunk 的 size 是否合法, 它只管顺着 fd 指针往下找。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// malloc_consolidate </span></span><br><span class="line">p = atomic_exchange_acq (fb, <span class="literal">NULL</span>); <span class="comment">// 取出整个 Fastbin 链表</span></span><br><span class="line"><span class="keyword">while</span> (p != <span class="number">0</span>) &#123;</span><br><span class="line">    nextp = p-&gt;fd;                  <span class="comment">// 无脑跟进 fd 指针，不做合法性校验</span></span><br><span class="line">    ...                             <span class="comment">// 尝试合并相邻块 </span></span><br><span class="line">    ...                             <span class="comment">// 将其放入 Unsorted Bin</span></span><br><span class="line">    p = nextp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="house-of-rabbit-攻击流程-以-glibc-2-23-为例"><a href="#house-of-rabbit-攻击流程-以-glibc-2-23-为例" class="headerlink" title="house of rabbit 攻击流程(以 glibc 2.23 为例)"></a>house of rabbit 攻击流程(以 glibc 2.23 为例)</h3><p>假设我们的目标是在某个地址，分配一块内存。比如 BSS 段上的某段地址，这里我们称之为 target_addr</p>
+<h4 id="在目标地址伪造-Chunk"><a href="#在目标地址伪造-Chunk" class="headerlink" title="在目标地址伪造 Chunk"></a>在目标地址伪造 Chunk</h4><p>在 target_addr 附近伪造一个 chunk 头部。由于最终我们要把它送进 Unsorted Bin，我们可以给它赋予一个极大的 Size，我们这里默认修改成 0x80000</p>
+<ul>
+<li>为了防止 malloc_consolidate 在寻找 next_chunk 时发生段错误，target_addr + fake_size 所在的地址必须是可读写的内存区域。</li>
+</ul>
+<h4 id="劫持-Fastbin-链表"><a href="#劫持-Fastbin-链表" class="headerlink" title="劫持 Fastbin 链表"></a>劫持 Fastbin 链表</h4><p>分配一个 Fastbin 大小的 Chunk A，然后将其释放。此时 Chunk A 进入 Fastbin。</p>
+<p>利用 UAF 或溢出漏洞，将 Chunk A 的 fd 指针修改为指向我们伪造的 fake_chunk。</p>
+<ul>
+<li>此时的单链表：<code>Fastbin Head -&gt; Chunk A -&gt; fake_chunk</code></li>
+</ul>
+<h4 id="触发-malloc-consolidate"><a href="#触发-malloc-consolidate" class="headerlink" title="触发 malloc_consolidate"></a>触发 malloc_consolidate</h4><p>控制程序 malloc 一个较大的内存。glibc 发现 Fastbin 里有碎片，触发 malloc_consolidate 进行整理。</p>
+<ol>
+<li>glibc 最开始检查 Chunk A，计算它的下一个 chunk，取消 INUSE 位，把 Chunk A 扔进 Unsorted Bin。</li>
+<li>顺着 fd 指针，看到我们的 fake_chunk。</li>
+<li>它不会检查 fake_chunk 为什么会在 Fastbin 里，也不会管它的 size 为什么是极大的 0x80000。</li>
+<li>它直接根据 0x80000 找到下一个伪造的 chunk，清除那个位置的 INUSE 位。</li>
+<li>之后就直接将 fake_chunk 投入 Unsorted Bin 当中了</li>
+</ol>
+<h4 id="从-Unsorted-Bin-中切割劫持-chunk"><a href="#从-Unsorted-Bin-中切割劫持-chunk" class="headerlink" title="从 Unsorted Bin 中切割劫持 chunk"></a>从 Unsorted Bin 中切割劫持 chunk</h4><p>此时，Unsorted Bin 中躺着一个位于 target_addr、大小为 0x80000 的巨大堆块。</p>
+<p>你只需要再次调用 malloc 申请你实际需要的内存大小，glibc 就会从这个巨大的 fake_chunk 中切割一块给你。</p>
+<p>由于我们伪造的是 bss 段上的地址，我们就可以随意对其内容进行篡改从而获取 shell</p>
+<hr>
+<p>看两个例子：我们分别称之为 demo1 和 demo2：</p>
+<h4 id="demo1-modify-the-size-of-fastbin-chunk"><a href="#demo1-modify-the-size-of-fastbin-chunk" class="headerlink" title="demo1 modify the size of fastbin chunk:"></a>demo1 modify the size of fastbin chunk:</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* chunk1=<span class="built_in">malloc</span>(<span class="number">0x40</span>); <span class="comment">//0x602000</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* chunk2=<span class="built_in">malloc</span>(<span class="number">0x40</span>); <span class="comment">//0x602050</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x10</span>);</span><br><span class="line">    <span class="built_in">free</span>(chunk1);</span><br><span class="line">    <span class="built_in">free</span>(chunk3);</span><br><span class="line"></span><br><span class="line">    chunk1[<span class="number">-1</span>]=<span class="number">0xa1</span>; <span class="comment">// modify chunk1 size to be 0xa1</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x400</span>);   <span class="comment">// allocate a large chunk, trigger malloc_consolidate</span></span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">0x90</span>);    <span class="comment">// 申请到修改size后的chunk，并造成overlapping</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最开始两次 malloc 之后：</p>
+<p><img src="/HFTTC.github.io/images/pwn/Mfq--aW5gZI4CBlM/1777566709246-f2789d0a-d441-447b-98c1-e827b96b2046-057217.png" alt="1777566709246-f2789d0a-d441-447b-98c1-e827b96b2046.png"></p>
+<p>chunk1[-1]&#x3D;0xa1 之后对 chunk1 的 size 进行了修改让其数值变大，之后申请大堆块触发 malloc_consolidate</p>
+<p>malloc(0x400)之后：</p>
+<p><img src="/HFTTC.github.io/images/pwn/Mfq--aW5gZI4CBlM/1777566740189-36b11109-c08d-439b-b1d7-80087a0c7112-476769.png" alt="1777566740189-36b11109-c08d-439b-b1d7-80087a0c7112.png"></p>
+<p>可以发现此时两个 fastbin 已经全部进入到了 Smallbin 当中，并且成功制造出来了一个堆重叠</p>
+<h4 id="demo2-modify-FD-pointer"><a href="#demo2-modify-FD-pointer" class="headerlink" title="demo2 modify FD pointer:"></a>demo2 <font style="color:rgb(77, 77, 77);">modify FD pointer:</font></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* chunk1=<span class="built_in">malloc</span>(<span class="number">0x40</span>); <span class="comment">// 0x602000</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* chunk2=<span class="built_in">malloc</span>(<span class="number">0x100</span>);<span class="comment">// 0x602050</span></span><br><span class="line">    chunk2[<span class="number">1</span>]=<span class="number">0x31</span>;     <span class="comment">// fake chunk size 0x30        0x602090</span></span><br><span class="line">    chunk2[<span class="number">7</span>]=<span class="number">0x21</span>;     <span class="comment">// fake chunk&#x27;s next chunk    0x6020c0</span></span><br><span class="line">    chunk2[<span class="number">11</span>]=<span class="number">0x21</span>;    <span class="comment">// fake chunk&#x27;s next chunk&#x27;s next chuck</span></span><br><span class="line">    <span class="built_in">free</span>(chunk1);</span><br><span class="line">    chunk1[<span class="number">0</span>]=<span class="number">0x602060</span>; <span class="comment">// modify the fd of chunk1</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* Fastbin Header -&gt; 0x602000 (chunk1) -&gt; 0x602060 (Fake Chunk) */</span></span><br><span class="line">    </span><br><span class="line">    <span class="built_in">malloc</span>(<span class="number">5000</span>);       <span class="comment">// malloc a  big chunk to trigger malloc consolidate</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 <code>glibc 2.31</code> 及更高的版本中，House of Rabbit 已经从“一击必杀”的终极武器，退化成了利用链条中的一环。它的核心使命变成了：在堆空间内部制造合法的“堆块重叠（Heap Overlapping）”，为后续的 Tcache Poisoning（Tcache 投毒）铺路。</li>
+</ul>
+<p>在现代 Pwn 题中，一般会按照以下标准套路来使用它。我们可以把这个过程想象成“吃掉邻居的地盘”。</p>
+<h3 id="💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell"><a href="#💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell" class="headerlink" title="💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell"></a>💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</h3><p>为了让你更直观地理解，我们假设堆上有三个相邻的正常 Chunk：</p>
+<ul>
+<li>Chunk A (准备丢入 Fastbin 的诱饵)</li>
+<li>Chunk B (受害者，准备被覆盖)</li>
+<li>Chunk C (防线，用来伪造 Next Chunk 绕过检查)</li>
+</ul>
+<hr>
+<h3 id="🐾-Step-by-Step-现代利用流程"><a href="#🐾-Step-by-Step-现代利用流程" class="headerlink" title="🐾 Step-by-Step 现代利用流程"></a>🐾 Step-by-Step 现代利用流程</h3><h4 id="1-内存布局与伪造-Next-Chunk-最关键的难点"><a href="#1-内存布局与伪造-Next-Chunk-最关键的难点" class="headerlink" title="1. 内存布局与伪造 Next Chunk (最关键的难点)"></a>1. 内存布局与伪造 Next Chunk (最关键的难点)</h4><p>在 2.31 中，由于有 <code>next_chunk-&gt;size</code> 的检查，你不能随便写个 Fake Size 就跑。你必须保证 <code>Chunk A + Fake_Size</code> 指向的位置，存在一个合法的 Chunk 头。</p>
+<ul>
+<li>操作： 我们预先计算好，打算让 Chunk A 的大小“膨胀”并刚好包裹住 Chunk B。那么 <code>Fake_Size = 正常A的大小 + B的大小</code>。</li>
+<li>布置： 我们利用正常的分配，在 <code>Chunk A + Fake_Size</code> 的位置布置好 Chunk C。确保 Chunk C 的 <code>size</code> 字段是合法的，并且它的 <code>PREV_INUSE</code> 标志位为 1。</li>
+</ul>
+<h4 id="2-填满-Tcache"><a href="#2-填满-Tcache" class="headerlink" title="2. 填满 Tcache"></a>2. 填满 Tcache</h4><p>这是 2.31 绕不开的坎。因为 <code>Chunk A</code> 的大小（未膨胀前）一般较小，如果你直接 <code>free</code>，它会优先进入 Tcache。</p>
+<ul>
+<li>操作： 连续 <code>free</code> 7 个与 Chunk A 同样大小的堆块，把对应大小的 Tcache 垃圾桶塞满。</li>
+</ul>
+<h4 id="3-释放目标进入-Fastbin"><a href="#3-释放目标进入-Fastbin" class="headerlink" title="3. 释放目标进入 Fastbin"></a>3. 释放目标进入 Fastbin</h4><ul>
+<li>操作： 释放 <code>Chunk A</code>。因为 Tcache 已经满了，<code>Chunk A</code> 只能委屈地进入 Fastbin。</li>
+</ul>
+<h4 id="4-UAF-越界写：修改-Size"><a href="#4-UAF-越界写：修改-Size" class="headerlink" title="4. UAF &#x2F; 越界写：修改 Size"></a>4. UAF &#x2F; 越界写：修改 Size</h4><ul>
+<li>操作： 触发你程序里的漏洞（比如 Use-After-Free 或者堆溢出），去修改躺在 Fastbin 里的 <code>Chunk A</code> 的 <code>size</code> 字段。</li>
+<li>将其修改为前面计算好的 <code>Fake_Size</code>。</li>
+<li>注意： 这个 <code>Fake_Size</code> 必须小于 <code>av-&gt;system_mem</code>（通常在 132KB 左右），这就是为什么现在只能在堆内重叠，不能跨越到 BSS 段的原因。</li>
+</ul>
+<h4 id="5-触发-malloc-consolidate-见证奇迹的时刻"><a href="#5-触发-malloc-consolidate-见证奇迹的时刻" class="headerlink" title="5. 触发 malloc_consolidate (见证奇迹的时刻)"></a>5. 触发 <code>malloc_consolidate</code> (见证奇迹的时刻)</h4><ul>
+<li>操作： 申请一个大于 Large Bin 范围的堆块（比如申请 <code>0x400</code> 以上的大小）。</li>
+<li>内部发生的事：<code>glibc</code> 开始整理碎片，遍历 Fastbin 发现了 <code>Chunk A</code>。它读取 <code>Chunk A</code> 巨大的 <code>Fake_Size</code>，然后向后找 <code>Next Chunk</code>（此时完美匹配到了我们预先布置好的 Chunk C，绕过检查！）。</li>
+<li>结果： 带着巨大 Size 的 <code>Chunk A</code> 被合法地送进了 Unsorted Bin。此时，它在物理和逻辑上已经完全包裹（覆盖）了 Chunk B。</li>
+</ul>
+<h4 id="6-Tcache-投毒-收割成果"><a href="#6-Tcache-投毒-收割成果" class="headerlink" title="6. Tcache 投毒 (收割成果)"></a>6. Tcache 投毒 (收割成果)</h4><p>这个时候，情况变成了：Unsorted Bin 里的 <code>Chunk A</code> 和正常使用或被释放的 <code>Chunk B</code>重叠了。</p>
+<ol>
+<li>我们将 <code>Chunk B</code> 释放进 Tcache。</li>
+<li>我们从 Unsorted Bin 再次 <code>malloc</code> 申请内存（从膨胀的 <code>Chunk A</code> 里切出一块，大小正好覆盖到 <code>Chunk B</code>）。</li>
+<li>因为我们拿到了这块内存的写权限，我们可以直接篡改下方 <code>Chunk B</code> 的 <code>fd</code> 指针，将其指向任意目标地址（比如 <code>__free_hook</code> 或者栈上的返回地址）。</li>
+<li>最后，连续两次 <code>malloc</code> 同等大小的 Tcache，第二次就会把目标地址分配给你，实现任意地址写！</li>
+</ol>
+<hr>
+<h3 id="💡-总结"><a href="#💡-总结" class="headerlink" title="💡 总结"></a>💡 总结</h3><p>2.31 之后，House of Rabbit 的通常用法是：“伪造 Size -&gt; Consolidate 制造堆重叠 -&gt; 篡改重叠块的 fd 劫持 Tcache -&gt; 任意地址写”。它变成了一个精密的“接力赛”第一棒。</p>
+<p>这个过程涉及的内存布局比较讲究，你是否需要我用简单的文本图解（ASCII 图）画一下 <code>Chunk A, B, C</code> 在内存中被包裹和重叠的具体状态？在 <code>glibc 2.31</code> 及更高的版本中，House of Rabbit 已经从“一击必杀”的终极武器，退化成了利用链条中的一环。它的核心使命变成了：在堆空间内部制造合法的“堆块重叠（Heap Overlapping）”，为后续的 Tcache Poisoning（Tcache 投毒）铺路。</p>
+<p>在现代 Pwn 题中，一般会按照以下标准套路来使用它。我们可以把这个过程想象成“吃掉邻居的地盘”。</p>
+<h3 id="💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-1"><a href="#💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-1" class="headerlink" title="💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell"></a>💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</h3><p>为了让你更直观地理解，我们假设堆上有三个相邻的正常 Chunk：</p>
+<ul>
+<li>Chunk A (准备丢入 Fastbin 的诱饵)</li>
+<li>Chunk B (受害者，准备被覆盖)</li>
+<li>Chunk C (防线，用来伪造 Next Chunk 绕过检查)</li>
+</ul>
+<hr>
+<h3 id="🐾-Step-by-Step-现代利用流程-1"><a href="#🐾-Step-by-Step-现代利用流程-1" class="headerlink" title="🐾 Step-by-Step 现代利用流程"></a>🐾 Step-by-Step 现代利用流程</h3><h4 id="1-内存布局与伪造-Next-Chunk-最关键的难点-1"><a href="#1-内存布局与伪造-Next-Chunk-最关键的难点-1" class="headerlink" title="1. 内存布局与伪造 Next Chunk (最关键的难点)"></a>1. 内存布局与伪造 Next Chunk (最关键的难点)</h4><p>在 2.31 中，由于有 <code>next_chunk-&gt;size</code> 的检查，你不能随便写个 Fake Size 就跑。你必须保证 <code>Chunk A + Fake_Size</code> 指向的位置，存在一个合法的 Chunk 头。</p>
+<ul>
+<li>操作： 我们预先计算好，打算让 Chunk A 的大小“膨胀”并刚好包裹住 Chunk B。那么 <code>Fake_Size = 正常A的大小 + B的大小</code>。</li>
+<li>布置： 我们利用正常的分配，在 <code>Chunk A + Fake_Size</code> 的位置布置好 Chunk C。确保 Chunk C 的 <code>size</code> 字段是合法的，并且它的 <code>PREV_INUSE</code> 标志位为 1。</li>
+</ul>
+<h4 id="2-填满-Tcache-1"><a href="#2-填满-Tcache-1" class="headerlink" title="2. 填满 Tcache"></a>2. 填满 Tcache</h4><p>这是 2.31 绕不开的坎。因为 <code>Chunk A</code> 的大小（未膨胀前）一般较小，如果你直接 <code>free</code>，它会优先进入 Tcache。</p>
+<ul>
+<li>操作： 连续 <code>free</code> 7 个与 Chunk A 同样大小的堆块，把对应大小的 Tcache 垃圾桶塞满。</li>
+</ul>
+<h4 id="3-释放目标进入-Fastbin-1"><a href="#3-释放目标进入-Fastbin-1" class="headerlink" title="3. 释放目标进入 Fastbin"></a>3. 释放目标进入 Fastbin</h4><ul>
+<li>操作： 释放 <code>Chunk A</code>。因为 Tcache 已经满了，<code>Chunk A</code> 只能委屈地进入 Fastbin。</li>
+</ul>
+<h4 id="4-UAF-越界写：修改-Size-1"><a href="#4-UAF-越界写：修改-Size-1" class="headerlink" title="4. UAF &#x2F; 越界写：修改 Size"></a>4. UAF &#x2F; 越界写：修改 Size</h4><ul>
+<li>操作： 触发你程序里的漏洞（比如 Use-After-Free 或者堆溢出），去修改躺在 Fastbin 里的 <code>Chunk A</code> 的 <code>size</code> 字段。</li>
+<li>将其修改为前面计算好的 <code>Fake_Size</code>。</li>
+<li>注意： 这个 <code>Fake_Size</code> 必须小于 <code>av-&gt;system_mem</code>（通常在 132KB 左右），这就是为什么现在只能在堆内重叠，不能跨越到 BSS 段的原因。</li>
+</ul>
+<h4 id="5-触发-malloc-consolidate-见证奇迹的时刻-1"><a href="#5-触发-malloc-consolidate-见证奇迹的时刻-1" class="headerlink" title="5. 触发 malloc_consolidate (见证奇迹的时刻)"></a>5. 触发 <code>malloc_consolidate</code> (见证奇迹的时刻)</h4><ul>
+<li>操作： 申请一个大于 Large Bin 范围的堆块（比如申请 <code>0x400</code> 以上的大小）。</li>
+<li>内部发生的事：<code>glibc</code> 开始整理碎片，遍历 Fastbin 发现了 <code>Chunk A</code>。它读取 <code>Chunk A</code> 巨大的 <code>Fake_Size</code>，然后向后找 <code>Next Chunk</code>（此时完美匹配到了我们预先布置好的 Chunk C，绕过检查！）。</li>
+<li>结果： 带着巨大 Size 的 <code>Chunk A</code> 被合法地送进了 Unsorted Bin。此时，它在物理和逻辑上已经完全包裹（覆盖）了 Chunk B。</li>
+</ul>
+<h4 id="6-Tcache-投毒-收割成果-1"><a href="#6-Tcache-投毒-收割成果-1" class="headerlink" title="6. Tcache 投毒 (收割成果)"></a>6. Tcache 投毒 (收割成果)</h4><p>这个时候，情况变成了：Unsorted Bin 里的 <code>Chunk A</code> 和正常使用或被释放的 <code>Chunk B</code>重叠了。</p>
+<ol>
+<li>我们将 <code>Chunk B</code> 释放进 Tcache。</li>
+<li>我们从 Unsorted Bin 再次 <code>malloc</code> 申请内存（从膨胀的 <code>Chunk A</code> 里切出一块，大小正好覆盖到 <code>Chunk B</code>）。</li>
+<li>因为我们拿到了这块内存的写权限，我们可以直接篡改下方 <code>Chunk B</code> 的 <code>fd</code> 指针，将其指向任意目标地址（比如 <code>__free_hook</code> 或者栈上的返回地址）。</li>
+<li>最后，连续两次 <code>malloc</code> 同等大小的 Tcache，第二次就会把目标地址分配给你，实现任意地址写！</li>
+</ol>
+<hr>
+<h3 id="💡-总结-1"><a href="#💡-总结-1" class="headerlink" title="💡 总结"></a>💡 总结</h3><p>2.31 之后，House of Rabbit 的通常用法是：“伪造 Size -&gt; Consolidate 制造堆重叠 -&gt; 篡改重叠块的 fd 劫持 Tcache -&gt; 任意地址写”。它变成了一个精密的“接力赛”第一棒。</p>
+<p>这个过程涉及的内存布局比较讲究，你是否需要我用简单的文本图解（ASCII 图）画一下 <code>Chunk A, B, C</code> 在内存中被包裹和重叠的具体状态？在 <code>glibc 2.31</code> 及更高的版本中，House of Rabbit 已经从“一击必杀”的终极武器，退化成了利用链条中的一环。它的核心使命变成了：在堆空间内部制造合法的“堆块重叠（Heap Overlapping）”，为后续的 Tcache Poisoning（Tcache 投毒）铺路。</p>
+<p>在现代 Pwn 题中，一般会按照以下标准套路来使用它。我们可以把这个过程想象成“吃掉邻居的地盘”。</p>
+<h3 id="💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-2"><a href="#💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-2" class="headerlink" title="💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell"></a>💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</h3><p>为了让你更直观地理解，我们假设堆上有三个相邻的正常 Chunk：</p>
+<ul>
+<li>Chunk A (准备丢入 Fastbin 的诱饵)</li>
+<li>Chunk B (受害者，准备被覆盖)</li>
+<li>Chunk C (防线，用来伪造 Next Chunk 绕过检查)</li>
+</ul>
+<hr>
+<h3 id="🐾-Step-by-Step-现代利用流程-2"><a href="#🐾-Step-by-Step-现代利用流程-2" class="headerlink" title="🐾 Step-by-Step 现代利用流程"></a>🐾 Step-by-Step 现代利用流程</h3><h4 id="1-内存布局与伪造-Next-Chunk-最关键的难点-2"><a href="#1-内存布局与伪造-Next-Chunk-最关键的难点-2" class="headerlink" title="1. 内存布局与伪造 Next Chunk (最关键的难点)"></a>1. 内存布局与伪造 Next Chunk (最关键的难点)</h4><p>在 2.31 中，由于有 <code>next_chunk-&gt;size</code> 的检查，你不能随便写个 Fake Size 就跑。你必须保证 <code>Chunk A + Fake_Size</code> 指向的位置，存在一个合法的 Chunk 头。</p>
+<ul>
+<li>操作： 我们预先计算好，打算让 Chunk A 的大小“膨胀”并刚好包裹住 Chunk B。那么 <code>Fake_Size = 正常A的大小 + B的大小</code>。</li>
+<li>布置： 我们利用正常的分配，在 <code>Chunk A + Fake_Size</code> 的位置布置好 Chunk C。确保 Chunk C 的 <code>size</code> 字段是合法的，并且它的 <code>PREV_INUSE</code> 标志位为 1。</li>
+</ul>
+<h4 id="2-填满-Tcache-2"><a href="#2-填满-Tcache-2" class="headerlink" title="2. 填满 Tcache"></a>2. 填满 Tcache</h4><p>这是 2.31 绕不开的坎。因为 <code>Chunk A</code> 的大小（未膨胀前）一般较小，如果你直接 <code>free</code>，它会优先进入 Tcache。</p>
+<ul>
+<li>操作： 连续 <code>free</code> 7 个与 Chunk A 同样大小的堆块，把对应大小的 Tcache 垃圾桶塞满。</li>
+</ul>
+<h4 id="3-释放目标进入-Fastbin-2"><a href="#3-释放目标进入-Fastbin-2" class="headerlink" title="3. 释放目标进入 Fastbin"></a>3. 释放目标进入 Fastbin</h4><ul>
+<li>操作： 释放 <code>Chunk A</code>。因为 Tcache 已经满了，<code>Chunk A</code> 只能委屈地进入 Fastbin。</li>
+</ul>
+<h4 id="4-UAF-越界写：修改-Size-2"><a href="#4-UAF-越界写：修改-Size-2" class="headerlink" title="4. UAF &#x2F; 越界写：修改 Size"></a>4. UAF &#x2F; 越界写：修改 Size</h4><ul>
+<li>操作： 触发你程序里的漏洞（比如 Use-After-Free 或者堆溢出），去修改躺在 Fastbin 里的 <code>Chunk A</code> 的 <code>size</code> 字段。</li>
+<li>将其修改为前面计算好的 <code>Fake_Size</code>。</li>
+<li>注意： 这个 <code>Fake_Size</code> 必须小于 <code>av-&gt;system_mem</code>（通常在 132KB 左右），这就是为什么现在只能在堆内重叠，不能跨越到 BSS 段的原因。</li>
+</ul>
+<h4 id="5-触发-malloc-consolidate-见证奇迹的时刻-2"><a href="#5-触发-malloc-consolidate-见证奇迹的时刻-2" class="headerlink" title="5. 触发 malloc_consolidate (见证奇迹的时刻)"></a>5. 触发 <code>malloc_consolidate</code> (见证奇迹的时刻)</h4><ul>
+<li>操作： 申请一个大于 Large Bin 范围的堆块（比如申请 <code>0x400</code> 以上的大小）。</li>
+<li>内部发生的事：<code>glibc</code> 开始整理碎片，遍历 Fastbin 发现了 <code>Chunk A</code>。它读取 <code>Chunk A</code> 巨大的 <code>Fake_Size</code>，然后向后找 <code>Next Chunk</code>（此时完美匹配到了我们预先布置好的 Chunk C，绕过检查！）。</li>
+<li>结果： 带着巨大 Size 的 <code>Chunk A</code> 被合法地送进了 Unsorted Bin。此时，它在物理和逻辑上已经完全包裹（覆盖）了 Chunk B。</li>
+</ul>
+<h4 id="6-Tcache-投毒-收割成果-2"><a href="#6-Tcache-投毒-收割成果-2" class="headerlink" title="6. Tcache 投毒 (收割成果)"></a>6. Tcache 投毒 (收割成果)</h4><p>这个时候，情况变成了：Unsorted Bin 里的 <code>Chunk A</code> 和正常使用或被释放的 <code>Chunk B</code>重叠了。</p>
+<ol>
+<li>我们将 <code>Chunk B</code> 释放进 Tcache。</li>
+<li>我们从 Unsorted Bin 再次 <code>malloc</code> 申请内存（从膨胀的 <code>Chunk A</code> 里切出一块，大小正好覆盖到 <code>Chunk B</code>）。</li>
+<li>因为我们拿到了这块内存的写权限，我们可以直接篡改下方 <code>Chunk B</code> 的 <code>fd</code> 指针，将其指向任意目标地址（比如 <code>__free_hook</code> 或者栈上的返回地址）。</li>
+<li>最后，连续两次 <code>malloc</code> 同等大小的 Tcache，第二次就会把目标地址分配给你，实现任意地址写！</li>
+</ol>
+<hr>
+<h3 id="💡-总结-2"><a href="#💡-总结-2" class="headerlink" title="💡 总结"></a>💡 总结</h3><p>2.31 之后，House of Rabbit 的通常用法是：“伪造 Size -&gt; Consolidate 制造堆重叠 -&gt; 篡改重叠块的 fd 劫持 Tcache -&gt; 任意地址写”。它变成了一个精密的“接力赛”第一棒。</p>
+<p>这个过程涉及的内存布局比较讲究，你是否需要我用简单的文本图解（ASCII 图）画一下 <code>Chunk A, B, C</code> 在内存中被包裹和重叠的具体状态？在 <code>glibc 2.31</code> 及更高的版本中，House of Rabbit 已经从“一击必杀”的终极武器，退化成了利用链条中的一环。它的核心使命变成了：在堆空间内部制造合法的“堆块重叠（Heap Overlapping）”，为后续的 Tcache Poisoning（Tcache 投毒）铺路。</p>
+<p>在现代 Pwn 题中，一般会按照以下标准套路来使用它。我们可以把这个过程想象成“吃掉邻居的地盘”。</p>
+<h3 id="💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-3"><a href="#💥-核心思路：通过-Rabbit-制造重叠，通过-Tcache-拿-Shell-3" class="headerlink" title="💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell"></a>💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</h3><p>为了让你更直观地理解，我们假设堆上有三个相邻的正常 Chunk：</p>
+<ul>
+<li>Chunk A (准备丢入 Fastbin 的诱饵)</li>
+<li>Chunk B (受害者，准备被覆盖)</li>
+<li>Chunk C (防线，用来伪造 Next Chunk 绕过检查)</li>
+</ul>
+<hr>
+<h3 id="🐾-Step-by-Step-现代利用流程-3"><a href="#🐾-Step-by-Step-现代利用流程-3" class="headerlink" title="🐾 Step-by-Step 现代利用流程"></a>🐾 Step-by-Step 现代利用流程</h3><h4 id="1-内存布局与伪造-Next-Chunk-最关键的难点-3"><a href="#1-内存布局与伪造-Next-Chunk-最关键的难点-3" class="headerlink" title="1. 内存布局与伪造 Next Chunk (最关键的难点)"></a>1. 内存布局与伪造 Next Chunk (最关键的难点)</h4><p>在 2.31 中，由于有 <code>next_chunk-&gt;size</code> 的检查，你不能随便写个 Fake Size 就跑。你必须保证 <code>Chunk A + Fake_Size</code> 指向的位置，存在一个合法的 Chunk 头。</p>
+<ul>
+<li>操作： 我们预先计算好，打算让 Chunk A 的大小“膨胀”并刚好包裹住 Chunk B。那么 <code>Fake_Size = 正常A的大小 + B的大小</code>。</li>
+<li>布置： 我们利用正常的分配，在 <code>Chunk A + Fake_Size</code> 的位置布置好 Chunk C。确保 Chunk C 的 <code>size</code> 字段是合法的，并且它的 <code>PREV_INUSE</code> 标志位为 1。</li>
+</ul>
+<h4 id="2-填满-Tcache-3"><a href="#2-填满-Tcache-3" class="headerlink" title="2. 填满 Tcache"></a>2. 填满 Tcache</h4><p>这是 2.31 绕不开的坎。因为 <code>Chunk A</code> 的大小（未膨胀前）一般较小，如果你直接 <code>free</code>，它会优先进入 Tcache。</p>
+<ul>
+<li>操作： 连续 <code>free</code> 7 个与 Chunk A 同样大小的堆块，把对应大小的 Tcache 垃圾桶塞满。</li>
+</ul>
+<h4 id="3-释放目标进入-Fastbin-3"><a href="#3-释放目标进入-Fastbin-3" class="headerlink" title="3. 释放目标进入 Fastbin"></a>3. 释放目标进入 Fastbin</h4><ul>
+<li>操作： 释放 <code>Chunk A</code>。因为 Tcache 已经满了，<code>Chunk A</code> 只能委屈地进入 Fastbin。</li>
+</ul>
+<h4 id="4-UAF-越界写：修改-Size-3"><a href="#4-UAF-越界写：修改-Size-3" class="headerlink" title="4. UAF &#x2F; 越界写：修改 Size"></a>4. UAF &#x2F; 越界写：修改 Size</h4><ul>
+<li>操作： 触发你程序里的漏洞（比如 Use-After-Free 或者堆溢出），去修改躺在 Fastbin 里的 <code>Chunk A</code> 的 <code>size</code> 字段。</li>
+<li>将其修改为前面计算好的 <code>Fake_Size</code>。</li>
+<li>注意： 这个 <code>Fake_Size</code> 必须小于 <code>av-&gt;system_mem</code>（通常在 132KB 左右），这就是为什么现在只能在堆内重叠，不能跨越到 BSS 段的原因。</li>
+</ul>
+<h4 id="5-触发-malloc-consolidate-见证奇迹的时刻-3"><a href="#5-触发-malloc-consolidate-见证奇迹的时刻-3" class="headerlink" title="5. 触发 malloc_consolidate (见证奇迹的时刻)"></a>5. 触发 <code>malloc_consolidate</code> (见证奇迹的时刻)</h4><ul>
+<li>操作： 申请一个大于 Large Bin 范围的堆块（比如申请 <code>0x400</code> 以上的大小）。</li>
+<li>内部发生的事：<code>glibc</code> 开始整理碎片，遍历 Fastbin 发现了 <code>Chunk A</code>。它读取 <code>Chunk A</code> 巨大的 <code>Fake_Size</code>，然后向后找 <code>Next Chunk</code>（此时完美匹配到了我们预先布置好的 Chunk C，绕过检查！）。</li>
+<li>结果： 带着巨大 Size 的 <code>Chunk A</code> 被合法地送进了 Unsorted Bin。此时，它在物理和逻辑上已经完全包裹（覆盖）了 Chunk B。</li>
+</ul>
+<h4 id="6-Tcache-投毒-收割成果-3"><a href="#6-Tcache-投毒-收割成果-3" class="headerlink" title="6. Tcache 投毒 (收割成果)"></a>6. Tcache 投毒 (收割成果)</h4><p>这个时候，情况变成了：Unsorted Bin 里的 <code>Chunk A</code> 和正常使用或被释放的 <code>Chunk B</code>重叠了。</p>
+<ol>
+<li>我们将 <code>Chunk B</code> 释放进 Tcache。</li>
+<li>我们从 Unsorted Bin 再次 <code>malloc</code> 申请内存（从膨胀的 <code>Chunk A</code> 里切出一块，大小正好覆盖到 <code>Chunk B</code>）。</li>
+<li>因为我们拿到了这块内存的写权限，我们可以直接篡改下方 <code>Chunk B</code> 的 <code>fd</code> 指针，将其指向任意目标地址（比如 <code>__free_hook</code> 或者栈上的返回地址）。</li>
+<li>最后，连续两次 <code>malloc</code> 同等大小的 Tcache，第二次就会把目标地址分配给你，实现任意地址写！</li>
+</ol>
+<hr>
+<h3 id="💡-总结-3"><a href="#💡-总结-3" class="headerlink" title="💡 总结"></a>💡 总结</h3><p>2.31 之后，House of Rabbit 的通常用法是：“伪造 Size -&gt; Consolidate 制造堆重叠 -&gt; 篡改重叠块的 fd 劫持 Tcache -&gt; 任意地址写”。它变成了一个精密的“接力赛”第一棒。</p>
+<p>这个过程涉及的内存布局比较讲究，你是否需要我用简单的文本图解（ASCII 图）画一下 <code>Chunk A, B, C</code> 在内存中被包裹和重叠的具体状态？</p>
+<h4 id="6-Tcache-投毒"><a href="#6-Tcache-投毒" class="headerlink" title="6. Tcache 投毒"></a>6. Tcache 投毒</h4><p>这个时候，情况变成了：Unsorted Bin 里的 Chunk A 和正常使用或被释放的 Chunk B重叠了。</p>
+<ol>
+<li>我们将 <code>Chunk B</code> 释放进 Tcache。</li>
+<li>我们从 Unsorted Bin 再次 <code>malloc</code> 申请内存（从膨胀的 <code>Chunk A</code> 里切出一块，大小正好覆盖到 <code>Chunk B</code>）。</li>
+<li>因为我们拿到了这块内存的写权限，我们可以直接篡改下方 <code>Chunk B</code> 的 <code>fd</code> 指针，将其指向任意目标地址（比如 <code>__free_hook</code> 或者栈上的返回地址）。</li>
+<li>最后，连续两次 <code>malloc</code> 同等大小的 Tcache，第二次就会把目标地址分配给你，实现任意地址写！</li>
+</ol>
+<hr>
+<h3 id="💡-总结-4"><a href="#💡-总结-4" class="headerlink" title="💡 总结"></a>💡 总结</h3><p>2.31 之后，House of Rabbit 的通常用法是：“伪造 Size -&gt; Consolidate 制造堆重叠 -&gt; 篡改重叠块的 fd 劫持 Tcache -&gt; 任意地址写”。它变成了一个精密的“接力赛”第一棒。</p>
+<p>这个过程涉及的内存布局比较讲究，你是否需要我用简单的文本图解（ASCII 图）画一下 <code>Chunk A, B, C</code> 在内存中被包裹和重叠的具体状态？</p>
+<blockquote>
+<p>更新: 2026-05-03 00:36:18<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/tlohtg5p20y48e96">https://www.yuque.com/idcm/wnemg9/tlohtg5p20y48e96</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="CTFHub House of Einherjar" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/HouseOfEinherjar/CTFHubHouseofEinherjar/" aria-label="前一篇: CTFHub House of Einherjar" title="前一篇: CTFHub House of Einherjar"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            CTFHub House of Einherjar
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Einherjar" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/HouseOfEinherjar/index/" aria-label="后一篇: House Of Einherjar"  title="后一篇: House Of Einherjar"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          House Of Einherjar
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#House-Of-Rabbit"><span class="toc-number">1.</span> <span class="toc-text">House Of Rabbit</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#malloc-consolidate-%E6%BC%8F%E6%B4%9E%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">malloc_consolidate 漏洞：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#house-of-rabbit-%E6%94%BB%E5%87%BB%E6%B5%81%E7%A8%8B-%E4%BB%A5-glibc-2-23-%E4%B8%BA%E4%BE%8B"><span class="toc-number">1.2.</span> <span class="toc-text">house of rabbit 攻击流程(以 glibc 2.23 为例)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8%E7%9B%AE%E6%A0%87%E5%9C%B0%E5%9D%80%E4%BC%AA%E9%80%A0-Chunk"><span class="toc-number">1.2.1.</span> <span class="toc-text">在目标地址伪造 Chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%AB%E6%8C%81-Fastbin-%E9%93%BE%E8%A1%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">劫持 Fastbin 链表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-malloc-consolidate"><span class="toc-number">1.2.3.</span> <span class="toc-text">触发 malloc_consolidate</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E-Unsorted-Bin-%E4%B8%AD%E5%88%87%E5%89%B2%E5%8A%AB%E6%8C%81-chunk"><span class="toc-number">1.2.4.</span> <span class="toc-text">从 Unsorted Bin 中切割劫持 chunk</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#demo1-modify-the-size-of-fastbin-chunk"><span class="toc-number">1.2.5.</span> <span class="toc-text">demo1 modify the size of fastbin chunk:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#demo2-modify-FD-pointer"><span class="toc-number">1.2.6.</span> <span class="toc-text">demo2 modify FD pointer:</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell"><span class="toc-number">1.3.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="toc-number">1.4.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin"><span class="toc-number">1.4.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size"><span class="toc-number">1.4.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB"><span class="toc-number">1.4.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C"><span class="toc-number">1.4.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93"><span class="toc-number">1.5.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-1"><span class="toc-number">1.6.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-1"><span class="toc-number">1.7.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-1"><span class="toc-number">1.7.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-1"><span class="toc-number">1.7.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-1"><span class="toc-number">1.7.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-1"><span class="toc-number">1.7.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-1"><span class="toc-number">1.7.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-1"><span class="toc-number">1.7.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-1"><span class="toc-number">1.8.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-2"><span class="toc-number">1.9.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-2"><span class="toc-number">1.10.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-2"><span class="toc-number">1.10.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-2"><span class="toc-number">1.10.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-2"><span class="toc-number">1.10.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-2"><span class="toc-number">1.10.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-2"><span class="toc-number">1.10.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-2"><span class="toc-number">1.10.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-2"><span class="toc-number">1.11.</span> <span class="toc-text">💡 总结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A5-%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF%EF%BC%9A%E9%80%9A%E8%BF%87-Rabbit-%E5%88%B6%E9%80%A0%E9%87%8D%E5%8F%A0%EF%BC%8C%E9%80%9A%E8%BF%87-Tcache-%E6%8B%BF-Shell-3"><span class="toc-number">1.12.</span> <span class="toc-text">💥 核心思路：通过 Rabbit 制造重叠，通过 Tcache 拿 Shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%90%BE-Step-by-Step-%E7%8E%B0%E4%BB%A3%E5%88%A9%E7%94%A8%E6%B5%81%E7%A8%8B-3"><span class="toc-number">1.13.</span> <span class="toc-text">🐾 Step-by-Step 现代利用流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80%E4%B8%8E%E4%BC%AA%E9%80%A0-Next-Chunk-%E6%9C%80%E5%85%B3%E9%94%AE%E7%9A%84%E9%9A%BE%E7%82%B9-3"><span class="toc-number">1.13.1.</span> <span class="toc-text">1. 内存布局与伪造 Next Chunk (最关键的难点)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%A1%AB%E6%BB%A1-Tcache-3"><span class="toc-number">1.13.2.</span> <span class="toc-text">2. 填满 Tcache</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E9%87%8A%E6%94%BE%E7%9B%AE%E6%A0%87%E8%BF%9B%E5%85%A5-Fastbin-3"><span class="toc-number">1.13.3.</span> <span class="toc-text">3. 释放目标进入 Fastbin</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-UAF-%E8%B6%8A%E7%95%8C%E5%86%99%EF%BC%9A%E4%BF%AE%E6%94%B9-Size-3"><span class="toc-number">1.13.4.</span> <span class="toc-text">4. UAF &#x2F; 越界写：修改 Size</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E8%A7%A6%E5%8F%91-malloc-consolidate-%E8%A7%81%E8%AF%81%E5%A5%87%E8%BF%B9%E7%9A%84%E6%97%B6%E5%88%BB-3"><span class="toc-number">1.13.5.</span> <span class="toc-text">5. 触发 malloc_consolidate (见证奇迹的时刻)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92-%E6%94%B6%E5%89%B2%E6%88%90%E6%9E%9C-3"><span class="toc-number">1.13.6.</span> <span class="toc-text">6. Tcache 投毒 (收割成果)</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-3"><span class="toc-number">1.14.</span> <span class="toc-text">💡 总结</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#6-Tcache-%E6%8A%95%E6%AF%92"><span class="toc-number">1.14.1.</span> <span class="toc-text">6. Tcache 投毒</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%F0%9F%92%A1-%E6%80%BB%E7%BB%93-4"><span class="toc-number">1.15.</span> <span class="toc-text">💡 总结</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "House Of Rabbit",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/HouseOfRabbit/",
+          excerpt: "",
+          description: "",
+          stripContent: "House Of Rabbit前言：查找其他题目 wp 的时候偶尔看见了这种利用手法，由于好奇就来了解一下，也算是扩展自己的攻击手法和视野，不过没有碰见合适的题目，以后遇见了在对例题进行补充。 在低版本 glibc ，House of Rabbit 是一种极具破坏力的堆利用手法。它的核心思想是利用 malloc_consolidate 机制的盲目性，将受到严格大小限制的 Fastbin 堆块，强行偷渡到审查宽松的 Unsorted Bin 中，从而实现任意地址分配或大规模堆重叠。 在 glibc",
+          date: "Sat May 23 2026 02:46:10 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

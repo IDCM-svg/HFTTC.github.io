@@ -1,0 +1,767 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    Kernel PWN | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Kernel PWN如何理解内核：操作系统内核（Operation System Kernel）本质上也是一种软件，可以看作是普通应用程式与硬件之间的一层中间层，其主要作用便是调度系统资源、控制 IO 设备、操作网络与文件系统等，并为上层应用提供便捷、抽象的应用接口。操作系统内核实际上是我们抽象出来的一个概念，本质上与用户进程一般无二，都是位于物理内存中的代码 + 数据，不同之处在于当 CPU 执">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel PWN">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/KernelPWN/index/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="Kernel PWN如何理解内核：操作系统内核（Operation System Kernel）本质上也是一种软件，可以看作是普通应用程式与硬件之间的一层中间层，其主要作用便是调度系统资源、控制 IO 设备、操作网络与文件系统等，并为上层应用提供便捷、抽象的应用接口。操作系统内核实际上是我们抽象出来的一个概念，本质上与用户进程一般无二，都是位于物理内存中的代码 + 数据，不同之处在于当 CPU 执">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778156031304-90f5f625-9a47-42a6-94f8-aad3db28284e-674510.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162038106-8ca1d5fd-982b-4368-98c5-87fa7f1d96af-505853.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162069424-090bcef7-5bb1-47ac-b3fd-8ff18398970e-947278.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162173546-1b57b444-dd78-4025-b8fe-1e2b4611b6a0-857628.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778169578736-0413538d-7afa-450d-921f-c53ab70e4a8c-999753.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778169664111-b07a2d48-b499-4c46-be28-a3d9241ccb5a-644290.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778170420746-7baf8d38-212c-4c69-b38f-530a8df17d8c-578508.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778173642660-8fd31c04-6eb8-42ac-8a4e-d78d0e796283-000481.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778173781375-0136a59f-f9d0-430a-9f98-69ef639aaa15-070394.png">
+<meta property="article:published_time" content="2026-05-22T18:46:55.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.491Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778156031304-90f5f625-9a47-42a6-94f8-aad3db28284e-674510.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="Kernel PWN">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">Kernel PWN</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kernel-PWN"><span class="toc-number">1.</span> <span class="toc-text">Kernel PWN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E5%86%85%E6%A0%B8%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">如何理解内核：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%BA%A7%E4%BF%9D%E6%8A%A4%E5%9F%9F%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">分级保护域：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E5%88%87%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">状态切换：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">虚拟内存分布：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">进程权限管理：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KernelPWN-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%9A"><span class="toc-number">1.6.</span> <span class="toc-text">KernelPWN 环境搭建：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E5%99%A8-GEF"><span class="toc-number">1.6.1.</span> <span class="toc-text">配置高级调试器 (GEF)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%B9%B6%E7%BC%96%E8%AF%91%E7%BA%AF%E5%87%80%E7%89%88%E5%86%85%E6%A0%B8"><span class="toc-number">1.6.2.</span> <span class="toc-text">下载并编译纯净版内核</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9-%E6%9E%81%E5%BA%A6%E5%85%B3%E9%94%AE"><span class="toc-number">1.6.3.</span> <span class="toc-text">配置内核编译选项 (极度关键)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-config"><span class="toc-number">1.6.4.</span> <span class="toc-text">修改.config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E9%9D%99%E9%BB%98%E6%9B%BF%E6%8D%A2"><span class="toc-number">1.6.5.</span> <span class="toc-text">执行静默替换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%86%85%E6%A0%B8-%E9%9C%80%E8%A6%81%E5%87%A0%E5%8D%81%E5%88%86%E9%92%9F%EF%BC%8C%E8%A7%86%E7%94%B5%E8%84%91%E6%80%A7%E8%83%BD%E8%80%8C%E5%AE%9A"><span class="toc-number">1.6.6.</span> <span class="toc-text">编译内核(需要几十分钟，视电脑性能而定)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91-BusyBox-%E6%8F%90%E4%BE%9B%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4"><span class="toc-number">1.6.7.</span> <span class="toc-text">编译 BusyBox (提供基础命令)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%EF%BC%9A%E8%BE%93%E5%85%A5-make-menuconfig%E3%80%82"><span class="toc-number">1.6.8.</span> <span class="toc-text">配置静态编译：输入 make menuconfig。</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-KernelPWN/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:55.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.491Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="Kernel-PWN"><a href="#Kernel-PWN" class="headerlink" title="Kernel PWN"></a>Kernel PWN</h1><h3 id="如何理解内核："><a href="#如何理解内核：" class="headerlink" title="如何理解内核："></a>如何理解内核：</h3><p>操作系统内核（Operation System Kernel）本质上也是一种软件，可以看作是普通应用程式与硬件之间的一层中间层，其主要作用便是调度系统资源、控制 IO 设备、操作网络与文件系统等，并为上层应用提供便捷、抽象的应用接口。操作系统内核实际上是我们抽象出来的一个概念，本质上与用户进程一般无二，都是位于物理内存中的代码 + 数据，不同之处在于当 CPU 执行操作系统内核代码时通常运行在高权限，拥有着完全的硬件访问能力，而 CPU 在执行用户态代码时通常运行在低权限环境，只拥有部分 &#x2F; 缺失硬件访问能力。</p>
+<h3 id="分级保护域："><a href="#分级保护域：" class="headerlink" title="分级保护域："></a>分级保护域：</h3><p>分级保护域又称为保护环，简称 Rings，是一种将计算机不同资源划分至不同权限的模型：</p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778156031304-90f5f625-9a47-42a6-94f8-aad3db28284e-674510.png" alt="1778156031304-90f5f625-9a47-42a6-94f8-aad3db28284e.png"></p>
+<p>CPU 的权限主要分为 0-3 四级，基本常用的就是用 Ring0 和 Ring3，对应操作系统内核与用户进程，CPU 在执行用户进程代码时处于 Ring3 下：</p>
+<p>现代 CPU 架构在硬件层面就设计了权限等级。</p>
+<ul>
+<li>用户态 (User Space &#x2F; Ring 3): 普通程序运行的地方。权限极低，如果代码尝试直接访问硬件或越权读取内存，CPU 会直接触发异常（比如常见的 <code>Segmentation fault</code>）。</li>
+<li>内核态 (Kernel Space &#x2F; Ring 0): 内核代码运行的地方。拥有最高权限，可以执行特权指令，掌控所有硬件资源。在异构架构中，这种权限划分同样存在，比如 ARM 的不同异常级别，Exception Levels, 如 EL0 对应用户态，EL1 对应内核态。</li>
+</ul>
+<h3 id="状态切换："><a href="#状态切换：" class="headerlink" title="状态切换："></a>状态切换：</h3><ul>
+<li>中断与异常</li>
+<li>特权级相关指令</li>
+</ul>
+<p>现代操作系统的开发者包装出了系统调用（syscall），作为由”用户态 “切换到” 内核态“的入口，从而执行内核代码来完成用户进程所需的一些功能。当用户进程想要请求更高权限的服务时，便需要通过由系统提供的应用接口，使用系统调用以陷入内核态，再由操作系统完成请求。</p>
+<p>当发生系统调用，产生异常，外设产生中断等事件时，会发生用户态到内核态的切换，具体的过程为：</p>
+<ol>
+<li>通过 swapgs 切换 GS 段寄存器，将 GS 寄存器值和一个特定位置的值进行交换，目的是保存 GS 值，同时将该位置的值作为内核执行时的 GS 值使用。</li>
+<li>将当前栈顶记录在 CPU 独占变量区域里，将 CPU 独占区域里记录的内核栈顶放入 rsp&#x2F;esp。</li>
+<li>通过 push 保存各寄存器值</li>
+<li>通过汇编指令判断是否为 <code>x32_abi</code>。</li>
+<li>通过系统调用号，跳到全局变量 <code>sys_call_table</code> 相应位置继续执行系统调用。</li>
+</ol>
+<p>退出时，流程如下：</p>
+<ol>
+<li>通过 <code>swapgs</code> 恢复 GS 值。</li>
+<li>通过 <code>sysretq</code> 或者 <code>iretq</code> 恢复到用户控件继续执行。如果使用 <code>iretq</code> 还需要给出用户空间的一些信息（CS, eflags&#x2F;rflags, esp&#x2F;rsp 等）。</li>
+</ol>
+<h3 id="虚拟内存分布："><a href="#虚拟内存分布：" class="headerlink" title="虚拟内存分布："></a>虚拟内存分布：</h3><p>虚拟内存分为供用户使用的用户空间和供内核使用的内核空间：可以分为 32 和 64 位不同模式：</p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162038106-8ca1d5fd-982b-4368-98c5-87fa7f1d96af-505853.png" alt="1778162038106-8ca1d5fd-982b-4368-98c5-87fa7f1d96af.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162069424-090bcef7-5bb1-47ac-b3fd-8ff18398970e-947278.png" alt="1778162069424-090bcef7-5bb1-47ac-b3fd-8ff18398970e.png"></p>
+<h3 id="进程权限管理："><a href="#进程权限管理：" class="headerlink" title="进程权限管理："></a>进程权限管理：</h3><p><strong>进程描述符</strong>：源码在<code>include/linux/sched.h</code>中，task_struct结构体结构如下：</p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778162173546-1b57b444-dd78-4025-b8fe-1e2b4611b6a0-857628.png" alt="1778162173546-1b57b444-dd78-4025-b8fe-1e2b4611b6a0.png"></p>
+<p><strong>重要字段结构化表格</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>核心类别</strong></th>
+<th><strong>字段 (Fields)</strong></th>
+<th><strong>功能说明 (Description)</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>调度相关</strong></td>
+<td><code>state</code>, <code>sched_class</code></td>
+<td>调度信息</td>
+</tr>
+<tr>
+<td></td>
+<td><code>prio</code>, <code>static_prio</code></td>
+<td>进程的动态优先级与静态优先级。</td>
+</tr>
+<tr>
+<td></td>
+<td><code>se</code>, <code>rt_priority</code></td>
+<td>调度器实体</td>
+</tr>
+<tr>
+<td><strong>内存管理</strong><br/><em>(掌控虚拟地址空间)</em></td>
+<td><code>mm</code>, <code>active_mm</code></td>
+<td>mm指向进程虚拟内存空间的描述符。内核线程没有自己的用户空间，借用前一个进程的active_mm</td>
+</tr>
+<tr>
+<td></td>
+<td><code>stack</code>, <code>thread_info</code></td>
+<td>指向该进程专属的内核栈，以及通常存放在栈底部的线程硬件信息。</td>
+</tr>
+<tr>
+<td><strong>标识与控制</strong><br/><br/><em>(进程的身份户口)</em></td>
+<td><code>pid</code>, <code>tgid</code></td>
+<td><code>pid</code>是内核中每个执行流的唯一 ID。而在多线程程序中，所有线程对外表现为一个整体，共享同一个 <code>tgid</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>real_parent</code>, <code>children</code></td>
+<td>父子关系管理</td>
+</tr>
+<tr>
+<td><strong>资源管理</strong></td>
+<td><code>files</code>, <code>fs</code>, <code>signal</code></td>
+<td>文件，文件系统和信号资源</td>
+</tr>
+<tr>
+<td></td>
+<td><code>cred</code>, <code>limits</code></td>
+<td>权限与资源限制</td>
+</tr>
+<tr>
+<td><strong>统计与架构</strong></td>
+<td><code>utime</code>, <code>stime</code></td>
+<td>CPU 时间</td>
+</tr>
+<tr>
+<td></td>
+<td><code>cpu_context</code>, <code>thread</code></td>
+<td>当内核执行进程切换时，需要把当前 CPU 寄存器的状态保存在这里，以便下次恢复执行。</td>
+</tr>
+<tr>
+<td><strong>安全与调试</strong><br/></td>
+<td><code>ptrace</code>, <code>seccomp</code></td>
+<td><code>ptrace</code>是 GDB 等调试器能够附加和控制该进程的底层支持；<code>seccomp</code>则是一种沙盒安全机制，用于过滤和限制该进程能执行的系统调用。</td>
+</tr>
+</tbody></table>
+<h3 id="KernelPWN-环境搭建："><a href="#KernelPWN-环境搭建：" class="headerlink" title="KernelPWN 环境搭建："></a>KernelPWN 环境搭建：</h3><h4 id="配置高级调试器-GEF"><a href="#配置高级调试器-GEF" class="headerlink" title="配置高级调试器 (GEF)"></a>配置高级调试器 (GEF)</h4><p>原生 GDB 调试内核会很吃力，我们需要安装 GEF 插件和相关依赖。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip3 install capstone unicorn keystone-engine ropper</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/hugsy/gef.git</span><br><span class="line"><span class="built_in">echo</span> <span class="built_in">source</span> `<span class="built_in">pwd</span>`/gef/gef.py &gt;&gt; ~/.gdbinit</span><br></pre></td></tr></table></figure>
+
+<h4 id="下载并编译纯净版内核"><a href="#下载并编译纯净版内核" class="headerlink" title="下载并编译纯净版内核"></a>下载并编译纯净版内核</h4><p>我们将亲自编译出一个带有调试符号的内核 (<code>vmlinux</code>)。</p>
+<p>下载并解压 Linux 5.9.8 源码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -O -L https://mirrors.tuna.tsinghua.edu.cn/kernel/v5.x/linux-5.9.8.tar.xz</span><br><span class="line">unxz linux-5.9.8.tar.xz</span><br><span class="line">tar -xf linux-5.9.8.tar</span><br><span class="line"><span class="built_in">cd</span> linux-5.9.8</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778169578736-0413538d-7afa-450d-921f-c53ab70e4a8c-999753.png" alt="1778169578736-0413538d-7afa-450d-921f-c53ab70e4a8c.png"></p>
+<h4 id="配置内核编译选项-极度关键"><a href="#配置内核编译选项-极度关键" class="headerlink" title="配置内核编译选项 (极度关键)"></a>配置内核编译选项 (极度关键)</h4><p>保证编译器在编译时保留所有的调试符号，这样以后用 GDB 才能看清里面的变量和源码。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778169664111-b07a2d48-b499-4c46-be28-a3d9241ccb5a-644290.png" alt="1778169664111-b07a2d48-b499-4c46-be28-a3d9241ccb5a.png"></p>
+<p>在这个界面里，使用键盘的上下方向键移动，回车键进入子菜单，空格键用来勾选（前面会出现 [*] 标志），按 Esc 键两次可以退回上一级。</p>
+<ol>
+<li>找到目标：使用方向键 ↓ 一直往下按，直到光标停在最后一行 <code>Kernel hacking ---&gt;</code> 上。</li>
+<li>进入子菜单：按下 <code>回车键 (Enter)</code>。</li>
+</ol>
+<p>接下来，你会看到更深一层的选项，继续执行这几个关键勾选：</p>
+<ul>
+<li><p>路径 I）开启编译调试信息：进入 <code>Compile-time checks and compiler options ---&gt;</code></p>
+<ul>
+<li>找到 <code>Compile the kernel with debug info</code>，按 <code>空格键</code> 把它变成 <code>[*]</code>。</li>
+</ul>
+</li>
+<li><p>路径 II）开启 KGDB 调试器支持</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">退出来按 `Esc`：进入 `Generic Kernel Debugging Instruments ---&gt;`</span><br><span class="line"></span><br><span class="line">找到 `KGDB: kernel debugger`，按 `空格键` 变成 `[*]`。</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="3">
+<li>保存并退出：</li>
+</ol>
+<ul>
+<li>一直按两下 Esc 退到最外层主界面。</li>
+<li>再按两下 Esc，系统会弹窗问你 Do you wish to save your new configuration?。</li>
+<li>选择 &lt; Yes &gt; 回车保存。</li>
+</ul>
+<h4 id="修改-config"><a href="#修改-config" class="headerlink" title="修改.config"></a>修改.config</h4><p>内核编译脚本在默认情况下会去寻找指定的 .pem 证书文件来为内核模块进行签名。由于你的环境中没有对应的 Debian 官方私钥和证书，如果不置空，编译进行到一半就会报错 No rule to make target ‘debian&#x2F;certs&#x2F;debian-uefi-certs.pem’ 并直接中断。</p>
+<h4 id="执行静默替换"><a href="#执行静默替换" class="headerlink" title="执行静默替换"></a>执行静默替换</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/CONFIG_SYSTEM_TRUSTED_KEYS=.*/CONFIG_SYSTEM_TRUSTED_KEYS=&quot;&quot;/&#x27;</span> .config</span><br></pre></td></tr></table></figure>
+
+<p>在较新的 Kali&#x2F;Ubuntu 环境下编译 5.9.8 这种稍旧的内核，有时会遇到 <code>BTF</code> (BPF Type Format) 相关的编译错误。为了保险起见，建议你也把下面这一项关掉（改为 <code>n</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sed -i <span class="string">&#x27;s/CONFIG_DEBUG_INFO_BTF=y/CONFIG_DEBUG_INFO_BTF=n/&#x27;</span> .config</span><br></pre></td></tr></table></figure>
+
+<p>如果不关掉它，编译时可能需要额外的 <code>pahole</code> 工具，且容易报错中断。</p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778170420746-7baf8d38-212c-4c69-b38f-530a8df17d8c-578508.png" alt="1778170420746-7baf8d38-212c-4c69-b38f-530a8df17d8c.png"></p>
+<h4 id="编译内核-需要几十分钟，视电脑性能而定"><a href="#编译内核-需要几十分钟，视电脑性能而定" class="headerlink" title="编译内核(需要几十分钟，视电脑性能而定)"></a>编译内核(需要几十分钟，视电脑性能而定)</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt-get install libelf-dev  <span class="comment"># 安装可能缺失的依赖</span></span><br><span class="line">make -j 8 bzImage</span><br></pre></td></tr></table></figure>
+
+<p><em>编译成功后，你会看到 Setup is… System is… bzImage is ready 的提示。带符号的 <em><code><em>vmlinux</em></code></em> 就在当前目录下</em></p>
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778173642660-8fd31c04-6eb8-42ac-8a4e-d78d0e796283-000481.png" alt="1778173642660-8fd31c04-6eb8-42ac-8a4e-d78d0e796283.png"></p>
+<h4 id="编译-BusyBox-提供基础命令"><a href="#编译-BusyBox-提供基础命令" class="headerlink" title="编译 BusyBox (提供基础命令)"></a>编译 BusyBox (提供基础命令)</h4><p>内核只是个引擎，还需要 <code>ls</code>, <code>cd</code>, <code>sh</code> 这些基础命令，由 BusyBox 提供。</p>
+<ol>
+<li>下载并解压：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https://busybox.net/downloads/busybox-1.34.1.tar.bz2</span><br><span class="line">tar -jxf busybox-1.34.1.tar.bz2</span><br><span class="line"><span class="built_in">cd</span> busybox-1.34.1</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/79r518mqbSFYeDbv/1778173781375-0136a59f-f9d0-430a-9f98-69ef639aaa15-070394.png" alt="1778173781375-0136a59f-f9d0-430a-9f98-69ef639aaa15.png"></p>
+<h4 id="配置静态编译：输入-make-menuconfig。"><a href="#配置静态编译：输入-make-menuconfig。" class="headerlink" title="配置静态编译：输入 make menuconfig。"></a>配置静态编译：输入 <code>make menuconfig</code>。</h4><ul>
+<li>进入 <code>Settings</code>，勾选 <code>Build static binary (no shared libs)</code>。</li>
+<li>（可选）在 <code>Linux System Utilities</code> 中取消选中 <code>Support mounting NFS...</code>。</li>
+<li>保存并退出。</li>
+</ul>
+<p>我现在的 kernelpwn 环境完整吗</p>
+<hr>
+<p>参考资料：<a target="_blank" rel="noopener" href="https://collectcrop.github.io/blog/2025/02/22/kernel-pwn%E5%88%9D%E6%8E%A2/#kernel-rop">https://collectcrop.github.io/blog/2025/02/22/kernel-pwn%E5%88%9D%E6%8E%A2/#kernel-rop</a></p>
+<blockquote>
+<p>更新: 2026-05-08 01:58:24<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/zawntpmoci7rqq3c">https://www.yuque.com/idcm/wnemg9/zawntpmoci7rqq3c</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="初识 KernelPWN" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/" aria-label="前一篇: 初识 KernelPWN" title="前一篇: 初识 KernelPWN"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            初识 KernelPWN
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="mini-mqtt" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/mini-mqtt/" aria-label="后一篇: mini-mqtt"  title="后一篇: mini-mqtt"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          mini-mqtt
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Kernel-PWN"><span class="toc-number">1.</span> <span class="toc-text">Kernel PWN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3%E5%86%85%E6%A0%B8%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">如何理解内核：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%BA%A7%E4%BF%9D%E6%8A%A4%E5%9F%9F%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">分级保护域：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E5%88%87%E6%8D%A2%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">状态切换：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%88%86%E5%B8%83%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">虚拟内存分布：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">进程权限管理：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#KernelPWN-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%9A"><span class="toc-number">1.6.</span> <span class="toc-text">KernelPWN 环境搭建：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%AB%98%E7%BA%A7%E8%B0%83%E8%AF%95%E5%99%A8-GEF"><span class="toc-number">1.6.1.</span> <span class="toc-text">配置高级调试器 (GEF)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD%E5%B9%B6%E7%BC%96%E8%AF%91%E7%BA%AF%E5%87%80%E7%89%88%E5%86%85%E6%A0%B8"><span class="toc-number">1.6.2.</span> <span class="toc-text">下载并编译纯净版内核</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91%E9%80%89%E9%A1%B9-%E6%9E%81%E5%BA%A6%E5%85%B3%E9%94%AE"><span class="toc-number">1.6.3.</span> <span class="toc-text">配置内核编译选项 (极度关键)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-config"><span class="toc-number">1.6.4.</span> <span class="toc-text">修改.config</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E9%9D%99%E9%BB%98%E6%9B%BF%E6%8D%A2"><span class="toc-number">1.6.5.</span> <span class="toc-text">执行静默替换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E5%86%85%E6%A0%B8-%E9%9C%80%E8%A6%81%E5%87%A0%E5%8D%81%E5%88%86%E9%92%9F%EF%BC%8C%E8%A7%86%E7%94%B5%E8%84%91%E6%80%A7%E8%83%BD%E8%80%8C%E5%AE%9A"><span class="toc-number">1.6.6.</span> <span class="toc-text">编译内核(需要几十分钟，视电脑性能而定)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E8%AF%91-BusyBox-%E6%8F%90%E4%BE%9B%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4"><span class="toc-number">1.6.7.</span> <span class="toc-text">编译 BusyBox (提供基础命令)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%EF%BC%9A%E8%BE%93%E5%85%A5-make-menuconfig%E3%80%82"><span class="toc-number">1.6.8.</span> <span class="toc-text">配置静态编译：输入 make menuconfig。</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "Kernel PWN",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/KernelPWN/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "Kernel PWN如何理解内核：操作系统内核（Operation System Kernel）本质上也是一种软件，可以看作是普通应用程式与硬件之间的一层中间层，其主要作用便是调度系统资源、控制 IO 设备、操作网络与文件系统等，并为上层应用提供便捷、抽象的应用接口。操作系统内核实际上是我们抽象出来的一个概念，本质上与用户进程一般无二，都是位于物理内存中的代码 + 数据，不同之处在于当 CPU 执行操作系统内核代码时通常运行在高权限，拥有着完全的硬件访问能力，而 CPU 在执行用户态代码时通常运",
+          date: "Sat May 23 2026 02:46:55 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

