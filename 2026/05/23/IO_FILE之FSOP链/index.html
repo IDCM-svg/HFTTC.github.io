@@ -1,0 +1,609 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    __IO_FILE之FSOP链 | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="__IO_FILE之FSOP链参考资料： https:&#x2F;&#x2F;blog.csdn.net&#x2F;KaliLinux_V&#x2F;article&#x2F;details&#x2F;146547239?utm_medium&#x3D;distribute.pc_relevant.none-task-blog-2defaultbaidujs_baidulandingword~default-0-1465472">
+<meta property="og:type" content="article">
+<meta property="og:title" content="__IO_FILE之FSOP链">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/IO_FILE%E4%B9%8BFSOP%E9%93%BE/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="__IO_FILE之FSOP链参考资料： https:&#x2F;&#x2F;blog.csdn.net&#x2F;KaliLinux_V&#x2F;article&#x2F;details&#x2F;146547239?utm_medium&#x3D;distribute.pc_relevant.none-task-blog-2defaultbaidujs_baidulandingword~default-0-1465472">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/aSFYj8s_nV6qGA3N/1774932265790-1f627b7b-cd61-4899-8034-8f91362626a7-976955.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/aSFYj8s_nV6qGA3N/1774932282286-e50324e1-a33e-4a08-b3f2-2c67d82e1a94-656579.png">
+<meta property="article:published_time" content="2026-05-22T18:45:36.000Z">
+<meta property="article:modified_time" content="2026-05-22T18:58:43.332Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/aSFYj8s_nV6qGA3N/1774932265790-1f627b7b-cd61-4899-8034-8f91362626a7-976955.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/categories">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">分类</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="__IO_FILE之FSOP链">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">__IO_FILE之FSOP链</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IO-FILE%E4%B9%8BFSOP%E9%93%BE"><span class="toc-number">1.</span> <span class="toc-text">__IO_FILE之FSOP链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#FSOP-%E9%93%BE%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">FSOP 链执行过程：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#IO-flush-all-lockp%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.1.</span> <span class="toc-text">_IO_flush_all_lockp函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#init-malloc%E5%87%BD%E6%95%B0%E4%B8%AD%E9%83%A8%E5%88%86"><span class="toc-number">1.1.2.</span> <span class="toc-text">__init_malloc函数中部分</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#malloc-printerr%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.3.</span> <span class="toc-text">malloc_printerr函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#libc-message%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.4.</span> <span class="toc-text">__libc_message函数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#about-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">about 函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fllush-%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.</span> <span class="toc-text">fllush 函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IO-flush-all-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">__IO_flush_all 函数：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">125</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-IO_FILE之FSOP链" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-05-22T18:45:36.000Z" itemprop="datePublished">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-05-23</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-05-22T18:58:43.332Z" itemprop="dateModified">2026-05-23</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <h1 id="IO-FILE之FSOP链"><a href="#IO-FILE之FSOP链" class="headerlink" title="__IO_FILE之FSOP链"></a>__IO_FILE之FSOP链</h1><p>参考资料：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/KaliLinux_V/article/details/146547239?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-146547239-blog-115327308.235%5Ev43%5Epc_blog_bottom_relevance_base4&spm=1001.2101.3001.4242.1&utm_relevant_index=2">https://blog.csdn.net/KaliLinux_V&#x2F;article&#x2F;details&#x2F;146547239?utm_medium&#x3D;distribute.pc_relevant.none-task-blog-2<del>default</del>baidujs_baidulandingword~default-0-146547239-blog-115327308.235^v43^pc_blog_bottom_relevance_base4&amp;spm&#x3D;1001.2101.3001.4242.1&amp;utm_relevant_index&#x3D;2</a></p>
+<h4 id="FSOP-链执行过程："><a href="#FSOP-链执行过程：" class="headerlink" title="FSOP 链执行过程："></a>FSOP 链执行过程：</h4><p><em><strong>FSOP <strong>__</strong><font style="color:rgb(77, 77, 77);">Stream Oriented Programming. </font></strong></em><font style="color:rgb(77, 77, 77);">是</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">针对 glibc 标准 IO 流（_IO_FILE 结构体）的堆漏洞利用技术</font><font style="color:rgb(77, 77, 77);">，核心是通过篡改文件流（</font><font style="color:rgb(0, 0, 0);background-color:rgba(0, 0, 0, 0);">stdin&#x2F;stdout&#x2F;stderr</font><font style="color:rgb(77, 77, 77);"> 等）的结构体数据，劫持程序执行流，实现任意代码执行。  </font></p>
+<p><font style="color:rgb(77, 77, 77);">我们通对 __IO_FILE 的学习可以知道：进程内所有的 __IO_FILE 结构会使用 chain 域互相连接形成一个链表，这个链表的头部由 __IO_list_all 维护</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; p _IO_list_all-&gt;file._chain</span><br><span class="line">$<span class="number">5</span> = (<span class="keyword">struct</span> _IO_FILE *) <span class="number">0x7ffff7dd2620</span> &lt;_IO_2_1_stdout_&gt;</span><br><span class="line">pwndbg&gt; p _IO_list_all-&gt;file._chain._chain</span><br><span class="line">$<span class="number">6</span> = (<span class="keyword">struct</span> _IO_FILE *) <span class="number">0x7ffff7dd18e0</span> &lt;_IO_2_1_stdin_&gt;</span><br><span class="line">pwndbg&gt; p _IO_list_all-&gt;file._chain._chain._chain</span><br><span class="line">$<span class="number">7</span> = (<span class="keyword">struct</span> _IO_FILE *) <span class="number">0x0</span></span><br></pre></td></tr></table></figure>
+
+<p>FSOP 的核心思想就是劫持_IO_list_all 的值来伪造链表和其中的_IO_FILE 项，但是单纯的伪造只是构造了数据还需要某种方法进行触发。FSOP 选择的触发方法是调用_IO_flush_all_lockp，这个函数会刷新_IO_list_all 链表中所有项的文件流，相当于对每个 FILE 调用 fflush，也对应着会调用_IO_FILE_plus.vtable 中的_IO_overflow</p>
+<h5 id="IO-flush-all-lockp函数"><a href="#IO-flush-all-lockp函数" class="headerlink" title="_IO_flush_all_lockp函数"></a><font style="color:rgb(79, 79, 79);">_IO_flush_all_lockp函数</font></h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span></span><br><span class="line">_IO_flush_all_lockp (<span class="type">int</span> do_lock) <span class="comment">//这是一个内部函数，用于刷新所有已打开的文件流。do_lock 参数用于控制是否在刷新时对文件流加锁</span></span><br><span class="line">&#123;</span><br><span class="line">  ...</span><br><span class="line">  fp = (_IO_FILE *) _IO_list_all;<span class="comment">//fp 是一个指向 __IO_FILE 结构的指针，用于遍历链表</span></span><br><span class="line">  <span class="keyword">while</span> (fp != <span class="literal">NULL</span>)	<span class="comment">//这个循环遍历链表中的每一个文件流，直到链表结束</span></span><br><span class="line">  &#123;</span><br><span class="line">       ...</span><br><span class="line">       <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base))</span><br><span class="line">           <span class="comment">//检查文件流的模式。如果 _mode 小于或等于 0，表示这是一个输出流或以写模式打开的文件。检查输出缓冲区中是否有未写入的数据</span></span><br><span class="line">               &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)	<span class="comment">//调用 _IO_OVERFLOW 函数来刷新缓冲区。如果刷新失败（返回 EOF）</span></span><br><span class="line">           &#123;</span><br><span class="line">               result = EOF;</span><br><span class="line">          &#125;</span><br><span class="line">        ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(78, 161, 219) !important;">在 malloc</font><font style="color:rgb(77, 77, 77);"> </font><font style="color:#000000;">时 unsorted bin出错会调用malloc_printerr 输出错误：</font></p>
+<h5 id="init-malloc函数中部分"><a href="#init-malloc函数中部分" class="headerlink" title="__init_malloc函数中部分"></a><font style="color:#000000;">__init_malloc函数中部分</font></h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">_int_malloc (mstate av, <span class="type">size_t</span> bytes)	<span class="comment">//这是 malloc 的内部函数，用于从内存池中分配内存.</span></span><br><span class="line">    .........							<span class="comment">//av 是一个指向内存分配状态（mstate）的指针，表示当前的内存分配区</span></span><br><span class="line">    .........							<span class="comment">//bytes 是请求分配的内存大小。</span></span><br><span class="line">    .........</span><br><span class="line"><span class="keyword">for</span> (;; )	<span class="comment">//这是一个无限循环</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">int</span> iters = <span class="number">0</span>;	<span class="comment">//是一个计数器，用于限制循环的次数，防止无限循环</span></span><br><span class="line">      <span class="keyword">while</span> ((victim = unsorted_chunks (av)-&gt;bk) != unsorted_chunks (av)) <span class="comment">//这个循环遍历未排序的 chunk链表</span></span><br><span class="line">          <span class="comment">//unsorted_chunks(av)返回未排序 chunk 链表的头部</span></span><br><span class="line">          <span class="comment">//victim 是当前正在检查的 chunk。</span></span><br><span class="line">		  <span class="comment">//bk 是 chunk 的后向指针，指向链表中的下一个 chunk</span></span><br><span class="line">        &#123;																			</span><br><span class="line">          bck = victim-&gt;bk;</span><br><span class="line">          <span class="comment">//__builtin_expect 是 GCC 的一个内置函数，用于优化条件判断，提示编译器哪个条件更有可能为真。</span></span><br><span class="line">          <span class="keyword">if</span> (__builtin_expect (victim-&gt;size &lt;= <span class="number">2</span> * SIZE_SZ, <span class="number">0</span>)		<span class="comment">//检查当前 chunk 的大小是否有效</span></span><br><span class="line">              || __builtin_expect (victim-&gt;size &gt; av-&gt;system_mem, <span class="number">0</span>))	<span class="comment">//检查 chunk 的大小是否超过了系统内存的大小，这也是无效的。</span></span><br><span class="line">            malloc_printerr (check_action, <span class="string">&quot;malloc(): memory corruption&quot;</span>,</span><br><span class="line">                             chunk2mem (victim), av);</span><br><span class="line">          <span class="comment">//如果 chunk 的大小无效，调用 malloc_printerr 函数报告内存损坏错误</span></span><br><span class="line">          size = chunksize (victim);</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如果 chunk 的大小无效，调用 malloc_printerr 函数报告内存损坏<font style="color:#000000;">错误</font></p>
+<h5 id="malloc-printerr函数"><a href="#malloc-printerr函数" class="headerlink" title="malloc_printerr函数"></a><font style="color:#000000;">malloc_printerr函数</font></h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">malloc_printerr (<span class="type">int</span> action, <span class="type">const</span> <span class="type">char</span> *str, <span class="type">void</span> *ptr, mstate ar_ptr)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    action：表示错误的处理方式（如打印错误信息、终止程序等）。</span></span><br><span class="line"><span class="comment">    str：错误信息字符串，描述错误的类型。</span></span><br><span class="line"><span class="comment">    ptr：指向发生错误的内存地址。</span></span><br><span class="line"><span class="comment">	ar_ptr：指向内存分配区（mstate）的指针</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">    </span><br><span class="line">  <span class="comment">/* Avoid using this arena in future.  We do not attempt to synchronize this</span></span><br><span class="line"><span class="comment">     with anything else because we minimally want to ensure that __libc_message</span></span><br><span class="line"><span class="comment">     gets its resources safely without stumbling on the current corruption.  */</span></span><br><span class="line">  <span class="keyword">if</span> (ar_ptr)</span><br><span class="line">    set_arena_corrupt (ar_ptr); 	<span class="comment">//如果 ar_ptr 不为空，调用 set_arena_corrupt 函数将该内存分配区标记为损坏</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> ((action &amp; <span class="number">5</span>) == <span class="number">5</span>)</span><br><span class="line">    __libc_message (action &amp; <span class="number">2</span>, <span class="string">&quot;%s\n&quot;</span>, str);	<span class="comment">//检查action 的低三位是否为 5(101)调用 __libc_message 函数打印错误信息。</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (action &amp; <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/*</span></span><br><span class="line"><span class="comment">      如果 action 的最低位为 1，表示需要打印详细的错误信息。构造一个包含错误地址的字符串：buf 是一个缓冲区，用于存储格式化后的地址</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">      <span class="type">char</span> buf[<span class="number">2</span> * <span class="keyword">sizeof</span> (<span class="type">uintptr_t</span>) + <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">      buf[<span class="keyword">sizeof</span> (buf) - <span class="number">1</span>] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">      <span class="type">char</span> *cp = _itoa_word ((<span class="type">uintptr_t</span>) ptr, &amp;buf[<span class="keyword">sizeof</span> (buf) - <span class="number">1</span>], <span class="number">16</span>, <span class="number">0</span>);</span><br><span class="line">      <span class="comment">//__itoa_word 将指针 ptr 转换为十六进制字符串</span></span><br><span class="line">      <span class="keyword">while</span> (cp &gt; buf)</span><br><span class="line">        *--cp = <span class="string">&#x27;0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">      __libc_message (action &amp; <span class="number">2</span>, <span class="string">&quot;*** Error in `%s&#x27;: %s: 0x%s ***\n&quot;</span>,</span><br><span class="line">                      __libc_argv[<span class="number">0</span>] ? : <span class="string">&quot;&lt;unknown&gt;&quot;</span>, str, cp);	<span class="comment">//__libc_argv[0]是程序的名称,为空则用&lt;unknown&gt;。</span></span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (action &amp; <span class="number">2</span>)</span><br><span class="line">    <span class="built_in">abort</span> ();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(77, 77, 77);">跟进__libc_message函数，最后也调用了abort函数：</font></p>
+<h5 id="libc-message函数"><a href="#libc-message函数" class="headerlink" title="__libc_message函数"></a><font style="color:#000000;">__libc_message函数</font></h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Abort with an error message.  */</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line">__libc_message (<span class="type">int</span> do_abort, <span class="type">const</span> <span class="type">char</span> *fmt, ...)</span><br><span class="line">&#123;</span><br><span class="line">  va_list ap;</span><br><span class="line">  <span class="type">int</span> fd = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">  va_start (ap, fmt);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> FATAL_PREPARE</span></span><br><span class="line">  FATAL_PREPARE;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Open a descriptor for /dev/tty unless the user explicitly</span></span><br><span class="line"><span class="comment">     requests errors on standard error.  */</span></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *on_2 = __libc_secure_getenv (<span class="string">&quot;LIBC_FATAL_STDERR_&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> (on_2 == <span class="literal">NULL</span> || *on_2 == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">    fd = open_not_cancel_2 (_PATH_TTY, O_RDWR | O_NOCTTY | O_NDELAY);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (fd == <span class="number">-1</span>)</span><br><span class="line">    fd = STDERR_FILENO;</span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">str_list</span> *<span class="title">list</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">  <span class="type">int</span> nlist = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *cp = fmt;</span><br><span class="line">  <span class="keyword">while</span> (*cp != <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">/* Find the next &quot;%s&quot; or the end of the string.  */</span></span><br><span class="line">      <span class="type">const</span> <span class="type">char</span> *next = cp;</span><br><span class="line">      <span class="keyword">while</span> (next[<span class="number">0</span>] != <span class="string">&#x27;%&#x27;</span> || next[<span class="number">1</span>] != <span class="string">&#x27;s&#x27;</span>)</span><br><span class="line">	&#123;</span><br><span class="line">	  next = __strchrnul (next + <span class="number">1</span>, <span class="string">&#x27;%&#x27;</span>);</span><br><span class="line"></span><br><span class="line">	  <span class="keyword">if</span> (next[<span class="number">0</span>] == <span class="string">&#x27;\0&#x27;</span>)</span><br><span class="line">	    <span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* Determine what to print.  */</span></span><br><span class="line">      <span class="type">const</span> <span class="type">char</span> *str;</span><br><span class="line">      <span class="type">size_t</span> len;</span><br><span class="line">      <span class="keyword">if</span> (cp[<span class="number">0</span>] == <span class="string">&#x27;%&#x27;</span> &amp;&amp; cp[<span class="number">1</span>] == <span class="string">&#x27;s&#x27;</span>)</span><br><span class="line">	&#123;</span><br><span class="line">	  str = va_arg (ap, <span class="type">const</span> <span class="type">char</span> *);</span><br><span class="line">	  len = <span class="built_in">strlen</span> (str);</span><br><span class="line">	  cp += <span class="number">2</span>;</span><br><span class="line">	&#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">	  str = cp;</span><br><span class="line">	  len = next - cp;</span><br><span class="line">	  cp = next;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">      <span class="class"><span class="keyword">struct</span> <span class="title">str_list</span> *<span class="title">newp</span> =</span> alloca (<span class="keyword">sizeof</span> (<span class="keyword">struct</span> str_list));</span><br><span class="line">      newp-&gt;str = str;</span><br><span class="line">      newp-&gt;len = len;</span><br><span class="line">      newp-&gt;next = <span class="built_in">list</span>;</span><br><span class="line">      <span class="built_in">list</span> = newp;</span><br><span class="line">      ++nlist;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="type">bool</span> written = <span class="literal">false</span>;</span><br><span class="line">  <span class="keyword">if</span> (nlist &gt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="class"><span class="keyword">struct</span> <span class="title">iovec</span> *<span class="title">iov</span> =</span> alloca (nlist * <span class="keyword">sizeof</span> (<span class="keyword">struct</span> iovec));</span><br><span class="line">      <span class="type">ssize_t</span> total = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">for</span> (<span class="type">int</span> cnt = nlist - <span class="number">1</span>; cnt &gt;= <span class="number">0</span>; --cnt)</span><br><span class="line">	&#123;</span><br><span class="line">	  iov[cnt].iov_base = (<span class="type">char</span> *) <span class="built_in">list</span>-&gt;str;</span><br><span class="line">	  iov[cnt].iov_len = <span class="built_in">list</span>-&gt;len;</span><br><span class="line">	  total += <span class="built_in">list</span>-&gt;len;</span><br><span class="line">	  <span class="built_in">list</span> = <span class="built_in">list</span>-&gt;next;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">      written = WRITEV_FOR_FATAL (fd, iov, nlist, total);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (do_abort)</span><br><span class="line">	&#123;</span><br><span class="line">	  total = ((total + <span class="number">1</span> + GLRO(dl_pagesize) - <span class="number">1</span>)</span><br><span class="line">		   &amp; ~(GLRO(dl_pagesize) - <span class="number">1</span>));</span><br><span class="line">	  <span class="class"><span class="keyword">struct</span> <span class="title">abort_msg_s</span> *<span class="title">buf</span> =</span> __mmap (<span class="literal">NULL</span>, total,</span><br><span class="line">					    PROT_READ | PROT_WRITE,</span><br><span class="line">					    MAP_ANON | MAP_PRIVATE, <span class="number">-1</span>, <span class="number">0</span>);</span><br><span class="line">	  <span class="keyword">if</span> (__glibc_likely (buf != MAP_FAILED))</span><br><span class="line">	    &#123;</span><br><span class="line">	      buf-&gt;size = total;</span><br><span class="line">	      <span class="type">char</span> *wp = buf-&gt;msg;</span><br><span class="line">	      <span class="keyword">for</span> (<span class="type">int</span> cnt = <span class="number">0</span>; cnt &lt; nlist; ++cnt)</span><br><span class="line">		wp = mempcpy (wp, iov[cnt].iov_base, iov[cnt].iov_len);</span><br><span class="line">	      *wp = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">	      <span class="comment">/* We have to free the old buffer since the application might</span></span><br><span class="line"><span class="comment">		 catch the SIGABRT signal.  */</span></span><br><span class="line">	      <span class="class"><span class="keyword">struct</span> <span class="title">abort_msg_s</span> *<span class="title">old</span> =</span> atomic_exchange_acq (&amp;__abort_msg,</span><br><span class="line">							     buf);</span><br><span class="line">	      <span class="keyword">if</span> (old != <span class="literal">NULL</span>)</span><br><span class="line">		__munmap (old, old-&gt;size);</span><br><span class="line">	    &#125;</span><br><span class="line">	&#125;</span><br><span class="line">    &#125;</span><br><span class="line">  va_end (ap);</span><br><span class="line">  <span class="keyword">if</span> (do_abort)</span><br><span class="line">    &#123;</span><br><span class="line">      BEFORE_ABORT (do_abort, written, fd);</span><br><span class="line"></span><br><span class="line">      <span class="comment">/* Kill the application.  */</span></span><br><span class="line">      <span class="built_in">abort</span> ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#000000;">跟进abort函数，其中调用了</font><a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=fflush&spm=1001.2101.3001.7020"><font style="color:#000000;">fflush</font></a><font style="color:#000000;">函数：</font></p>
+<h4 id="about-函数："><a href="#about-函数：" class="headerlink" title="about 函数："></a>about 函数：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Cause an abnormal program termination with core-dump.  */</span></span><br><span class="line"><span class="type">void</span></span><br><span class="line"><span class="title function_">abort</span> <span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> <span class="title">sigaction</span> <span class="title">act</span>;</span></span><br><span class="line">  <span class="type">sigset_t</span> sigs;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* First acquire the lock.  */</span></span><br><span class="line">  __libc_lock_lock_recursive (lock);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Now it&#x27;s for sure we are alone.  But recursive calls are possible.  */</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Unlock SIGABRT.  */</span></span><br><span class="line">  <span class="keyword">if</span> (stage == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      ++stage;</span><br><span class="line">      <span class="keyword">if</span> (__sigemptyset (&amp;sigs) == <span class="number">0</span> &amp;&amp;</span><br><span class="line">	  __sigaddset (&amp;sigs, SIGABRT) == <span class="number">0</span>)</span><br><span class="line">	__sigprocmask (SIG_UNBLOCK, &amp;sigs, (<span class="type">sigset_t</span> *) <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* Flush all streams.  We cannot close them now because the user</span></span><br><span class="line"><span class="comment">     might have registered a handler for SIGABRT.  */</span></span><br><span class="line">  <span class="keyword">if</span> (stage == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">      ++stage;</span><br><span class="line">      fflush (<span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line">······</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#000000;">跟进fflush函数，fflush是一个宏定义，调用了IO_fflush函数，且参数是NULL</font></p>
+<h4 id="fllush-函数"><a href="#fllush-函数" class="headerlink" title="fllush 函数"></a><font style="color:#000000;">fllush 函数</font></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span></span><br><span class="line">_IO_fflush (_IO_FILE *fp)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (fp == <span class="literal">NULL</span>)</span><br><span class="line">    <span class="keyword">return</span> _IO_flush_all ();</span><br><span class="line">  <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">int</span> result;</span><br><span class="line">      CHECK_FILE (fp, EOF);</span><br><span class="line">      _IO_acquire_lock (fp);</span><br><span class="line">      result = _IO_SYNC (fp) ? EOF : <span class="number">0</span>;</span><br><span class="line">      _IO_release_lock (fp);</span><br><span class="line">      <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(77, 77, 77);">继续跟进IO_fflush(NULL)，由于传入的参数为NULL，所以会调用_IO_flush_all函数:</font></p>
+<h4 id="IO-flush-all-函数："><a href="#IO-flush-all-函数：" class="headerlink" title="__IO_flush_all 函数："></a><font style="color:#000000;">__IO_flush_all 函数：</font></h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span></span><br><span class="line">_IO_flush_all (<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">/* We want locking.  */</span></span><br><span class="line">  <span class="keyword">return</span> _IO_flush_all_lockp (<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#000000;">_IO_flush_all_lockp调用了_IO_flush_all_lockp(1)：</font></p>
+<p><strong><font style="color:rgb(77, 77, 77);">跟进_IO_flush_all_lockp(1)，而 _IO_flush_all_lockp就是这条FILE终点:</font></strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span></span><br><span class="line">_IO_flush_all_lockp (<span class="type">int</span> do_lock)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">int</span> result = <span class="number">0</span>;</span><br><span class="line">  <span class="class"><span class="keyword">struct</span> _<span class="title">IO_FILE</span> *<span class="title">fp</span>;</span></span><br><span class="line">  <span class="type">int</span> last_stamp;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _IO_MTSAFE_IO</span></span><br><span class="line">  __libc_cleanup_region_start (do_lock, flush_cleanup, <span class="literal">NULL</span>);</span><br><span class="line">  <span class="keyword">if</span> (do_lock)</span><br><span class="line">    _IO_lock_lock (list_all_lock);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  last_stamp = _IO_list_all_stamp;</span><br><span class="line">  fp = (_IO_FILE *) _IO_list_all;<span class="comment">//这里fp取到了_IO_list_all 这里fp直接指向了_IO_2_1_stderr_首地址</span></span><br><span class="line">  <span class="keyword">while</span> (fp != <span class="literal">NULL</span>)<span class="comment">//进入循环</span></span><br><span class="line">    &#123;</span><br><span class="line">      run_fp = fp;</span><br><span class="line">      <span class="keyword">if</span> (do_lock)</span><br><span class="line">	_IO_flockfile (fp);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (((fp-&gt;_mode &lt;= <span class="number">0</span> &amp;&amp; fp-&gt;_IO_write_ptr &gt; fp-&gt;_IO_write_base)</span><br><span class="line"><span class="meta">#<span class="keyword">if</span> defined _LIBC || defined _GLIBCPP_USE_WCHAR_T</span></span><br><span class="line">	   || (_IO_vtable_offset (fp) == <span class="number">0</span></span><br><span class="line">	       &amp;&amp; fp-&gt;_mode &gt; <span class="number">0</span> &amp;&amp; (fp-&gt;_wide_data-&gt;_IO_write_ptr</span><br><span class="line">				    &gt; fp-&gt;_wide_data-&gt;_IO_write_base))</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	   )</span><br><span class="line">	  &amp;&amp; _IO_OVERFLOW (fp, EOF) == EOF)<span class="comment">//这里经过前面的判断后调用了_IO_OVERFLOW(fp,EOF)</span></span><br><span class="line">	result = EOF;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (do_lock)</span><br><span class="line">	_IO_funlockfile (fp);</span><br><span class="line">      run_fp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> (last_stamp != _IO_list_all_stamp)</span><br><span class="line">	&#123;</span><br><span class="line">	  <span class="comment">/* Something was added to the list.  Start all over again.  */</span></span><br><span class="line">	  fp = (_IO_FILE *) _IO_list_all;</span><br><span class="line">	  last_stamp = _IO_list_all_stamp;</span><br><span class="line">	&#125;</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">	fp = fp-&gt;_chain;<span class="comment">//这里使用FILE结构中的_chain来更新fp，直到fp为空才退出循环，所以会刷新_IO_list_all 链表中所有项的文件流</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _IO_MTSAFE_IO</span></span><br><span class="line">  <span class="keyword">if</span> (do_lock)</span><br><span class="line">    _IO_lock_unlock (list_all_lock);</span><br><span class="line">  __libc_cleanup_region_end (<span class="number">0</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:#000000;">查看_IO_OVERFLOW(fp, EOF)定义，以及最后的</font></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//libc_2.23 的定义</span></span><br><span class="line">define _IO_OVERFLOW(FP, CH) JUMP1 (__overflow, FP, CH)</span><br><span class="line">    <span class="comment">//调用 JUMP1 宏，传入 __overflow 函数指针、FILE 结构体指针 FP 和字符 CH</span></span><br><span class="line">define <span class="title function_">JUMP1</span><span class="params">(FUNC, THIS, X1)</span> <span class="params">(_IO_JUMPS_FUNC(THIS)-&gt;FUNC)</span> <span class="params">(THIS, X1)</span></span><br><span class="line">    <span class="comment">//通过 _IO_JUMPS_FUNC(THIS) 获取虚表指针，然后调用虚表中的 FUNC 函数。</span></span><br><span class="line">define _<span class="title function_">IO_JUMPS_FUNC</span><span class="params">(THIS)</span> <span class="params">(*(<span class="keyword">struct</span> _IO_jump_t **) ((<span class="type">void</span> *) &amp;_IO_JUMPS_FILE_plus (THIS) + (THIS)-&gt;_vtable_offset))</span></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    	获取 FILE 结构体的虚表偏移量 _vtable_offset。</span></span><br><span class="line"><span class="comment">		将 _IO_JUMPS_FILE_plus(THIS) 的地址转换为 void* 类型。</span></span><br><span class="line"><span class="comment">		加上 _vtable_offset 偏移量，得到虚表指针。</span></span><br><span class="line"><span class="comment">		解引用虚表指针，得到 struct _IO_jump_t 类型的虚表</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"><span class="comment">//结合传入的参数转化后如下：相当于调用了fp的__overflow函数</span></span><br><span class="line">define _<span class="title function_">IO_OVERFLOW</span><span class="params">(FP, CH)</span> <span class="title function_">JUMP1</span> <span class="params">(__overflow, FP, CH)</span></span><br><span class="line">define <span class="title function_">JUMP1</span><span class="params">(__overflow, FP, CH)</span> <span class="params">(_IO_JUMPS_FUNC(FP)-&gt;__overflow)</span> <span class="params">(FP, CH)</span></span><br><span class="line">define _<span class="title function_">IO_JUMPS_FUNC</span><span class="params">(FP)</span> <span class="params">(*(<span class="keyword">struct</span> _IO_jump_t **) ((<span class="type">void</span> *) &amp;_IO_JUMPS_FILE_plus (FP) + (FP)-&gt;_vtable_offset))</span></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"><span class="comment">//在libc_2.24后：_IO_JUMPS_FUNC的宏定义变化</span></span><br><span class="line">define <span class="title function_">JUMP1</span><span class="params">(FUNC, THIS, X1)</span> <span class="params">(_IO_JUMPS_FUNC(THIS)-&gt;FUNC)</span> <span class="params">(THIS, X1)</span></span><br><span class="line">define _<span class="title function_">IO_JUMPS_FUNC</span><span class="params">(THIS)</span> <span class="params">(IO_validate_vtable (_IO_JUMPS_FILE_plus (THIS)))</span></span><br><span class="line"><span class="comment">/*_IO_JUMPS_FUNC(THIS)：调用 IO_validate_vtable 函数，对虚表指针进行验证。IO_validate_vtable：验证虚表指针是否合法*/</span>    </span><br><span class="line"><span class="comment">/* Check if unknown vtable pointers are permitted; otherwise,</span></span><br><span class="line"><span class="comment">   terminate the process.  */</span></span><br><span class="line"><span class="type">void</span> _<span class="title function_">IO_vtable_check</span> <span class="params">(<span class="type">void</span>)</span> attribute_hidden; <span class="comment">//提前声明</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* Perform vtable pointer validation.  If validation fails, terminate</span></span><br><span class="line"><span class="comment">   the process.  */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">const</span> <span class="keyword">struct</span> _IO_jump_t *</span><br><span class="line"><span class="title function_">IO_validate_vtable</span> <span class="params">(<span class="type">const</span> <span class="keyword">struct</span> _IO_jump_t *vtable)</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">/* Fast path: The vtable pointer is within the __libc_IO_vtables</span></span><br><span class="line"><span class="comment">     section.  */</span></span><br><span class="line">  <span class="type">uintptr_t</span> section_length = __stop___libc_IO_vtables - __start___libc_IO_vtables;</span><br><span class="line">  <span class="type">const</span> <span class="type">char</span> *ptr = (<span class="type">const</span> <span class="type">char</span> *) vtable;</span><br><span class="line">  <span class="type">uintptr_t</span> offset = ptr - __start___libc_IO_vtables;</span><br><span class="line">  <span class="keyword">if</span> (__glibc_unlikely (offset &gt;= section_length))</span><br><span class="line">    <span class="comment">/* The vtable pointer is not in the expected section.  Use the</span></span><br><span class="line"><span class="comment">       slow path, which will terminate the process if necessary.  */</span></span><br><span class="line">    _IO_vtable_check ();</span><br><span class="line">  <span class="keyword">return</span> vtable;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> attribute_hidden _IO_vtable_check (<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> SHARED</span></span><br><span class="line">  <span class="comment">/* Honor the compatibility flag.  */</span></span><br><span class="line">  <span class="type">void</span> (*flag) (<span class="type">void</span>) = atomic_load_relaxed (&amp;IO_accept_foreign_vtables);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> PTR_DEMANGLE</span></span><br><span class="line">  PTR_DEMANGLE (flag);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">  <span class="keyword">if</span> (flag == &amp;_IO_vtable_check)</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* In case this libc copy is in a non-default namespace, we always</span></span><br><span class="line"><span class="comment">     need to accept foreign vtables because there is always a</span></span><br><span class="line"><span class="comment">     possibility that FILE * objects are passed across the linking</span></span><br><span class="line"><span class="comment">     boundary.  */</span></span><br><span class="line">  &#123;</span><br><span class="line">    Dl_info di;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">link_map</span> *<span class="title">l</span>;</span></span><br><span class="line">    <span class="keyword">if</span> (_dl_open_hook != <span class="literal">NULL</span></span><br><span class="line">        || (_dl_addr (_IO_vtable_check, &amp;di, &amp;l, <span class="literal">NULL</span>) != <span class="number">0</span></span><br><span class="line">            &amp;&amp; l-&gt;l_ns != LM_ID_BASE))</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">else</span> <span class="comment">/* !SHARED */</span></span></span><br><span class="line">  <span class="comment">/* We cannot perform vtable validation in the static dlopen case</span></span><br><span class="line"><span class="comment">     because FILE * handles might be passed back and forth across the</span></span><br><span class="line"><span class="comment">     boundary.  Therefore, we disable checking in this case.  */</span></span><br><span class="line">  <span class="keyword">if</span> (__dlopen != <span class="literal">NULL</span>)</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">  __libc_fatal (<span class="string">&quot;Fatal error: glibc detected an invalid stdio handle\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><font style="color:rgb(77, 77, 77);">最后找函数地址时，使用了_vtable_offset 即 _IO_FILE 结构体的 vtable 指针，而vtable 指针指向的是一个虚表，所以相当于最后调用到了下面的_IO_file_overflow函数，并且传入的参数是fp指针，即文件的地址</font></p>
+<p><img src="/HFTTC.github.io/images/pwn/aSFYj8s_nV6qGA3N/1774932265790-1f627b7b-cd61-4899-8034-8f91362626a7-976955.png" alt="1774932265790-1f627b7b-cd61-4899-8034-8f91362626a7.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/aSFYj8s_nV6qGA3N/1774932282286-e50324e1-a33e-4a08-b3f2-2c67d82e1a94-656579.png" alt="1774932282286-e50324e1-a33e-4a08-b3f2-2c67d82e1a94.png"></p>
+<p>所以最后IO_FILE链为：malloc报错 &#x3D;&#x3D;&gt; malloc_printerr &#x3D;&#x3D;&gt; __libc_message &#x3D;&#x3D;&gt; abort &#x3D;&#x3D;&gt; fflush &#x3D;&#x3D;&gt; IO_fflush &#x3D;&#x3D;&gt; _IO_flush_all &#x3D;&#x3D;&gt; _IO_flush_all_lockp &#x3D;&#x3D;&gt; _IO_OVERFLOW(最后使用vtable 指向的虚表中的指针)，</p>
+<p>最后在_IO_flush_all_lockp中时有两个判断条件需要绕过，才能调用到_IO_OVERFLOW ：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fp-&gt;_mode &lt;= <span class="number">0</span></span><br><span class="line">fp-&gt; _IO_write_ptr &gt; fp-&gt;_IO_write_base</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p>更新: 2026-03-31 12:54:08<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ryo4gboq4x7kmgmm">https://www.yuque.com/idcm/wnemg9/ryo4gboq4x7kmgmm</a></p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Orange glibc-2.23" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/index/" aria-label="前一篇: House of Orange glibc-2.23" title="前一篇: House of Orange glibc-2.23"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            House of Orange glibc-2.23
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__IO_FILE 结构分析" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/IO_FILE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/" aria-label="后一篇: __IO_FILE 结构分析"  title="后一篇: __IO_FILE 结构分析"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          __IO_FILE 结构分析
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        219.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        18:08
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IO-FILE%E4%B9%8BFSOP%E9%93%BE"><span class="toc-number">1.</span> <span class="toc-text">__IO_FILE之FSOP链</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#FSOP-%E9%93%BE%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">FSOP 链执行过程：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#IO-flush-all-lockp%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.1.</span> <span class="toc-text">_IO_flush_all_lockp函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#init-malloc%E5%87%BD%E6%95%B0%E4%B8%AD%E9%83%A8%E5%88%86"><span class="toc-number">1.1.2.</span> <span class="toc-text">__init_malloc函数中部分</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#malloc-printerr%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.3.</span> <span class="toc-text">malloc_printerr函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#libc-message%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.4.</span> <span class="toc-text">__libc_message函数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#about-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">about 函数：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#fllush-%E5%87%BD%E6%95%B0"><span class="toc-number">1.3.</span> <span class="toc-text">fllush 函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IO-flush-all-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">__IO_flush_all 函数：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">125</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">1</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/categories" aria-label="分类"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">分类</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "__IO_FILE之FSOP链",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/05/23/IO_FILE%E4%B9%8BFSOP%E9%93%BE/",
+          excerpt: "",
+          description: "",
+          stripContent: "__IO_FILE之FSOP链参考资料： https://blog.csdn.net/KaliLinux_V&amp;#x2F;article&amp;#x2F;details&amp;#x2F;146547239?utm_medium&amp;#x3D;distribute.pc_relevant.none-task-blog-2defaultbaidujs_baidulandingword~default-0-146547239-blog-115327308.235^v43^pc_blog_bottom_relevance",
+          date: "Sat May 23 2026 02:45:36 GMT+0800",
+          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
