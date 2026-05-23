@@ -302,14 +302,21 @@
       <section class="about-interaction-card" data-aos="fade-up">
         <div class="about-interaction-head">
           <h2>互动区</h2>
-          <p>这里的点赞和评论会保存在当前浏览器中。</p>
+          <p>这里可以直接前往 GitHub 给仓库点 Star，评论区仍然使用 GitHub Issues。</p>
         </div>
         <div class="about-like-row">
-          <button type="button" class="about-like-button" id="about-like-button" aria-label="点赞">
+          <a
+            class="about-like-button"
+            id="about-like-button"
+            href="https://github.com/IDCM-svg/HFTTC.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="前往 GitHub 仓库点 Star"
+          >
             <span class="about-like-icon">★</span>
-            <span id="about-like-text">给我点个赞</span>
-          </button>
-          <span class="about-like-count">当前点赞：<strong id="about-like-count">0</strong></span>
+            <span id="about-like-text">前往 GitHub 点 Star</span>
+          </a>
+          <span class="about-like-count">Star 后会在 GitHub 仓库中生效</span>
         </div>
         <div class="about-comment-box">
           <label class="about-comment-label">评论</label>
@@ -347,6 +354,7 @@
           border: 0;
           cursor: pointer;
           transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+          text-decoration: none;
         }
         .about-like-button:hover {
           transform: translateY(-1px);
@@ -388,35 +396,9 @@
       </style>
       <script>
         (() => {
-          const likeKey = 'about-page-liked';
-          const countKey = 'about-page-like-count';
           const likeButton = document.getElementById('about-like-button');
-          const likeCount = document.getElementById('about-like-count');
-          const likeText = document.getElementById('about-like-text');
           const commentHost = document.getElementById('about-comment-host');
-          if (!likeButton || !likeCount || !likeText || !commentHost) return;
-
-          const syncLikeState = () => {
-            const liked = localStorage.getItem(likeKey) === 'true';
-            const count = Number(localStorage.getItem(countKey) || '0');
-            likeButton.classList.toggle('is-liked', liked);
-            likeText.textContent = liked ? '已点赞' : '给我点个赞';
-            likeCount.textContent = String(count);
-          };
-
-          likeButton.addEventListener('click', () => {
-            const liked = localStorage.getItem(likeKey) === 'true';
-            let count = Number(localStorage.getItem(countKey) || '0');
-            if (liked) {
-              count = Math.max(0, count - 1);
-              localStorage.setItem(likeKey, 'false');
-            } else {
-              count += 1;
-              localStorage.setItem(likeKey, 'true');
-            }
-            localStorage.setItem(countKey, String(count));
-            syncLikeState();
-          });
+          if (!likeButton || !commentHost) return;
 
           const currentTheme = () => (
             document.documentElement.getAttribute('data-theme') === 'dark'
@@ -447,7 +429,6 @@
             );
           };
 
-          syncLikeState();
           loadUtterances();
           document.body.addEventListener('reimu:theme-set', syncUtterancesTheme);
         })();
