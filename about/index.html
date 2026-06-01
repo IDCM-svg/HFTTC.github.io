@@ -312,10 +312,18 @@
     </footer>
       <section class="about-trend-card" data-aos="fade-up">
         <div class="about-trend-head">
-          <h2>博客成长轨迹</h2>
-          <p>用累计文章数的上涨曲线，看整个博客的持续积累。</p>
+          <h2>访问趋势</h2>
+          <p>同一张图里展示访问量 PV 和访客量 UV，两条线分别用不同颜色区分。</p>
         </div>
         <div class="about-trend-metrics">
+          <div class="about-trend-metric">
+            <span>今日访问量</span>
+            <strong id="about-today-views">--</strong>
+          </div>
+          <div class="about-trend-metric">
+            <span>今日访客量</span>
+            <strong id="about-today-users">--</strong>
+          </div>
           <div class="about-trend-metric">
             <span>文章总数</span>
             <strong>126</strong>
@@ -324,10 +332,15 @@
             <span>分类数量</span>
             <strong>1</strong>
           </div>
-          <div class="about-trend-metric">
-            <span>当前累计</span>
-            <strong>126</strong>
-          </div>
+        </div>
+        <div class="about-trend-status" id="about-trend-status">正在读取统计数据...</div>
+        <div class="about-trend-legend">
+          <span class="about-trend-legend-item">
+            <i class="about-trend-dot about-trend-dot-views"></i>访问量 PV
+          </span>
+          <span class="about-trend-legend-item">
+            <i class="about-trend-dot about-trend-dot-users"></i>访客量 UV
+          </span>
         </div>
         <div class="about-trend-chart-wrap">
           <div class="about-trend-chart" id="about-trend-chart"></div>
@@ -399,6 +412,47 @@
         .about-trend-metric strong {
           font-size: 1.7rem;
           line-height: 1;
+        }
+        .about-trend-status {
+          margin-bottom: 1rem;
+          padding: 0.9rem 1rem;
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          font-size: 0.94rem;
+        }
+        .about-trend-status.is-error {
+          color: #ffd6d6;
+          background: rgba(255, 109, 109, 0.14);
+        }
+        .about-trend-status.is-ok {
+          color: #d6ffef;
+          background: rgba(92, 214, 159, 0.14);
+        }
+        .about-trend-legend {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin-bottom: 1rem;
+          font-size: 0.92rem;
+        }
+        .about-trend-legend-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          opacity: 0.86;
+        }
+        .about-trend-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+        .about-trend-dot-views {
+          background: #ff9f87;
+        }
+        .about-trend-dot-users {
+          background: #63b8ff;
         }
         .about-trend-chart-wrap {
           padding: 1rem;
@@ -477,36 +531,84 @@
       <script>
         (() => {
           const trendChart = document.getElementById('about-trend-chart');
-          const trendData = [{"label":"2026-05","count":1},{"label":"2026-05","count":19},{"label":"2026-05","count":37},{"label":"2026-05","count":55},{"label":"2026-05","count":72},{"label":"2026-05","count":90},{"label":"2026-05","count":108},{"label":"2026-06","count":126}];
-          if (trendChart && Array.isArray(trendData) && trendData.length) {
-            const width = 700;
-            const height = 240;
-            const padding = 26;
-            const max = Math.max(...trendData.map((item) => Number(item.count || 0)), 1);
-            const step = trendData.length > 1 ? (width - padding * 2) / (trendData.length - 1) : 0;
-            const points = trendData.map((item, index) => {
+          const trendStatus = document.getElementById('about-trend-status');
+          const todayViews = document.getElementById('about-today-views');
+          const todayUsers = document.getElementById('about-today-users');
+          const statsApi = "";
+
+          const setStatus = (message, state) => {
+            if (!trendStatus) return;
+            trendStatus.textContent = message;
+            trendStatus.classList.remove('is-error', 'is-ok');
+            if (state) trendStatus.classList.add(state);
+          };
+
+          const setMetric = (node, value) => {
+            if (node) node.textContent = value;
+          };
+
+          const buildLine = (values, width, height, padding, max) => {
+            const step = values.length > 1 ? (width - padding * 2) / (values.length - 1) : 0;
+            return values.map((item, index) => {
               const x = padding + index * step;
-              const y = height - padding - ((Number(item.count || 0) / max) * (height - padding * 2));
-              return { x, y, label: item.label, count: Number(item.count || 0) };
+              const y = height - padding - ((Number(item.value || 0) / max) * (height - padding * 2));
+              return { x, y, label: item.label, value: Number(item.value || 0) };
             });
-            const line = points.map((point) => `${point.x},${point.y}`).join(' ');
-            const area = `M ${padding} ${height - padding} L ${points.map((point) => `${point.x} ${point.y}`).join(' L ')} L ${width - padding} ${height - padding} Z`;
+          };
+
+          const renderTrend = (trend) => {
+            if (!trendChart) return;
+            if (!Array.isArray(trend) || !trend.length) {
+              trendChart.innerHTML = '<p>暂无统计趋势数据</p>';
+              return;
+            }
+            const width = 760;
+            const height = 260;
+            const padding = 30;
+            const max = Math.max(
+              ...trend.map((item) => Number(item.views || 0)),
+              ...trend.map((item) => Number(item.users || 0)),
+              1
+            );
+            const viewPoints = buildLine(trend.map((item) => ({ label: item.date, value: item.views })), width, height, padding, max);
+            const userPoints = buildLine(trend.map((item) => ({ label: item.date, value: item.users })), width, height, padding, max);
+            const makePolyline = (points) => points.map((point) => `${point.x},${point.y}`).join(' ');
+
             trendChart.innerHTML = `
-              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="博客成长折线图">
-                <defs>
-                  <linearGradient id="aboutTrendArea" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stop-color="#ff8a7a" stop-opacity="0.6"></stop>
-                    <stop offset="100%" stop-color="#ff8a7a" stop-opacity="0.04"></stop>
-                  </linearGradient>
-                </defs>
-                <path d="${area}" fill="url(#aboutTrendArea)"></path>
-                <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${line}"></polyline>
-                ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="#fff"></circle>`).join('')}
-                ${points.map((point) => `<text x="${point.x}" y="${point.y - 12}" text-anchor="middle" font-size="12" fill="#ffffff">${point.count}</text>`).join('')}
-                ${points.map((point) => `<text x="${point.x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${point.label}</text>`).join('')}
+              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="访问量和访客量折线图">
+                <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(viewPoints)}"></polyline>
+                <polyline fill="none" stroke="#63b8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(userPoints)}"></polyline>
+                ${viewPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#ff9f87"></circle>`).join('')}
+                ${userPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#63b8ff"></circle>`).join('')}
+                ${trend.map((item, index) => `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${item.date.slice(5)}</text>`).join('')}
               </svg>
             `;
-          }
+          };
+
+          const loadAboutTrend = async () => {
+            if (!statsApi) {
+              setStatus('还没配置统计接口。接上 Cloudflare Worker 后，这里会显示真实的访问量和访客量折线图。', 'is-error');
+              renderTrend([]);
+              return;
+            }
+            try {
+              setStatus('正在同步 Google Analytics 4 数据...', null);
+              const response = await fetch(statsApi.replace(/\/$/, '') + '/summary', {
+                headers: { Accept: 'application/json' },
+              });
+              if (!response.ok) throw new Error('HTTP ' + response.status);
+              const data = await response.json();
+              setMetric(todayViews, Number(data.today?.views || 0));
+              setMetric(todayUsers, Number(data.today?.users || 0));
+              renderTrend(data.trend || []);
+              setStatus(`最近更新：${data.generatedAt || '未知时间'}`, 'is-ok');
+            } catch (error) {
+              setStatus(`统计读取失败：${error.message}`, 'is-error');
+              renderTrend([]);
+            }
+          };
+
+          loadAboutTrend();
 
           const likeButton = document.getElementById('about-like-button');
           const commentHost = document.getElementById('about-comment-host');
