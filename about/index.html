@@ -312,8 +312,8 @@
     </footer>
       <section class="about-trend-card" data-aos="fade-up">
         <div class="about-trend-head">
-          <h2>博客更新轨迹</h2>
-          <p>用一张折线图看最近一段时间的写作节奏。</p>
+          <h2>博客成长轨迹</h2>
+          <p>用累计文章数的上涨曲线，看整个博客的持续积累。</p>
         </div>
         <div class="about-trend-metrics">
           <div class="about-trend-metric">
@@ -325,8 +325,8 @@
             <strong>1</strong>
           </div>
           <div class="about-trend-metric">
-            <span>本月更新</span>
-            <strong>1</strong>
+            <span>当前累计</span>
+            <strong>126</strong>
           </div>
         </div>
         <div class="about-trend-chart-wrap">
@@ -477,7 +477,7 @@
       <script>
         (() => {
           const trendChart = document.getElementById('about-trend-chart');
-          const trendData = [{"month":"2026-05","count":125},{"month":"2026-06","count":1}];
+          const trendData = [{"label":"2026-05","count":1},{"label":"2026-05","count":19},{"label":"2026-05","count":37},{"label":"2026-05","count":55},{"label":"2026-05","count":72},{"label":"2026-05","count":90},{"label":"2026-05","count":108},{"label":"2026-06","count":126}];
           if (trendChart && Array.isArray(trendData) && trendData.length) {
             const width = 700;
             const height = 240;
@@ -487,12 +487,12 @@
             const points = trendData.map((item, index) => {
               const x = padding + index * step;
               const y = height - padding - ((Number(item.count || 0) / max) * (height - padding * 2));
-              return { x, y, month: item.month, count: Number(item.count || 0) };
+              return { x, y, label: item.label, count: Number(item.count || 0) };
             });
             const line = points.map((point) => `${point.x},${point.y}`).join(' ');
             const area = `M ${padding} ${height - padding} L ${points.map((point) => `${point.x} ${point.y}`).join(' L ')} L ${width - padding} ${height - padding} Z`;
             trendChart.innerHTML = `
-              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="博客更新折线图">
+              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="博客成长折线图">
                 <defs>
                   <linearGradient id="aboutTrendArea" x1="0" x2="0" y1="0" y2="1">
                     <stop offset="0%" stop-color="#ff8a7a" stop-opacity="0.6"></stop>
@@ -503,7 +503,7 @@
                 <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${line}"></polyline>
                 ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="#fff"></circle>`).join('')}
                 ${points.map((point) => `<text x="${point.x}" y="${point.y - 12}" text-anchor="middle" font-size="12" fill="#ffffff">${point.count}</text>`).join('')}
-                ${points.map((point) => `<text x="${point.x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${point.month.slice(5)}</text>`).join('')}
+                ${points.map((point) => `<text x="${point.x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${point.label}</text>`).join('')}
               </svg>
             `;
           }
