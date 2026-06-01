@@ -593,7 +593,7 @@
             }
             try {
               setStatus('正在同步 Google Analytics 4 数据...', null);
-              const response = await fetch(statsApi.replace(/\/$/, '') + '/summary', {
+              const response = await fetch(statsApi, {
                 headers: { Accept: 'application/json' },
               });
               if (!response.ok) throw new Error('HTTP ' + response.status);
