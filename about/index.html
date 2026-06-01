@@ -310,6 +310,29 @@
     <footer class="article-footer">
       
     </footer>
+      <section class="about-trend-card" data-aos="fade-up">
+        <div class="about-trend-head">
+          <h2>博客更新轨迹</h2>
+          <p>用一张折线图看最近一段时间的写作节奏。</p>
+        </div>
+        <div class="about-trend-metrics">
+          <div class="about-trend-metric">
+            <span>文章总数</span>
+            <strong>126</strong>
+          </div>
+          <div class="about-trend-metric">
+            <span>分类数量</span>
+            <strong>1</strong>
+          </div>
+          <div class="about-trend-metric">
+            <span>本月更新</span>
+            <strong>1</strong>
+          </div>
+        </div>
+        <div class="about-trend-chart-wrap">
+          <div class="about-trend-chart" id="about-trend-chart"></div>
+        </div>
+      </section>
       <section class="about-interaction-card" data-aos="fade-up">
         <div class="about-interaction-head">
           <h2>互动区</h2>
@@ -336,6 +359,7 @@
         </div>
       </section>
       <style>
+        .about-trend-card,
         .about-interaction-card {
           margin-top: 2rem;
           padding: 1.5rem;
@@ -344,13 +368,51 @@
           background: linear-gradient(145deg, rgba(32, 44, 66, 0.92), rgba(18, 24, 38, 0.95));
           box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
         }
+        .about-trend-head h2,
         .about-interaction-head h2 {
           margin: 0 0 0.4rem;
         }
+        .about-trend-head p,
         .about-interaction-head p {
           margin: 0 0 1rem;
           opacity: 0.78;
           font-size: 0.95rem;
+        }
+        .about-trend-metrics {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 0.9rem;
+          margin-bottom: 1rem;
+        }
+        .about-trend-metric {
+          padding: 0.95rem 1rem;
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .about-trend-metric span {
+          display: block;
+          margin-bottom: 0.35rem;
+          font-size: 0.92rem;
+          opacity: 0.72;
+        }
+        .about-trend-metric strong {
+          font-size: 1.7rem;
+          line-height: 1;
+        }
+        .about-trend-chart-wrap {
+          padding: 1rem;
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .about-trend-chart {
+          min-height: 240px;
+        }
+        .about-trend-chart svg {
+          width: 100%;
+          height: 240px;
+          display: block;
         }
         .about-like-row {
           display: flex;
@@ -402,9 +464,50 @@
           border-radius: 14px;
           overflow: hidden;
         }
+        @media (max-width: 640px) {
+          .about-trend-card,
+          .about-interaction-card {
+            padding: 1.1rem;
+          }
+          .about-trend-chart svg {
+            height: 210px;
+          }
+        }
       </style>
       <script>
         (() => {
+          const trendChart = document.getElementById('about-trend-chart');
+          const trendData = [{"month":"2026-05","count":125},{"month":"2026-06","count":1}];
+          if (trendChart && Array.isArray(trendData) && trendData.length) {
+            const width = 700;
+            const height = 240;
+            const padding = 26;
+            const max = Math.max(...trendData.map((item) => Number(item.count || 0)), 1);
+            const step = trendData.length > 1 ? (width - padding * 2) / (trendData.length - 1) : 0;
+            const points = trendData.map((item, index) => {
+              const x = padding + index * step;
+              const y = height - padding - ((Number(item.count || 0) / max) * (height - padding * 2));
+              return { x, y, month: item.month, count: Number(item.count || 0) };
+            });
+            const line = points.map((point) => `${point.x},${point.y}`).join(' ');
+            const area = `M ${padding} ${height - padding} L ${points.map((point) => `${point.x} ${point.y}`).join(' L ')} L ${width - padding} ${height - padding} Z`;
+            trendChart.innerHTML = `
+              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="博客更新折线图">
+                <defs>
+                  <linearGradient id="aboutTrendArea" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#ff8a7a" stop-opacity="0.6"></stop>
+                    <stop offset="100%" stop-color="#ff8a7a" stop-opacity="0.04"></stop>
+                  </linearGradient>
+                </defs>
+                <path d="${area}" fill="url(#aboutTrendArea)"></path>
+                <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${line}"></polyline>
+                ${points.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4.5" fill="#fff"></circle>`).join('')}
+                ${points.map((point) => `<text x="${point.x}" y="${point.y - 12}" text-anchor="middle" font-size="12" fill="#ffffff">${point.count}</text>`).join('')}
+                ${points.map((point) => `<text x="${point.x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${point.month.slice(5)}</text>`).join('')}
+              </svg>
+            `;
+          }
+
           const likeButton = document.getElementById('about-like-button');
           const commentHost = document.getElementById('about-comment-host');
           if (!likeButton || !commentHost) return;
