@@ -1093,6 +1093,9 @@ button {
   opacity: 1;
   animation: blur 0.8s ease-in-out forwards;
 }
+.article-entry img:not(.lazyload):not(.lazyloading):not(.lazyloaded) {
+  opacity: 1;
+}
 .article-entry iframe {
   border: none;
   border-radius: 12px;
