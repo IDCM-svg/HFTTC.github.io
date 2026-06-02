@@ -1,9 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const { chromium } = require("playwright");
+const https = require("https");
 
 const siteUrl = process.env.SITE_URL || "https://idcm-svg.github.io/HFTTC.github.io/";
 const dataPath = path.join(process.cwd(), "data", "site-stats.json");
+const busuanziEndpoint = "https://busuanzi.ibruce.info/busuanzi?jsonpCallback=BusuanziCallback";
 
 function toNumber(value) {
   const text = String(value || "").replace(/[^\d]/g, "");
@@ -35,30 +36,45 @@ function formatShanghaiIso() {
   return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}:${get("second")}+08:00`;
 }
 
+function fetchText(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, {
+      headers: {
+        "user-agent": "Mozilla/5.0 (compatible; SiteStatsBot/1.0)",
+        referer: siteUrl,
+      },
+      timeout: 30000,
+    }, (response) => {
+      if (response.statusCode && response.statusCode >= 400) {
+        reject(new Error(`HTTP ${response.statusCode}`));
+        response.resume();
+        return;
+      }
+
+      let body = "";
+      response.setEncoding("utf8");
+      response.on("data", (chunk) => {
+        body += chunk;
+      });
+      response.on("end", () => resolve(body));
+    }).on("timeout", function onTimeout() {
+      this.destroy(new Error("Request timeout"));
+    }).on("error", reject);
+  });
+}
+
 async function readBusuanziSnapshot() {
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
-
-  try {
-    await page.goto(siteUrl, { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForFunction(() => {
-      const pv = document.querySelector("#busuanzi_value_site_pv")?.textContent?.trim();
-      const uv = document.querySelector("#busuanzi_value_site_uv")?.textContent?.trim();
-      return Boolean(pv && uv);
-    }, { timeout: 60000 });
-
-    const values = await page.evaluate(() => ({
-      views: document.querySelector("#busuanzi_value_site_pv")?.textContent?.trim() || "",
-      users: document.querySelector("#busuanzi_value_site_uv")?.textContent?.trim() || "",
-    }));
-
-    return {
-      views: toNumber(values.views),
-      users: toNumber(values.users),
-    };
-  } finally {
-    await browser.close();
+  const body = await fetchText(busuanziEndpoint);
+  const match = body.match(/BusuanziCallback\((.*)\)\s*;?\s*$/s);
+  if (!match) {
+    throw new Error("Unexpected busuanzi response");
   }
+
+  const payload = JSON.parse(match[1]);
+  return {
+    views: toNumber(payload.site_pv),
+    users: toNumber(payload.site_uv),
+  };
 }
 
 function loadExisting() {

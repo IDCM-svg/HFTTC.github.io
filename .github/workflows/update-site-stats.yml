@@ -25,11 +25,6 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install Playwright
-        run: |
-          npm install --no-save playwright
-          npx playwright install --with-deps chromium
-
       - name: Update stats snapshot
         env:
           SITE_URL: https://idcm-svg.github.io/HFTTC.github.io/
