@@ -313,23 +313,15 @@
       <section class="about-trend-card" data-aos="fade-up">
         <div class="about-trend-head">
           <h2>访问趋势</h2>
-          <p>同一张图里展示访问量 PV 和访客量 UV，两条线分别用不同颜色区分。</p>
+          <p>使用主题自带访问统计生成每日快照，展示总访问量和总访客量的累计变化。</p>
         </div>
         <div class="about-trend-metrics">
           <div class="about-trend-metric">
-            <span>今日访问量</span>
-            <strong id="about-today-views">--</strong>
-          </div>
-          <div class="about-trend-metric">
-            <span>今日访客量</span>
-            <strong id="about-today-users">--</strong>
-          </div>
-          <div class="about-trend-metric">
-            <span>绱璁块棶閲?PV</span>
+            <span>总访问量 PV</span>
             <strong id="about-total-views">--</strong>
           </div>
           <div class="about-trend-metric">
-            <span>绱璁垮閲?UV</span>
+            <span>总访客量 UV</span>
             <strong id="about-total-users">--</strong>
           </div>
           <div class="about-trend-metric">
@@ -344,10 +336,10 @@
         <div class="about-trend-status" id="about-trend-status">正在读取统计数据...</div>
         <div class="about-trend-legend">
           <span class="about-trend-legend-item">
-            <i class="about-trend-dot about-trend-dot-views"></i>访问量 PV
+            <i class="about-trend-dot about-trend-dot-views"></i>总访问量 PV
           </span>
           <span class="about-trend-legend-item">
-            <i class="about-trend-dot about-trend-dot-users"></i>访客量 UV
+            <i class="about-trend-dot about-trend-dot-users"></i>总访客量 UV
           </span>
         </div>
         <div class="about-trend-chart-wrap">
@@ -373,9 +365,7 @@
         </div>
         <div class="about-comment-box">
           <label class="about-comment-label">评论</label>
-          <p class="about-comment-tip">
-            这里使用 GitHub Issues 作为评论区，所有访客都能看到彼此的评论。
-          </p>
+          <p class="about-comment-tip">这里使用 GitHub Issues 作为评论区，所有访客都能看到彼此的评论。</p>
           <div class="about-comment-host" id="about-comment-host"></div>
         </div>
       </section>
@@ -502,14 +492,8 @@
           color: #fff;
           font-weight: 600;
         }
-        .about-like-button.is-liked {
-          background: linear-gradient(135deg, #ff6474, #ff2f68);
-        }
         .about-like-icon {
           font-size: 1.05rem;
-        }
-        .about-like-count {
-          font-size: 0.96rem;
         }
         .about-comment-label {
           display: inline-block;
@@ -540,11 +524,9 @@
         (() => {
           const trendChart = document.getElementById('about-trend-chart');
           const trendStatus = document.getElementById('about-trend-status');
-          const todayViews = document.getElementById('about-today-views');
-          const todayUsers = document.getElementById('about-today-users');
           const totalViews = document.getElementById('about-total-views');
           const totalUsers = document.getElementById('about-total-users');
-          const statsApi = "https://vercel-stats-proxy.vercel.app";
+          const statsApi = "/HFTTC.github.io/data/site-stats.json";
 
           const setStatus = (message, state) => {
             if (!trendStatus) return;
@@ -566,57 +548,53 @@
             });
           };
 
-          const renderTrend = (trend) => {
+          const renderTrend = (history) => {
             if (!trendChart) return;
-            if (!Array.isArray(trend) || !trend.length) {
-              trendChart.innerHTML = '<p>暂无统计趋势数据</p>';
+            if (!Array.isArray(history) || !history.length) {
+              trendChart.innerHTML = '<p>暂无历史趋势数据</p>';
               return;
             }
             const width = 760;
             const height = 260;
             const padding = 30;
             const max = Math.max(
-              ...trend.map((item) => Number(item.views || 0)),
-              ...trend.map((item) => Number(item.users || 0)),
+              ...history.map((item) => Number(item.views || 0)),
+              ...history.map((item) => Number(item.users || 0)),
               1
             );
-            const viewPoints = buildLine(trend.map((item) => ({ label: item.date, value: item.views })), width, height, padding, max);
-            const userPoints = buildLine(trend.map((item) => ({ label: item.date, value: item.users })), width, height, padding, max);
+            const viewPoints = buildLine(history.map((item) => ({ label: item.date, value: item.views })), width, height, padding, max);
+            const userPoints = buildLine(history.map((item) => ({ label: item.date, value: item.users })), width, height, padding, max);
             const makePolyline = (points) => points.map((point) => `${point.x},${point.y}`).join(' ');
+            const labelStep = history.length > 8 ? Math.ceil(history.length / 8) : 1;
 
             trendChart.innerHTML = `
-              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="访问量和访客量折线图">
+              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="总访问量和总访客量折线图">
                 <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(viewPoints)}"></polyline>
                 <polyline fill="none" stroke="#63b8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(userPoints)}"></polyline>
                 ${viewPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#ff9f87"></circle>`).join('')}
                 ${userPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#63b8ff"></circle>`).join('')}
-                ${trend.map((item, index) => `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${item.date.slice(5)}</text>`).join('')}
+                ${history.map((item, index) => {
+                  if (index % labelStep !== 0 && index !== history.length - 1) return '';
+                  return `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${item.date.slice(5)}</text>`;
+                }).join('')}
               </svg>
             `;
           };
 
           const loadAboutTrend = async () => {
-            if (!statsApi) {
-              setStatus('还没配置统计接口。接上 Cloudflare Worker 后，这里会显示真实的访问量和访客量折线图。', 'is-error');
-              renderTrend([]);
-              return;
-            }
             try {
-              setStatus('正在同步 Google Analytics 4 数据...', null);
+              setStatus('正在读取访问快照...', null);
               const response = await fetch(statsApi, {
                 headers: { Accept: 'application/json' },
               });
               if (!response.ok) throw new Error('HTTP ' + response.status);
               const data = await response.json();
-              const trend = Array.isArray(data.trend) ? data.trend : [];
-              const summedViews = trend.reduce((sum, item) => sum + Number(item.views || 0), 0);
-              const summedUsers = trend.reduce((sum, item) => sum + Number(item.users || 0), 0);
-              setMetric(todayViews, summedViews);
-              setMetric(todayUsers, summedUsers);
-              setMetric(totalViews, summedViews);
-              setMetric(totalUsers, summedUsers);
-              renderTrend(trend);
-              setStatus(`最近更新：${data.generatedAt || '未知时间'}`, 'is-ok');
+              const history = Array.isArray(data.history) ? data.history : [];
+              const total = data.total || {};
+              setMetric(totalViews, Number(total.views || 0));
+              setMetric(totalUsers, Number(total.users || 0));
+              renderTrend(history);
+              setStatus(`最近更新：${data.updatedAt || '未知时间'}`, 'is-ok');
             } catch (error) {
               setStatus(`统计读取失败：${error.message}`, 'is-error');
               renderTrend([]);
@@ -665,6 +643,7 @@
   </div>
   
 </article>
+
 
 
 </section>
