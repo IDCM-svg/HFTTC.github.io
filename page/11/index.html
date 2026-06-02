@@ -185,17 +185,6 @@
     <div class="sidebar-state-number">1</div>
   </div>
 </div>
-<div class="sidebar-site-stats">
-  <div class="sidebar-site-stats-title">实时站点统计</div>
-  <div class="sidebar-site-stats-row">
-    <span>总访问量</span>
-    <strong id="sidebar-busuanzi-site-pv">--</strong>
-  </div>
-  <div class="sidebar-site-stats-row">
-    <span>总访客量</span>
-    <strong id="sidebar-busuanzi-site-uv">--</strong>
-  </div>
-</div>
 <div class="sidebar-social" >
     <div class="icon-github sidebar-social-icon">
       <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
@@ -245,6 +234,25 @@
         <div class="sidebar-menu-link">关于</div>
       </div>
 </div>
+
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  <div class="widget-wrapper">
+  <div class="widget-wrap" data-aos="fade-up">
+    <h3 class="widget-title">实时站点统计</h3>
+    <div class="widget site-stats-widget">
+      <div class="site-stats-row">
+        <span>总访问量</span>
+        <strong id="sidebar-busuanzi-site-pv">--</strong>
+      </div>
+      <div class="site-stats-row">
+        <span>总访客量</span>
+        <strong id="sidebar-busuanzi-site-uv">--</strong>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
   (() => {
     const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
@@ -266,9 +274,6 @@
   })();
 </script>
 
-    </div>
-  </div>
-  <div class="sidebar-widget">
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">分类</h3>
@@ -616,17 +621,6 @@ ret2csu 的利用原理首先再次介绍一下 64 位程序的传参方式：�
     <div class="sidebar-state-number">1</div>
   </div>
 </div>
-<div class="sidebar-site-stats">
-  <div class="sidebar-site-stats-title">实时站点统计</div>
-  <div class="sidebar-site-stats-row">
-    <span>总访问量</span>
-    <strong id="sidebar-busuanzi-site-pv">--</strong>
-  </div>
-  <div class="sidebar-site-stats-row">
-    <span>总访客量</span>
-    <strong id="sidebar-busuanzi-site-uv">--</strong>
-  </div>
-</div>
 <div class="sidebar-social" >
     <div class="icon-github sidebar-social-icon">
       <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
@@ -676,26 +670,6 @@ ret2csu 的利用原理首先再次介绍一下 64 位程序的传参方式：�
         <div class="sidebar-menu-link">关于</div>
       </div>
 </div>
-<script>
-  (() => {
-    const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
-    const uvTarget = document.getElementById('sidebar-busuanzi-site-uv');
-    if (!pvTarget || !uvTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-      if (pv) pvTarget.textContent = pv;
-      if (uv) uvTarget.textContent = uv;
-    };
-
-    syncBusuanziStats();
-    const timer = window.setInterval(syncBusuanziStats, 1000);
-    window.addEventListener('beforeunload', () => window.clearInterval(timer), { once: true });
-  })();
-</script>
 
   </div>
 </nav>

@@ -189,17 +189,6 @@
     <div class="sidebar-state-number">1</div>
   </div>
 </div>
-<div class="sidebar-site-stats">
-  <div class="sidebar-site-stats-title">实时站点统计</div>
-  <div class="sidebar-site-stats-row">
-    <span>总访问量</span>
-    <strong id="sidebar-busuanzi-site-pv">--</strong>
-  </div>
-  <div class="sidebar-site-stats-row">
-    <span>总访客量</span>
-    <strong id="sidebar-busuanzi-site-uv">--</strong>
-  </div>
-</div>
 <div class="sidebar-social" >
     <div class="icon-github sidebar-social-icon">
       <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
@@ -249,6 +238,29 @@
         <div class="sidebar-menu-link">关于</div>
       </div>
 </div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  <div class="widget-wrapper">
+  <div class="widget-wrap" data-aos="fade-up">
+    <h3 class="widget-title">实时站点统计</h3>
+    <div class="widget site-stats-widget">
+      <div class="site-stats-row">
+        <span>总访问量</span>
+        <strong id="sidebar-busuanzi-site-pv">--</strong>
+      </div>
+      <div class="site-stats-row">
+        <span>总访客量</span>
+        <strong id="sidebar-busuanzi-site-uv">--</strong>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
   (() => {
     const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
@@ -269,14 +281,7 @@
     window.addEventListener('beforeunload', () => window.clearInterval(timer), { once: true });
   })();
 </script>
-</div>
-          <div class="sidebar-btn-wrapper" style="position:static">
-            <div class="sidebar-toc-btn current"></div>
-            <div class="sidebar-common-btn"></div>
-          </div>
-    </div>
-  </div>
-  <div class="sidebar-widget">
+
   </div>
   </div>
 </aside>
@@ -311,19 +316,19 @@
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache Poisoning" class="lazyload">
-        <a href="/HFTTC.github.io/2026/05/23/TcachePoisoning/" aria-label="前一篇: Tcache Poisoning" title="前一篇: Tcache Poisoning"></a>
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcachebin Attack 基本介绍" class="lazyload">
+        <a href="/HFTTC.github.io/2026/05/23/TcachebinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" aria-label="前一篇: Tcachebin Attack 基本介绍" title="前一篇: Tcachebin Attack 基本介绍"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
-            Tcache Poisoning
+            Tcachebin Attack 基本介绍
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcachebin Attack 基本介绍" class="lazyload">
-      <a href="/HFTTC.github.io/2026/05/23/TcachebinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" aria-label="后一篇: Tcachebin Attack 基本介绍"  title="后一篇: Tcachebin Attack 基本介绍"></a>
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="houseoforange_hitcon_2016" class="lazyload">
+      <a href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="后一篇: houseoforange_hitcon_2016"  title="后一篇: houseoforange_hitcon_2016"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
-          Tcachebin Attack 基本介绍
+          houseoforange_hitcon_2016
       </h3>
     </div>
   </nav>
@@ -394,17 +399,6 @@
     <div class="sidebar-state-number">1</div>
   </div>
 </div>
-<div class="sidebar-site-stats">
-  <div class="sidebar-site-stats-title">实时站点统计</div>
-  <div class="sidebar-site-stats-row">
-    <span>总访问量</span>
-    <strong id="sidebar-busuanzi-site-pv">--</strong>
-  </div>
-  <div class="sidebar-site-stats-row">
-    <span>总访客量</span>
-    <strong id="sidebar-busuanzi-site-uv">--</strong>
-  </div>
-</div>
 <div class="sidebar-social" >
     <div class="icon-github sidebar-social-icon">
       <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
@@ -454,26 +448,6 @@
         <div class="sidebar-menu-link">关于</div>
       </div>
 </div>
-<script>
-  (() => {
-    const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
-    const uvTarget = document.getElementById('sidebar-busuanzi-site-uv');
-    if (!pvTarget || !uvTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-      if (pv) pvTarget.textContent = pv;
-      if (uv) uvTarget.textContent = uv;
-    };
-
-    syncBusuanziStats();
-    const timer = window.setInterval(syncBusuanziStats, 1000);
-    window.addEventListener('beforeunload', () => window.clearInterval(timer), { once: true });
-  })();
-</script>
 </div>
   </div>
       <div class="sidebar-btn-wrapper">
