@@ -92,8 +92,22 @@ function loadExisting() {
 }
 
 async function main() {
-  const snapshot = await readBusuanziSnapshot();
   const existing = loadExisting();
+  let snapshot;
+
+  try {
+    snapshot = await readBusuanziSnapshot();
+  } catch (error) {
+    const currentViews = toNumber(existing.total?.views);
+    const currentUsers = toNumber(existing.total?.users);
+    if (currentViews > 0 || currentUsers > 0) {
+      console.warn(`Skip stats update: ${error.message}`);
+      console.log(`Keep existing stats: PV=${currentViews}, UV=${currentUsers}`);
+      return;
+    }
+    throw error;
+  }
+
   const today = formatShanghaiDate();
 
   const history = Array.isArray(existing.history) ? existing.history.slice() : [];
