@@ -548,6 +548,14 @@
             });
           };
 
+          const renderValueLabels = (points, color, direction) => points.map((point, index) => {
+            const offset = direction === 'up'
+              ? (index % 2 === 0 ? 14 : 28)
+              : (index % 2 === 0 ? 18 : 32);
+            const y = direction === 'up' ? point.y - offset : point.y + offset;
+            return `<text x="${point.x}" y="${y}" text-anchor="middle" font-size="12" font-weight="600" fill="${color}">${point.value}</text>`;
+          }).join('');
+
           const renderTrend = (history) => {
             if (!trendChart) return;
             if (!Array.isArray(history) || !history.length) {
@@ -573,6 +581,8 @@
                 <polyline fill="none" stroke="#63b8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(userPoints)}"></polyline>
                 ${viewPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#ff9f87"></circle>`).join('')}
                 ${userPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#63b8ff"></circle>`).join('')}
+                ${renderValueLabels(viewPoints, '#ffd2c6', 'up')}
+                ${renderValueLabels(userPoints, '#b9ddff', 'down')}
                 ${history.map((item, index) => {
                   if (index % labelStep !== 0 && index !== history.length - 1) return '';
                   return `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${item.date.slice(5)}</text>`;
