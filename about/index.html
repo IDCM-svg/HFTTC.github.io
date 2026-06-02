@@ -310,42 +310,6 @@
     <footer class="article-footer">
       
     </footer>
-      <section class="about-trend-card" data-aos="fade-up">
-        <div class="about-trend-head">
-          <h2>访问趋势</h2>
-          <p>使用主题自带访问统计生成每日快照，展示总访问量和总访客量的累计变化。</p>
-        </div>
-        <div class="about-trend-metrics">
-          <div class="about-trend-metric">
-            <span>总访问量 PV</span>
-            <strong id="about-total-views">--</strong>
-          </div>
-          <div class="about-trend-metric">
-            <span>总访客量 UV</span>
-            <strong id="about-total-users">--</strong>
-          </div>
-          <div class="about-trend-metric">
-            <span>文章总数</span>
-            <strong>126</strong>
-          </div>
-          <div class="about-trend-metric">
-            <span>分类数量</span>
-            <strong>1</strong>
-          </div>
-        </div>
-        <div class="about-trend-status" id="about-trend-status">正在读取统计数据...</div>
-        <div class="about-trend-legend">
-          <span class="about-trend-legend-item">
-            <i class="about-trend-dot about-trend-dot-views"></i>总访问量 PV
-          </span>
-          <span class="about-trend-legend-item">
-            <i class="about-trend-dot about-trend-dot-users"></i>总访客量 UV
-          </span>
-        </div>
-        <div class="about-trend-chart-wrap">
-          <div class="about-trend-chart" id="about-trend-chart"></div>
-        </div>
-      </section>
       <section class="about-interaction-card" data-aos="fade-up">
         <div class="about-interaction-head">
           <h2>互动区</h2>
@@ -370,7 +334,6 @@
         </div>
       </section>
       <style>
-        .about-trend-card,
         .about-interaction-card {
           margin-top: 2rem;
           padding: 1.5rem;
@@ -379,92 +342,13 @@
           background: linear-gradient(145deg, rgba(32, 44, 66, 0.92), rgba(18, 24, 38, 0.95));
           box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
         }
-        .about-trend-head h2,
         .about-interaction-head h2 {
           margin: 0 0 0.4rem;
         }
-        .about-trend-head p,
         .about-interaction-head p {
           margin: 0 0 1rem;
           opacity: 0.78;
           font-size: 0.95rem;
-        }
-        .about-trend-metrics {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-          gap: 0.9rem;
-          margin-bottom: 1rem;
-        }
-        .about-trend-metric {
-          padding: 0.95rem 1rem;
-          border-radius: 16px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .about-trend-metric span {
-          display: block;
-          margin-bottom: 0.35rem;
-          font-size: 0.92rem;
-          opacity: 0.72;
-        }
-        .about-trend-metric strong {
-          font-size: 1.7rem;
-          line-height: 1;
-        }
-        .about-trend-status {
-          margin-bottom: 1rem;
-          padding: 0.9rem 1rem;
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          font-size: 0.94rem;
-        }
-        .about-trend-status.is-error {
-          color: #ffd6d6;
-          background: rgba(255, 109, 109, 0.14);
-        }
-        .about-trend-status.is-ok {
-          color: #d6ffef;
-          background: rgba(92, 214, 159, 0.14);
-        }
-        .about-trend-legend {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1rem;
-          margin-bottom: 1rem;
-          font-size: 0.92rem;
-        }
-        .about-trend-legend-item {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.45rem;
-          opacity: 0.86;
-        }
-        .about-trend-dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          display: inline-block;
-        }
-        .about-trend-dot-views {
-          background: #ff9f87;
-        }
-        .about-trend-dot-users {
-          background: #63b8ff;
-        }
-        .about-trend-chart-wrap {
-          padding: 1rem;
-          border-radius: 18px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .about-trend-chart {
-          min-height: 240px;
-        }
-        .about-trend-chart svg {
-          width: 100%;
-          height: 240px;
-          display: block;
         }
         .about-like-row {
           display: flex;
@@ -511,121 +395,13 @@
           overflow: hidden;
         }
         @media (max-width: 640px) {
-          .about-trend-card,
           .about-interaction-card {
             padding: 1.1rem;
-          }
-          .about-trend-chart svg {
-            height: 210px;
           }
         }
       </style>
       <script>
         (() => {
-          const trendChart = document.getElementById('about-trend-chart');
-          const trendStatus = document.getElementById('about-trend-status');
-          const totalViews = document.getElementById('about-total-views');
-          const totalUsers = document.getElementById('about-total-users');
-          const statsApi = "/HFTTC.github.io/data/site-stats.json";
-
-          const setStatus = (message, state) => {
-            if (!trendStatus) return;
-            trendStatus.textContent = message;
-            trendStatus.classList.remove('is-error', 'is-ok');
-            if (state) trendStatus.classList.add(state);
-          };
-
-          const setMetric = (node, value) => {
-            if (node) node.textContent = value;
-          };
-
-          const formatTrendLabel = (value) => {
-            const text = String(value || '');
-            if (text.includes(' ')) return text.slice(11, 16);
-            if (text.length >= 10) return text.slice(5);
-            return text;
-          };
-
-          const buildLine = (values, width, height, padding, min, max) => {
-            const step = values.length > 1 ? (width - padding * 2) / (values.length - 1) : 0;
-            const span = Math.max(max - min, 1);
-            const chartHeight = height - padding * 2;
-            const innerPadding = Math.min(24, chartHeight * 0.14);
-            return values.map((item, index) => {
-              const x = padding + index * step;
-              const value = Number(item.value || 0);
-              const normalized = (value - min) / span;
-              const y = height - padding - innerPadding - (normalized * (chartHeight - innerPadding * 2));
-              return { x, y, label: item.label, value: Number(item.value || 0) };
-            });
-          };
-
-          const renderValueLabels = (points, color, direction) => points.map((point, index) => {
-            const offset = direction === 'up'
-              ? (index % 2 === 0 ? 14 : 28)
-              : (index % 2 === 0 ? 18 : 32);
-            const y = direction === 'up' ? point.y - offset : point.y + offset;
-            return `<text x="${point.x}" y="${y}" text-anchor="middle" font-size="12" font-weight="600" fill="${color}">${point.value}</text>`;
-          }).join('');
-
-          const renderTrend = (history) => {
-            if (!trendChart) return;
-            if (!Array.isArray(history) || !history.length) {
-              trendChart.innerHTML = '<p>暂无历史趋势数据</p>';
-              return;
-            }
-            const width = 760;
-            const height = 260;
-            const padding = 30;
-            const viewsMin = Math.min(...history.map((item) => Number(item.views || 0)));
-            const viewsMax = Math.max(...history.map((item) => Number(item.views || 0)), 1);
-            const usersMin = Math.min(...history.map((item) => Number(item.users || 0)));
-            const usersMax = Math.max(...history.map((item) => Number(item.users || 0)), 1);
-            const viewPoints = buildLine(history.map((item) => ({ label: item.date, value: item.views })), width, height, padding, viewsMin, viewsMax);
-            const userPoints = buildLine(history.map((item) => ({ label: item.date, value: item.users })), width, height, padding, usersMin, usersMax);
-            const makePolyline = (points) => points.map((point) => `${point.x},${point.y}`).join(' ');
-            const labelStep = history.length > 8 ? Math.ceil(history.length / 8) : 1;
-
-            trendChart.innerHTML = `
-              <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="总访问量和总访客量折线图">
-                <text x="${padding}" y="${padding - 8}" text-anchor="start" font-size="12" fill="#ffd2c6">PV: ${viewsMin} - ${viewsMax}</text>
-                <text x="${width - padding}" y="${padding - 8}" text-anchor="end" font-size="12" fill="#b9ddff">UV: ${usersMin} - ${usersMax}</text>
-                <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(viewPoints)}"></polyline>
-                <polyline fill="none" stroke="#63b8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(userPoints)}"></polyline>
-                ${viewPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#ff9f87"></circle>`).join('')}
-                ${userPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#63b8ff"></circle>`).join('')}
-                ${renderValueLabels(viewPoints, '#ffd2c6', 'up')}
-                ${renderValueLabels(userPoints, '#b9ddff', 'down')}
-                ${history.map((item, index) => {
-                  if (index % labelStep !== 0 && index !== history.length - 1) return '';
-                  return `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${formatTrendLabel(item.date)}</text>`;
-                }).join('')}
-              </svg>
-            `;
-          };
-
-          const loadAboutTrend = async () => {
-            try {
-              setStatus('正在读取访问快照...', null);
-              const response = await fetch(statsApi, {
-                headers: { Accept: 'application/json' },
-              });
-              if (!response.ok) throw new Error('HTTP ' + response.status);
-              const data = await response.json();
-              const history = Array.isArray(data.history) ? data.history : [];
-              const total = data.total || {};
-              setMetric(totalViews, Number(total.views || 0));
-              setMetric(totalUsers, Number(total.users || 0));
-              renderTrend(history);
-              setStatus(`最近检查：${data.checkedAt || data.updatedAt || '未知时间'}`, 'is-ok');
-            } catch (error) {
-              setStatus(`统计读取失败：${error.message}`, 'is-error');
-              renderTrend([]);
-            }
-          };
-
-          loadAboutTrend();
-
           const likeButton = document.getElementById('about-like-button');
           const commentHost = document.getElementById('about-comment-host');
           if (!likeButton || !commentHost) return;
