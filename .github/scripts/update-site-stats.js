@@ -20,6 +20,22 @@ function formatShanghaiDate() {
   }).format(new Date());
 }
 
+function formatShanghaiSlot() {
+  const parts = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+
+  const get = (type) => parts.find((item) => item.type === type)?.value || "00";
+  const hour = Number(get("hour"));
+  const slotHour = String(Math.floor(hour / 6) * 6).padStart(2, "0");
+  return `${get("year")}-${get("month")}-${get("day")} ${slotHour}:00`;
+}
+
 function formatShanghaiIso() {
   const parts = new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Asia/Shanghai",
@@ -109,15 +125,16 @@ async function main() {
   }
 
   const today = formatShanghaiDate();
+  const slot = formatShanghaiSlot();
 
   const history = Array.isArray(existing.history) ? existing.history.slice() : [];
   const nextEntry = {
-    date: today,
+    date: slot,
     views: snapshot.views,
     users: snapshot.users,
   };
 
-  const index = history.findIndex((item) => item.date === today);
+  const index = history.findIndex((item) => item.date === slot);
   if (index >= 0) {
     history[index] = nextEntry;
   } else {

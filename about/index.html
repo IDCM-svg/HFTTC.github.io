@@ -539,6 +539,13 @@
             if (node) node.textContent = value;
           };
 
+          const formatTrendLabel = (value) => {
+            const text = String(value || '');
+            if (text.includes(' ')) return text.slice(11, 16);
+            if (text.length >= 10) return text.slice(5);
+            return text;
+          };
+
           const buildLine = (values, width, height, padding, min, max) => {
             const step = values.length > 1 ? (width - padding * 2) / (values.length - 1) : 0;
             const span = Math.max(max - min, 1);
@@ -591,7 +598,7 @@
                 ${renderValueLabels(userPoints, '#b9ddff', 'down')}
                 ${history.map((item, index) => {
                   if (index % labelStep !== 0 && index !== history.length - 1) return '';
-                  return `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${item.date.slice(5)}</text>`;
+                  return `<text x="${viewPoints[index].x}" y="${height - 6}" text-anchor="middle" font-size="12" fill="rgba(255,255,255,0.72)">${formatTrendLabel(item.date)}</text>`;
                 }).join('')}
               </svg>
             `;
