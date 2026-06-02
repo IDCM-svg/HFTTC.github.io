@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v5
@@ -40,4 +42,5 @@ jobs:
           git add data/site-stats.json
           git diff --cached --quiet && exit 0
           git commit -m "chore: update site stats"
+          git pull --rebase origin main
           git push
