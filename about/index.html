@@ -325,6 +325,14 @@
             <strong id="about-today-users">--</strong>
           </div>
           <div class="about-trend-metric">
+            <span>绱璁块棶閲?PV</span>
+            <strong id="about-total-views">--</strong>
+          </div>
+          <div class="about-trend-metric">
+            <span>绱璁垮閲?UV</span>
+            <strong id="about-total-users">--</strong>
+          </div>
+          <div class="about-trend-metric">
             <span>文章总数</span>
             <strong>126</strong>
           </div>
@@ -534,6 +542,8 @@
           const trendStatus = document.getElementById('about-trend-status');
           const todayViews = document.getElementById('about-today-views');
           const todayUsers = document.getElementById('about-today-users');
+          const totalViews = document.getElementById('about-total-views');
+          const totalUsers = document.getElementById('about-total-users');
           const statsApi = "https://vercel-stats-proxy.vercel.app";
 
           const setStatus = (message, state) => {
@@ -598,9 +608,14 @@
               });
               if (!response.ok) throw new Error('HTTP ' + response.status);
               const data = await response.json();
+              const trend = Array.isArray(data.trend) ? data.trend : [];
+              const summedViews = trend.reduce((sum, item) => sum + Number(item.views || 0), 0);
+              const summedUsers = trend.reduce((sum, item) => sum + Number(item.users || 0), 0);
               setMetric(todayViews, Number(data.today?.views || 0));
               setMetric(todayUsers, Number(data.today?.users || 0));
-              renderTrend(data.trend || []);
+              setMetric(totalViews, summedViews);
+              setMetric(totalUsers, summedUsers);
+              renderTrend(trend);
               setStatus(`最近更新：${data.generatedAt || '未知时间'}`, 'is-ok');
             } catch (error) {
               setStatus(`统计读取失败：${error.message}`, 'is-error');
