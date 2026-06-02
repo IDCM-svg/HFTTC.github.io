@@ -617,7 +617,7 @@
               setMetric(totalViews, Number(total.views || 0));
               setMetric(totalUsers, Number(total.users || 0));
               renderTrend(history);
-              setStatus(`最近更新：${data.updatedAt || '未知时间'}`, 'is-ok');
+              setStatus(`最近检查：${data.checkedAt || data.updatedAt || '未知时间'}`, 'is-ok');
             } catch (error) {
               setStatus(`统计读取失败：${error.message}`, 'is-error');
               renderTrend([]);
