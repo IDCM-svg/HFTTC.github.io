@@ -28,16 +28,16 @@
     
 <link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
 
-    <meta name="description" content="评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 你还需要做最后一步：  按 Waline 官方文档部署服务端。 拿到 Waline 服务地址。 打开 E:\hexo\hexo\_config.yml，填写 comment_service.waline.server_url。 重新执行 npm run build 和 npm run deploy。  部署完成后：">
+    <meta name="description" content="评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 推荐部署组合：  Vercel 托管 Waline 服务端 LeanCloud 存储评论数据  你还需要做最后一步：  按 Waline 官方文档部署服务端。 至少准备这些环境变量： LEAN_ID LEAN_KEY LEAN_MASTER_KEY JWT_TOKEN 如果使用 LeanCloud 中国版，再补 LEA">
 <meta property="og:type" content="website">
 <meta property="og:title" content="评论系统配置说明">
 <meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/comment-setup/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
-<meta property="og:description" content="评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 你还需要做最后一步：  按 Waline 官方文档部署服务端。 拿到 Waline 服务地址。 打开 E:\hexo\hexo\_config.yml，填写 comment_service.waline.server_url。 重新执行 npm run build 和 npm run deploy。  部署完成后：">
+<meta property="og:description" content="评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 推荐部署组合：  Vercel 托管 Waline 服务端 LeanCloud 存储评论数据  你还需要做最后一步：  按 Waline 官方文档部署服务端。 至少准备这些环境变量： LEAN_ID LEAN_KEY LEAN_MASTER_KEY JWT_TOKEN 如果使用 LeanCloud 中国版，再补 LEA">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/banner.webp">
 <meta property="article:published_time" content="2026-06-02T10:10:00.000Z">
-<meta property="article:modified_time" content="2026-06-02T14:47:49.190Z">
+<meta property="article:modified_time" content="2026-06-02T14:57:07.779Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="Pwn, CTF, Binary">
 <meta name="twitter:card" content="summary">
@@ -324,7 +324,7 @@
     <time style="display: none;" id="post-update-time">2026-06-02</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-02T14:47:49.190Z" itemprop="dateModified">2026-06-02</time>
+      <time datetime="2026-06-02T14:57:07.779Z" itemprop="dateModified">2026-06-02</time>
     </span>
 </div>
 
@@ -334,9 +334,22 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
         <h1 id="评论系统配置说明"><a href="#评论系统配置说明" class="headerlink" title="评论系统配置说明"></a>评论系统配置说明</h1><p>本站已经预留了独立评论区接入位，当前采用 <code>Waline</code> 方案。</p>
+<p>推荐部署组合：</p>
+<ul>
+<li><code>Vercel</code> 托管 Waline 服务端</li>
+<li><code>LeanCloud</code> 存储评论数据</li>
+</ul>
 <p>你还需要做最后一步：</p>
 <ol>
 <li>按 Waline 官方文档部署服务端。</li>
+<li>至少准备这些环境变量：<ul>
+<li><code>LEAN_ID</code></li>
+<li><code>LEAN_KEY</code></li>
+<li><code>LEAN_MASTER_KEY</code></li>
+<li><code>JWT_TOKEN</code></li>
+<li>如果使用 LeanCloud 中国版，再补 <code>LEAN_SERVER</code></li>
+</ul>
+</li>
 <li>拿到 Waline 服务地址。</li>
 <li>打开 <code>E:\hexo\hexo\_config.yml</code>，填写 <code>comment_service.waline.server_url</code>。</li>
 <li>重新执行 <code>npm run build</code> 和 <code>npm run deploy</code>。</li>
@@ -346,6 +359,10 @@
 <li>每篇文章底部都会出现独立评论区。</li>
 <li><code>/message/</code> 会变成全站通用留言板。</li>
 <li>不再依赖 GitHub 评论。</li>
+</ul>
+<p>本地预置目录：</p>
+<ul>
+<li><code>E:\hexo\hexo\waline-server</code></li>
 </ul>
 <p>官方文档：</p>
 <ul>
@@ -551,9 +568,9 @@
           url: "https://idcm-svg.github.io/HFTTC.github.io/comment-setup/index.html",
           excerpt: "",
           description: "",
-          stripContent: "评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 你还需要做最后一步：  按 Waline 官方文档部署服务端。 拿到 Waline 服务地址。 打开 E:\hexo\hexo\_config.yml，填写 comment_service.waline.server_url。 重新执行 npm run build 和 npm run deploy。  部署完成后：  每篇文章底部都会出现独立评论区。 /message/ 会变成全站通用留言板。 不再依赖 GitHub",
+          stripContent: "评论系统配置说明本站已经预留了独立评论区接入位，当前采用 Waline 方案。 推荐部署组合：  Vercel 托管 Waline 服务端 LeanCloud 存储评论数据  你还需要做最后一步：  按 Waline 官方文档部署服务端。 至少准备这些环境变量： LEAN_ID LEAN_KEY LEAN_MASTER_KEY JWT_TOKEN 如果使用 LeanCloud 中国版，再补 LEAN_SERVER   拿到 Waline 服务地址。 打开 E:\hexo\hexo\_config",
           date: "Tue Jun 02 2026 18:10:00 GMT+0800",
-          updated: "Tue Jun 02 2026 22:47:49 GMT+0800",
+          updated: "Tue Jun 02 2026 22:57:07 GMT+0800",
           cover: "/HFTTC.github.io/images/banner.webp",
         };
       </script>
