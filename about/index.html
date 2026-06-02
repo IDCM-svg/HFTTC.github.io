@@ -565,18 +565,17 @@
             const width = 760;
             const height = 260;
             const padding = 30;
-            const max = Math.max(
-              ...history.map((item) => Number(item.views || 0)),
-              ...history.map((item) => Number(item.users || 0)),
-              1
-            );
-            const viewPoints = buildLine(history.map((item) => ({ label: item.date, value: item.views })), width, height, padding, max);
-            const userPoints = buildLine(history.map((item) => ({ label: item.date, value: item.users })), width, height, padding, max);
+            const viewsMax = Math.max(...history.map((item) => Number(item.views || 0)), 1);
+            const usersMax = Math.max(...history.map((item) => Number(item.users || 0)), 1);
+            const viewPoints = buildLine(history.map((item) => ({ label: item.date, value: item.views })), width, height, padding, viewsMax);
+            const userPoints = buildLine(history.map((item) => ({ label: item.date, value: item.users })), width, height, padding, usersMax);
             const makePolyline = (points) => points.map((point) => `${point.x},${point.y}`).join(' ');
             const labelStep = history.length > 8 ? Math.ceil(history.length / 8) : 1;
 
             trendChart.innerHTML = `
               <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="总访问量和总访客量折线图">
+                <text x="${padding}" y="${padding - 8}" text-anchor="start" font-size="12" fill="#ffd2c6">PV 轴最大值: ${viewsMax}</text>
+                <text x="${width - padding}" y="${padding - 8}" text-anchor="end" font-size="12" fill="#b9ddff">UV 轴最大值: ${usersMax}</text>
                 <polyline fill="none" stroke="#ff9f87" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(viewPoints)}"></polyline>
                 <polyline fill="none" stroke="#63b8ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${makePolyline(userPoints)}"></polyline>
                 ${viewPoints.map((point) => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="#ff9f87"></circle>`).join('')}
