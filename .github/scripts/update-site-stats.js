@@ -99,6 +99,7 @@ function loadExisting() {
       source: "busuanzi",
       siteUrl,
       updatedAt: formatShanghaiIso(),
+      checkedAt: formatShanghaiIso(),
       total: { views: 0, users: 0 },
       history: [],
     };
@@ -117,6 +118,14 @@ async function main() {
     const currentViews = toNumber(existing.total?.views);
     const currentUsers = toNumber(existing.total?.users);
     if (currentViews > 0 || currentUsers > 0) {
+      const next = {
+        ...existing,
+        source: "busuanzi",
+        siteUrl,
+        checkedAt: formatShanghaiIso(),
+      };
+      fs.mkdirSync(path.dirname(dataPath), { recursive: true });
+      fs.writeFileSync(dataPath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
       console.warn(`Skip stats update: ${error.message}`);
       console.log(`Keep existing stats: PV=${currentViews}, UV=${currentUsers}`);
       return;
@@ -147,6 +156,7 @@ async function main() {
     source: "busuanzi",
     siteUrl,
     updatedAt: formatShanghaiIso(),
+    checkedAt: formatShanghaiIso(),
     total: {
       views: snapshot.views,
       users: snapshot.users,
