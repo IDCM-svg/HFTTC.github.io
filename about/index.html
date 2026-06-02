@@ -611,8 +611,8 @@
               const trend = Array.isArray(data.trend) ? data.trend : [];
               const summedViews = trend.reduce((sum, item) => sum + Number(item.views || 0), 0);
               const summedUsers = trend.reduce((sum, item) => sum + Number(item.users || 0), 0);
-              setMetric(todayViews, Number(data.today?.views || 0));
-              setMetric(todayUsers, Number(data.today?.users || 0));
+              setMetric(todayViews, summedViews);
+              setMetric(todayUsers, summedUsers);
               setMetric(totalViews, summedViews);
               setMetric(totalUsers, summedUsers);
               renderTrend(trend);
