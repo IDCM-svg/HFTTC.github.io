@@ -138,6 +138,12 @@
             </div>
           <span class="main-nav-link">关于</span>
         </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/message/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">留言板</span>
+        </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
   <nav id="sub-nav" aria-label="Secondary navigation">
@@ -216,6 +222,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/message/" aria-label="留言板"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">留言板</div>
       </div>
 </div>
 
@@ -342,11 +355,18 @@
             <span class="about-like-icon">★</span>
             <span id="about-like-text">GitHub</span>
           </a>
+          <a
+            class="about-like-button about-message-button"
+            href="/HFTTC.github.io/message/"
+            aria-label="前往独立留言板"
+          >
+            <span class="about-like-icon">✎</span>
+            <span>留言板</span>
+          </a>
         </div>
         <div class="about-comment-box">
-          <label class="about-comment-label">评论</label>
-          <p class="about-comment-tip">这里使用 GitHub Issues 作为评论区，所有访客都能看到彼此的评论。</p>
-          <div class="about-comment-host" id="about-comment-host"></div>
+          <label class="about-comment-label">互动</label>
+          <p class="about-comment-tip">站点评论区已切换为独立留言系统。想留言、提建议或闲聊，直接去留言板。</p>
         </div>
       </section>
       <style>
@@ -392,6 +412,9 @@
           color: #fff;
           font-weight: 600;
         }
+        .about-message-button {
+          background: linear-gradient(135deg, #2d8cf0, #18b3c7);
+        }
         .about-like-icon {
           font-size: 1.05rem;
         }
@@ -405,56 +428,12 @@
           font-size: 0.94rem;
           opacity: 0.72;
         }
-        .about-comment-host {
-          min-height: 160px;
-          border-radius: 14px;
-          overflow: hidden;
-        }
         @media (max-width: 640px) {
           .about-interaction-card {
             padding: 1.1rem;
           }
         }
       </style>
-      <script>
-        (() => {
-          const likeButton = document.getElementById('about-like-button');
-          const commentHost = document.getElementById('about-comment-host');
-          if (!likeButton || !commentHost) return;
-
-          const currentTheme = () => (
-            document.documentElement.getAttribute('data-theme') === 'dark'
-              ? 'github-dark'
-              : 'github-light'
-          );
-
-          const loadUtterances = () => {
-            if (commentHost.querySelector('iframe.utterances-frame')) return;
-            commentHost.innerHTML = '';
-            const script = document.createElement('script');
-            script.src = 'https://utteranc.es/client.js';
-            script.async = true;
-            script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
-            script.setAttribute('issue-term', 'pathname');
-            script.setAttribute('label', 'about-comment');
-            script.setAttribute('theme', currentTheme());
-            script.setAttribute('crossorigin', 'anonymous');
-            commentHost.appendChild(script);
-          };
-
-          const syncUtterancesTheme = () => {
-            const frame = commentHost.querySelector('iframe.utterances-frame');
-            if (!frame || !frame.contentWindow) return;
-            frame.contentWindow.postMessage(
-              { type: 'set-theme', theme: currentTheme() },
-              'https://utteranc.es'
-            );
-          };
-
-          loadUtterances();
-          document.body.addEventListener('reimu:theme-set', syncUtterancesTheme);
-        })();
-      </script>
   </div>
   
 </article>
@@ -554,6 +533,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/message/" aria-label="留言板"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">留言板</div>
       </div>
 </div>
 
