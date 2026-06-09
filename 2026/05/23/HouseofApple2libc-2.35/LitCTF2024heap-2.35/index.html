@@ -243,20 +243,12 @@
       <ul class="archive-list site-stats-list">
         <li class="archive-list-item site-stats-item">
           <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label" id="site-stats-label-primary">&#24635;&#35775;&#38382;&#37327;</span>
-            <strong class="site-stats-value" id="site-stats-primary">--</strong>
+            <span class="site-stats-label">总访问量 </span><span class="site-stats-value" id="site-stats-primary">--</span>
           </span>
         </li>
         <li class="archive-list-item site-stats-item">
           <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label" id="site-stats-label-secondary">&#24635;&#35775;&#23458;&#37327;</span>
-            <strong class="site-stats-value" id="site-stats-secondary">--</strong>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item" id="site-stats-extra-item" style="display:none;">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label" id="site-stats-label-extra">&#22312;&#32447;&#35775;&#23458;</span>
-            <strong class="site-stats-value" id="site-stats-extra">--</strong>
+            <span class="site-stats-label">总访客量 </span><span class="site-stats-value" id="site-stats-secondary">--</span>
           </span>
         </li>
       </ul>
@@ -265,80 +257,23 @@
 </div>
 <script>
   (() => {
-    const statsApi = "https://vercel-stats-proxy.vercel.app";
     const primaryTarget = document.getElementById('site-stats-primary');
     const secondaryTarget = document.getElementById('site-stats-secondary');
-    const extraTarget = document.getElementById('site-stats-extra');
-    const primaryLabel = document.getElementById('site-stats-label-primary');
-    const secondaryLabel = document.getElementById('site-stats-label-secondary');
-    const extraLabel = document.getElementById('site-stats-label-extra');
-    const extraItem = document.getElementById('site-stats-extra-item');
-    if (!primaryTarget || !secondaryTarget || !primaryLabel || !secondaryLabel) return;
-
-    const formatNumber = (value) => {
-      const num = Number(value);
-      return Number.isFinite(num) ? num.toLocaleString('zh-CN') : '--';
-    };
-
-    const showExtra = (label, value) => {
-      if (!extraItem || !extraTarget || !extraLabel) return;
-      if (value == null || value === '') {
-        extraItem.style.display = 'none';
-        return;
-      }
-      extraLabel.textContent = label;
-      extraTarget.textContent = String(value);
-      extraItem.style.display = '';
-    };
-
-    const applyStatsApiData = (data) => {
-      if (data?.total && typeof data.total === 'object') {
-        primaryLabel.textContent = '总访问量';
-        secondaryLabel.textContent = '总访客量';
-        primaryTarget.textContent = formatNumber(data.total.views);
-        secondaryTarget.textContent = formatNumber(data.total.users);
-        showExtra('统计时间', data.generatedAt ? new Date(data.generatedAt).toLocaleString('zh-CN', { hour12: false }) : null);
-        return true;
-      }
-
-      if (data?.today && typeof data.today === 'object') {
-        primaryLabel.textContent = '今日访问量';
-        secondaryLabel.textContent = '今日访客量';
-        primaryTarget.textContent = formatNumber(data.today.views);
-        secondaryTarget.textContent = formatNumber(data.today.users);
-        const activeUsers = data?.realtime?.activeUsers;
-        showExtra('在线访客', activeUsers != null ? formatNumber(activeUsers) : null);
-        return true;
-      }
-
-      return false;
-    };
+    if (!primaryTarget || !secondaryTarget) return;
 
     const syncBusuanziStats = () => {
       const pvSource = document.getElementById('busuanzi_value_site_pv');
       const uvSource = document.getElementById('busuanzi_value_site_uv');
       const pv = pvSource?.textContent?.trim();
       const uv = uvSource?.textContent?.trim();
-      let updated = false;
-      if (pv) {
-        primaryLabel.textContent = '总访问量';
-        primaryTarget.textContent = pv;
-        updated = true;
-      }
-      if (uv) {
-        secondaryLabel.textContent = '总访客量';
-        secondaryTarget.textContent = uv;
-        updated = true;
-      }
-      if (updated) showExtra('', null);
-      return updated;
+
+      if (pv) primaryTarget.textContent = pv;
+      if (uv) secondaryTarget.textContent = uv;
     };
 
     const watchBusuanziStats = () => {
       syncBusuanziStats();
-      const observer = new MutationObserver(() => {
-        syncBusuanziStats();
-      });
+      const observer = new MutationObserver(syncBusuanziStats);
       const pvSource = document.getElementById('busuanzi_value_site_pv');
       const uvSource = document.getElementById('busuanzi_value_site_uv');
       if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
@@ -346,32 +281,7 @@
       window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
     };
 
-    const normalizeStatsApiUrl = (value) => value.replace(/\/+$/, '');
-
-    const fetchStatsApi = async () => {
-      if (!statsApi) return false;
-      const baseUrl = normalizeStatsApiUrl(statsApi);
-      const candidates = baseUrl.endsWith('/summary')
-        ? [baseUrl]
-        : [`${baseUrl}/summary`, baseUrl];
-
-      for (const url of candidates) {
-        try {
-          const response = await fetch(url, {
-            headers: { Accept: 'application/json' },
-          });
-          if (!response.ok) continue;
-          const data = await response.json();
-          if (applyStatsApiData(data)) return true;
-        } catch (_) {
-        }
-      }
-      return false;
-    };
-
-    fetchStatsApi().then((loaded) => {
-      if (!loaded) watchBusuanziStats();
-    });
+    watchBusuanziStats();
   })();
 </script>
 
