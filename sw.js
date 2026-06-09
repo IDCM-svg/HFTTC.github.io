@@ -1,4 +1,4 @@
-const VERSION = "1781010346366";const preCache = ["/HFTTC.github.io/images/taichi.png","/HFTTC.github.io/images/banner.webp","/HFTTC.github.io/css/loader.css","/HFTTC.github.io/css/style.css","/HFTTC.github.io/js/script.js"];const cacheDomain = [
+const VERSION = "1781010902342";const preCache = ["/HFTTC.github.io/images/taichi.png","/HFTTC.github.io/images/banner.webp","/HFTTC.github.io/css/loader.css","/HFTTC.github.io/css/style.css","/HFTTC.github.io/js/script.js"];const cacheDomain = [
   "fonts.googleapis.com",
   "npm.webcache.cn",
   "unpkg.com",

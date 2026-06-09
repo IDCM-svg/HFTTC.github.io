@@ -46,7 +46,7 @@
 <meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2023-strangetalkbot/img-009.png">
 <meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2023-strangetalkbot/img-010.png">
 <meta property="article:published_time" content="2026-06-09T02:25:00.000Z">
-<meta property="article:modified_time" content="2026-06-09T13:05:28.489Z">
+<meta property="article:modified_time" content="2026-06-09T13:12:07.708Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="ciscn">
 <meta property="article:tag" content="protobuf">
@@ -157,8 +157,9 @@
   </nav>
 </div>
 <header id="header" aria-label="Site header">
-    <picture></picture>
-    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/ciscn-2023-strangetalkbot.jpg" alt="[CISCN 2023]StrangeTalkBot">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[CISCN 2023]StrangeTalkBot">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -296,7 +297,7 @@
     <time style="display: none;" id="post-update-time">2026-06-09</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-09T13:05:28.489Z" itemprop="dateModified">2026-06-09</time>
+      <time datetime="2026-06-09T13:12:07.708Z" itemprop="dateModified">2026-06-09</time>
     </span>
 </div>
 
@@ -771,7 +772,7 @@
           description: "",
           stripContent: "一道 protobuf 序列化的题目，打 setcontext 的方式也比较熟悉，或许打 environ 也可以，没尝试过。    程序分析：main  进到 main 函数，找到该程序反序列化的入口 sub_192D，该函数主要的作用是为了把读进来的原始字节按 protobuf 消息 pwn 解析成一个对象，进去看一看： sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsigned __in",
           date: "Tue Jun 09 2026 10:25:00 GMT+0800",
-          updated: "Tue Jun 09 2026 21:05:28 GMT+0800",
+          updated: "Tue Jun 09 2026 21:12:07 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/ciscn-2023-strangetalkbot.jpg",
         };
       </script>
