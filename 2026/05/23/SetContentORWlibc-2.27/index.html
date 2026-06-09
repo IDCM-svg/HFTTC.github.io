@@ -241,55 +241,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">&#23454;&#26102;&#31449;&#28857;&#32479;&#35745;</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量 </span><span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量 </span><span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
   </div>
   </div>
 </aside>
