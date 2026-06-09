@@ -1,0 +1,896 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    LLVM-PWN环境搭建与gdb调试 | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLVM-PWN环境搭建与gdb调试">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780983841676-7d2e4b9f-de75-4cb1-89a4-79bc231440d5.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985291361-03a17632-de64-475f-8e75-94de4fdb8687.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985876450-7c06afd2-4691-44be-b521-f8476de10fbb.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985925985-10929f97-803e-493f-aa48-73ff21bcbde1.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986137488-ba506795-3ab8-4f93-b01d-870e0111726f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986186654-c010a28c-7b2c-437c-9ca8-b6b46a374755.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986790503-0d3a164c-aa48-47d7-8750-a2e188ffb43f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986921113-7eb37095-33be-41a6-921f-7d97f1aa4c46.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986950578-cf864e63-4e30-4429-b279-207e7bb928d6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986985029-3312b850-2433-4176-b675-fc26e47d7754.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780987049064-96d4162e-7c4b-495f-9f6e-4cd184f3dc0d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780987120770-4c44ae13-717c-4794-890d-77e20d61ad3d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989268817-e826571e-93f4-4484-abd2-33dfcb793bc2.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989552387-dba1fe88-de88-4a2b-8872-cc50afbfafa6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989718829-55749130-e323-4ad5-aeac-cd61251895cb.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989737262-ca5e73de-1da6-4ab9-93c6-2cbd39bd18ae.png">
+<meta property="article:published_time" content="2026-06-09T02:05:00.000Z">
+<meta property="article:modified_time" content="2026-06-09T12:54:24.450Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="gdb">
+<meta property="article:tag" content="llvm">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780983841676-7d2e4b9f-de75-4cb1-89a4-79bc231440d5.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="LLVM-PWN环境搭建与gdb调试">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">LLVM-PWN环境搭建与gdb调试</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLVM-PASS"><span class="toc-number">1.</span> <span class="toc-text">LLVM PASS :</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LLVM-%E7%8E%AF%E5%A2%83%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">LLVM 环境：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#attention%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">attention：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-docker-%E5%92%8C-ubuntu%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">安装 docker 和 ubuntu：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%9B%B4%E6%96%B0%E7%B3%BB%E7%BB%9F%E5%8C%85%E5%88%97%E8%A1%A8"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 更新系统包列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85-Docker"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 安装 Docker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%90%AF%E5%8A%A8%E5%B9%B6%E5%90%AF%E7%94%A8-Docker-%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 启动并启用 Docker 服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E6%8B%89%E5%8F%96%E5%B9%B6%E8%BF%90%E8%A1%8C-Ubuntu-%E5%AE%B9%E5%99%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. 拉取并运行 Ubuntu 容器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E4%BB%AC%E5%8F%AF%E4%BB%A5%E5%88%A9%E7%94%A8%E5%91%BD%E4%BB%A4%E5%8E%BB%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E7%9A%84-docker-%E5%AE%B9%E5%99%A8%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">我们可以利用命令去查看当前的 docker 容器：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E4%BB%A5%E6%8A%8A%E8%BF%99%E4%B8%AA%E5%81%9C%E6%AD%A2%E7%9A%84%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="toc-number">1.4.1.</span> <span class="toc-text">可以把这个停止的容器启动起来</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%8D%E8%BF%9B%E5%85%A5%E8%BF%99%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8"><span class="toc-number">1.4.2.</span> <span class="toc-text">再进入这个正在运行的容器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%8A-kali-share-%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6%E7%BB%99-docker"><span class="toc-number">1.5.</span> <span class="toc-text">把 kali_share 的文件复制给 docker</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gdb%E8%B0%83%E8%AF%95%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">gdb调试：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E4%BB%AC%E4%BB%A5-CISCN-2021-satool-%E4%B8%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">我们以 CISCN-2021 satool 为例：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-SAPass-so-%E5%9F%BA%E5%9C%B0%E5%9D%80%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">寻找 SAPass.so 基地址：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C-catch-load%EF%BC%9A"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">执行 catch load：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#runOnFunction"><span class="toc-number">2.2.</span> <span class="toc-text">runOnFunction</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  <div class="widget-wrapper">
+  <div class="widget-wrap" data-aos="fade-up">
+    <h3 class="widget-title">&#23454;&#26102;&#31449;&#28857;&#32479;&#35745;</h3>
+    <div class="widget">
+      <ul class="archive-list site-stats-list">
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">&#24635;&#35775;&#38382;&#37327;</span>
+            <strong class="site-stats-value" id="sidebar-busuanzi-site-pv">--</strong>
+          </span>
+        </li>
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">&#24635;&#35775;&#23458;&#37327;</span>
+            <strong class="site-stats-value" id="sidebar-busuanzi-site-uv">--</strong>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  (() => {
+    const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
+    const uvTarget = document.getElementById('sidebar-busuanzi-site-uv');
+    if (!pvTarget || !uvTarget) return;
+
+    const syncBusuanziStats = () => {
+      const pvSource = document.getElementById('busuanzi_value_site_pv');
+      const uvSource = document.getElementById('busuanzi_value_site_uv');
+      const pv = pvSource?.textContent?.trim();
+      const uv = uvSource?.textContent?.trim();
+      if (pv) pvTarget.textContent = pv;
+      if (uv) uvTarget.textContent = uv;
+    };
+
+    syncBusuanziStats();
+    const timer = window.setInterval(syncBusuanziStats, 1000);
+    window.addEventListener('beforeunload', () => window.clearInterval(timer), { once: true });
+  })();
+</script>
+
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-LLVM-PWN环境搭建与gdb调试" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-06-09T02:05:00.000Z" itemprop="datePublished">2026-06-09</time>
+    <time style="display: none;" id="post-update-time">2026-06-09</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-06-09T12:54:24.450Z" itemprop="dateModified">2026-06-09</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。</p>
+<p>由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一个一个学习，虽然感觉栈的知识也很久没有复习过了 emmmm…….T_T&#x2F;&#x2F;  有没有谁愿意带带我 ……</p>
+<hr>
+<h2 id="LLVM-PASS"><a href="#LLVM-PASS" class="headerlink" title="LLVM PASS :"></a><font style="color:rgb(0, 0, 0);">LLVM PASS :</font></h2><p>LLVM 是 C++编写的构架编译器的框架系统，可用于优化以任意程序语言编写的程序。</p>
+<p>LLVM Pass 可用于对代码进行优化或者对代码插桩（插入新代码），LLVM 的核心库中提供了一些 Pass 类可以继承，通过实现它的一些方法，可以对传入的 LLVM IR 进行遍历并操作。</p>
+<p>LLVM IR 即代码的中间表示，有三种形式：</p>
+<ol>
+<li><code>.ll 格式：</code>人类可以阅读的文本：**主要用于开发者调试和学习。**它的语法有点类似汇编语言，但比底层汇编高级得多，带有强类型系统和无限的虚拟寄存器（以 <code>%</code> 开头）。</li>
+<li><code>.bc 格式：</code>适合机器存储的二进制文件：**主要用于高效存储、快速加载以及链接时优化 (LTO)。**它占用的磁盘空间比 <code>.ll</code> 小得多，且 LLVM 解析它的速度远快于解析文本文件。</li>
+<li><code>内存表示：</code>当前端（如 Clang）解析完源代码，或者 LLVM 从磁盘读取了 <code>.bc</code>&#x2F;<code>.ll</code> 文件后，都会在内存中构建出一套极其复杂的 C++ 对象树。在编写 Pass 时，操作的 <code>llvm::Module</code>、<code>llvm::Function</code>、<code>llvm::BasicBlock</code> 和 <code>llvm::Instruction</code> 等 C++ 类，就是 IR 在内存中的实体。所有的优化、增删改查都是在这个层面发生的。</li>
+</ol>
+<p><font style="color:rgb(0, 0, 0);">下面给出</font><code>&lt;font style=&quot;color:rgb(166, 44, 100);&quot;&gt;.ll&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);">格式和</font><code>&lt;font style=&quot;color:rgb(166, 44, 100);&quot;&gt;.bc&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);">格式生成及相互转换的常用指令清单：</font></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.c -&gt; .ll：clang -emit-llvm -S a.c -o a.ll</span><br><span class="line">.c -&gt; .bc: clang -emit-llvm -c a.c -o a.bc</span><br><span class="line">.ll -&gt; .bc: llvm-as a.ll -o a.bc</span><br><span class="line">.bc -&gt; .ll: llvm-dis a.bc -o a.ll</span><br><span class="line">.bc -&gt; .s: llc a.bc -o a.s</span><br></pre></td></tr></table></figure>
+
+<h3 id="LLVM-环境："><a href="#LLVM-环境：" class="headerlink" title="LLVM 环境："></a>LLVM 环境：</h3><p><font style="color:rgb(0, 0, 0);">需要安装</font><code>&lt;font style=&quot;color:rgb(166, 44, 100);&quot;&gt;CTF&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);">题目中常用的三个版本的</font><code>&lt;font style=&quot;color:rgb(166, 44, 100);&quot;&gt;clang&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);">及</font><code>&lt;font style=&quot;color:rgb(166, 44, 100);&quot;&gt;LLVM&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);">：</font></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install clang-8</span><br><span class="line"><span class="built_in">sudo</span> apt install llvm-8</span><br><span class="line"> </span><br><span class="line"><span class="built_in">sudo</span> apt install clang-10</span><br><span class="line"><span class="built_in">sudo</span> apt install llvm-10</span><br><span class="line"> </span><br><span class="line"><span class="built_in">sudo</span> apt install clang-12</span><br><span class="line"><span class="built_in">sudo</span> apt install llvm-12</span><br></pre></td></tr></table></figure>
+
+<p>opt 是<code>LLVM</code>的优化器和分析器，可加载指定的模块，对输入的 LLVM IR 或者 LLVM 字节码进行优化或分析。</p>
+<p>CTF题目一般会给出所需版本的<code>opt</code>文件（可用.&#x2F;opt –version查看版本）</p>
+<p>或者在<code>README</code>文档中告知<code>opt</code>版本。</p>
+<p>安装好 llvm 后，可在&#x2F;usr&#x2F;lib&#x2F;llvm-xx&#x2F;bin&#x2F;opt路径下找到对应<code>llvm</code>版本的<code>opt</code>文件，一般不开<code>PIE</code>保护</p>
+<h3 id="attention："><a href="#attention：" class="headerlink" title="attention："></a>attention：</h3><p>可以在安装 clang 和 LLVM 的时候由于 pwn 环境版本过高导致启用上述低版本的 clang 和 LLVM，我的解决方法是在 PWN 环境上起一个 docker 容器，找到适配的 ubuntu 镜像即可</p>
+<p>不知道为什么，我的电脑只要装上 ubuntu 镜像去开启虚拟机时虚拟机就会变得很卡，导致无法使用，因此我一直使用的是 kali linux 的镜像。</p>
+<p>最近碰到了 V8 和 LLVM 的题目，由于 kali 是 glibc-2.42 版本的，对于很多低版本的题目是不适配的，只能起一个 docker 容器在里面写题，感觉还是挺麻烦的，也不清楚是否有更好的方法去解决。</p>
+<p>Kali Linux 是基于 Debian 的发行版，对 Docker 的支持非常好。只要在 Kali 上安装了 Docker 引擎，就可以像在其他宿主机系统上一样，轻松拉取并运行 Ubuntu 容器。<strong>事实上这种工作现在大部分可以交给 ai 去做。</strong></p>
+<h3 id="安装-docker-和-ubuntu："><a href="#安装-docker-和-ubuntu：" class="headerlink" title="安装 docker 和 ubuntu："></a>安装 docker 和 ubuntu：</h3><h4 id="1-更新系统包列表"><a href="#1-更新系统包列表" class="headerlink" title="1. 更新系统包列表"></a>1. 更新系统包列表</h4><p>首先，打开终端并确保你的 Kali 系统包索引是最新的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-安装-Docker"><a href="#2-安装-Docker" class="headerlink" title="2. 安装 Docker"></a>2. 安装 Docker</h4><p>在 Kali 中，你可以直接使用内置的包管理器来安装 Docker：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install docker.io -y</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-启动并启用-Docker-服务"><a href="#3-启动并启用-Docker-服务" class="headerlink" title="3. 启动并启用 Docker 服务"></a>3. 启动并启用 Docker 服务</h4><p>安装完成后，启动 Docker 服务，并设置它在系统引导时自动启动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> docker</span><br></pre></td></tr></table></figure>
+
+<p><em>(可选) 验证 Docker 是否正常运行：</em></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker --version</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-拉取并运行-Ubuntu-容器"><a href="#4-拉取并运行-Ubuntu-容器" class="headerlink" title="4. 拉取并运行 Ubuntu 容器"></a>4. 拉取并运行 Ubuntu 容器</h4><p>现在 Docker 已经准备就绪，你可以直接使用 <code>docker run</code> 命令来拉取并进入一个交互式的 Ubuntu 容器：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker run -it ubuntu /bin/bash</span><br></pre></td></tr></table></figure>
+
+<h3 id="我们可以利用命令去查看当前的-docker-容器："><a href="#我们可以利用命令去查看当前的-docker-容器：" class="headerlink" title="我们可以利用命令去查看当前的 docker 容器："></a>我们可以利用命令去查看当前的 docker 容器：</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker ps -a</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780983841676-7d2e4b9f-de75-4cb1-89a4-79bc231440d5.png"></p>
+<h4 id="可以把这个停止的容器启动起来"><a href="#可以把这个停止的容器启动起来" class="headerlink" title="可以把这个停止的容器启动起来"></a>可以把这个停止的容器启动起来</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker start &lt;你的容器ID&gt;</span><br></pre></td></tr></table></figure>
+
+<h4 id="再进入这个正在运行的容器"><a href="#再进入这个正在运行的容器" class="headerlink" title="再进入这个正在运行的容器"></a>再进入这个正在运行的容器</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker <span class="built_in">exec</span> -it &lt;你的容器ID&gt; /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>再在 ubuntu docker 容器当中装上自己需要的 dbg，pwntools，ropper 等等等等的 PWN环境即可</p>
+<h3 id="把-kali-share-的文件复制给-docker"><a href="#把-kali-share-的文件复制给-docker" class="headerlink" title="把 kali_share 的文件复制给 docker"></a>把 kali_share 的文件复制给 docker</h3><p>我是在 kali 当中创建了一个和物理机共享的的文件夹 kali_share，方便传输文件，但是起了 ubuntu 环境也就意味着不能直接把文件传到自己需要的环境当中</p>
+<p>假设 Kali 的当前目录是 <code>.../CISCN-2021 satool</code>。你需要把题目附件（二进制文件或 libc 库）丢进容器里才能调试。这时候要用到 <code>**docker cp**</code> 命令，它就像宿主机和容器之间的“U盘”：</p>
+<p>假设你的题目文件名为 <code>satool</code>，你想把它复制到 <code>satool20</code> 容器的 <code>/root</code> 目录下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> docker <span class="built_in">cp</span> ./satool satool20:/root/</span><br></pre></td></tr></table></figure>
+
+<p>(反过来，如果你在容器里写了 exp 脚本想拿出来，把路径对调一下就可以了：<code>sudo docker cp satool20:/root/exp.py ./</code>)</p>
+<p>安装上了 docker 之后也是成功的完成了第一道 LLVM 题目 T_T&#x2F;&#x2F;&#x2F;</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985291361-03a17632-de64-475f-8e75-94de4fdb8687.png"></p>
+<h2 id="gdb调试："><a href="#gdb调试：" class="headerlink" title="gdb调试："></a>gdb调试：</h2><h3 id="我们以-CISCN-2021-satool-为例："><a href="#我们以-CISCN-2021-satool-为例：" class="headerlink" title="我们以 CISCN-2021 satool 为例："></a>我们以 CISCN-2021 satool 为例：</h3><p>我们直接在对应的 ubuntu 20.04 环境下开始 gdb 调试即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb ./opt</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985876450-7c06afd2-4691-44be-b521-f8476de10fbb.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780985925985-10929f97-803e-493f-aa48-73ff21bcbde1.png"></p>
+<p>不过 opt 并不会一开始就将 SAPass.so 模块加入进来，而是会在 call 了一堆 llvm 初始化之后的第一个 call 函数执行完之后才会加载 SAPass.so 模块：像这些 call 都是典型的 llvm 初始化</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986137488-ba506795-3ab8-4f93-b01d-870e0111726f.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986186654-c010a28c-7b2c-437c-9ca8-b6b46a374755.png"></p>
+<p>那么有一种方法可以快速定位加载 SAPass.so 的时候，从而利用 vmmap 查找 SAPass.so 基地址：</p>
+<h4 id="寻找-SAPass-so-基地址："><a href="#寻找-SAPass-so-基地址：" class="headerlink" title="寻找 SAPass.so 基地址："></a>寻找 SAPass.so 基地址：</h4><p>假设我们当前处于 pwndbg-b main-r 之后：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986790503-0d3a164c-aa48-47d7-8750-a2e188ffb43f.png"></p>
+<h5 id="执行-catch-load："><a href="#执行-catch-load：" class="headerlink" title="执行 catch load："></a>执行 catch load：</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">catch load</span><br></pre></td></tr></table></figure>
+
+<p> 这会让程序在每次调用底层加载库时自动断下，继续执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">r -load ./SAPass.so -SAPass ./exp.ll</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986921113-7eb37095-33be-41a6-921f-7d97f1aa4c46.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986950578-cf864e63-4e30-4429-b279-207e7bb928d6.png"></p>
+<p>c continue：会依次经过我们下的断点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780986985029-3312b850-2433-4176-b675-fc26e47d7754.png"></p>
+<p>继续 c，直到出现如下字样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Catchpoint 2  Inferior loaded ./SAPass.so</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780987049064-96d4162e-7c4b-495f-9f6e-4cd184f3dc0d.png"></p>
+<p>此时我们就可以利用 vmmap 去查看 SAPass.so 的基地址了：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780987120770-4c44ae13-717c-4794-890d-77e20d61ad3d.png"></p>
+<p><font style="color:rgb(0, 0, 0);">圈出来</font>的就是<code>so</code>模块的基地址（高版本<code>opt</code>会显示在内存分布表的下方），直接用这个基地址加上对应偏移就可以得到<code>so</code>模块中的汇编指令地址了，也就能下断点了。</p>
+<h3 id="runOnFunction"><a href="#runOnFunction" class="headerlink" title="runOnFunction"></a>runOnFunction</h3><p><code>runOnFunction</code>函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989268817-e826571e-93f4-4484-abd2-33dfcb793bc2.png"></p>
+<p><code>sub_19D0</code>是虚表中的最后一个，也就是我们常说的 runOnFunction</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989552387-dba1fe88-de88-4a2b-8872-cc50afbfafa6.png"></p>
+<p>进入之后 F5 反编译一下：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989718829-55749130-e323-4ad5-aeac-cd61251895cb.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780989737262-ca5e73de-1da6-4ab9-93c6-2cbd39bd18ae.png"></p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[2024CISCN 初赛]ez_heap" class="lazyload">
+        <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" aria-label="前一篇: [2024CISCN 初赛]ez_heap" title="前一篇: [2024CISCN 初赛]ez_heap"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            [2024CISCN 初赛]ez_heap
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="CISCN-2021 satool" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/09/CISCN-2021%20satool/" aria-label="后一篇: CISCN-2021 satool"  title="后一篇: CISCN-2021 satool"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          CISCN-2021 satool
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        237.4k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        19:41
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#LLVM-PASS"><span class="toc-number">1.</span> <span class="toc-text">LLVM PASS :</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LLVM-%E7%8E%AF%E5%A2%83%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">LLVM 环境：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#attention%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">attention：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-docker-%E5%92%8C-ubuntu%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">安装 docker 和 ubuntu：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%9B%B4%E6%96%B0%E7%B3%BB%E7%BB%9F%E5%8C%85%E5%88%97%E8%A1%A8"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 更新系统包列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85-Docker"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 安装 Docker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%90%AF%E5%8A%A8%E5%B9%B6%E5%90%AF%E7%94%A8-Docker-%E6%9C%8D%E5%8A%A1"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 启动并启用 Docker 服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E6%8B%89%E5%8F%96%E5%B9%B6%E8%BF%90%E8%A1%8C-Ubuntu-%E5%AE%B9%E5%99%A8"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. 拉取并运行 Ubuntu 容器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E4%BB%AC%E5%8F%AF%E4%BB%A5%E5%88%A9%E7%94%A8%E5%91%BD%E4%BB%A4%E5%8E%BB%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E7%9A%84-docker-%E5%AE%B9%E5%99%A8%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">我们可以利用命令去查看当前的 docker 容器：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E4%BB%A5%E6%8A%8A%E8%BF%99%E4%B8%AA%E5%81%9C%E6%AD%A2%E7%9A%84%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E8%B5%B7%E6%9D%A5"><span class="toc-number">1.4.1.</span> <span class="toc-text">可以把这个停止的容器启动起来</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%8D%E8%BF%9B%E5%85%A5%E8%BF%99%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8"><span class="toc-number">1.4.2.</span> <span class="toc-text">再进入这个正在运行的容器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8A%8A-kali-share-%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6%E7%BB%99-docker"><span class="toc-number">1.5.</span> <span class="toc-text">把 kali_share 的文件复制给 docker</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gdb%E8%B0%83%E8%AF%95%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">gdb调试：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E4%BB%AC%E4%BB%A5-CISCN-2021-satool-%E4%B8%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">我们以 CISCN-2021 satool 为例：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-SAPass-so-%E5%9F%BA%E5%9C%B0%E5%9D%80%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">寻找 SAPass.so 基地址：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%A7%E8%A1%8C-catch-load%EF%BC%9A"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">执行 catch load：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#runOnFunction"><span class="toc-number">2.2.</span> <span class="toc-text">runOnFunction</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "LLVM-PWN环境搭建与gdb调试",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一个一个学习，虽然感觉栈的知识也很久没有复习过了 emmmm…….T_T&amp;#x2F;&amp;#x2F;  有",
+          date: "Tue Jun 09 2026 10:05:00 GMT+0800",
+          updated: "Tue Jun 09 2026 20:54:24 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

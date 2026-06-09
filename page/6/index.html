@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">126</div>
+    <div class="sidebar-state-number">132</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -278,19 +278,19 @@
       <div class="widget">
         <ul>
             <li>
-              <a href="/HFTTC.github.io/2026/06/01/WEB-PWN/%5BCISCN%202026%E5%88%9D%E8%B5%9B%5Dminihttpd(47%E8%A7%A3)/" title="[CISCN 2026初赛]minihttpd(47解)">[CISCN 2026初赛]minihttpd(47解)</a>
+              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
             </li>
             <li>
-              <a href="/HFTTC.github.io/2026/05/23/VMpwn/" title="VMpwn">VMpwn</a>
+              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
             </li>
             <li>
-              <a href="/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/" title="[CISCN 2017]kernel-babydriver">[CISCN 2017]kernel-babydriver</a>
+              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
             </li>
             <li>
-              <a href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/" title="初识 KernelPWN">初识 KernelPWN</a>
+              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
             </li>
             <li>
-              <a href="/HFTTC.github.io/2026/05/23/KernelPWN/index/" title="Kernel PWN">Kernel PWN</a>
+              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -302,6 +302,143 @@
 </aside>
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofApple2libc-2.35/LitCTF2024heap-2.35/" aria-label="LitCTF2024 heap-2.35" title="LitCTF2024 heap-2.35"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="LitCTF2024 heap-2.35" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>3.1k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">LitCTF2024 heap-2.35</h2>
+      <article class="post-article">
+          LitCTF2024 heap-2.35在 glibc 2.34 及以后的版本中，诸如 __free_hook 和 __malloc_hook 这类极易被劫持的全局函数指针被彻底移除了。因此，安全研究人员将目光转向了 FSOP (File Stream Oriented Programming)。你提供的这段 EXP 正是利用了 Large Bin Attack 结合 House of Apple 2 技术来实现任意代码执行的。
+House of Apple 2 是一种基于 _IO_FILE 的利用链。它的终极目标是：在不劫持 vtable 指针（通常受到 CFI&amp;#x2F;vtable 检查
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/realloc_hook%E5%8A%AB%E6%8C%81%E7%AF%A1%E6%94%B9gadgets/" aria-label="__realloc_hook 劫持篡改 gadgets" title="__realloc_hook 劫持篡改 gadgets"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__realloc_hook 劫持篡改 gadgets" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>1.5k 字</span>
+        <span><span class="icon-clock"></span>8 分钟</span>
+      </div>
+      <h2 class="post-title">__realloc_hook 劫持篡改 gadgets</h2>
+      <article class="post-article">
+          __realloc_hook 劫持篡改 gadgets参考资料：https://zhuanlan.zhihu.com/p/269126935
+劫持  __realloc_hook 的背景：我们在写堆溢出的时候经常会用到篡改 hook 为 gadgets 的手法去获取shellcode，不过相应的也存在一些问题
+One_gadgets 虽然可以一键获取 shell，但是他对执行时的寄存器和栈环境有及其严苛的要求：
+
+比如它可能要求 [rsp+0x40] == NULL 或者 rcx == NULL。 当我们通过劫持 __malloc_hook，在调用 malloc 时直接跳向 one_gadge
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofApple2libc-2.35/index/" aria-label="House of Apple2 libc-2.35" title="House of Apple2 libc-2.35"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Apple2 libc-2.35" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>1.8k 字</span>
+        <span><span class="icon-clock"></span>8 分钟</span>
+      </div>
+      <h2 class="post-title">House of Apple2 libc-2.35</h2>
+      <article class="post-article">
+          House of Apple2 libc-2.35参考资料：https://xz.aliyun.com/news/16212
+https://www.roderickchan.cn/zh-cn/house-of-apple-%E4%B8%80%E7%A7%8D%E6%96%B0%E7%9A%84glibc%E4%B8%ADio%E6%94%BB%E5%87%BB%E6%96%B9%E6%B3%95-2/
+House of Apple 一共有 apple1，apple2，apple3 三种攻击方式，我们这里先学习 apple2 的攻击调用。
+House of Apple 攻击的调用背景：Libc
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%E8%AE%A1%E7%AE%97main_arena%E5%92%8Cenviron%E4%B9%8B%E9%97%B4%E7%9A%84%E5%81%8F%E7%A7%BB/" aria-label="两种方法计算main_arena和environ之间的偏移" title="两种方法计算main_arena和environ之间的偏移"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="两种方法计算main_arena和environ之间的偏移" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>31 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
+      </div>
+      <h2 class="post-title">两种方法计算main_arena和environ之间的偏移</h2>
+      <article class="post-article">
+          两种方法计算main_arena和environ之间的偏移
+更新: 2026-04-21 00:20:38原文: https://www.yuque.com/idcm/wnemg9/hwze1rfx22pssoha
+
+
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/glibc-2.32malloc()_unalignedtcachechunkdetected/" aria-label="glibc-2.32 malloc(): unaligned tcache chunk detected" title="glibc-2.32 malloc(): unaligned tcache chunk detected"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.32 malloc(): unaligned tcache chunk detected" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>448 字</span>
+        <span><span class="icon-clock"></span>3 分钟</span>
+      </div>
+      <h2 class="post-title">glibc-2.32 malloc(): unaligned tcache chunk detected</h2>
+      <article class="post-article">
+          glibc-2.32 malloc(): unaligned tcache chunk detected从 glibc 2.32 版本开始，官方在 malloc 从 Tcache 中取出内存块的代码里加了一行检查：取出的内存地址，必须能够被 16 整除（也就是地址的最后一位必须是 0）。 如果最后一位不是 0（比如你这里的 8），glibc 会立刻判定 Tcache 链表被黑客破坏，并抛出如下致命报错：malloc(): unaligned tcache chunk detected
+随后程序直接 abort() 退出，你的利用链就此中断。
+我们可以看一道题去了解这个报错：
+在 [ISCC 2
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/" aria-label="[ISCC 2024] chaos_plus(堆栈结合)" title="[ISCC 2024] chaos_plus(堆栈结合)"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[ISCC 2024] chaos_plus(堆栈结合)" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>3.2k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">[ISCC 2024] chaos_plus(堆栈结合)</h2>
+      <article class="post-article">
+          [ISCC 2024] chaos_plus(堆栈结合)网上有师傅对 [ISCC 2024] chaos 进行了修改，抬高了 libc 版本至 2.35 并修改了部分函数，思路可以供自己去学习高版本 libc 的堆攻击，也认识了 Safe-Linking  基址机制。总而言之，是一道非常好的题目。
+参考资料：https://blog.csdn.net/j284886202/article/details/139119047
+chaos_plus(UAF libc-2.35)
+程序分析：main123456789101112131415161718192021222324252627282930
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="[CISCN 2021 初赛]lonelywolf" title="[CISCN 2021 初赛]lonelywolf"></a>
     <div class="post-cover left">
@@ -393,140 +530,8 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcachedup/" aria-label="Tcache dup" title="Tcache dup"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache dup" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>19 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
-      </div>
-      <h2 class="post-title">Tcache dup</h2>
-      <article class="post-article">
-          Tcache dup
-更新: 2026-04-08 19:12:44原文: https://www.yuque.com/idcm/wnemg9/ro1d3xm9z0b5h6eu
-
-
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/TcachebinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" aria-label="Tcachebin Attack 基本介绍" title="Tcachebin Attack 基本介绍"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcachebin Attack 基本介绍" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>216 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
-      </div>
-      <h2 class="post-title">Tcachebin Attack 基本介绍</h2>
-      <article class="post-article">
-          Tcachebin Attack 基本介绍参考资料：PWN入门（3-15-1）-Tcache Attack综述（libc-2.27.so）
-Linux 虚拟机环境 glibc 2.27 版本
-Tcachebin 综述tcache（Thread local caching）线程本地缓存（简称：TLC）。线程本地缓存（tcache）是 glibc 2.26 的新特性，为每个线程缓存小尺寸空闲堆块，也是现代堆漏洞利用的核心。详细来说就是它为每个线程创建一个缓存 cache，增加了堆的分配效率，同时也引入了更多的不安全性，使之前的很多代码都不在其作用，可以很好的绕过。
-tcachebin 和 unso
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="houseoforange_hitcon_2016" title="houseoforange_hitcon_2016"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="houseoforange_hitcon_2016" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2.7k 字</span>
-        <span><span class="icon-clock"></span>14 分钟</span>
-      </div>
-      <h2 class="post-title">houseoforange_hitcon_2016</h2>
-      <article class="post-article">
-          houseoforange_hitcon_2016
-main1234567891011121314151617181920212223242526272829303132333435363738394041void __fastcall __noreturn main(const char *p_Invalid_choice, char **a2, char **a3)&amp;#123;  int n2; // eax  sub_1218();  while ( 1 )  &amp;#123;    while ( 1 )    &amp;#123;      menu();      n2 = atoi_(p_I
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/index/" aria-label="House of Orange glibc-2.23" title="House of Orange glibc-2.23"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Orange glibc-2.23" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2k 字</span>
-        <span><span class="icon-clock"></span>9 分钟</span>
-      </div>
-      <h2 class="post-title">House of Orange glibc-2.23</h2>
-      <article class="post-article">
-          House of Orange glibc-2.23什么是 House of Orange？House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段
-
-House of Orange Poc123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354/* * For glibc-2.23 */#include &amp;lt;stdio.h&amp;gt;#include &amp;l
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/IO_FILE%E4%B9%8BFSOP%E9%93%BE/" aria-label="__IO_FILE之FSOP链" title="__IO_FILE之FSOP链"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__IO_FILE之FSOP链" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2.6k 字</span>
-        <span><span class="icon-clock"></span>13 分钟</span>
-      </div>
-      <h2 class="post-title">__IO_FILE之FSOP链</h2>
-      <article class="post-article">
-          __IO_FILE之FSOP链参考资料：
-https://blog.csdn.net/KaliLinux_V&amp;#x2F;article&amp;#x2F;details&amp;#x2F;146547239?utm_medium&amp;#x3D;distribute.pc_relevant.none-task-blog-2defaultbaidujs_baidulandingword~default-0-146547239-blog-115327308.235^v43^pc_blog_bottom_relevance_base4&amp;amp;spm&amp;#x3D;1001.2101.3001.4242.1&amp;amp;utm_
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/IO_FILE%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/" aria-label="__IO_FILE 结构分析" title="__IO_FILE 结构分析"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__IO_FILE 结构分析" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>3k 字</span>
-        <span><span class="icon-clock"></span>13 分钟</span>
-      </div>
-      <h2 class="post-title">__IO_FILE 结构分析</h2>
-      <article class="post-article">
-          __IO_FILE 结构分析参考资料：https://blog.csdn.net/yjh_fnu_ltn/article/details/141143289?spm=1001.2101.3001.10752
-https://xz.aliyun.com/news/15283
-https://blog.csdn.net/KaliLinux_V/article/details/146547239?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0-146547239
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/5/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/4/">4</a><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><a class="page-number" href="/HFTTC.github.io/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/13/">13</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/7/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/5/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/4/">4</a><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><a class="page-number" href="/HFTTC.github.io/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/14/">14</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/7/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -548,10 +553,10 @@ https://blog.csdn.net/KaliLinux_V/article/details/146547239?utm_medium=distribut
       </div>
       <div>
         <span class="icon-brush"></span>
-        223.3k
+        237.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        18:28
+        19:41
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -579,7 +584,7 @@ https://blog.csdn.net/KaliLinux_V/article/details/146547239?utm_medium=distribut
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">126</div>
+    <div class="sidebar-state-number">132</div>
   </div>
 </div>
 <div class="sidebar-social" >

