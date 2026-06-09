@@ -237,6 +237,57 @@
     </div>
   </div>
   <div class="sidebar-widget">
+  <div class="widget-wrapper">
+  <div class="widget-wrap" data-aos="fade-up">
+    <h3 class="widget-title">实时站点统计</h3>
+    <div class="widget">
+      <ul class="archive-list site-stats-list">
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">总访问量</span>
+            <span class="site-stats-value" id="site-stats-primary">--</span>
+          </span>
+        </li>
+        <li class="archive-list-item site-stats-item">
+          <span class="archive-list-link site-stats-link">
+            <span class="site-stats-label">总访客量</span>
+            <span class="site-stats-value" id="site-stats-secondary">--</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+  (() => {
+    const statsApi = "https://vercel-stats-proxy.vercel.app";
+    const primaryTarget = document.getElementById('site-stats-primary');
+    const secondaryTarget = document.getElementById('site-stats-secondary');
+    if (!primaryTarget || !secondaryTarget || !statsApi) return;
+
+    const formatNumber = (value) => {
+      const num = Number(value);
+      return Number.isFinite(num) ? num.toLocaleString('zh-CN') : '--';
+    };
+
+    const normalizeStatsApiUrl = (value) => value.replace(/\/+$/, '');
+
+    const loadStats = async () => {
+      const url = normalizeStatsApiUrl(statsApi);
+      try {
+        const response = await fetch(url, { headers: { Accept: 'application/json' } });
+        if (!response.ok) return;
+        const data = await response.json();
+        primaryTarget.textContent = formatNumber(data?.total?.views);
+        secondaryTarget.textContent = formatNumber(data?.total?.users);
+      } catch (_) {
+      }
+    };
+
+    loadStats();
+  })();
+</script>
+
   </div>
   </div>
 </aside>
