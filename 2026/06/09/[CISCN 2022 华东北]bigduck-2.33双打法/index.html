@@ -263,31 +263,31 @@
 </div>
 <script>
   (() => {
-    const statsApi = "https://vercel-stats-proxy.vercel.app";
     const primaryTarget = document.getElementById('site-stats-primary');
     const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget || !statsApi) return;
+    if (!primaryTarget || !secondaryTarget) return;
 
-    const formatNumber = (value) => {
-      const num = Number(value);
-      return Number.isFinite(num) ? num.toLocaleString('zh-CN') : '--';
+    const syncBusuanziStats = () => {
+      const pvSource = document.getElementById('busuanzi_value_site_pv');
+      const uvSource = document.getElementById('busuanzi_value_site_uv');
+      const pv = pvSource?.textContent?.trim();
+      const uv = uvSource?.textContent?.trim();
+
+      if (pv) primaryTarget.textContent = pv;
+      if (uv) secondaryTarget.textContent = uv;
     };
 
-    const normalizeStatsApiUrl = (value) => value.replace(/\/+$/, '');
-
-    const loadStats = async () => {
-      const url = normalizeStatsApiUrl(statsApi);
-      try {
-        const response = await fetch(url, { headers: { Accept: 'application/json' } });
-        if (!response.ok) return;
-        const data = await response.json();
-        primaryTarget.textContent = formatNumber(data?.total?.views);
-        secondaryTarget.textContent = formatNumber(data?.total?.users);
-      } catch (_) {
-      }
+    const watchBusuanziStats = () => {
+      syncBusuanziStats();
+      const observer = new MutationObserver(syncBusuanziStats);
+      const pvSource = document.getElementById('busuanzi_value_site_pv');
+      const uvSource = document.getElementById('busuanzi_value_site_uv');
+      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
+      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
+      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
     };
 
-    loadStats();
+    watchBusuanziStats();
   })();
 </script>
 
