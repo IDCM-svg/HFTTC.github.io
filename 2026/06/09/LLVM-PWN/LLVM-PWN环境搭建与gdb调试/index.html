@@ -31,7 +31,7 @@
     <meta name="description" content="前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LLVM-PWN环境搭建与gdb调试">
-<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/index.html">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一">
 <meta property="og:locale" content="zh_CN">
@@ -393,7 +393,7 @@
   </div>
 </aside>
 
-          <section id="main" aria-label="Main content"><article id="post-LLVM-PWN环境搭建与gdb调试" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+          <section id="main" aria-label="Main content"><article id="post-LLVM-PWN/LLVM-PWN环境搭建与gdb调试" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-inner" data-aos="fade-up">
     <div class="article-meta">
       <div class="article-date">
@@ -537,7 +537,7 @@
       </div>
     <div class="article-nav-link-wrap right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2021-satool.jpg" data-sizes="auto" alt="CISCN-2021 satool" class="lazyload">
-      <a href="/HFTTC.github.io/2026/06/09/CISCN-2021%20satool/" aria-label="后一篇: CISCN-2021 satool"  title="后一篇: CISCN-2021 satool"></a>
+      <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/CISCN-2021%20satool/" aria-label="后一篇: CISCN-2021 satool"  title="后一篇: CISCN-2021 satool"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
           CISCN-2021 satool
@@ -754,7 +754,7 @@
         window.REIMU_POST = {
           author: "HFTTC",
           title: "LLVM-PWN环境搭建与gdb调试",
-          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/",
           excerpt: "",
           description: "",
           stripContent: "前言：感觉最近碰到了很多不会的知识，一时间有点手忙脚乱。高版本的堆攻击还不能熟练运用，house of 系列的高版本还有很多疏漏，写题的时候又碰见了 V8，LLVM，异构 PWN，内核，phppwn 等等等等之前没有接触过的难题，及时到现在还是没有学会上面说的这些东西，只能说感觉要学习的东西还有很多很多。 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一个一个学习，虽然感觉栈的知识也很久没有复习过了 emmmm…….T_T&amp;#x2F;&amp;#x2F;  有",

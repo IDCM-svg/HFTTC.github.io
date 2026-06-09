@@ -31,7 +31,7 @@
     <meta name="description" content="第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的  runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置   sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction   进入之后 F5 反编译一下：     坐牢，代码">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CISCN-2021 satool">
-<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/CISCN-2021%20satool/index.html">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN/CISCN-2021%20satool/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的  runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置   sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction   进入之后 F5 反编译一下：     坐牢，代码">
 <meta property="og:locale" content="zh_CN">
@@ -405,7 +405,7 @@
   </div>
 </aside>
 
-          <section id="main" aria-label="Main content"><article id="post-CISCN-2021 satool" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+          <section id="main" aria-label="Main content"><article id="post-LLVM-PWN/CISCN-2021 satool" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-inner" data-aos="fade-up">
     <div class="article-meta">
       <div class="article-date">
@@ -555,7 +555,7 @@
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
           <img data-src="/HFTTC.github.io/images/pwn/covers/llvm-pwn-gdb.jpg" data-sizes="auto" alt="LLVM-PWN环境搭建与gdb调试" class="lazyload">
-        <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" aria-label="前一篇: LLVM-PWN环境搭建与gdb调试" title="前一篇: LLVM-PWN环境搭建与gdb调试"></a>
+        <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" aria-label="前一篇: LLVM-PWN环境搭建与gdb调试" title="前一篇: LLVM-PWN环境搭建与gdb调试"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
             LLVM-PWN环境搭建与gdb调试
@@ -780,7 +780,7 @@
         window.REIMU_POST = {
           author: "HFTTC",
           title: "CISCN-2021 satool",
-          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/CISCN-2021%20satool/",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/09/LLVM-PWN/CISCN-2021%20satool/",
           excerpt: "",
           description: "",
           stripContent: "第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的  runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置   sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction   进入之后 F5 反编译一下：     坐牢，代码很长，这里不放出来了，一点一点分析吧：   r0oDkc4B 本身是小端序的十六进制的数值，转换成字",
