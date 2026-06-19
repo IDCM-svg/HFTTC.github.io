@@ -35,13 +35,22 @@
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-006.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-007.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-008.png">
 <meta property="article:published_time" content="2026-06-19T13:36:09.000Z">
-<meta property="article:modified_time" content="2026-06-19T14:01:39.116Z">
+<meta property="article:modified_time" content="2026-06-19T14:29:45.740Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="d3ctf">
 <meta property="article:tag" content="php">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-001.png">
       <meta name="keywords" content="Pwn, CTF, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
     <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
@@ -243,7 +252,7 @@
     <time style="display: none;" id="post-update-time">2026-06-19</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-19T14:01:39.116Z" itemprop="dateModified">2026-06-19</time>
+      <time datetime="2026-06-19T14:29:45.740Z" itemprop="dateModified">2026-06-19</time>
     </span>
 </div>
 
@@ -257,7 +266,7 @@
 <h3 id="PHPPWN-GDB-流程"><a href="#PHPPWN-GDB-流程" class="headerlink" title="PHPPWN GDB 流程"></a>PHPPWN GDB 流程</h3><p>PHPPWN 一般来说都是给一个拓展 .so 文件，我们在写题过程中启用这个拓展就可以直接进行内部函数的调用。</p>
 <p>当然也会给 dockerfile 方便我们起一个 docker 环境复现相同的 php 版本环境：</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-001.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-001.png"></p>
 <h4 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h4><p>保存文件后，在终端里重新跑一遍 build 命令（换个名字以示区分）：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t pwnshell_debug .</span><br></pre></td></tr></table></figure>
 
@@ -266,20 +275,20 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a                         <span class="comment"># 查看当前容器</span></span><br><span class="line"></span><br><span class="line">docker <span class="built_in">rm</span> -f pwn_debug_container     <span class="comment"># 如果有的话，删除掉就容器</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 重新启动一个带 8888 端口映射的新容器</span></span><br><span class="line">docker run -d -p 8080:80 -p 8888:8888 \</span><br><span class="line">  --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \</span><br><span class="line">  --name pwn_debug_container pwnshell_debug /bin/bash</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-002.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-002.png"></p>
 <h4 id="监听端口"><a href="#监听端口" class="headerlink" title="监听端口"></a>监听端口</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it 53871d62457c /bin/bash</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get install -y gdb gdbserver</span><br><span class="line">gdbserver 0.0.0.0:8888 php /var/www/html/index.php</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-003.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-003.png"></p>
 <h4 id="gdb-连接远程"><a href="#gdb-连接远程" class="headerlink" title="gdb 连接远程"></a>gdb 连接远程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gdb -q \</span><br><span class="line">  -ex <span class="string">&quot;add-symbol-file ./stuff/vuln.so&quot;</span> \</span><br><span class="line">  -ex <span class="string">&quot;target remote 127.0.0.1:8888&quot;</span></span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-004.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-004.png"></p>
 <p>看一眼 vmmap，觉得没什么问题，应该可以进行调试了：</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-005.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-005.png"></p>
 <h4 id="gdb-调试的注意事项"><a href="#gdb-调试的注意事项" class="headerlink" title="gdb 调试的注意事项"></a>gdb 调试的注意事项</h4><p>当我们 gdb 去调试的时候必须得有一段 PHP 代码去触发它。</p>
 <p><code>.so</code> 是一个动态链接库，它自己是不能单独运行的。它的作用是给 PHP 增加新的函数（比如出题人加了一个叫 <code>pwn_hacker()</code> 的函数）。你要想让 GDB 抓住这个漏洞，就必须得让 PHP 引擎去执行这个恶意函数。</p>
 <p>例如我们题目当中假如有 zif_addHacker 这个函数，我们想要下断点就比如要先引用这个函数：</p>
@@ -289,9 +298,9 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; <span class="built_in">set</span> breakpoint pending on</span><br><span class="line">pwndbg&gt; b zif_addHacker</span><br><span class="line">pwndbg&gt; b zif_removeHacker</span><br><span class="line">pwndbg&gt; c</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-006.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-006.png"></p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-007.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-007.png"></p>
 <p>这样就可以直接跳转到函数当中。</p>
 <h4 id="在-exp-当中下断点："><a href="#在-exp-当中下断点：" class="headerlink" title="在 exp 当中下断点："></a>在 exp 当中下断点：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="title function_ invoke__">str_repeat</span>(<span class="string">&quot;A&quot;</span>, <span class="number">100</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="string">&quot;===== HINT: Checking Heap =====&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -301,7 +310,7 @@
 <p>那么在这里还有一个问题：出题人经常会在 php.ini 当中限制 var_dump 函数，我们删掉即可</p>
 <p>直接 Ctrl + f 搜索 var_dump,，然后 Ctrl + k 直接给这一行删了就行</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;PHP-PWN d3ctf2024-pwnshell&#x2F;img-008.png)</p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/php-pwn-d3ctf2024-pwnshell/img-008.png"></p>
 <p>再次进行上述操作调试：删除旧容器，起一个新容器</p>
 <h4 id="还有一种方法"><a href="#还有一种方法" class="headerlink" title="还有一种方法"></a>还有一种方法</h4><p>emmm 就下断点在对应函数，执行 c，如果有重复的，就多次 c 即可。</p>
 <p>参考资料：<a target="_blank" rel="noopener" href="https://ixout.github.io/posts/5022/index.html#WACON2023-heaphp">https://ixout.github.io/posts/5022/index.html#WACON2023-heaphp</a></p>
@@ -364,10 +373,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        246.3k
+        245.8k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        20:25
+        20:21
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -537,7 +546,7 @@
           description: "",
           stripContent: "前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。 PHPPWN GDB 流程PHPPWN 一般来说都是给一个拓展 .s",
           date: "Fri Jun 19 2026 21:36:09 GMT+0800",
-          updated: "Fri Jun 19 2026 22:01:39 GMT+0800",
+          updated: "Fri Jun 19 2026 22:29:45 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg",
         };
       </script>
