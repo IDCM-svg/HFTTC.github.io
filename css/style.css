@@ -3032,8 +3032,7 @@ pre .emphasis {
   font-size: 20px;
 }
 .site-stats-list {
-  margin: 0;
-  padding: 0;
+  margin-left: 0;
 }
 .site-stats-item {
   list-style: none;
@@ -3043,9 +3042,11 @@ pre .emphasis {
 .site-stats-link {
   display: inline;
   cursor: default;
+  margin-left: 0 !important;
 }
 .site-stats-label {
   opacity: 0.8;
+  margin-left: 0 !important;
 }
 .site-stats-value {
   color: var(--red-0);
