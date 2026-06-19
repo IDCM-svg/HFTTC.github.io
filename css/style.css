@@ -3037,21 +3037,19 @@ pre .emphasis {
 }
 .site-stats-item {
   list-style: none;
+  margin: 8px 0;
+  padding: 1px 0;
 }
 .site-stats-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: inline;
   cursor: default;
-  padding-right: 8px;
 }
 .site-stats-label {
   opacity: 0.8;
-  padding-right: 12px;
 }
 .site-stats-value {
   color: var(--red-0);
-  font-weight: bold;
+  font-weight: normal;
 }
 .sidebar-social {
   display: flex;
