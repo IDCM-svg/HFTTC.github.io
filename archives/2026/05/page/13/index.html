@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -221,57 +221,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">实时站点统计</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量</span>
-            <span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量</span>
-            <span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
@@ -287,19 +236,19 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" title="(no title)">(no title)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -412,10 +361,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        237.4k
+        252.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        19:41
+        20:55
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -443,7 +392,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >

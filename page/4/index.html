@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -221,57 +221,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">实时站点统计</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量</span>
-            <span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量</span>
-            <span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
@@ -287,19 +236,19 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" title="(no title)">(no title)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -311,6 +260,97 @@
 </aside>
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfMuney/%5BCISCN2023%5Dmuney/" aria-label="[CISCN 2023]muney" title="[CISCN 2023]muney"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2023]muney" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>20 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
+      </div>
+      <h2 class="post-title">[CISCN 2023]muney</h2>
+      <article class="post-article">
+          [CISCN 2023]muney
+更新: 2026-05-10 20:31:05原文: https://www.yuque.com/idcm/wnemg9/fd9q4zih4k72yiv4
+
+
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfEmma/%5B%E6%B9%96%E6%B9%98%E6%9D%AF2021%5Dhouse_of_emma/" aria-label="[湖湘杯 2021]house_of_emma" title="[湖湘杯 2021]house_of_emma"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[湖湘杯 2021]house_of_emma" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.9k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">[湖湘杯 2021]house_of_emma</h2>
+      <article class="post-article">
+          [湖湘杯 2021]house_of_emma
+程序分析：main：12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182838485868788899091929394959697void __fastcall __noreturn main(__int64 a1, char **a2, char **a3)&amp;#123;    void *
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfMuney/index/" aria-label="House Of Muney" title="House Of Muney"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Muney" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>43 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
+      </div>
+      <h2 class="post-title">House Of Muney</h2>
+      <article class="post-article">
+          House Of Muney前言：感觉这种利用手法有点
+参考资料：https://www.cnblogs.com/CH13hh/p/18452565
+
+更新: 2026-05-10 20:56:52原文: https://www.yuque.com/idcm/wnemg9/ww0ig3e86gusds15
+
+
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfEmma/index/" aria-label="House Of Emma" title="House Of Emma"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Emma" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>1.3k 字</span>
+        <span><span class="icon-clock"></span>7 分钟</span>
+      </div>
+      <h2 class="post-title">House Of Emma</h2>
+      <article class="post-article">
+          House Of EmmaHouse Of Emma 的利用背景：学习 House Of Kiwi 大概是一个月之前了，中间由于学校的一些活动确实是有一段时间没怎么学习，回过神来还需要把前面的知识再重新复习一遍，感觉也不算是很扎实。
+House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们通常在 _IO_file_jumps 可以写的情况下的利用 Kiwi ，那如果不可写呢，house of emma 就是对其的补充，也可以说是进阶。
+如果 vtable 指向的 _IO_file_jumps 不可写，那么 House of Kiwi 这种攻击手法就会失效。这时候就需要考
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfCat/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2022%5DHouseofCat/" aria-label="[强网杯 2022]House of Cat" title="[强网杯 2022]House of Cat"></a>
     <div class="post-cover left">
@@ -442,95 +482,6 @@ House of Kiwi在 glibc 2.29 之后，当题目开启了沙箱，利用思路一�
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfBotcake/%5BCISCN2022%5D%E5%8D%8E%E4%B8%9C%E5%8C%97%E8%B5%9B%E5%8C%BAblueNSS/" aria-label="[CISCN 2022]华东北赛区 blue NSS" title="[CISCN 2022]华东北赛区 blue NSS"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2022]华东北赛区 blue NSS" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>3.5k 字</span>
-        <span><span class="icon-clock"></span>19 分钟</span>
-      </div>
-      <h2 class="post-title">[CISCN 2022]华东北赛区 blue NSS</h2>
-      <article class="post-article">
-          [CISCN 2022]华东北赛区 blue NSS
-通过 pwninit 我们了解到这个文件是 libc 2.31 版本的
-程序分析：main简单逆向修改函数过后大概是这个样子
-123456789101112131415161718192021222324252627282930313233343536373839404142void __fastcall __noreturn main(const char *p_Invalid_choice_n, char **a2, char **a3)&amp;#123;    int num; // [rsp+Ch] [rbp-4h]    init_0(
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfBotcake/index/" aria-label="House Of Botcake" title="House Of Botcake"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Botcake" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.7k 字</span>
-        <span><span class="icon-clock"></span>7 分钟</span>
-      </div>
-      <h2 class="post-title">House Of Botcake</h2>
-      <article class="post-article">
-          House Of Botcake参考资料：https://www.cnblogs.com/brain-Z/p/16853137.html
-House of Botcake：感觉不是很复杂的利用手法，这里就简单对攻击方式进行分析，之后通过一道题目去深入了解House of Botcake
-https://www.yuque.com/idcm/wnemg9/gvr9dhnayk94sxfw，如果了解利用手法可以直接看题目。
-house of botcake 的利用背景：在 Glibc 2.28 及以前，Tcache 几乎是在裸奔。当你 free(chunk) 时，系统根本不管这个 chunk 是不
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfEinherjar/CTFHubHouseofEinherjar/" aria-label="CTFHub House of Einherjar" title="CTFHub House of Einherjar"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="CTFHub House of Einherjar" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.9k 字</span>
-        <span><span class="icon-clock"></span>11 分钟</span>
-      </div>
-      <h2 class="post-title">CTFHub House of Einherjar</h2>
-      <article class="post-article">
-          CTFHub House of Einherjar
-程序分析：main12345678910111213141516171819202122232425262728293031323334353637int __fastcall __noreturn main(int argc, const char **argv, const char **envp)&amp;#123;    int v3; // [rsp+24h] [rbp-Ch] BYREF    unsigned __int64 v4; // [rsp+28h] [rbp-8h]    v4 = __readfsqword(0x28u); 
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfRabbit/" aria-label="House Of Rabbit" title="House Of Rabbit"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Rabbit" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>5.3k 字</span>
-        <span><span class="icon-clock"></span>21 分钟</span>
-      </div>
-      <h2 class="post-title">House Of Rabbit</h2>
-      <article class="post-article">
-          House Of Rabbit前言：查找其他题目 wp 的时候偶尔看见了这种利用手法，由于好奇就来了解一下，也算是扩展自己的攻击手法和视野，不过没有碰见合适的题目，以后遇见了在对例题进行补充。
-在低版本 glibc ，House of Rabbit 是一种极具破坏力的堆利用手法。它的核心思想是利用 malloc_consolidate 机制的盲目性，将受到严格大小限制的 Fastbin 堆块，强行偷渡到审查宽松的 Unsorted Bin 中，从而实现任意地址分配或大规模堆重叠。
-在 glibc 2.23 中，由于缺少了高版本中严苛的 system_mem 等检查，House of Rabbi
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
     <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/3/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/14/">14</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/5/">下一页 &raquo;</a>
   </nav>
@@ -554,10 +505,10 @@ house of botcake 的利用背景：在 Glibc 2.28 及以前，Tcache 几乎是�
       </div>
       <div>
         <span class="icon-brush"></span>
-        237.4k
+        252.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        19:41
+        20:55
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -585,7 +536,7 @@ house of botcake 的利用背景：在 Glibc 2.28 及以前，Tcache 几乎是�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >

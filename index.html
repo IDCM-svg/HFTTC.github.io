@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -221,57 +221,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">实时站点统计</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量</span>
-            <span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量</span>
-            <span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
@@ -287,19 +236,19 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" title="(no title)">(no title)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -311,6 +260,109 @@
 </aside>
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" aria-label="" title=""></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-06-19</span>
+          <span><span class="icon-calendar-plus"></span>2026-06-19</span>
+        <span><span class="icon-pencil"></span>2.7k 字</span>
+        <span><span class="icon-clock"></span>14 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          这道题目的逻辑并不算难，一道新型编译器也算是拓展眼界了。wp 写得会比较长，实际上并没有那么难。
+不过也有点难受，就是你要新认识一个编译器，并编写出相应的代码进行篡改攻击 emmmm……
+本质还是利用指针篡改 got 表
+
+
+
+serve.py1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374#!/usr/bin/env python3import osimport r
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" aria-label="" title=""></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-06-19</span>
+          <span><span class="icon-calendar-plus"></span>2026-06-19</span>
+        <span><span class="icon-pencil"></span>5.3k 字</span>
+        <span><span class="icon-clock"></span>25 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          前言：差不多一个多月前接触了 kernelpwn，学习了一道 UAF 就没有下文了。话说这段时间还真是懈怠呢。
+因此决定从今天开始重新拾起 kernelpwn(其实倒不如说重新认识) ^_^&amp;#x2F;&amp;#x2F;&amp;#x2F;
+
+阅读网上文章发现 ret2usr 的利用手法已经过时了，不过这应当是最基础的一类内核栈手法了吧，还是要学的。
+由于本人基础薄弱，因此在文章中写了许多重要的不重要的，有用的没有用的东西，望见谅…………
+
+ret2usrret2usr（Return-to-user，返回用户态）是一种经典的内核（Kernel）漏洞利用手法。
+简单来说，当操作系统内核空间存在函数指针覆盖或栈
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="" title=""></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-06-19</span>
+          <span><span class="icon-calendar-plus"></span>2026-06-19</span>
+        <span><span class="icon-pencil"></span>3.1k 字</span>
+        <span><span class="icon-clock"></span>15 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站
+也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&amp;lt;指的我自己~~~&amp;gt;
+从一开始会非常详细，往后逐渐了解之后会着重点记录  \[^_^]\
+
+下载 pwn.college 附件：pwn.college 的 kernel 基础关卡在：https://pwn.college/system-security/kernel-security/
+
+
+首先在 Us
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" aria-label="" title=""></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-06-19</span>
+          <span><span class="icon-calendar-plus"></span>2026-06-19</span>
+        <span><span class="icon-pencil"></span>4.2k 字</span>
+        <span><span class="icon-clock"></span>20 分钟</span>
+      </div>
+      <h2 class="post-title"></h2>
+      <article class="post-article">
+          前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。
+一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。
+
+好吧还是想吐槽一下，最开始的时候利用 off-by-null 一直有点懵，再想为什么要重复申请这个堆块，后来看了很久才发现 off-by-null 修改了指针地址。之
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" aria-label="[CISCN 2023]StrangeTalkBot" title="[CISCN 2023]StrangeTalkBot"></a>
     <div class="post-cover left">
@@ -474,109 +526,6 @@ r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后�
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/06/01/WEB-PWN/%5BCISCN%202026%E5%88%9D%E8%B5%9B%5Dminihttpd(47%E8%A7%A3)/" aria-label="[CISCN 2026初赛]minihttpd(47解)" title="[CISCN 2026初赛]minihttpd(47解)"></a>
-    <div class="post-cover left">
-        <img data-src="/HFTTC.github.io/images/pwn/ciscnminihttpd-home.jpg" data-sizes="auto" alt="[CISCN 2026初赛]minihttpd(47解)" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-06-01</span>
-          <span><span class="icon-calendar-plus"></span>2026-06-01</span>
-        <span><span class="icon-pencil"></span>4.1k 字</span>
-        <span><span class="icon-clock"></span>20 分钟</span>
-      </div>
-      <h2 class="post-title">[CISCN 2026初赛]minihttpd(47解)</h2>
-      <article class="post-article">
-          WEBPWN+CSU+ORW(OPENFILE)+RECV()
-
-
-
-
-
-
-最近在打御网杯，前面打了 ISCC，结果又轮到我分享会了，其实最近打比赛感触蛮大的，你说想体验一把真的是有点…… CTF 不用 AI 吧，且不说不会写的，即使到最后 ak 了也只能吃个低保，用了 AI 吧，又有一种感觉牢无所获，没有丝毫体验感，赛后也是一直在赶 wp 根本没时间复现，其实 ai 打出来之后也不想去复现了，想偷懒看看 ai 的思路就当是过去了，久而久之感觉自己的能力在退化，很多知识不学忘得也很快，算了不再多说了，赶一下分享会的内容：
-在这之前，已经学过三道 webpwn 的题目了，其中两道是基于 http
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/VMpwn/" aria-label="VMpwn" title="VMpwn"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="VMpwn" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2.1k 字</span>
-        <span><span class="icon-clock"></span>11 分钟</span>
-      </div>
-      <h2 class="post-title">VMpwn</h2>
-      <article class="post-article">
-          VMpwn参考资料：https://xz.aliyun.com/news/15722
-https://zikh26.github.io/posts/ccd7886.html#ciscn-2019-qual-virtual
-在学习 VMpwn 之前，建议学一学虚拟机逆向，这两个关联是很大的。VMpwn 一般代指在程序中实现运算指令来模拟程序的运行（汇编类）或者在程序中自定义运算指令的程序（编译类）。
-[OGeek2019 Final]OVM
-首先看一下题目主体吧：
-123456789101112131415161718192021222324252627282930313233343536373
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/" aria-label="[CISCN 2017]kernel-babydriver" title="[CISCN 2017]kernel-babydriver"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2017]kernel-babydriver" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>3.6k 字</span>
-        <span><span class="icon-clock"></span>16 分钟</span>
-      </div>
-      <h2 class="post-title">[CISCN 2017]kernel-babydriver</h2>
-      <article class="post-article">
-          [CISCN 2017]kernel-babydriver作为一个刚刚涉足 kernelpwn 的萌新，由于大量未知的基础知识以及对 kernelpen 工具的陌生，一时不知道该从哪里学起，也不清楚整个 kernelpwn 大概是走什么样子的学习路线。既然如此，那就从题目开始熟悉 kernelpwn
-上一篇文章我们通过 kernel-babydriver 这个题目初步了解整个题目提权的过程，这次就记录一下如何利用漏洞
-checksec 检查 babydriver.ko：
-cat boot.sh
-
-没有 KASLR：-append 参数中没有 kaslr。这表示内核基地址是固定的，你不需要通过泄
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/" aria-label="初识 KernelPWN" title="初识 KernelPWN"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="初识 KernelPWN" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>829 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
-      </div>
-      <h2 class="post-title">初识 KernelPWN</h2>
-      <article class="post-article">
-          初识 KernelPWNKernel UAF-babydriver现在处于一种并不了解 KernelPWN 的现状，这篇文章主要是根据已知文件和 exp 了解解题步骤，为后续打基础
-利用 exp 解一道题目的过程：在&amp;#x2F;home&amp;#x2F;kali&amp;#x2F;Desktop&amp;#x2F;give_to_player 有一道内核pwn ，这个可以自行去寻找文件
-在该文件夹中有下面这些文件 bzImage  rootfs.cpio  boot.sh  babydriver.ko exp.c
-
-
-bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件， 负责管理 C
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
     <span class="page-number current">1</span><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/14/">14</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/2/">下一页 &raquo;</a>
   </nav>
@@ -600,10 +549,10 @@ bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件�
       </div>
       <div>
         <span class="icon-brush"></span>
-        237.4k
+        252.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        19:41
+        20:55
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -631,7 +580,7 @@ bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >

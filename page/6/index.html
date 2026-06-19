@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -221,57 +221,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">实时站点统计</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量</span>
-            <span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量</span>
-            <span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
@@ -287,19 +236,19 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" title="(no title)">(no title)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -311,6 +260,96 @@
 </aside>
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofRoman/npuctf_2020_bad_guy/" aria-label="npuctf_2020_bad_guy" title="npuctf_2020_bad_guy"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="npuctf_2020_bad_guy" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.3k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
+      </div>
+      <h2 class="post-title">npuctf_2020_bad_guy</h2>
+      <article class="post-article">
+          npuctf_2020_bad_guy前言：House Of Roman + _IO_2_1_stdout 泄露：解题方法只是在第一步利用了House of Roman 拿到stdout之后就是泄漏libc和fastbin_attack，最后就可以 getshell了。可以把 Roman 当做一种爆破的思路，但是不推荐整道题都通过爆破去攻击，毕竟爆破次数是 16 的指数级增长。
+本题目由于找不到合适的 libc，虽然远程打通了，不过本地还是由于 libc 版本问题打不通。
+
+
+12345678910111213141516171819202122232425262728293031323334
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofRoman/index/" aria-label="House of Roman" title="House of Roman"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Roman" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>797 字</span>
+        <span><span class="icon-clock"></span>4 分钟</span>
+      </div>
+      <h2 class="post-title">House of Roman</h2>
+      <article class="post-article">
+          House of Roman前言：感觉没有找到非常合适的例子，这里就简单说一下原理和利用手法吧。
+什么是 House of Ruman？House of Roman 是一种非常经典且具有挑战性的高级堆利用手法。它的核心是：在没有任何信息泄露的情况下，通过概率爆破，通常是 1&amp;#x2F;16 的成功率，实现相对地址覆盖，最终获取远程代码执行。
+这项技术由安全研究员 Roman 提出，主要针对缺少 puts、printf 等打印输出功能，导致攻击者无法获取 Libc 基址的极端情况。  
+House of Roman 的原理：House of Roman 的本质是组合拳。由于没有地址泄露，我们无法
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/IO_2_1_stdout%E6%B3%84%E9%9C%B2libc/%5B2021%E9%95%BF%E5%9F%8E%E6%9D%AF%5DK1ng_in_h3Ap_I/" aria-label="[ 2021长城杯 ]K1ng_in_h3Ap_I" title="[ 2021长城杯 ]K1ng_in_h3Ap_I"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[ 2021长城杯 ]K1ng_in_h3Ap_I" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.3k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
+      </div>
+      <h2 class="post-title">[ 2021长城杯 ]K1ng_in_h3Ap_I</h2>
+      <article class="post-article">
+          [ 2021长城杯 ]K1ng_in_h3Ap_I
+整个程序分析：main12345678910111213141516171819202122232425262728293031323334353637383940void __fastcall __noreturn main(__int64 a1, char **a2, char **a3)&amp;#123;  int n2; // eax  init_();  while ( 1 )  &amp;#123;    while ( 1 )    &amp;#123;      menu(a1, a2);      n2 = atoi_0();      if (
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/IO_2_1_stdout%E6%B3%84%E9%9C%B2libc/index/" aria-label="_IO_2_1_stdout 泄露libc" title="_IO_2_1_stdout 泄露libc"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="_IO_2_1_stdout 泄露libc" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>3.3k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">_IO_2_1_stdout 泄露libc</h2>
+      <article class="post-article">
+          _IO_2_1_stdout 泄露libc参考资料：https://www.cnblogs.com/Langx/articles/19089433
+前言：尽管我们前面已经学了很多关于 __IO_FILE 的知识，不过我们这里依旧从头开始了解 _IO_2_1_stdout。
+_IO_FILE 结构FILE 在 linux 系统的标准 IO 库使用来表述文件结构，称之为文件流。这里所提及的”流”其实是一种抽象的概念。无论是硬件还是软件其实都没有”流”这一说，只是人们为了便于表述数据的流向而创造的名称。比如说当我们要输出磁盘中记录的数据，那么在计算机中首先会将磁盘中的数据加载进内存，那么磁盘 -&amp;g
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofApple2libc-2.35/LitCTF2024heap-2.35/" aria-label="LitCTF2024 heap-2.35" title="LitCTF2024 heap-2.35"></a>
     <div class="post-cover left">
@@ -447,98 +486,6 @@ chaos_plus(UAF libc-2.35)
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="[CISCN 2021 初赛]lonelywolf" title="[CISCN 2021 初赛]lonelywolf"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2021 初赛]lonelywolf" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.8k 字</span>
-        <span><span class="icon-clock"></span>10 分钟</span>
-      </div>
-      <h2 class="post-title">[CISCN 2021 初赛]lonelywolf</h2>
-      <article class="post-article">
-          [CISCN 2021 初赛]lonelywolf
-程序分析：
-main 函数
-
-12345678910111213141516171819202122232425262728293031323334353637void __fastcall __noreturn main(__int64 a1, char **a2, char **a3)&amp;#123;  _QWORD v3[5]; // [rsp+0h] [rbp-28h] BYREF  v3[1] = __readfsqword(0x28u);  setvbuf_0();  while ( 1 )  &amp;#123;    puts(&amp;quot
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/index/" aria-label="glibc-2.35 新增保护机制" title="glibc-2.35 新增保护机制"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.35 新增保护机制" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1k 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
-      </div>
-      <h2 class="post-title">glibc-2.35 新增保护机制</h2>
-      <article class="post-article">
-          glibc-2.35 新增保护机制在 glibc 2.35 环境下进行堆利用时，保护机制的升级使得许多早期的经典利用手法彻底失效。相较于早期版本（如 2.23 - 2.27 甚至 2.29），2.35 版本的堆结构和内存分配器更加严格。以下是几个需要特别注意的核心变化和应对思路：
-1. 传统 Hook 全面移除 (The End of Hooks)这是 2.35 下影响最大的改变（此机制从 2.34 开始就已被彻底执行）。
-
-变化：__free_hook、__malloc_hook、__realloc_hook 等全局函数指针被完全删除。
-影响： 过去“劫持 Hook -&amp;gt; 填入 sys
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/index/" aria-label="Tcache_perthread_corruption" title="Tcache_perthread_corruption"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache_perthread_corruption" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>789 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
-      </div>
-      <h2 class="post-title">Tcache_perthread_corruption</h2>
-      <article class="post-article">
-          Tcache_perthread_corruption参考资料：https://www.cnblogs.com/Theffth-blog/p/12790720.html
-Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地址的方法是泄露 unsortedbin 中的 fd 和 bk 指针。而在严格限制 chunk 大小的堆题当中，如果有 Tcachebin 机制的影响，我们必须先将 Tcachebin 填满才能把释放的 chunk 放入 UnSortedbin 当中进行地址泄露 main_arena + 固定偏移。此时如果题目堆 malloc 和 free
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/TcachePoisoning/" aria-label="Tcache Poisoning" title="Tcache Poisoning"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache Poisoning" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.3k 字</span>
-        <span><span class="icon-clock"></span>7 分钟</span>
-      </div>
-      <h2 class="post-title">Tcache Poisoning</h2>
-      <article class="post-article">
-          Tcache Poisoning[LitCTF 2024] heap-2.31 Tcache Poisoning
-123┌──(pwn_env)─(root㉿kali)-[/home/kali/Desktop]└─# patchelf --set-interpreter ./glibc-all-in-one/libs/2.31-0ubuntu9_amd64/ld-2.31.so ./heap2.31 patchelf --set-rpath /home/kali/Desktop/glibc-all-in-one/libs/2.31-0ubuntu9_amd64 ./heap2.31 
-
-封装函
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
     <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/5/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/4/">4</a><a class="page-number" href="/HFTTC.github.io/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><a class="page-number" href="/HFTTC.github.io/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/14/">14</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/7/">下一页 &raquo;</a>
   </nav>
@@ -562,10 +509,10 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
       </div>
       <div>
         <span class="icon-brush"></span>
-        237.4k
+        252.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        19:41
+        20:55
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -593,7 +540,7 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >

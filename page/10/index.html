@@ -172,7 +172,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -221,57 +221,6 @@
     </div>
   </div>
   <div class="sidebar-widget">
-  <div class="widget-wrapper">
-  <div class="widget-wrap" data-aos="fade-up">
-    <h3 class="widget-title">实时站点统计</h3>
-    <div class="widget">
-      <ul class="archive-list site-stats-list">
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访问量</span>
-            <span class="site-stats-value" id="site-stats-primary">--</span>
-          </span>
-        </li>
-        <li class="archive-list-item site-stats-item">
-          <span class="archive-list-link site-stats-link">
-            <span class="site-stats-label">总访客量</span>
-            <span class="site-stats-value" id="site-stats-secondary">--</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
-<script>
-  (() => {
-    const primaryTarget = document.getElementById('site-stats-primary');
-    const secondaryTarget = document.getElementById('site-stats-secondary');
-    if (!primaryTarget || !secondaryTarget) return;
-
-    const syncBusuanziStats = () => {
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      const pv = pvSource?.textContent?.trim();
-      const uv = uvSource?.textContent?.trim();
-
-      if (pv) primaryTarget.textContent = pv;
-      if (uv) secondaryTarget.textContent = uv;
-    };
-
-    const watchBusuanziStats = () => {
-      syncBusuanziStats();
-      const observer = new MutationObserver(syncBusuanziStats);
-      const pvSource = document.getElementById('busuanzi_value_site_pv');
-      const uvSource = document.getElementById('busuanzi_value_site_uv');
-      if (pvSource) observer.observe(pvSource, { childList: true, subtree: true, characterData: true });
-      if (uvSource) observer.observe(uvSource, { childList: true, subtree: true, characterData: true });
-      window.addEventListener('beforeunload', () => observer.disconnect(), { once: true });
-    };
-
-    watchBusuanziStats();
-  })();
-</script>
-
         <div class="widget-wrapper">
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
@@ -287,19 +236,19 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" title="(no title)">(no title)</a>
+            </li>
+            <li>
+              <a href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" title="(no title)">(no title)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" title="[CISCN 2023]StrangeTalkBot">[CISCN 2023]StrangeTalkBot</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" title="[CISCN 2023] 烧烤摊儿">[CISCN 2023] 烧烤摊儿</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" title="[CISCN 2022 华东北]bigduck-2.33双打法">[CISCN 2022 华东北]bigduck-2.33双打法</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" title="[2024CISCN 初赛]ez_heap">[2024CISCN 初赛]ez_heap</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" title="LLVM-PWN环境搭建与gdb调试">LLVM-PWN环境搭建与gdb调试</a>
             </li>
         </ul>
       </div>
@@ -311,6 +260,103 @@
 </aside>
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-NULLTcachebin/" aria-label="OFF-BY-NULL Tcachebin" title="OFF-BY-NULL Tcachebin"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="OFF-BY-NULL Tcachebin" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.4k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
+      </div>
+      <h2 class="post-title">OFF-BY-NULL Tcachebin</h2>
+      <article class="post-article">
+          OFF-BY-NULL Tcachebin该利用链利用了 **Off-By-Null **漏洞来触发 **Backward Consolidation（向后合并）**从而制造出 **Overlapping **。接着，它通过 Unsorted Bin 泄露 libc 的基址，并利用 double-free 进行 Tcache Poisoning，将 __free_hook 覆盖为 one_gadget 从而获取 shell。
+hitcon_2018_children_tcache(Off-By-NULL)
+main1234567891011121314151617181920212223242
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-ONE%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="OFF-BY-ONE 例题分析" title="OFF-BY-ONE 例题分析"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="OFF-BY-ONE 例题分析" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>1.8k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
+      </div>
+      <h2 class="post-title">OFF-BY-ONE 例题分析</h2>
+      <article class="post-article">
+          OFF-BY-ONE 例题分析npuctf_2020_easyheap题目提示 ubuntu18.04 版本，高版本 libc 2.27 tcachebin attack（ tcache poisoning  ）
+
+12345678910111213141516171819202122232425262728293031323334int __fastcall main(int argc, const char **argv, const char **envp)&amp;#123;  char buf[4]; // [rsp+4h] [rbp-Ch] BYREF  unsigned __int64 
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/index/" aria-label="Off-By-One漏洞原理及利用" title="Off-By-One漏洞原理及利用"></a>
+    <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Off-By-One漏洞原理及利用" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>3.2k 字</span>
+        <span><span class="icon-clock"></span>14 分钟</span>
+      </div>
+      <h2 class="post-title">Off-By-One漏洞原理及利用</h2>
+      <article class="post-article">
+          Off-By-One漏洞原理及利用参考文献：https://ctf-wiki.org/pwn/linux/user-mode/heap/ptmalloc2/off-by-one/
+什么是off-by-one？off-by-one是一种比较特殊的溢出漏洞，指的是当程序向缓冲区写入的字节数超过了这个缓冲区本身申请的字节数并且只越界了一个字节。
+off-by-one漏洞原理offbyone只单字节缓冲区溢出，这种漏洞的产生往往与边界验证不严和字符串操作有关，也不排除写入的大小正好只多出了一个字节
+边界验证不严通常包括：
+
+使用循环语句向堆块中写入数据的时候，循环的次数设置错误
+字符串操作不合适
+
+一
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/FastbinDOUBLEFREE/" aria-label="Fastbin DOUBLE FREE" title="Fastbin DOUBLE FREE"></a>
+    <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Fastbin DOUBLE FREE" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.1k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
+      </div>
+      <h2 class="post-title">Fastbin DOUBLE FREE</h2>
+      <article class="post-article">
+          Fastbin DOUBLE FREEFastbin Attack 基本介绍fastbin attack是一类漏洞的利用方法，是指所有基于fastbin机制的漏洞利用方法。这类利用的前提是：
+
+存在堆溢出、UAF 等能够控制 chunk 内容的漏洞。
+漏洞发生于 fastbin 类型的 chunk 当中。
+
+Fastbin Attack 漏洞原理fastbin attack 存在的原因在于 fastbin 是使用单链表来维护释放的堆块的，若一个 chunk 被释放之后进入 fastbin，那么其相邻下一个堆块的 prev_inuse 标志位不会被清空（prev_inuse 简写为 P，位于 s
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/fastbin%E9%94%99%E4%BD%8D%E4%BC%AA%E9%80%A0/" aria-label="fastbin 错位伪造" title="fastbin 错位伪造"></a>
     <div class="post-cover left">
@@ -450,100 +496,6 @@ windows和linux下的堆分配，管理方式都不同，这里主要是l
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/%5BNISACTF2022%5Dshop_pwn/" aria-label="[NISACTF 2022]shop_pwn" title="[NISACTF 2022]shop_pwn"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[NISACTF 2022]shop_pwn" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>20 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
-      </div>
-      <h2 class="post-title">[NISACTF 2022]shop_pwn</h2>
-      <article class="post-article">
-          [NISACTF 2022]shop_pwn
-更新: 2026-05-20 20:44:37原文: https://www.yuque.com/idcm/wnemg9/fdgzrl8ymmuk1h4i
-
-
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/%5BNepCTF2025%5Dtime%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A0%88/" aria-label="[NepCTF 2025] time 多线程栈" title="[NepCTF 2025] time 多线程栈"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[NepCTF 2025] time 多线程栈" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.7k 字</span>
-        <span><span class="icon-clock"></span>8 分钟</span>
-      </div>
-      <h2 class="post-title">[NepCTF 2025] time 多线程栈</h2>
-      <article class="post-article">
-          [NepCTF 2025] time 多线程栈
-程序分析：
-12345678910111213141516171819unsigned __int64 inputname()&amp;#123;  char *argv[5]; // [rsp+10h] [rbp-30h] BYREF  unsigned __int64 v2; // [rsp+38h] [rbp-8h]  v2 = __readfsqword(0x28u);  puts(&amp;quot;please input your name:&amp;quot;);  __isoc99_scanf(&amp;quot;%100s&amp;quot;, byte_50A0)
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89%E6%BC%8F%E6%B4%9E/index/" aria-label="条件竞争漏洞" title="条件竞争漏洞"></a>
-    <div class="post-cover left">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="条件竞争漏洞" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>5.2k 字</span>
-        <span><span class="icon-clock"></span>20 分钟</span>
-      </div>
-      <h2 class="post-title">条件竞争漏洞</h2>
-      <article class="post-article">
-          条件竞争漏洞条件竞争：系统中，最小的运算调度单位是线程，而每个线程又依附于一个进程，条件竞争则是多进程或多线程对一个共享资源操作，因为操作顺序不受控的时候所产生的问题。
-进程：在计算机操作系统中，进程是指一个正在运行的程序的实例。它是操作系统进行资源分配和调度的基本单位。
-进程的内存空间布局：当操作系统启动一个进程时，会为它分配独立的虚拟内存空间。这个空间通常被划分为以下几个主要部分：
-
-代码段（Text&amp;#x2F;Code Segment）： 存储程序执行的机器指令。这部分通常是只读的，以防止程序意外修改自己的指令。
-数据段（Data Segment）： 存储程序中已经初始化的全局变量和静态
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/SROP%E5%88%A9%E7%94%A8%E6%8A%80%E5%B7%A7/ORW+%E6%A0%88%E8%BF%81%E7%A7%BBSROP/" aria-label="ORW+栈迁移SROP" title="ORW+栈迁移SROP"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="ORW+栈迁移SROP" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1k 字</span>
-        <span><span class="icon-clock"></span>6 分钟</span>
-      </div>
-      <h2 class="post-title">ORW+栈迁移SROP</h2>
-      <article class="post-article">
-          ORW+栈迁移SROP[ NewStarCTF 2025 ]only_read
-一个开启了沙箱的 SROP：
-123456ssize_t vuln()&amp;#123;  _BYTE buf[16]; // [rsp+0h] [rbp-10h] BYREF  return read(0, buf, 0x100u);&amp;#125;
-
-123456789101112131415161718192021222324252627282930__int64 sandbox()&amp;#123;  __int64 v1; // [rsp+8h] [rbp-8h]  v1 = seccomp_init(214741811
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
     <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/9/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/8/">8</a><a class="page-number" href="/HFTTC.github.io/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/HFTTC.github.io/page/11/">11</a><a class="page-number" href="/HFTTC.github.io/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/14/">14</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/11/">下一页 &raquo;</a>
   </nav>
@@ -567,10 +519,10 @@ windows和linux下的堆分配，管理方式都不同，这里主要是l
       </div>
       <div>
         <span class="icon-brush"></span>
-        237.4k
+        252.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        19:41
+        20:55
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -598,7 +550,7 @@ windows和linux下的堆分配，管理方式都不同，这里主要是l
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">132</div>
+    <div class="sidebar-state-number">136</div>
   </div>
 </div>
 <div class="sidebar-social" >
