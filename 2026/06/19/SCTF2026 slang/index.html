@@ -35,25 +35,13 @@
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="这道题目的逻辑并不算难，一道新型编译器也算是拓展眼界了。wp 写得会比较长，实际上并没有那么难。 不过也有点难受，就是你要新认识一个编译器，并编写出相应的代码进行篡改攻击 emmmm…… 本质还是利用指针篡改 got 表 下一步我们要寻找的就是对外暴露的原语： 简单来讲就是可以 malloc，printf，put，free，以及控制指针等可以利用的函数： 123456789101112131415">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521197347-066357e5-c7ee-4701-a97c-645c71180591.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521402120-41616829-281c-4fb5-80f4-c29e9658bf6e.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521501806-b740d2e9-1bed-44ba-81f0-ebd5e3131c61.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521992081-5324f2e2-080a-4c1a-ab6f-c9a0d425ce54.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781522186193-0d73943b-3664-4bd2-b7d4-32c188e0e19b.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781522424290-b0960be4-12f3-4744-8523-a8bab1c97dac.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781523058437-88cb5b12-95e7-45be-bf88-c3a420bb822c.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781523238205-6fc9940b-b6d8-4b74-b552-a74b3f35701f.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781526410336-1973cc9c-1567-4871-bf70-2da72ebc8bcb.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781526591193-b206d81b-ccd6-4c10-b947-6875744e4203.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781525589551-341c90e8-a7af-4205-9092-cc3ba896f713.png">
 <meta property="article:published_time" content="2026-06-19T13:35:22.000Z">
-<meta property="article:modified_time" content="2026-06-19T13:58:31.963Z">
+<meta property="article:modified_time" content="2026-06-19T14:02:01.499Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="compiler">
 <meta property="article:tag" content="pwn">
 <meta property="article:tag" content="sctf">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521197347-066357e5-c7ee-4701-a97c-645c71180591.png">
       <meta name="keywords" content="Pwn, CTF, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
     <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
@@ -255,7 +243,7 @@
     <time style="display: none;" id="post-update-time">2026-06-19</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-19T13:58:31.963Z" itemprop="dateModified">2026-06-19</time>
+      <time datetime="2026-06-19T14:02:01.499Z" itemprop="dateModified">2026-06-19</time>
     </span>
 </div>
 
@@ -289,31 +277,31 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nano test1.slang</span><br><span class="line">./slang test1.slang test1.c</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521197347-066357e5-c7ee-4701-a97c-645c71180591.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-001.png)</p>
 <h5 id="添加局部变量"><a href="#添加局部变量" class="headerlink" title="添加局部变量"></a>添加局部变量</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function main(): int a -&gt; int &#123;</span><br><span class="line">    a := 0;</span><br><span class="line">    return a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521402120-41616829-281c-4fb5-80f4-c29e9658bf6e.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-002.png)</p>
 <h5 id="验证多个局部变量"><a href="#验证多个局部变量" class="headerlink" title="验证多个局部变量"></a>验证多个局部变量</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function main(): int a, int b -&gt; int &#123;</span><br><span class="line">    a := 1;</span><br><span class="line">    b := 2;</span><br><span class="line">    return a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521501806-b740d2e9-1bed-44ba-81f0-ebd5e3131c61.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-003.png)</p>
 <p>因此大概可以确定的是：</p>
 <p><code>int a，int b</code> -&gt;<code>slot[0] = a  slot[1] = b </code>； </p>
 <p><code>a := 1;  b := 2;  return a;</code> -&gt; <code> slot[0] = 1;  slot[1] = 2;  return slot[0];</code></p>
 <h5 id="尝试传入参数："><a href="#尝试传入参数：" class="headerlink" title="尝试传入参数："></a>尝试传入参数：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function add(int x, int y): -&gt; int &#123;</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function main(): -&gt; int &#123;</span><br><span class="line">    return add(1, 2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781521992081-5324f2e2-080a-4c1a-ab6f-c9a0d425ce54.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-004.png)</p>
 <h5 id="尝试字符串类型："><a href="#尝试字符串类型：" class="headerlink" title="尝试字符串类型："></a>尝试字符串类型：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function main(): str s -&gt; int &#123;</span><br><span class="line">    s := &quot;hello&quot;;</span><br><span class="line">    say(s);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781522186193-0d73943b-3664-4bd2-b7d4-32c188e0e19b.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-005.png)</p>
 <p>这里是为了确认 str 类型存在，且字符串字面量用双引号；say 是内建函数且可以输出字符串。</p>
 <h5 id="验证-vec-类型以及-vec-new："><a href="#验证-vec-类型以及-vec-new：" class="headerlink" title="验证 vec 类型以及 vec_new："></a>验证 vec 类型以及 vec_new：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">function main(): vec v -&gt; int &#123;</span><br><span class="line">    v := vec_new(2);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781522424290-b0960be4-12f3-4744-8523-a8bab1c97dac.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-006.png)</p>
 <p>slot[] 是所有局部变量的统一存储</p>
 <p>编译器没有给不同类型单独建变量，而是统一用：<code>uintptr_t slot[n]</code> 来保存所有局部变量。</p>
 <p>这意味着：int、str、vec 在编译产物里都只是一个 uintptr_t。</p>
@@ -327,12 +315,12 @@
 <h5 id="验证-scribble："><a href="#验证-scribble：" class="headerlink" title="验证 scribble："></a>验证 scribble：</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function main(): vec v -&gt; int &#123;</span><br><span class="line">    v := vec_new(2);</span><br><span class="line">    scribble(v, 0, 1);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781523058437-88cb5b12-95e7-45be-bf88-c3a420bb822c.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-007.png)</p>
 <p>由此可以确认 scribble 是合法调用且参数顺序是 (vec, idx, delta)</p>
 <h5 id="验证-if"><a href="#验证-if" class="headerlink" title="验证 if"></a>验证 if</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">function main(): int a -&gt; int &#123;</span><br><span class="line">    a := 1;</span><br><span class="line">    if (a &lt; 2) &#123;</span><br><span class="line">      a := 3;</span><br><span class="line">    &#125;</span><br><span class="line">    return a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781523238205-6fc9940b-b6d8-4b74-b552-a74b3f35701f.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-008.png)</p>
 <h5 id="黑盒编译器总结："><a href="#黑盒编译器总结：" class="headerlink" title="黑盒编译器总结："></a>黑盒编译器总结：</h5><ol>
 <li>slot[] 是所有局部变量的统一存储，vec 可以被当 int 返回，泄露指针值，int 可以被当 vec 返回，伪造对象指针。</li>
 <li>scribble、say 是合法函数。</li>
@@ -349,7 +337,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker build -t slang-local .</span><br><span class="line">docker run -d --name slang-test -p 19999:9999 slang-local</span><br><span class="line">docker <span class="built_in">exec</span> -it slang-test /bin/sh</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781526410336-1973cc9c-1567-4871-bf70-2da72ebc8bcb.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-009.png)</p>
 <p>先写一个一定会调用 say 的 .slang，这样生成的 ELF 才会导入 puts：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">cd /home/ctf</span><br><span class="line"></span><br><span class="line">cat &gt; /tmp/probe.slang &lt;&lt; <span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">function main(): <span class="built_in">str</span> s -&gt; <span class="built_in">int</span> &#123;</span><br><span class="line">s := <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">say(s);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
 
@@ -370,7 +358,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readelf -s /lib/x86_64-linux-gnu/libc.so.6 | egrep <span class="string">&#x27; puts@@| system@@&#x27;</span></span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781526591193-b206d81b-ccd6-4c10-b947-6875744e4203.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-010.png)</p>
 <p>所以： SYSTEM_MINUS_PUTS &#x3D; 0x52290 - 0x84420</p>
 <pre><code>       PUTS_GOT = 0x404018
 </code></pre>
@@ -380,7 +368,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">vec_new(2)</span><br><span class="line">  ↓</span><br><span class="line">得到真实 vec</span><br><span class="line">  ↓</span><br><span class="line">leak(v) 把 vec_t* 变成 int</span><br><span class="line">  ↓</span><br><span class="line">p + 32 找到 v-&gt;data</span><br><span class="line">  ↓</span><br><span class="line">把 v-&gt;data 伪造成 fake vec_t</span><br><span class="line">  ↓</span><br><span class="line">fake-&gt;data = puts@GOT</span><br><span class="line">fake-&gt;size = 1</span><br><span class="line">  ↓</span><br><span class="line">scribble(fake, 0, system - puts)</span><br><span class="line">  ↓</span><br><span class="line">puts@GOT 改成 system</span><br><span class="line">  ↓</span><br><span class="line">say(&quot;cat /home/ctf/flag&quot;)</span><br><span class="line">  ↓</span><br><span class="line">system(&quot;cat /home/ctf/flag&quot;)</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781525589551-341c90e8-a7af-4205-9092-cc3ba896f713.png"></p>
+<p>![](&#x2F;images&#x2F;pwn&#x2F;imported&#x2F;SCTF2026 slang&#x2F;img-011.png)</p>
 
     </div>
     <footer class="article-footer">
@@ -448,10 +436,10 @@
       </div>
       <div>
         <span class="icon-brush"></span>
-        245.8k
+        246.3k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        20:21
+        20:25
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -621,7 +609,7 @@
           description: "",
           stripContent: "这道题目的逻辑并不算难，一道新型编译器也算是拓展眼界了。wp 写得会比较长，实际上并没有那么难。 不过也有点难受，就是你要新认识一个编译器，并编写出相应的代码进行篡改攻击 emmmm…… 本质还是利用指针篡改 got 表 下一步我们要寻找的就是对外暴露的原语： 简单来讲就是可以 malloc，printf，put，free，以及控制指针等可以利用的函数： 1234567891011121314151617181920212223vec_t *rt_vec_new(int64_t n) &amp;#123",
           date: "Fri Jun 19 2026 21:35:22 GMT+0800",
-          updated: "Fri Jun 19 2026 21:58:31 GMT+0800",
+          updated: "Fri Jun 19 2026 22:02:01 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/sctf2026-slang.jpg",
         };
       </script>
