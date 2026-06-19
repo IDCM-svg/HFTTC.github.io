@@ -20,7 +20,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
   <title>
-    ret2usr 与 SMEP、KPTI 绕过学习笔记 | HFTTC&#39;s Blog
+    ret2usr_smep绕过_kpti绕过 QWB2018-core | HFTTC&#39;s Blog
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -30,7 +30,7 @@
 
     <meta name="description" content="前言：差不多一个多月前接触了 kernelpwn，学习了一道 UAF 就没有下文了。话说这段时间还真是懈怠呢。 因此决定从今天开始重新拾起 kernelpwn(其实倒不如说重新认识) ^_^&#x2F;&#x2F;&#x2F; ret2usrret2usr（Return-to-user，返回用户态）是一种经典的内核（Kernel）漏洞利用手法。 简单来说，当操作系统内核空间存在函数指针覆盖或栈溢出">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ret2usr 与 SMEP、KPTI 绕过学习笔记">
+<meta property="og:title" content="ret2usr_smep绕过_kpti绕过 QWB2018-core">
 <meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="前言：差不多一个多月前接触了 kernelpwn，学习了一道 UAF 就没有下文了。话说这段时间还真是懈怠呢。 因此决定从今天开始重新拾起 kernelpwn(其实倒不如说重新认识) ^_^&#x2F;&#x2F;&#x2F; ret2usrret2usr（Return-to-user，返回用户态）是一种经典的内核（Kernel）漏洞利用手法。 简单来说，当操作系统内核空间存在函数指针覆盖或栈溢出">
@@ -47,7 +47,7 @@
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781866251167-0c01a0fb-1ca3-41f2-88e3-a7059f2d2965.png">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781866091547-04029e42-e940-4547-af97-fbf15fb8a168.png">
 <meta property="article:published_time" content="2026-06-19T13:35:44.000Z">
-<meta property="article:modified_time" content="2026-06-19T13:54:55.629Z">
+<meta property="article:modified_time" content="2026-06-19T13:58:31.962Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="kernel">
 <meta property="article:tag" content="pwn">
@@ -159,11 +159,11 @@
 </div>
 <header id="header" aria-label="Site header">
     <picture></picture>
-    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/ret2usr-smep-kpti-qwb2018-core.jpg" alt="ret2usr 与 SMEP、KPTI 绕过学习笔记">
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/ret2usr-smep-kpti-qwb2018-core.jpg" alt="ret2usr_smep绕过_kpti绕过 QWB2018-core">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">ret2usr 与 SMEP、KPTI 绕过学习笔记</h1>
+            <h1 data-aos="slide-up">ret2usr_smep绕过_kpti绕过 QWB2018-core</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
         </h2>
@@ -255,7 +255,7 @@
     <time style="display: none;" id="post-update-time">2026-06-19</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-19T13:54:55.629Z" itemprop="dateModified">2026-06-19</time>
+      <time datetime="2026-06-19T13:58:31.962Z" itemprop="dateModified">2026-06-19</time>
     </span>
 </div>
 
@@ -424,19 +424,19 @@
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-          <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college Kernel 1-6 学习记录" class="lazyload">
-        <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="前一篇: Pwn.college Kernel 1-6 学习记录" title="前一篇: Pwn.college Kernel 1-6 学习记录"></a>
+          <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college-Kernel-1-6" class="lazyload">
+        <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="前一篇: Pwn.college-Kernel-1-6" title="前一篇: Pwn.college-Kernel-1-6"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
-            Pwn.college Kernel 1-6 学习记录
+            Pwn.college-Kernel-1-6
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-        <img data-src="/HFTTC.github.io/images/pwn/covers/sctf2026-slang.jpg" data-sizes="auto" alt="slang 编译器题学习记录" class="lazyload">
-      <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" aria-label="后一篇: slang 编译器题学习记录"  title="后一篇: slang 编译器题学习记录"></a>
+        <img data-src="/HFTTC.github.io/images/pwn/covers/sctf2026-slang.jpg" data-sizes="auto" alt="SCTF2026 slang" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" aria-label="后一篇: SCTF2026 slang"  title="后一篇: SCTF2026 slang"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
-          slang 编译器题学习记录
+          SCTF2026 slang
       </h3>
     </div>
   </nav>
@@ -649,13 +649,13 @@
       <script data-pjax>
         window.REIMU_POST = {
           author: "HFTTC",
-          title: "ret2usr 与 SMEP、KPTI 绕过学习笔记",
+          title: "ret2usr_smep绕过_kpti绕过 QWB2018-core",
           url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/",
           excerpt: "",
           description: "",
           stripContent: "前言：差不多一个多月前接触了 kernelpwn，学习了一道 UAF 就没有下文了。话说这段时间还真是懈怠呢。 因此决定从今天开始重新拾起 kernelpwn(其实倒不如说重新认识) ^_^&amp;#x2F;&amp;#x2F;&amp;#x2F; ret2usrret2usr（Return-to-user，返回用户态）是一种经典的内核（Kernel）漏洞利用手法。 简单来说，当操作系统内核空间存在函数指针覆盖或栈溢出漏洞时，攻击者可以让内核的执行流跳转到用户空间由攻击者提前准备好的恶意代码上，从而以内核权限 (Ri",
           date: "Fri Jun 19 2026 21:35:44 GMT+0800",
-          updated: "Fri Jun 19 2026 21:54:55 GMT+0800",
+          updated: "Fri Jun 19 2026 21:58:31 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/ret2usr-smep-kpti-qwb2018-core.jpg",
         };
       </script>

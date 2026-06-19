@@ -20,7 +20,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
   <title>
-    PHPPWN 学习与 d3ctf2024 pwnshell 复现 | HFTTC&#39;s Blog
+    PHP-PWN d3ctf2024-pwnshell | HFTTC&#39;s Blog
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -30,7 +30,7 @@
 
     <meta name="description" content="前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="PHPPWN 学习与 d3ctf2024 pwnshell 复现">
+<meta property="og:title" content="PHP-PWN d3ctf2024-pwnshell">
 <meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，">
@@ -44,7 +44,7 @@
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781674291405-5acc52b1-d988-4a23-9a7c-7183026e7ad9.png">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1781675251691-82ec0315-7c6f-430b-ba55-eea47a5479a6.png">
 <meta property="article:published_time" content="2026-06-19T13:36:09.000Z">
-<meta property="article:modified_time" content="2026-06-19T13:54:55.627Z">
+<meta property="article:modified_time" content="2026-06-19T13:58:31.960Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="d3ctf">
 <meta property="article:tag" content="php">
@@ -156,11 +156,11 @@
 </div>
 <header id="header" aria-label="Site header">
     <picture></picture>
-    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg" alt="PHPPWN 学习与 d3ctf2024 pwnshell 复现">
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg" alt="PHP-PWN d3ctf2024-pwnshell">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">PHPPWN 学习与 d3ctf2024 pwnshell 复现</h1>
+            <h1 data-aos="slide-up">PHP-PWN d3ctf2024-pwnshell</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
         </h2>
@@ -252,7 +252,7 @@
     <time style="display: none;" id="post-update-time">2026-06-19</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-06-19T13:54:55.627Z" itemprop="dateModified">2026-06-19</time>
+      <time datetime="2026-06-19T13:58:31.960Z" itemprop="dateModified">2026-06-19</time>
     </span>
 </div>
 
@@ -323,11 +323,11 @@
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
     <div class="article-nav-link-wrap right">
-        <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college Kernel 1-6 学习记录" class="lazyload">
-      <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="后一篇: Pwn.college Kernel 1-6 学习记录"  title="后一篇: Pwn.college Kernel 1-6 学习记录"></a>
+        <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college-Kernel-1-6" class="lazyload">
+      <a href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="后一篇: Pwn.college-Kernel-1-6"  title="后一篇: Pwn.college-Kernel-1-6"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
-          Pwn.college Kernel 1-6 学习记录
+          Pwn.college-Kernel-1-6
       </h3>
     </div>
   </nav>
@@ -540,13 +540,13 @@
       <script data-pjax>
         window.REIMU_POST = {
           author: "HFTTC",
-          title: "PHPPWN 学习与 d3ctf2024 pwnshell 复现",
+          title: "PHP-PWN d3ctf2024-pwnshell",
           url: "https://idcm-svg.github.io/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/",
           excerpt: "",
           description: "",
           stripContent: "前言：大一快结束了，一直听说过 phppwn 但是没有学，最近其实挺累的，打了许多比赛结果被 AI 踹成路边一条，比赛题目也是有很多自己没有见过的，还是沉下心一点点学习吧。 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。 PHPPWN GDB 流程PHPPWN 一般来说都是给一个拓展 .s",
           date: "Fri Jun 19 2026 21:36:09 GMT+0800",
-          updated: "Fri Jun 19 2026 21:54:55 GMT+0800",
+          updated: "Fri Jun 19 2026 21:58:31 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg",
         };
       </script>
