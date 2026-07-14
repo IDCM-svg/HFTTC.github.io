@@ -180,6 +180,9 @@ _$$(".article-entry img").forEach((element) => {
   element.setAttribute("data-sizes", "auto");
   element.removeAttribute("src");
 });
+if (window.REIMU_LOAD_LOCAL_IMAGES) {
+  window.REIMU_LOAD_LOCAL_IMAGES(document);
+}
 
 // to top
 var sidebarTop = _$(".sidebar-top");
