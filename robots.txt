@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://idcm-svg.github.io/HFTTC.github.io/sitemap.xml
