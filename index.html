@@ -184,7 +184,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">144</div>
+    <div class="sidebar-state-number">145</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -322,6 +322,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" title="湾区杯 2025 PWN">湾区杯 2025 PWN</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" title="西湖论剑 2025 PWN">西湖论剑 2025 PWN</a>
             </li>
             <li>
@@ -332,9 +335,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" title="Lexington Informatics Tournament CTF 2026">Lexington Informatics Tournament CTF 2026</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/05/l3akctf2026/" title="L3akCTF 2026">L3akCTF 2026</a>
             </li>
         </ul>
       </div>
@@ -356,8 +356,32 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" aria-label="西湖论剑 2025 PWN" title="西湖论剑 2025 PWN"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" aria-label="湾区杯 2025 PWN" title="湾区杯 2025 PWN"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg" data-sizes="auto" alt="湾区杯 2025 PWN" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-17</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-17</span>
+        <span><span class="icon-pencil"></span>5.8k 字</span>
+        <span><span class="icon-clock"></span>28 分钟</span>
+      </div>
+      <h2 class="post-title">湾区杯 2025 PWN</h2>
+      <article class="post-article">
+          前言：大概快一个多月没有打过堆风水的题目了，期间或许偶尔碰见那么一两道吧，也都比较简单。国外的比赛经常给一些异构 pwn 或者某些偏于真实的程序，大部分都是篡改指针，然后反复跳转，难点在于读懂程序，最近国内比赛多起来了，开始复现国内的题目发现大部分都是堆风水，然后典型的堆覆盖泄露 libc 然后打 apple2 之类的，感觉长时间不写有点退化了，像湾区杯的 armpwn 也是在写题过程中学到了不少知识。
+digtal_bomb：
+
+2.35 版本的 libc，开启了 canary，pie 和 Full RELEO
+静态分析：main：我们先进入到 main 函数去看，做一个简单的逆向，之后得出
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" aria-label="西湖论剑 2025 PWN" title="西湖论剑 2025 PWN"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/xihulunjian-2025-pwn.jpg" data-sizes="auto" alt="西湖论剑 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -382,9 +406,9 @@ Vpwn：
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" aria-label="黄鹤杯 2026 PWN" title="黄鹤杯 2026 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/huanghecup-2026-pwn.jpg" data-sizes="auto" alt="黄鹤杯 2026 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -412,9 +436,9 @@ dest 是 bss 段上的，也就是说最开始会在 dest 存放 .&amp;#x2F;flag
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" aria-label="PWN 新生基础知识 2" title="PWN 新生基础知识 2"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-2.jpg" data-sizes="auto" alt="PWN 新生基础知识 2" class="lazyload">
     </div>
     <div class="post-info">
@@ -434,9 +458,9 @@ dest 是 bss 段上的，也就是说最开始会在 dest 存放 .&amp;#x2F;flag
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" aria-label="Lexington Informatics Tournament CTF 2026" title="Lexington Informatics Tournament CTF 2026"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/lexington-informatics-tournament-ctf-2026.jpg" data-sizes="auto" alt="Lexington Informatics Tournament CTF 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -456,9 +480,9 @@ pwn&amp;#x2F;long division题目描述：I made a calculator for dividing two 32
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" aria-label="L3akCTF 2026" title="L3akCTF 2026"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/l3akctf2026.jpg" data-sizes="auto" alt="L3akCTF 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -483,9 +507,9 @@ Rudimentary Calculator
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" aria-label="NepCTF 2026 PWN" title="NepCTF 2026 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/nepctf-2026-pwn.jpg" data-sizes="auto" alt="NepCTF 2026 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -504,9 +528,9 @@ Rudimentary Calculator
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/07/26/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-1/" aria-label="PWN 新生基础知识 1" title="PWN 新生基础知识 1"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-1.jpg?v=202607261709" data-sizes="auto" alt="PWN 新生基础知识 1" class="lazyload">
     </div>
     <div class="post-info">
@@ -526,9 +550,9 @@ PWN（读作 &amp;#x2F;poʊn&amp;#x2F;，发音类似于英文单词 “own”�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/07/14/%E8%AE%B0%E4%B8%80%E9%81%93%E6%9C%8B%E5%8F%8B%E7%BB%99%E7%9A%84%E7%BB%83%E4%B9%A0%E9%A2%98/" aria-label="记一道朋友给的练习题" title="记一道朋友给的练习题"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/fe061bb344c270d540b16a36796edace.jpg" data-sizes="auto" alt="记一道朋友给的练习题" class="lazyload">
     </div>
     <div class="post-info">
@@ -559,9 +583,9 @@ emmm，那这样的话思路就很固定了啊，没有 FULL RELEO，2.27 的 li
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" aria-label="PHP-PWN d3ctf2024-pwnshell" title="PHP-PWN d3ctf2024-pwnshell"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg" data-sizes="auto" alt="PHP-PWN d3ctf2024-pwnshell" class="lazyload">
     </div>
     <div class="post-info">
@@ -577,33 +601,6 @@ emmm，那这样的话思路就很固定了啊，没有 FULL RELEO，2.27 的 li
 一开始学 phppwn 有点迷，还好之前有一定的 web 基础，做过 web 的 php 代码审计的一类题目。phppwn 的 gdb 调试和普通 pwn 不太一样，需要利用 dockerfile 起一个 docker 环境，调试的时候也需要有对应的函数。
 
 好吧还是想吐槽一下，最开始的时候利用 off-by-null 一直有点懵，再想为什么要重复申请这个堆块，后来看了很久才发现 off-by-null 修改了指针地址。之
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="Pwn.college-Kernel-1-6" title="Pwn.college-Kernel-1-6"></a>
-    <div class="post-cover right">
-        <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college-Kernel-1-6" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-06-19</span>
-          <span><span class="icon-calendar-plus"></span>2026-06-19</span>
-        <span><span class="icon-pencil"></span>3.1k 字</span>
-        <span><span class="icon-clock"></span>15 分钟</span>
-      </div>
-      <h2 class="post-title">Pwn.college-Kernel-1-6</h2>
-      <article class="post-article">
-          前言：没有怎么接触过 KernelPWN 但是又不知道怎么学，在网上偶然发现有这么个学习内核基础利用的网站
-也就十二道题目，并且利用链并不长，决定学习一下。其实也不想一上来就学习太难的东西打消自己的积极性，另外没有一个好的基础直接学攻击手法利用链什么的总觉得有点空中楼阁，经不起考验。&amp;lt;指的我自己~~~&amp;gt;
-从一开始会非常详细，往后逐渐了解之后会着重点记录  \[^_^]\
-
-下载 pwn.college 附件：pwn.college 的 kernel 基础关卡在：https://pwn.college/system-security/kernel-security/
-
-
-首先在 Us
       </article>
     </div>
   </div>
@@ -631,10 +628,10 @@ emmm，那这样的话思路就很固定了啊，没有 FULL RELEO，2.27 的 li
       </div>
       <div>
         <span class="icon-brush"></span>
-        273.7k
+        279.5k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        22:34
+        23:02
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -662,7 +659,7 @@ emmm，那这样的话思路就很固定了啊，没有 FULL RELEO，2.27 的 li
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">144</div>
+    <div class="sidebar-state-number">145</div>
   </div>
 </div>
 <div class="sidebar-social" >
