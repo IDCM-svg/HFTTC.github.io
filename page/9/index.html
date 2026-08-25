@@ -184,7 +184,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">145</div>
+    <div class="sidebar-state-number">146</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -322,6 +322,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" title="湾区杯 2025 PWN">湾区杯 2025 PWN</a>
             </li>
             <li>
@@ -332,9 +335,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" title="PWN 新生基础知识 2">PWN 新生基础知识 2</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" title="Lexington Informatics Tournament CTF 2026">Lexington Informatics Tournament CTF 2026</a>
             </li>
         </ul>
       </div>
@@ -356,8 +356,33 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/LargebinAttack/index/" aria-label="Largebin Attack" title="Largebin Attack"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/LargebinAttack/0ctf_2018_heapstorm2/" aria-label="0ctf_2018_heapstorm2" title="0ctf_2018_heapstorm2"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="0ctf_2018_heapstorm2" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.8k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">0ctf_2018_heapstorm2</h2>
+      <article class="post-article">
+          0ctf_2018_heapstorm2Largebin attack + Unlink + off-by-null + overlap + 修改 hook 表 + mmap
+
+
+总体分析整个程序整个程序包括 Allocate，Update，Delete 和 View 四个部分。在 main 函数的开头，先是调用 mallopt()函数关闭了 fastbin 的分配，然后调用了 mmap()在地址 0x13370000 处分配了一块 0x1000 大小的内存，用于保存堆块结构体。随后，在从 0x13370800 的内存中开始写入随机数，后面是两个异或函数，相当于加了层混淆。
+
+这里构造了一个结
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/LargebinAttack/index/" aria-label="Largebin Attack" title="Largebin Attack"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Largebin Attack" class="lazyload">
     </div>
     <div class="post-info">
@@ -377,9 +402,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/SmallbinAttack/HouseOfLore/" aria-label="House Of Lore" title="House Of Lore"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Lore" class="lazyload">
     </div>
     <div class="post-info">
@@ -400,9 +425,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/SmallbinAttack/index/" aria-label="Smallbin Attack" title="Smallbin Attack"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Smallbin Attack" class="lazyload">
     </div>
     <div class="post-info">
@@ -422,9 +447,9 @@ House of Lore 的漏洞原理：Small Bin 是 glibc 用于管理特定大小（�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/main_arena%E7%BB%93%E6%9E%84/" aria-label="main_arena 结构" title="main_arena 结构"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="main_arena 结构" class="lazyload">
     </div>
     <div class="post-info">
@@ -446,9 +471,9 @@ main_arena 是一个全局变量，类型是 struct malloc_state。它存储了�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/UnSortedbin_leak_libc_base/" aria-label="UnSortedbin_leak_libc_base" title="UnSortedbin_leak_libc_base"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UnSortedbin_leak_libc_base" class="lazyload">
     </div>
     <div class="post-info">
@@ -485,9 +510,9 @@ U
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/UnSortedbinAttack%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="UnSortedbin Attack 例题分析" title="UnSortedbin Attack 例题分析"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UnSortedbin Attack 例题分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -508,9 +533,9 @@ BUUCTF 0ctf_2017_babyheap
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/UnsortedbinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/index/" aria-label="Unsortedbin Attack 基本介绍" title="Unsortedbin Attack 基本介绍"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unsortedbin Attack 基本介绍" class="lazyload">
     </div>
     <div class="post-info">
@@ -532,9 +557,9 @@ UnSortedb
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfForce%EF%BC%88topchunk%EF%BC%89/HouseOfForce%E4%BE%8B%E9%A2%98/" aria-label="House Of Force 例题" title="House Of Force 例题"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Force 例题" class="lazyload">
     </div>
     <div class="post-info">
@@ -553,9 +578,9 @@ UnSortedb
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfForce%EF%BC%88topchunk%EF%BC%89/index/" aria-label="House Of Force（topchunk）" title="House Of Force（topchunk）"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Force（topchunk）" class="lazyload">
     </div>
     <div class="post-info">
@@ -569,27 +594,6 @@ UnSortedb
       <article class="post-article">
           House Of Force（topchunk）什么是 House Of Force？ _House Of Force（HoF）_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控制 top_chunk，那就先了解一下 top_chunk：
 top_chunktop_chunk 是 glibc 的 ptmalloc 内存管理中，位于堆物理地址最高处的特殊空闲 chunk，不属于
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Alloc_to_Stack&ArbitaryAlloc/" aria-label="Alloc_to_Stack&amp;Arbitary Alloc" title="Alloc_to_Stack&amp;Arbitary Alloc"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Alloc_to_Stack&amp;Arbitary Alloc" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2k 字</span>
-        <span><span class="icon-clock"></span>10 分钟</span>
-      </div>
-      <h2 class="post-title">Alloc_to_Stack&amp;Arbitary Alloc</h2>
-      <article class="post-article">
-          Alloc_to_Stack&amp;amp;Arbitary AllocAFttack Alloc_to_Stack 概述Alloc_to_Stack&amp;amp;Arbitary Alloc(栈分配&amp;amp;任意地址分配) 如果你已经理解了 Fastbin Double Free 和 house of spirit 技术，那么理解该技术就不成问题了。他们的本质都在于 fastbin 链表的特性：当前 chunk 的 fd 指针指向下一个 chunk。
-该技术的核心点在于劫持 fastbin 链表中 chunk 的 fd 指针，把 fd 指针指向我们想要分配的栈上，从而实现控制栈中的一些关键数据，比如返
       </article>
     </div>
   </div>
@@ -617,10 +621,10 @@ top_chunktop_chunk 是 glibc 的 ptmalloc 内存管理中，位于堆物理地�
       </div>
       <div>
         <span class="icon-brush"></span>
-        279.5k
+        282.2k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:02
+        23:18
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -648,7 +652,7 @@ top_chunktop_chunk 是 glibc 的 ptmalloc 内存管理中，位于堆物理地�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">145</div>
+    <div class="sidebar-state-number">146</div>
   </div>
 </div>
 <div class="sidebar-social" >
