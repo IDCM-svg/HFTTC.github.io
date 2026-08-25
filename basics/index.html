@@ -20,7 +20,7 @@
   
   <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
   <title>
-    目录: Notes | HFTTC&#39;s Blog
+    基础知识 | HFTTC&#39;s Blog
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
@@ -28,19 +28,21 @@
     
 <link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
 
-    <meta name="description" content="心之所向，无问西东">
+    <meta name="description" content="PWN BASICS       基础知识       按主题整理 PWN 入门、常见绕过和基础利用链，保留最常用的文章入口，方便快速回查。                 4 个板块       基础 + 进阶       PWN                        入门       基础上手">
 <meta property="og:type" content="website">
-<meta property="og:title" content="HFTTC&#39;s Blog">
-<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/categories/Notes/page/3/index.html">
+<meta property="og:title" content="基础知识">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/basics/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
-<meta property="og:description" content="心之所向，无问西东">
+<meta property="og:description" content="PWN BASICS       基础知识       按主题整理 PWN 入门、常见绕过和基础利用链，保留最常用的文章入口，方便快速回查。                 4 个板块       基础 + 进阶       PWN                        入门       基础上手">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://idcm-svg.github.io/images/banner.webp">
+<meta property="article:published_time" content="2026-08-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-25T18:22:27.202Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://idcm-svg.github.io/images/banner.webp">
-    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/categories/Notes/page/3/">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/basics/">
       <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
     <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
     <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
@@ -54,7 +56,7 @@
     
 <link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"目录: Notes | HFTTC's Blog","headline":"HFTTC's Blog","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/categories/Notes/page/3/","inLanguage":"zh-CN"}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"基础知识 | HFTTC's Blog","headline":"基础知识","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/basics/","inLanguage":"zh-CN"}</script>
 <meta name="generator" content="Hexo 8.1.1"></head>
 
   <body>
@@ -175,14 +177,13 @@
 <header id="header" aria-label="Site header">
       <picture>
       </picture>
-        <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="">
+        <img  fetchpriority="high" src="/HFTTC.github.io/images/banner.webp" alt="基础知识">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
-            <h1 data-aos="slide-up">分类</h1>
+            <h1 data-aos="slide-up">基础知识</h1>
           </span>
         <h2 id="subtitle-wrap" data-aos="slide-down">
-              <span id="subtitle">Notes</span>
         </h2>
     </div>
   </div>
@@ -371,187 +372,387 @@
   </div>
 </aside>
 
-          <section id="main" aria-label="Main content"><div class="archives-outer-wrap" data-aos="fade-up">
-    <div class="tag-wrap">
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/pwn/">pwn</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E6%96%B0%E7%94%9F/">新生</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E6%A0%88%E6%BA%A2%E5%87%BA/">栈溢出</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/ret2shellcode/">ret2shellcode</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/php/">php</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/d3ctf/">d3ctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/sctf/">sctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/compiler/">compiler</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/kernel/">kernel</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/pwn-college/">pwn.college</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/ciscn/">ciscn</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/heap/">heap</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/protobuf/">protobuf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/l3akctf/">l3akctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/ctf/">ctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/litctf/">litctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/nepctf/">nepctf</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/qwb/">qwb</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E6%B9%BE%E5%8C%BA%E6%9D%AF/">湾区杯</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">宁波市网络安全</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">西湖论剑</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/%E9%BB%84%E9%B9%A4%E6%9D%AF/">黄鹤杯</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/llvm/">llvm</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/HFTTC.github.io/tags/gdb/">gdb</a>
-    </div>
+          <section id="main" aria-label="Main content"><article id="page-" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-08-25T16:00:00.000Z" itemprop="datePublished">2026-08-26</time>
+    <time style="display: none;" id="post-update-time">2026-08-26</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-25T18:22:27.202Z" itemprop="dateModified">2026-08-26</time>
+    </span>
 </div>
-<div class="category-wrap">
-    <div class="archives-category-list-item" data-aos="zoom-in">
-      <a class="archives-category-list-link" href="/HFTTC.github.io/categories/Notes/">Notes</a>
+
     </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        
+<div class="writeups-page">
+  <section class="writeups-hero">
+    <div>
+      <p class="writeups-kicker">PWN BASICS</p>
+      <h1>基础知识</h1>
+      <p class="writeups-intro">按主题整理 PWN 入门、常见绕过和基础利用链，保留最常用的文章入口，方便快速回查。</p>
+    </div>
+    <div class="writeups-summary" aria-label="Basics overview">
+      <span>4 个板块</span>
+      <span>基础 + 进阶</span>
+      <span>PWN</span>
+    </div>
+  </section>
+
+  <section class="writeups-section">
+    <div class="writeups-section-head">
+      <span class="writeups-year">入门</span>
+      <h2>基础上手</h2>
+    </div>
+    <div class="writeups-list">
+      <a class="writeup-row" href="/HFTTC.github.io/2026/07/26/PWN-新生基础知识-1/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">新手</span>
+          <h3>PWN 新生基础知识 1</h3>
+          <p>面向初学者的第一部分基础认知与环境准备。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-07-26</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/08/05/PWN-新生基础知识-2/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">新手</span>
+          <h3>PWN 新生基础知识 2</h3>
+          <p>继续补全常见栈利用的核心概念和实战思路。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-08-05</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/简单栈溢出ret2text/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">入门</span>
+          <h3>简单栈溢出 ret2text</h3>
+          <p>最基础的栈溢出切入点，先建立最小利用模型。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/简单栈溢出ret2text/ret2text的深入分析/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">补充</span>
+          <h3>ret2text 的深入分析</h3>
+          <p>对 ret2text 进一步拆解，补足利用细节。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/Shellcode利用原理及方法/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Shellcode</span>
+          <h3>Shellcode 利用原理及方法</h3>
+          <p>了解 shellcode 的构造方式和基本投递路径。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/可见字符shellcode/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Shellcode</span>
+          <h3>可见字符 shellcode</h3>
+          <p>适合受限输入环境的 shellcode 变体记录。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="writeups-section">
+    <div class="writeups-section-head">
+      <span class="writeups-year">绕过</span>
+      <h2>防护与约束</h2>
+    </div>
+    <div class="writeups-list">
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/ret2textret2syscallret2libc/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">基础链</span>
+          <h3>ret2text / ret2syscall / ret2libc</h3>
+          <p>把最常见的三类基础利用链放在一起对比。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/关于是否进行栈对齐的分析/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">对齐</span>
+          <h3>关于是否进行栈对齐的分析</h3>
+          <p>判断 ROP 链在不同场景下是否需要额外对齐。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/对于send和sendline的思考/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">IO</span>
+          <h3>对于 send 和 sendline 的思考</h3>
+          <p>整理交互题里最常见的输入边界和换行处理。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/绕过防御之击败canary保护/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">防护</span>
+          <h3>绕过防御之击败 canary 保护</h3>
+          <p>围绕栈保护的典型泄露与绕过方式。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/绕过防御之击败PIE保护/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">防护</span>
+          <h3>绕过防御之击败 PIE 保护</h3>
+          <p>地址随机化环境下的基址恢复与定位。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/特殊的栈溢出-整数溢出/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">边界</span>
+          <h3>特殊的栈溢出 - 整数溢出</h3>
+          <p>从长度计算和符号处理角度补栈溢出的缺口。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/栈保护全开的攻击手法(例)/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">模板</span>
+          <h3>栈保护全开的攻击手法(例)</h3>
+          <p>保护齐全时仍然可以落地的基础模板。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="writeups-section">
+    <div class="writeups-section-head">
+      <span class="writeups-year">技巧</span>
+      <h2>常用利用链</h2>
+    </div>
+    <div class="writeups-list">
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/格式化字符串利用方式/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Fmt</span>
+          <h3>格式化字符串利用方式</h3>
+          <p>格式化字符串漏洞的基础打法与变体整理。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/栈迁移/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">迁移</span>
+          <h3>栈迁移</h3>
+          <p>把执行流和伪造栈串起来的基础通用手法。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/ret2csucsu链利用/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">ROP</span>
+          <h3>ret2csu / csu 链利用</h3>
+          <p>没有合适 gadget 时的标准补位方案。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/一些常用函数的调用总结/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">函数</span>
+          <h3>一些常用函数的调用总结</h3>
+          <p>常用 libc / 系统调用参数与调用约定速查。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/SeccompOrw读写权限漏洞利用/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Seccomp</span>
+          <h3>SeccompOrw 读写权限漏洞利用</h3>
+          <p>受限系统调用下的 ORW 与利用链拆解。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="writeups-section">
+    <div class="writeups-section-head">
+      <span class="writeups-year">进阶</span>
+      <h2>串联与补充</h2>
+    </div>
+    <div class="writeups-list">
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/什么是Fork/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">进程</span>
+          <h3>什么是 Fork</h3>
+          <p>理解多进程题目时最常见的基础补丁。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/SSPLeak_libc2.27/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Leak</span>
+          <h3>SSP Leak &lt; libc2.27</h3>
+          <p>利用报错信息做泄露的经典老技术。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/environ利用/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Stack</span>
+          <h3>environ 利用</h3>
+          <p>从 libc 里的 environ 继续回到栈地址。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/libc_start_main/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Libc</span>
+          <h3>libc_start_main</h3>
+          <p>常见 libc 泄露点和调用链的整理。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/SROP利用技巧/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">SROP</span>
+          <h3>SROP 利用技巧</h3>
+          <p>sigreturn 体系的基础利用和延伸场景。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+
+      <a class="writeup-row" href="/HFTTC.github.io/2026/05/23/条件竞争漏洞/index/">
+        <div class="writeup-row-main">
+          <span class="writeup-badge">Race</span>
+          <h3>条件竞争漏洞</h3>
+          <p>多线程和竞态条件下的基础利用示例。</p>
+        </div>
+        <div class="writeup-row-side">
+          <time>2026-05-23</time>
+          <span>查看文章</span>
+        </div>
+      </a>
+    </div>
+  </section>
 </div>
-        <section class="archives-wrap" data-aos="fade-up">
-          <div class="archive-year-wrap">
-            <a href="/HFTTC.github.io/archives/2026" class="archive-year">2026</a>
+
+    </div>
+    <footer class="article-footer">
+      
+    </footer>
+  </div>
+  
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
           </div>
-          <ul>
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-31T16:00:00.000Z" itemprop="datePublished">06-01</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/06/01/WEB-PWN/%5BCISCN%202026%E5%88%9D%E8%B5%9B%5Dminihttpd(47%E8%A7%A3)/">[CISCN 2026初赛]minihttpd(47解)</a>
-</li>
+    </div>
+  </section>
 
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:47:01.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/VMpwn/">VMpwn</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:58.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/">[CISCN 2017]kernel-babydriver</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:57.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/">初识 KernelPWN</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:55.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/KernelPWN/index/">Kernel PWN</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:53.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/mini-mqtt/">mini-mqtt</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:52.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/httpd/">httpd</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:50.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/index/">PolarisCTF_2026_WEBPWN</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:49.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/WEB-PWN/%5BGHCTF2025%5DFruitNinja/">[GHCTF 2025]Fruit Ninja</a>
-</li>
-
-            <li class="archive-article">
-  <div class="archive-article-date">
-    <span>
-      <time class="dt-published" datetime="2026-05-22T18:46:48.000Z" itemprop="datePublished">05-23</time>
-    </span>
-  </div>
-    <a class="archive-article-title" href="/HFTTC.github.io/2026/05/23/GO-PWN/%5BCISCN2024%5Dgostack/">[CISCN 2024] gostack</a>
-</li>
-
-          </ul>
-        </section>
-  </div>
-  <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <a class="extend prev" rel="prev" href="/HFTTC.github.io/categories/Notes/page/2/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/categories/Notes/">1</a><a class="page-number" href="/HFTTC.github.io/categories/Notes/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/HFTTC.github.io/categories/Notes/page/4/">4</a><a class="page-number" href="/HFTTC.github.io/categories/Notes/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/categories/Notes/page/15/">15</a><a class="extend next" rel="next" href="/HFTTC.github.io/categories/Notes/page/4/">下一页 &raquo;</a>
-  </nav>
 
 </section>
         </div>
@@ -735,6 +936,206 @@
 
 <div id="lazy-script">
   <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "基础知识",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/basics/index.html",
+          excerpt: "",
+          description: "",
+          stripContent: "                PWN BASICS       基础知识       按主题整理 PWN 入门、常见绕过和基础利用链，保留最常用的文章入口，方便快速回查。                 4 个板块       基础 + 进阶       PWN                        入门       基础上手                                     新手           PWN 新生基础知识 1           面向初学者的第一",
+          date: "Wed Aug 26 2026 00:00:00 GMT+0800",
+          updated: "Wed Aug 26 2026 02:22:27 GMT+0800",
+          cover: "/HFTTC.github.io/images/banner.webp",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
   </div>
 </div>
 

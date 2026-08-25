@@ -2,6 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/basics/index.html</loc>
+    
+    <lastmod>2026-08-25</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/writeups/index.html</loc>
     
     <lastmod>2026-08-25</lastmod>
@@ -1404,20 +1413,6 @@
   </url>
   
   <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/php/</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/d3ctf/</loc>
-    <lastmod>2026-08-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/%E6%96%B0%E7%94%9F/</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
@@ -1439,14 +1434,14 @@
   </url>
   
   <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/kernel/</loc>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/php/</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/pwn-college/</loc>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/d3ctf/</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -1461,6 +1456,20 @@
   
   <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/compiler/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/kernel/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/pwn-college/</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
