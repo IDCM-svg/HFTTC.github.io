@@ -948,6 +948,43 @@ button {
   opacity: 1;
   background: rgba(255,255,255,0.28);
 }
+.main-nav-dropdown-item {
+  position: relative;
+}
+.main-nav-dropdown-item.has-children:hover .main-nav-submenu,
+.main-nav-dropdown-item.has-children:focus-within .main-nav-submenu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(0, 0) scaleY(1);
+}
+.main-nav-dropdown-parent {
+  position: relative;
+  padding-right: 24px;
+}
+.main-nav-dropdown-parent:after {
+  content: ">";
+  position: absolute;
+  right: 10px;
+  opacity: 0.65;
+}
+.main-nav-submenu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 8px);
+  min-width: 260px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--color-header-background);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-8px, 0) scaleY(0.96);
+  transform-origin: top left;
+  transition: opacity 0.18s, visibility 0.18s, transform 0.18s, background 1s;
+  z-index: 230;
+}
 [data-theme='dark'] .main-nav-dropdown-link {
   color: var(--red-2);
 }

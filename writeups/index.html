@@ -28,16 +28,16 @@
     
 <link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
 
-    <meta name="description" content="Writeups按比赛和题目整理的题解入口。 Recent CTF [NepCTF2025]time多线程栈 [ISCC2024]shopping多线程堆libc-2.31 [ISCC2024]chaos_plus(堆栈结合) [SWPUCTF2024秋季新生赛]不可名状的东西 [SWPUCTF2024秋季新生赛]出题人你到底干了什么？  2023 [HDCTF2023]Makewish fmts">
+    <meta name="description" content="比赛 WP主要按比赛整理 PWN 题解入口。 2026 第九届宁波市网络安全&amp;西湖论剑 PWN 2026 黄鹤杯 2026 PWN Lexington Informatics Tournament CTF 2026 L3akCTF 2026 NepCTF 2026 PWN SCTF2026 slang  2025 湾区杯 2025 PWN 西湖论剑 2025 PWN">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Writeups">
 <meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/writeups/index.html">
 <meta property="og:site_name" content="HFTTC&#39;s Blog">
-<meta property="og:description" content="Writeups按比赛和题目整理的题解入口。 Recent CTF [NepCTF2025]time多线程栈 [ISCC2024]shopping多线程堆libc-2.31 [ISCC2024]chaos_plus(堆栈结合) [SWPUCTF2024秋季新生赛]不可名状的东西 [SWPUCTF2024秋季新生赛]出题人你到底干了什么？  2023 [HDCTF2023]Makewish fmts">
+<meta property="og:description" content="比赛 WP主要按比赛整理 PWN 题解入口。 2026 第九届宁波市网络安全&amp;西湖论剑 PWN 2026 黄鹤杯 2026 PWN Lexington Informatics Tournament CTF 2026 L3akCTF 2026 NepCTF 2026 PWN SCTF2026 slang  2025 湾区杯 2025 PWN 西湖论剑 2025 PWN">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://idcm-svg.github.io/images/banner.webp">
 <meta property="article:published_time" content="2026-05-22T16:00:00.000Z">
-<meta property="article:modified_time" content="2026-05-22T18:27:59.750Z">
+<meta property="article:modified_time" content="2026-08-25T17:24:12.966Z">
 <meta property="article:author" content="HFTTC">
 <meta property="article:tag" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
 <meta name="twitter:card" content="summary">
@@ -124,11 +124,23 @@
               <span class="main-nav-link">目录</span>
             </a>
             <div class="main-nav-dropdown-menu" role="menu">
-                <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BAret2text" role="menuitem">基础知识</a>
-                <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog" role="menuitem">PWN知识集结</a>
-                <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-arm-pwn" role="menuitem">IOT</a>
-                <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-kernel-pwn" role="menuitem">Kernel</a>
-                <a class="main-nav-dropdown-link" href="/HFTTC.github.io/writeups" role="menuitem">比赛wp</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BAret2text" role="menuitem">基础知识</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog" role="menuitem">PWN知识集结</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-arm-pwn" role="menuitem">IOT</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-kernel-pwn" role="menuitem">Kernel</a>
+                  <div class="main-nav-dropdown-item has-children">
+                    <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
+                    <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" role="menuitem">黄鹤杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" role="menuitem">Lexington Informatics Tournament CTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" role="menuitem">L3akCTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" role="menuitem">nepctf2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" role="menuitem">SCTF2026</a>
+                    </div>
+                  </div>
             </div>
           </div>
           <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
@@ -366,10 +378,10 @@
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
     <time datetime="2026-05-22T16:00:00.000Z" itemprop="datePublished">2026-05-23</time>
-    <time style="display: none;" id="post-update-time">2026-05-23</time>
+    <time style="display: none;" id="post-update-time">2026-08-26</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-05-22T18:27:59.750Z" itemprop="dateModified">2026-05-23</time>
+      <time datetime="2026-08-25T17:24:12.966Z" itemprop="dateModified">2026-08-26</time>
     </span>
 </div>
 
@@ -378,37 +390,18 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <h1 id="Writeups"><a href="#Writeups" class="headerlink" title="Writeups"></a>Writeups</h1><p>按比赛和题目整理的题解入口。</p>
-<h2 id="Recent-CTF"><a href="#Recent-CTF" class="headerlink" title="Recent CTF"></a>Recent CTF</h2><ul>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BNepCTF2025%5Dtime%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A0%88/">[NepCTF2025]time多线程栈</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BISCC2024%5Dshopping%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%A0%86libc-2.31/">[ISCC2024]shopping多线程堆libc-2.31</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/">[ISCC2024]chaos_plus(堆栈结合)</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BSWPUCTF2024%E7%A7%8B%E5%AD%A3%E6%96%B0%E7%94%9F%E8%B5%9B%5D%E4%B8%8D%E5%8F%AF%E5%90%8D%E7%8A%B6%E7%9A%84%E4%B8%9C%E8%A5%BF/">[SWPUCTF2024秋季新生赛]不可名状的东西</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BSWPUCTF2024%E7%A7%8B%E5%AD%A3%E6%96%B0%E7%94%9F%E8%B5%9B%5D%E5%87%BA%E9%A2%98%E4%BA%BA%E4%BD%A0%E5%88%B0%E5%BA%95%E5%B9%B2%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%9F/">[SWPUCTF2024秋季新生赛]出题人你到底干了什么？</a></li>
+        <h1 id="比赛-WP"><a href="#比赛-WP" class="headerlink" title="比赛 WP"></a>比赛 WP</h1><p>主要按比赛整理 PWN 题解入口。</p>
+<h2 id="2026"><a href="#2026" class="headerlink" title="2026"></a>2026</h2><ul>
+<li><a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a></li>
+<li><a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/">黄鹤杯 2026 PWN</a></li>
+<li><a href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/">Lexington Informatics Tournament CTF 2026</a></li>
+<li><a href="/HFTTC.github.io/2026/08/05/l3akctf2026/">L3akCTF 2026</a></li>
+<li><a href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/">NepCTF 2026 PWN</a></li>
+<li><a href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/">SCTF2026 slang</a></li>
 </ul>
-<h2 id="2023"><a href="#2023" class="headerlink" title="2023"></a>2023</h2><ul>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BHDCTF2023%5DMakewish/">[HDCTF2023]Makewish</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/fmtstr__%5BHDCTF2023%5DMinions/">fmtstr__[HDCTF2023]Minions</a></li>
-</ul>
-<h2 id="2021"><a href="#2021" class="headerlink" title="2021"></a>2021</h2><ul>
-<li><a href="/HFTTC.github.io/2026/04/28/%5B2021%E9%95%BF%E5%9F%8E%E6%9D%AF%5DK1ng_in_h3Ap_I/">[2021长城杯]K1ng_in_h3Ap_I</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/">[CISCN2021初赛]lonelywolf</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/nepctf-2021NULL_FXCK/">nepctf-2021NULL_FXCK</a></li>
-</ul>
-<h2 id="Classic-And-Misc"><a href="#Classic-And-Misc" class="headerlink" title="Classic And Misc"></a>Classic And Misc</h2><ul>
-<li><a href="/HFTTC.github.io/2026/04/28/0ctf_2018_heapstorm2/">0ctf_2018_heapstorm2</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/LCTF_2016Pwn200/">LCTF_2016Pwn200</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/de1ctf_2019_weapon/">de1ctf_2019_weapon</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/npuctf_2020_bad_guy/">npuctf_2020_bad_guy</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/LitCTF2024heap-2.35/">LitCTF2024heap-2.35</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/pwnable.tworw%E4%BE%8B%E9%A2%98/">pwnable.tworw例题</a></li>
-<li><a href="/HFTTC.github.io/2026/04/28/CTFHubHouseofEinherjar/">CTFHubHouseofEinherjar</a></li>
-</ul>
-<h2 id="Notes"><a href="#Notes" class="headerlink" title="Notes"></a>Notes</h2><p>如果后面题解继续增多，下一步可以把这页改成：</p>
-<ul>
-<li>按比赛年份分组</li>
-<li>按题型分组</li>
-<li>按 libc &#x2F; glibc 版本分组</li>
+<h2 id="2025"><a href="#2025" class="headerlink" title="2025"></a>2025</h2><ul>
+<li><a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/">湾区杯 2025 PWN</a></li>
+<li><a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/">西湖论剑 2025 PWN</a></li>
 </ul>
 
     </div>
@@ -630,9 +623,9 @@
           url: "https://idcm-svg.github.io/HFTTC.github.io/writeups/index.html",
           excerpt: "",
           description: "",
-          stripContent: "Writeups按比赛和题目整理的题解入口。 Recent CTF [NepCTF2025]time多线程栈 [ISCC2024]shopping多线程堆libc-2.31 [ISCC2024]chaos_plus(堆栈结合) [SWPUCTF2024秋季新生赛]不可名状的东西 [SWPUCTF2024秋季新生赛]出题人你到底干了什么？  2023 [HDCTF2023]Makewish fmtstr__[HDCTF2023]Minions  2021 [2021长城杯]K1ng_in_h3Ap",
+          stripContent: "比赛 WP主要按比赛整理 PWN 题解入口。 2026 第九届宁波市网络安全&amp;amp;西湖论剑 PWN 2026 黄鹤杯 2026 PWN Lexington Informatics Tournament CTF 2026 L3akCTF 2026 NepCTF 2026 PWN SCTF2026 slang  2025 湾区杯 2025 PWN 西湖论剑 2025 PWN  ",
           date: "Sat May 23 2026 00:00:00 GMT+0800",
-          updated: "Sat May 23 2026 02:27:59 GMT+0800",
+          updated: "Wed Aug 26 2026 01:24:12 GMT+0800",
           cover: "/HFTTC.github.io/images/banner.webp",
         };
       </script>
