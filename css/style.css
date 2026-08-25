@@ -894,6 +894,64 @@ button {
 .main-nav-link-wrap:hover .main-nav-icon.rotate {
   transform: rotate(90deg) scale(1.1);
 }
+.main-nav-dropdown-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+@media screen and (max-width: 767px) {
+  .main-nav-dropdown-wrap {
+    display: none;
+  }
+}
+.main-nav-dropdown-wrap:hover .main-nav-dropdown-menu,
+.main-nav-dropdown-wrap:focus-within .main-nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+.main-nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  min-width: 150px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--color-header-background);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.2s, visibility 0.2s, transform 0.2s, background 1s;
+  z-index: 220;
+}
+.main-nav-dropdown-link {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--red-0);
+  font-weight: 700;
+  line-height: 1.4;
+  opacity: 0.8;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+.main-nav-dropdown-link:hover,
+.main-nav-dropdown-link:focus {
+  opacity: 1;
+  background: rgba(255,255,255,0.28);
+}
+[data-theme='dark'] .main-nav-dropdown-link {
+  color: var(--red-2);
+}
+[data-theme='dark'] .main-nav-dropdown-link:hover,
+[data-theme='dark'] .main-nav-dropdown-link:focus {
+  background: rgba(255,255,255,0.08);
+}
 .main-nav-link {
   letter-spacing: 1px;
   font-weight: 700;
@@ -3222,6 +3280,30 @@ pre .emphasis {
 }
 .sidebar-menu-link {
   pointer-events: none;
+}
+.sidebar-submenu {
+  display: grid;
+  gap: 6px;
+  width: 66%;
+  max-width: 190px;
+  margin: -2px auto 10px;
+}
+.sidebar-submenu-link {
+  color: var(--color-link);
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  opacity: 0.75;
+  padding: 7px 10px;
+  text-align: center;
+  text-decoration: none;
+  transition: opacity 0.2s, color 0.2s, background 0.2s;
+}
+.sidebar-submenu-link:hover,
+.sidebar-submenu-link:focus {
+  background: var(--color-code-background);
+  opacity: 1;
 }
 .link-active {
   background: var(--red-0);
