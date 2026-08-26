@@ -1413,20 +1413,6 @@
   </url>
   
   <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/php/</loc>
-    <lastmod>2026-08-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/d3ctf/</loc>
-    <lastmod>2026-08-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/%E6%96%B0%E7%94%9F/</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -1441,6 +1427,27 @@
   </url>
   
   <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/php/</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/d3ctf/</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/ret2shellcode/</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/kernel/</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
@@ -1449,13 +1456,6 @@
   
   <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/pwn-college/</loc>
-    <lastmod>2026-08-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://idcm-svg.github.io/HFTTC.github.io/tags/ret2shellcode/</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
