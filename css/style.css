@@ -1744,15 +1744,6 @@ button {
 .writeup-row-side span {
   color: var(--red-1);
 }
-.writeups-home-style .post-wrap {
-  box-shadow: var(--shadow-card);
-}
-.writeups-home-style .post-title {
-  margin: 0 !important;
-}
-.writeups-home-style .post-article {
-  margin: 0 !important;
-}
 [data-theme='dark'] .writeups-hero {
   border-bottom-color: rgba(255,255,255,0.1);
 }
