@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">147</div>
+    <div class="sidebar-state-number">148</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/27/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-3/" title="PWN 新生基础知识 3">PWN 新生基础知识 3</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" title="西湖论剑 2025 PWN">西湖论剑 2025 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" title="黄鹤杯 2026 PWN">黄鹤杯 2026 PWN</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,34 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA/" aria-label="对于got和hook的讨论" title="对于got和hook的讨论"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Heap%E4%B8%8EBins%E5%91%BD%E4%BB%A4/" aria-label="Heap 与 Bins 命令" title="Heap 与 Bins 命令"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Heap 与 Bins 命令" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>609 字</span>
+        <span><span class="icon-clock"></span>3 分钟</span>
+      </div>
+      <h2 class="post-title">Heap 与 Bins 命令</h2>
+      <article class="post-article">
+          Heap 与 Bins 命令1. heap 命令的原理：顺藤摸瓜（线性遍历）pwndbg 的 heap 命令是个“老实人”。它解析堆的方法是从堆的最开头（Heap Base）开始，挨个读取每一个 chunk 的 Size 字段。
+
+读到 Chunk A，Size 是 0x290，于是它跳到 Addr + 0x290 去找 Chunk B。
+读到 Chunk B，Size 是 0x20，于是它跳到 Addr + 0x20 去找 Chunk C。
+依此类推，直到找到 Top Chunk 为止。
+
+2. 致命的断链：为什么卡在 0x...9d20？在你执行 free(3) 触发 向后合并（Backw
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA/" aria-label="对于got和hook的讨论" title="对于got和hook的讨论"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于got和hook的讨论" class="lazyload">
     </div>
     <div class="post-info">
@@ -399,9 +425,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-NULLTcachebin/" aria-label="OFF-BY-NULL Tcachebin" title="OFF-BY-NULL Tcachebin"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="OFF-BY-NULL Tcachebin" class="lazyload">
     </div>
     <div class="post-info">
@@ -421,9 +447,9 @@ main1234567891011121314151617181920212223242
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/OFF-BY-ONE%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="OFF-BY-ONE 例题分析" title="OFF-BY-ONE 例题分析"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="OFF-BY-ONE 例题分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -443,9 +469,9 @@ main1234567891011121314151617181920212223242
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Off-By-One%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8/index/" aria-label="Off-By-One漏洞原理及利用" title="Off-By-One漏洞原理及利用"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Off-By-One漏洞原理及利用" class="lazyload">
     </div>
     <div class="post-info">
@@ -471,9 +497,9 @@ off-by-one漏洞原理offbyone只单字节缓冲区溢出，这种漏洞的产�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/FastbinDOUBLEFREE/" aria-label="Fastbin DOUBLE FREE" title="Fastbin DOUBLE FREE"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Fastbin DOUBLE FREE" class="lazyload">
     </div>
     <div class="post-info">
@@ -496,9 +522,9 @@ Fastbin Attack 漏洞原理fastbin attack 存在的原因在于 fastbin 是使�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/fastbin%E9%94%99%E4%BD%8D%E4%BC%AA%E9%80%A0/" aria-label="fastbin 错位伪造" title="fastbin 错位伪造"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="fastbin 错位伪造" class="lazyload">
     </div>
     <div class="post-info">
@@ -520,9 +546,9 @@ Fastbin Attack 漏洞原理fastbin attack 存在的原因在于 fastbin 是使�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/UAF_useafterfree/UseAfterFree%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="Use After Free 例题分析" title="Use After Free 例题分析"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Use After Free 例题分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -541,9 +567,9 @@ main 函数分析123456789101112131415161718192021222324252627282930313233343536
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/UAF_useafterfree/index/" aria-label="UAF/use after free" title="UAF/use after free"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="UAF/use after free" class="lazyload">
     </div>
     <div class="post-info">
@@ -563,9 +589,9 @@ UAF的概述UAF 是 Use After Free 的缩写，中文叫 “释放后使用”�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%9A%84%E5%BC%80%E8%BE%9F%E4%B8%8E%E9%87%8A%E6%94%BE/" aria-label="内存空间的开辟与释放" title="内存空间的开辟与释放"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="内存空间的开辟与释放" class="lazyload">
     </div>
     <div class="post-info">
@@ -586,28 +612,6 @@ bin 的分类体系：Tcache bin：
 大小范围：0x20-0x410
 单链表
 线程私有缓存，LIFO，几乎无 size 检查，
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%A0%86%E5%88%A9%E7%94%A8_glibc%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" aria-label="堆利用/glibc内存管理" title="堆利用/glibc内存管理"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="堆利用/glibc内存管理" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>4.5k 字</span>
-        <span><span class="icon-clock"></span>18 分钟</span>
-      </div>
-      <h2 class="post-title">堆利用/glibc内存管理</h2>
-      <article class="post-article">
-          堆利用&amp;#x2F;glibc内存管理什么是堆？首先明确一下堆的概念，堆不同于栈，堆是（由操作系统内核或者堆管理器）动态分配的，**只有在程序需要时才会分配。**在CTFpwn程序中，栈是程序加载进内存后就会出现，而堆是由malloc，alloc，realloc函数分配内存之后才会出现。
-堆（chunk）内存是一种允许程序在运行过程中动态分配和使用的内存区域。相比于栈内存和全局内存，堆内存没有固定的生命周期和固定的内存区域，程序可以动态地申请和释放不同大小的内存。被分配后，如果没有进行明确的释放操作，该堆内存区域都是一直有效的。
-windows和linux下的堆分配，管理方式都不同，这里主要是l
       </article>
     </div>
   </div>
@@ -635,10 +639,10 @@ windows和linux下的堆分配，管理方式都不同，这里主要是l
       </div>
       <div>
         <span class="icon-brush"></span>
-        283.4k
+        284.9k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:25
+        23:33
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -666,7 +670,7 @@ windows和linux下的堆分配，管理方式都不同，这里主要是l
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">147</div>
+    <div class="sidebar-state-number">148</div>
   </div>
 </div>
 <div class="sidebar-social" >

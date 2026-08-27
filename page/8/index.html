@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">147</div>
+    <div class="sidebar-state-number">148</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/27/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-3/" title="PWN 新生基础知识 3">PWN 新生基础知识 3</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" title="西湖论剑 2025 PWN">西湖论剑 2025 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" title="黄鹤杯 2026 PWN">黄鹤杯 2026 PWN</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,31 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/" aria-label="[ISCC 2024] chaos_plus(堆栈结合)" title="[ISCC 2024] chaos_plus(堆栈结合)"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/glibc-2.32malloc()_unalignedtcachechunkdetected/" aria-label="glibc-2.32 malloc(): unaligned tcache chunk detected" title="glibc-2.32 malloc(): unaligned tcache chunk detected"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.32 malloc(): unaligned tcache chunk detected" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>448 字</span>
+        <span><span class="icon-clock"></span>3 分钟</span>
+      </div>
+      <h2 class="post-title">glibc-2.32 malloc(): unaligned tcache chunk detected</h2>
+      <article class="post-article">
+          glibc-2.32 malloc(): unaligned tcache chunk detected从 glibc 2.32 版本开始，官方在 malloc 从 Tcache 中取出内存块的代码里加了一行检查：取出的内存地址，必须能够被 16 整除（也就是地址的最后一位必须是 0）。 如果最后一位不是 0（比如你这里的 8），glibc 会立刻判定 Tcache 链表被黑客破坏，并抛出如下致命报错：malloc(): unaligned tcache chunk detected
+随后程序直接 abort() 退出，你的利用链就此中断。
+我们可以看一道题去了解这个报错：
+在 [ISCC 2
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/" aria-label="[ISCC 2024] chaos_plus(堆栈结合)" title="[ISCC 2024] chaos_plus(堆栈结合)"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[ISCC 2024] chaos_plus(堆栈结合)" class="lazyload">
     </div>
     <div class="post-info">
@@ -400,9 +423,9 @@ chaos_plus(UAF libc-2.35)
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="[CISCN 2021 初赛]lonelywolf" title="[CISCN 2021 初赛]lonelywolf"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2021 初赛]lonelywolf" class="lazyload">
     </div>
     <div class="post-info">
@@ -424,9 +447,9 @@ main 函数
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/index/" aria-label="glibc-2.35 新增保护机制" title="glibc-2.35 新增保护机制"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.35 新增保护机制" class="lazyload">
     </div>
     <div class="post-info">
@@ -448,9 +471,9 @@ main 函数
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/index/" aria-label="Tcache_perthread_corruption" title="Tcache_perthread_corruption"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache_perthread_corruption" class="lazyload">
     </div>
     <div class="post-info">
@@ -469,9 +492,9 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/TcachePoisoning/" aria-label="Tcache Poisoning" title="Tcache Poisoning"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache Poisoning" class="lazyload">
     </div>
     <div class="post-info">
@@ -487,29 +510,6 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
 123┌──(pwn_env)─(root㉿kali)-[/home/kali/Desktop]└─# patchelf --set-interpreter ./glibc-all-in-one/libs/2.31-0ubuntu9_amd64/ld-2.31.so ./heap2.31 patchelf --set-rpath /home/kali/Desktop/glibc-all-in-one/libs/2.31-0ubuntu9_amd64 ./heap2.31 
 
 封装函
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcachedup/" aria-label="Tcache dup" title="Tcache dup"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache dup" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>19 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
-      </div>
-      <h2 class="post-title">Tcache dup</h2>
-      <article class="post-article">
-          Tcache dup
-更新: 2026-04-08 19:12:44原文: https://www.yuque.com/idcm/wnemg9/ro1d3xm9z0b5h6eu
-
-
       </article>
     </div>
   </div>
@@ -539,8 +539,31 @@ tcachebin 和 unso
 </div>
       <div class="post-wrapper">
   <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="houseoforange_hitcon_2016" title="houseoforange_hitcon_2016"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcachedup/" aria-label="Tcache dup" title="Tcache dup"></a>
     <div class="post-cover right">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache dup" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>19 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
+      </div>
+      <h2 class="post-title">Tcache dup</h2>
+      <article class="post-article">
+          Tcache dup
+更新: 2026-04-08 19:12:44原文: https://www.yuque.com/idcm/wnemg9/ro1d3xm9z0b5h6eu
+
+
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/houseoforange_hitcon_2016/" aria-label="houseoforange_hitcon_2016" title="houseoforange_hitcon_2016"></a>
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="houseoforange_hitcon_2016" class="lazyload">
     </div>
     <div class="post-info">
@@ -559,9 +582,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041voi
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofOrangeglibc-2.23/index/" aria-label="House of Orange glibc-2.23" title="House of Orange glibc-2.23"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Orange glibc-2.23" class="lazyload">
     </div>
     <div class="post-info">
@@ -576,27 +599,6 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041voi
           House of Orange glibc-2.23什么是 House of Orange？House of Orange 是针对于 libc-2.23 的一种攻击方法，是将 libc_heap 攻击和 __IO_FILE 攻击组合起来的利用手段
 
 House of Orange Poc123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354/* * For glibc-2.23 */#include &amp;lt;stdio.h&amp;gt;#include &amp;l
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/IO_FILE%E4%B9%8BFSOP%E9%93%BE/" aria-label="__IO_FILE之FSOP链" title="__IO_FILE之FSOP链"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__IO_FILE之FSOP链" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2.6k 字</span>
-        <span><span class="icon-clock"></span>13 分钟</span>
-      </div>
-      <h2 class="post-title">__IO_FILE之FSOP链</h2>
-      <article class="post-article">
-          __IO_FILE之FSOP链参考资料：
-https://blog.csdn.net/KaliLinux_V&amp;#x2F;article&amp;#x2F;details&amp;#x2F;146547239?utm_medium&amp;#x3D;distribute.pc_relevant.none-task-blog-2defaultbaidujs_baidulandingword~default-0-146547239-blog-115327308.235^v43^pc_blog_bottom_relevance_base4&amp;amp;spm&amp;#x3D;1001.2101.3001.4242.1&amp;amp;utm_
       </article>
     </div>
   </div>
@@ -624,10 +626,10 @@ https://blog.csdn.net/KaliLinux_V&amp;#x2F;article&amp;#x2F;details&amp;#x2F;146
       </div>
       <div>
         <span class="icon-brush"></span>
-        283.4k
+        284.9k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:25
+        23:33
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -655,7 +657,7 @@ https://blog.csdn.net/KaliLinux_V&amp;#x2F;article&amp;#x2F;details&amp;#x2F;146
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">147</div>
+    <div class="sidebar-state-number">148</div>
   </div>
 </div>
 <div class="sidebar-social" >
