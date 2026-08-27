@@ -131,6 +131,7 @@
                   <div class="main-nav-dropdown-item has-children">
                     <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
                     <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
@@ -202,7 +203,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -340,6 +341,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
             <li>
@@ -350,9 +354,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" title="黄鹤杯 2026 PWN">黄鹤杯 2026 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" title="PWN 新生基础知识 2">PWN 新生基础知识 2</a>
             </li>
         </ul>
       </div>
@@ -375,8 +376,36 @@
           <section id="main" aria-label="Main content">
   <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" aria-label="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" aria-label="网鼎杯 2024 半决赛 PWN" title="网鼎杯 2024 半决赛 PWN"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/wangdingbei-2024-semifinal-pwn.jpg" data-sizes="auto" alt="网鼎杯 2024 半决赛 PWN" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-27</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-27</span>
+        <span><span class="icon-pencil"></span>1.2k 字</span>
+        <span><span class="icon-clock"></span>7 分钟</span>
+      </div>
+      <h2 class="post-title">网鼎杯 2024 半决赛 PWN</h2>
+      <article class="post-article">
+          网鼎杯的题目决定先复现一道，cardmaster 这道题目总体来说是逆向难度比较大，指针比较乱，漏洞利用逻辑就是 glibc2.27 版本下的 UAF 和 teache_poisioning。另一道题目是一个内核题，决定再学习一段时间内核再去复现感觉效果会更好。
+
+PWN1-cardmaster
+
+
+
+看下初始化的一些基本信息：
+先开辟 0x28 大小的空间，地址存放在 v4。再开辟 0x20 大小的空间，地址存放在 v4[4]。
+可以把 v4[4] 看做一个链表，开辟一个 0xD0 大小的空间存放在 v4[4]-&amp;gt;v0，之后可以把 v0 看做是一个二维数组：v0[i][j]，每个数组相
+      </article>
+    </div>
+  </div>
+</div>
+  <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" aria-label="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ningbo-xihu-2026-pwn.jpg" data-sizes="auto" alt="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -408,9 +437,9 @@ size 会存入dword_4060[idx] 这个数组，chunk 地址会放在(_QWORD *)&amp
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" aria-label="湾区杯 2025 PWN" title="湾区杯 2025 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg" data-sizes="auto" alt="湾区杯 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -432,9 +461,9 @@ digtal_bomb：
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" aria-label="西湖论剑 2025 PWN" title="西湖论剑 2025 PWN"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/xihulunjian-2025-pwn.jpg" data-sizes="auto" alt="西湖论剑 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -459,9 +488,9 @@ Vpwn：
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" aria-label="黄鹤杯 2026 PWN" title="黄鹤杯 2026 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/huanghecup-2026-pwn.jpg" data-sizes="auto" alt="黄鹤杯 2026 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -489,9 +518,9 @@ dest 是 bss 段上的，也就是说最开始会在 dest 存放 .&amp;#x2F;flag
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" aria-label="Lexington Informatics Tournament CTF 2026" title="Lexington Informatics Tournament CTF 2026"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/lexington-informatics-tournament-ctf-2026.jpg" data-sizes="auto" alt="Lexington Informatics Tournament CTF 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -511,9 +540,9 @@ pwn&amp;#x2F;long division题目描述：I made a calculator for dividing two 32
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" aria-label="L3akCTF 2026" title="L3akCTF 2026"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/l3akctf2026.jpg" data-sizes="auto" alt="L3akCTF 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -538,9 +567,9 @@ Rudimentary Calculator
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" aria-label="NepCTF 2026 PWN" title="NepCTF 2026 PWN"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/nepctf-2026-pwn.jpg" data-sizes="auto" alt="NepCTF 2026 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -559,9 +588,9 @@ Rudimentary Calculator
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" aria-label="SCTF2026 slang" title="SCTF2026 slang"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/sctf2026-slang.jpg" data-sizes="auto" alt="SCTF2026 slang" class="lazyload">
     </div>
     <div class="post-info">
@@ -603,10 +632,10 @@ serve.py123456789101112131415161718192021222324252627282930313233343536373839404
       </div>
       <div>
         <span class="icon-brush"></span>
-        282.2k
+        283.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:18
+        23:25
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -634,7 +663,7 @@ serve.py123456789101112131415161718192021222324252627282930313233343536373839404
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >

@@ -129,6 +129,7 @@
                   <div class="main-nav-dropdown-item has-children">
                     <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
                     <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
@@ -205,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -343,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
             <li>
@@ -353,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" title="黄鹤杯 2026 PWN">黄鹤杯 2026 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" title="PWN 新生基础知识 2">PWN 新生基础知识 2</a>
             </li>
         </ul>
       </div>
@@ -377,8 +378,41 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" aria-label="PHP-PWN d3ctf2024-pwnshell" title="PHP-PWN d3ctf2024-pwnshell"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/07/14/%E8%AE%B0%E4%B8%80%E9%81%93%E6%9C%8B%E5%8F%8B%E7%BB%99%E7%9A%84%E7%BB%83%E4%B9%A0%E9%A2%98/" aria-label="记一道朋友给的练习题" title="记一道朋友给的练习题"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/fe061bb344c270d540b16a36796edace.jpg" data-sizes="auto" alt="记一道朋友给的练习题" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-14</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-14</span>
+        <span><span class="icon-pencil"></span>878 字</span>
+        <span><span class="icon-clock"></span>5 分钟</span>
+      </div>
+      <h2 class="post-title">记一道朋友给的练习题</h2>
+      <article class="post-article">
+          有一段时间没有练习了，前一段时间一直在准备御网杯的应急响应，虽然到最后也没拿出来什么好结果吧，朋友给了一道练习题写写，看看自己退化了没有
+练后：
+篡改函数走 system 的还是比较常见的，2.27 算是低版本了，大概一个多月没怎么手开过 pwn 了，也算是回复一下手感，题目还算是比较基础的，之后还有好多东西要学呢 emmmmm
+
+
+
+IDA 静态分析：main
+
+main 函数没什么看点，简单修一下函数名
+add
+
+要求大小只是小于 0x78。
+emmm，那这样的话思路就很固定了啊，没有 FULL RELEO，2.27 的 libc，并且是小于 0x78 的堆
+那么大概率就是篡改指针，走一个
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/19/PHP-PWN%20d3ctf2024-pwnshell/" aria-label="PHP-PWN d3ctf2024-pwnshell" title="PHP-PWN d3ctf2024-pwnshell"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/php-pwn-d3ctf2024-pwnshell.jpg" data-sizes="auto" alt="PHP-PWN d3ctf2024-pwnshell" class="lazyload">
     </div>
     <div class="post-info">
@@ -399,9 +433,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/19/Pwn.college-Kernel-1-6/" aria-label="Pwn.college-Kernel-1-6" title="Pwn.college-Kernel-1-6"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-college-kernel-1-6.jpg" data-sizes="auto" alt="Pwn.college-Kernel-1-6" class="lazyload">
     </div>
     <div class="post-info">
@@ -426,9 +460,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/19/ret2usr_smep%E7%BB%95%E8%BF%87_kpti%E7%BB%95%E8%BF%87%20QWB2018-core/" aria-label="ret2usr_smep绕过_kpti绕过 QWB2018-core" title="ret2usr_smep绕过_kpti绕过 QWB2018-core"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ret2usr-smep-kpti-qwb2018-core.jpg" data-sizes="auto" alt="ret2usr_smep绕过_kpti绕过 QWB2018-core" class="lazyload">
     </div>
     <div class="post-info">
@@ -453,9 +487,9 @@ ret2usrret2usr（Return-to-user，返回用户态）是一种经典的内核（K
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" aria-label="SCTF2026 slang" title="SCTF2026 slang"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/sctf2026-slang.jpg" data-sizes="auto" alt="SCTF2026 slang" class="lazyload">
     </div>
     <div class="post-info">
@@ -479,9 +513,9 @@ serve.py123456789101112131415161718192021222324252627282930313233343536373839404
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5DStrangeTalkBot/" aria-label="[CISCN 2023]StrangeTalkBot" title="[CISCN 2023]StrangeTalkBot"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2023-strangetalkbot.jpg" data-sizes="auto" alt="[CISCN 2023]StrangeTalkBot" class="lazyload">
     </div>
     <div class="post-info">
@@ -506,9 +540,9 @@ sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsign
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5BCISCN%202023%5D%20%E7%83%A7%E7%83%A4%E6%91%8A%E5%84%BF/" aria-label="[CISCN 2023] 烧烤摊儿" title="[CISCN 2023] 烧烤摊儿"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2023-shaokao.jpg" data-sizes="auto" alt="[CISCN 2023] 烧烤摊儿" class="lazyload">
     </div>
     <div class="post-info">
@@ -529,9 +563,9 @@ sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsign
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" aria-label="[CISCN 2022 华东北]bigduck-2.33双打法" title="[CISCN 2022 华东北]bigduck-2.33双打法"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2022-bigduck.jpg" data-sizes="auto" alt="[CISCN 2022 华东北]bigduck-2.33双打法" class="lazyload">
     </div>
     <div class="post-info">
@@ -552,9 +586,9 @@ sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsign
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" aria-label="[2024CISCN 初赛]ez_heap" title="[2024CISCN 初赛]ez_heap"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/2024ciscn-ez-heap.jpg" data-sizes="auto" alt="[2024CISCN 初赛]ez_heap" class="lazyload">
     </div>
     <div class="post-info">
@@ -580,9 +614,9 @@ sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsign
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" aria-label="LLVM-PWN环境搭建与gdb调试" title="LLVM-PWN环境搭建与gdb调试"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/llvm-pwn-gdb.jpg" data-sizes="auto" alt="LLVM-PWN环境搭建与gdb调试" class="lazyload">
     </div>
     <div class="post-info">
@@ -598,46 +632,6 @@ sub_192D1234char *__fastcall sub_192D(_UNKNOWN **a1, unsigned __int64 n5, unsign
 由于一时间碰见这么多要学习的东西，求学心切反而感觉导致自己有点浮躁和分心，因此决定沉下心来一个一个学习，虽然感觉栈的知识也很久没有复习过了 emmmm…….T_T&amp;#x2F;&amp;#x2F;  有没有谁愿意带带我 ……
 
 LLVM PASS :LLVM 是 C++编写的构架编译器的框架系统，可用
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/06/09/LLVM-PWN/CISCN-2021%20satool/" aria-label="CISCN-2021 satool" title="CISCN-2021 satool"></a>
-    <div class="post-cover right">
-        <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2021-satool.jpg" data-sizes="auto" alt="CISCN-2021 satool" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-06-09</span>
-          <span><span class="icon-calendar-plus"></span>2026-06-09</span>
-        <span><span class="icon-pencil"></span>1.2k 字</span>
-        <span><span class="icon-clock"></span>5 分钟</span>
-      </div>
-      <h2 class="post-title">CISCN-2021 satool</h2>
-      <article class="post-article">
-          第一次写 LLVM 的题目，感觉很难读懂，即使写完了也有一点懵懵的
-
-runOnFunction函数位于虚表中的最后一个位置，比赛题的漏洞基本就是这个，所以在做LLVM Pass pwn的时候定位函数的位置可以从虚表入手：可以直接搜索虚表 vtable 的位置
-
-
-sub_19D0是虚表中的最后一个，也就是我们常说的 runOnFunction
-
-
-进入之后 F5 反编译一下：
-
-
-
-
-坐牢，代码很长，这里不放出来了，一点一点分析吧：
-
-
-r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后倒序一下就是 B4ckDo0r
-不难看出是 backdoor
-
-
-剩下的程序过于冗杂难以分析
       </article>
     </div>
   </div>
@@ -665,10 +659,10 @@ r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后�
       </div>
       <div>
         <span class="icon-brush"></span>
-        282.2k
+        283.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:18
+        23:25
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -696,7 +690,7 @@ r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >

