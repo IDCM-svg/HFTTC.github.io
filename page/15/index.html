@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">148</div>
+    <div class="sidebar-state-number">149</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" title="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)">CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/27/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-3/" title="PWN 新生基础知识 3">PWN 新生基础知识 3</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" title="湾区杯 2025 PWN">湾区杯 2025 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" title="西湖论剑 2025 PWN">西湖论剑 2025 PWN</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,31 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4/" aria-label="绕过防御之击败canary保护" title="绕过防御之击败canary保护"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4/" aria-label="绕过防御之击败PIE保护" title="绕过防御之击败PIE保护"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="绕过防御之击败PIE保护" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.9k 字</span>
+        <span><span class="icon-clock"></span>13 分钟</span>
+      </div>
+      <h2 class="post-title">绕过防御之击败PIE保护</h2>
+      <article class="post-article">
+          绕过防御之击败PIE保护PIE的介绍Position-independent executable 地址无关可执行文件，该技术就是对于代码段、text 段、data 段、.bss 段等固定地址的一个防护手段，应用了 PIE 的程序在每次加载时都会变换加载基址，从而使 ropper 等工具无法得到准确的地址的一种防护。
+但注意：PIE 只是 “整体偏移随机”，程序内部的相对地址不变！
+tip) 在计算机中，内存地址本质是一串二进制数（比如 64 位系统中是 64 位二进制），“最后 12 位” 就是这串二进制数的最低 12 位（最右侧的 12 位）。  也可以认为成是十六进制的最后 1.5 位
+
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5canary%E4%BF%9D%E6%8A%A4/" aria-label="绕过防御之击败canary保护" title="绕过防御之击败canary保护"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="绕过防御之击败canary保护" class="lazyload">
     </div>
     <div class="post-info">
@@ -400,9 +423,9 @@ Canary 是一个低字节位 \x00 的十六进制数。
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%AF%B9%E4%BA%8Esend%E5%92%8Csendline%E7%9A%84%E6%80%9D%E8%80%83/" aria-label="对于send和sendline的思考" title="对于send和sendline的思考"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="对于send和sendline的思考" class="lazyload">
     </div>
     <div class="post-info">
@@ -459,9 +482,9 @@ sendline(d
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/ret2textret2syscallret2libc/" aria-label="ret2text ret2syscall ret2libc" title="ret2text ret2syscall ret2libc"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="ret2text ret2syscall ret2libc" class="lazyload">
     </div>
     <div class="post-info">
@@ -481,9 +504,9 @@ sendline(d
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%85%B3%E4%BA%8E%E6%98%AF%E5%90%A6%E8%BF%9B%E8%A1%8C%E6%A0%88%E5%AF%B9%E9%BD%90%E7%9A%84%E5%88%86%E6%9E%90/" aria-label="关于是否进行栈对齐的分析" title="关于是否进行栈对齐的分析"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="关于是否进行栈对齐的分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -503,9 +526,9 @@ sendline(d
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E5%8F%AF%E8%A7%81%E5%AD%97%E7%AC%A6shellcode/" aria-label="可见字符shellcode" title="可见字符shellcode"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="可见字符shellcode" class="lazyload">
     </div>
     <div class="post-info">
@@ -525,9 +548,9 @@ sendline(d
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Shellcode%E5%88%A9%E7%94%A8%E5%8E%9F%E7%90%86%E5%8F%8A%E6%96%B9%E6%B3%95/" aria-label="Shellcode利用原理及方法" title="Shellcode利用原理及方法"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Shellcode利用原理及方法" class="lazyload">
     </div>
     <div class="post-info">
@@ -548,9 +571,9 @@ sendline(d
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BAret2text/ret2text%E7%9A%84%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" aria-label="ret2text的深入分析" title="ret2text的深入分析"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="ret2text的深入分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -594,9 +617,9 @@ rw-p
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%AE%80%E5%8D%95%E6%A0%88%E6%BA%A2%E5%87%BAret2text/index/" aria-label="简单栈溢出ret2text" title="简单栈溢出ret2text"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="简单栈溢出ret2text" class="lazyload">
     </div>
     <div class="post-info">
@@ -640,10 +663,10 @@ _**ESP&amp;#x2F;RSP  **_栈指针寄存器，其中
       </div>
       <div>
         <span class="icon-brush"></span>
-        282.5k
+        285.3k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:24
+        23:35
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -671,7 +694,7 @@ _**ESP&amp;#x2F;RSP  **_栈指针寄存器，其中
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">148</div>
+    <div class="sidebar-state-number">149</div>
   </div>
 </div>
 <div class="sidebar-social" >

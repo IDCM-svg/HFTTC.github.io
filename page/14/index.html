@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">148</div>
+    <div class="sidebar-state-number">149</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" title="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)">CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/27/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-3/" title="PWN 新生基础知识 3">PWN 新生基础知识 3</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" title="湾区杯 2025 PWN">湾区杯 2025 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" title="西湖论剑 2025 PWN">西湖论剑 2025 PWN</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,31 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%88%E8%BF%81%E7%A7%BB/%5BHDCTF2023%5DMakewish/" aria-label="[HDCTF 2023]Makewish" title="[HDCTF 2023]Makewish"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/ret2csucsu%E9%93%BE%E5%88%A9%E7%94%A8/index/" aria-label="ret2csu csu 链利用" title="ret2csu csu 链利用"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="ret2csu csu 链利用" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.1k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
+      </div>
+      <h2 class="post-title">ret2csu csu 链利用</h2>
+      <article class="post-article">
+          ret2csu csu 链利用我们直接结合 BUUCTF 的一道题来了解 ret2csu 的利用方式 BUUCTF jarvisoj_level3_x64
+什么是 ret2csu？ret2csu 是 64 位 ROP 中针对缺少高寄存器 Gadget（如pop rdx&amp;#x2F;pop r12）的通用解决方案利用程序
+.init_array段的**CSU 通用初始化代码**，间接给rdx&amp;#x2F;r12-r15等寄存器赋值，实现多参数函数调用。  
+ret2csu 的利用原理首先再次介绍一下 64 位程序的传参方式：当参数少于 7 个时，参数从左到右依次放入寄存器：rdi，rsi，rdx，r
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%88%E8%BF%81%E7%A7%BB/%5BHDCTF2023%5DMakewish/" aria-label="[HDCTF 2023]Makewish" title="[HDCTF 2023]Makewish"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[HDCTF 2023]Makewish" class="lazyload">
     </div>
     <div class="post-info">
@@ -400,9 +423,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%88%E8%BF%81%E7%A7%BB/%E6%A0%88%E8%BF%81%E7%A7%BB%E5%88%A9%E7%94%A8%E6%96%B9%E6%B3%95%E5%88%86%E6%9E%90/" aria-label="栈迁移利用方法分析" title="栈迁移利用方法分析"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="栈迁移利用方法分析" class="lazyload">
     </div>
     <div class="post-info">
@@ -422,9 +445,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%88%E8%BF%81%E7%A7%BB/index/" aria-label="栈迁移" title="栈迁移"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="栈迁移" class="lazyload">
     </div>
     <div class="post-info">
@@ -446,9 +469,9 @@ leave指令即为mov esp ebp;pop ebp先将ebp赋给esp，此时esp与ebp位于�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/One-gadgets/" aria-label="One-gadgets" title="One-gadgets"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="One-gadgets" class="lazyload">
     </div>
     <div class="post-info">
@@ -470,9 +493,9 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%88%E4%BF%9D%E6%8A%A4%E5%85%A8%E5%BC%80%E7%9A%84%E6%94%BB%E5%87%BB%E6%89%8B%E6%B3%95(%E4%BE%8B)/" aria-label="栈保护全开的攻击手法(例)" title="栈保护全开的攻击手法(例)"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="栈保护全开的攻击手法(例)" class="lazyload">
     </div>
     <div class="post-info">
@@ -494,9 +517,9 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%89%B9%E6%AE%8A%E7%9A%84%E6%A0%88%E6%BA%A2%E5%87%BA-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA/" aria-label="特殊的栈溢出-整数溢出" title="特殊的栈溢出-整数溢出"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="特殊的栈溢出-整数溢出" class="lazyload">
     </div>
     <div class="post-info">
@@ -517,9 +540,9 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/fmtstr__%5BHDCTF2023%5DMinions/" aria-label="fmtstr::[HDCTF 2023]Minions" title="fmtstr::[HDCTF 2023]Minions"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="fmtstr::[HDCTF 2023]Minions" class="lazyload">
     </div>
     <div class="post-info">
@@ -538,9 +561,9 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/axb_2019_fmt64(%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%8D%95%E5%AD%97%E8%8A%82%E4%BF%AE%E6%94%B9--_x00%E6%88%AA%E6%96%AD%EF%BC%89/" aria-label="axb_2019_fmt64(格式化单字节修改--\x00 截断）" title="axb_2019_fmt64(格式化单字节修改--\x00 截断）"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="axb_2019_fmt64(格式化单字节修改--\x00 截断）" class="lazyload">
     </div>
     <div class="post-info">
@@ -562,9 +585,9 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F/index/" aria-label="格式化字符串利用方式" title="格式化字符串利用方式"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="格式化字符串利用方式" class="lazyload">
     </div>
     <div class="post-info">
@@ -581,29 +604,6 @@ One_gadgets 的约束：在二进制漏洞利用（Pwn）中，选择 one_gadget
 • 编程语言中（如 C&amp;#x2F;C++）的printf、sprintf等函数支持格式化输出（比如%s输出字符串、%d输出数字）。
 • 正常用法是：printf(“%s，%d”, 名字, 年龄)第一个参数是固定的格式化模板，后续是对应的数据参数。
 tip）：%d（打印一个整型）,%s 字符串（打印一个字符串）,%c（打印一个字符）,%x（以十六进制打印）
-
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E7%BB%95%E8%BF%87%E9%98%B2%E5%BE%A1%E4%B9%8B%E5%87%BB%E8%B4%A5PIE%E4%BF%9D%E6%8A%A4/" aria-label="绕过防御之击败PIE保护" title="绕过防御之击败PIE保护"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="绕过防御之击败PIE保护" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>2.9k 字</span>
-        <span><span class="icon-clock"></span>13 分钟</span>
-      </div>
-      <h2 class="post-title">绕过防御之击败PIE保护</h2>
-      <article class="post-article">
-          绕过防御之击败PIE保护PIE的介绍Position-independent executable 地址无关可执行文件，该技术就是对于代码段、text 段、data 段、.bss 段等固定地址的一个防护手段，应用了 PIE 的程序在每次加载时都会变换加载基址，从而使 ropper 等工具无法得到准确的地址的一种防护。
-但注意：PIE 只是 “整体偏移随机”，程序内部的相对地址不变！
-tip) 在计算机中，内存地址本质是一串二进制数（比如 64 位系统中是 64 位二进制），“最后 12 位” 就是这串二进制数的最低 12 位（最右侧的 12 位）。  也可以认为成是十六进制的最后 1.5 位
 
       </article>
     </div>
@@ -632,10 +632,10 @@ tip) 在计算机中，内存地址本质是一串二进制数（比如 64 位�
       </div>
       <div>
         <span class="icon-brush"></span>
-        282.5k
+        285.3k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:24
+        23:35
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -663,7 +663,7 @@ tip) 在计算机中，内存地址本质是一串二进制数（比如 64 位�
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">148</div>
+    <div class="sidebar-state-number">149</div>
   </div>
 </div>
 <div class="sidebar-social" >
