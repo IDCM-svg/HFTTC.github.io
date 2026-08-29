@@ -376,8 +376,40 @@
           <section id="main" aria-label="Main content">
   <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" aria-label="湾区杯 2025 PWN" title="湾区杯 2025 PWN"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" aria-label="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)" title="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/cve-2018-5767-tenda-ac15.jpg" data-sizes="auto" alt="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-29</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-29</span>
+        <span><span class="icon-pencil"></span>2.7k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)</h2>
+      <article class="post-article">
+          前言：该篇文章的学习主要是由于在复现 CVE-2020-8423 的过程中遇到了一点关于动态调试的问题，学长推荐了一篇文章是关于这个漏洞的，于是来这里学习一下动态调试的方法。
+
+环境搭建：固件分享链接(是 cCor4ng3 师傅的)夸克网盘，链接：https://pan.quark.cn/s/38df4f0919b4，提取码：6AEk
+binwalk 解包固件：
+1binwalk -Me CVE.bin
+
+
+
+1readelf -h ./busybox
+
+
+
+123#安装qemu和arm的动态链接库sudo apt install qemu-user-static libc6-arm* lib
+      </article>
+    </div>
+  </div>
+</div>
+  <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" aria-label="湾区杯 2025 PWN" title="湾区杯 2025 PWN"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg" data-sizes="auto" alt="湾区杯 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -399,9 +431,9 @@ digtal_bomb：
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/ARM-PWN/ROPEmporiumARMx32/" aria-label="ROP Emporium ARM x32" title="ROP Emporium ARM x32"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="ROP Emporium ARM x32" class="lazyload">
     </div>
     <div class="post-info">
@@ -420,9 +452,9 @@ digtal_bomb：
   </div>
 </div>
   <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/ARM-PWN/Shanghai2018_baby_arm/" aria-label="Shanghai2018_baby_arm" title="Shanghai2018_baby_arm"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Shanghai2018_baby_arm" class="lazyload">
     </div>
     <div class="post-info">
