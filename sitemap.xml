@@ -2,6 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/kernel/index.html</loc>
+    
+    <lastmod>2026-08-29</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://idcm-svg.github.io/HFTTC.github.io/pwn/index.html</loc>
+    
+    <lastmod>2026-08-29</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://idcm-svg.github.io/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/</loc>
     
     <lastmod>2026-08-29</lastmod>
