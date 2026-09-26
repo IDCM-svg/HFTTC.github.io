@@ -1,0 +1,930 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    简单的 MySQL 注入 | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="前言：有一段时间没有更新博客了，正好遇到新生培训，和前几天整理的 IOT 一起上传博客。 总结一点 SQL 和抓包 的知识，也当作是复习了，已经大概半年没有碰这些东西了。  Pikachu 环境搭建之前一直懒得搭建 pikachu，给新生培训也不想再重新拉了，直接起一个 docker 得了： 12docker pull area39&#x2F;pikachu   docker run -itd --name">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单的 MySQL 注入">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="前言：有一段时间没有更新博客了，正好遇到新生培训，和前几天整理的 IOT 一起上传博客。 总结一点 SQL 和抓包 的知识，也当作是复习了，已经大概半年没有碰这些东西了。  Pikachu 环境搭建之前一直懒得搭建 pikachu，给新生培训也不想再重新拉了，直接起一个 docker 得了： 12docker pull area39&#x2F;pikachu   docker run -itd --name">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/006.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/007.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/008.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/009.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/010.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/011.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/012.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/013.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/014.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/015.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/016.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/017.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/018.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/019.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/020.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/021.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/022.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/023.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/024.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/025.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/026.png">
+<meta property="article:published_time" content="2026-09-26T07:30:49.000Z">
+<meta property="article:modified_time" content="2026-09-26T07:31:00.038Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="SQL注入">
+<meta property="article:tag" content="pikachu">
+<meta property="article:tag" content="web">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/web/mysql-injection/001.png">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/">
+      <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"简单的 MySQL 注入 | HFTTC's Blog","headline":"简单的 MySQL 注入","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/","inLanguage":"zh-CN"}</script>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">首页</span>
+          </a>
+          <div class="main-nav-dropdown-wrap">
+            <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog" aria-haspopup="true">
+                <div class="main-nav-icon icon rotate">
+                    &#xe62b;
+                </div>
+              <span class="main-nav-link">目录</span>
+            </a>
+            <div class="main-nav-dropdown-menu" role="menu">
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/" role="menuitem">基础知识</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/pwn/" role="menuitem">PWN知识集结</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/iot/" role="menuitem">IOT</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/kernel/" role="menuitem">Kernel</a>
+                  <div class="main-nav-dropdown-item has-children">
+                    <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
+                    <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" role="menuitem">黄鹤杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" role="menuitem">Lexington Informatics Tournament CTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" role="menuitem">L3akCTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" role="menuitem">nepctf2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" role="menuitem">SCTF2026</a>
+                    </div>
+                  </div>
+            </div>
+          </div>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">公告</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">友链</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">归档</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">关于</span>
+          </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/web/covers/mysql-injection.jpg" alt="简单的 MySQL 注入">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">简单的 MySQL 注入</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Pikachu-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">Pikachu 环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E8%AE%B2%E8%A7%A3%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">题目讲解：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-%E6%B3%A8%E5%85%A5%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">MySQL 注入：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#information-schema-%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">information_schema 数据库：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#SCHEMATA%EF%BC%9A"><span class="toc-number">3.1.1.</span> <span class="toc-text">SCHEMATA：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TABLES%EF%BC%9A"><span class="toc-number">3.1.2.</span> <span class="toc-text">TABLES：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#COLUMNS%EF%BC%9A"><span class="toc-number">3.1.3.</span> <span class="toc-text">COLUMNS：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E8%80%8C%E8%A8%80%E4%B9%8B%EF%BC%9A"><span class="toc-number">3.2.</span> <span class="toc-text">简而言之：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E7%9A%84%E6%9F%A5%E8%AF%A2%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="toc-number">3.2.1.</span> <span class="toc-text">基本的查询语法：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pikachu%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">Pikachu：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sqli-%E6%95%B0%E5%AD%97%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-number">4.1.</span> <span class="toc-text">sqli-数字型注入</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">150</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-简单的MySQL注入" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-09-26T07:30:49.000Z" itemprop="datePublished">2026-09-26</time>
+    <time style="display: none;" id="post-update-time">2026-09-26</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-09-26T07:31:00.038Z" itemprop="dateModified">2026-09-26</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>前言：有一段时间没有更新博客了，正好遇到新生培训，和前几天整理的 IOT 一起上传博客。</p>
+<p>总结一点 SQL 和抓包 的知识，也当作是复习了，已经大概半年没有碰这些东西了。</p>
+<hr>
+<h3 id="Pikachu-环境搭建"><a href="#Pikachu-环境搭建" class="headerlink" title="Pikachu 环境搭建"></a>Pikachu 环境搭建</h3><p>之前一直懒得搭建 pikachu，给新生培训也不想再重新拉了，直接起一个 docker 得了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull area39/pikachu   </span><br><span class="line">docker run -itd --name pikachu -p 8082:80 area39/pikachu      </span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为：13:06 > DOCKER PULL AREA39/PIKACHU USING DEFAULT TAG:LATEST LATEST:PULLING FROM  AREA39/PIKACHU OEBF3D66B35D:PULL COMPLETE 159690A20E94:PULL COMPLETE 0B9E08503C76:PULL COMPLETE 3AFC878341B1:PULL COMPLETE 959F6424D70E:PULL  COMPLETE 145BBFA86189:PULL COMPLETE 604B62C0F613:PULL COMPLETE 3EAF806E3765:PULL COMPLETE 4843096104AD :PULL COMPLETE 7D24EC17AF71:PULL COMPLETE 356ABAC40837:PULL COMPLETE 8C321CE0469F:PULL COMPLETE 9CBDO1D2A616:PULL COMPLETE 98A362BELEDB:PULL COMPLETE 4AFB52D803AA:PULL COMPLETE E25F59D389D6:PULL COMPLETE DDFAFB750D27:PULL COMPLETE 208AA50D52D5:PULL COMPLETE BBEE4B7DDAAF:PULL COMPLETE 937A4090AC88:PULL  COMPLETE 547CA47D0234:PULL COMPLETE 2B4983EEA06B:PULL COMPLETE 5CDB92267944:PULL COMPLETE F085516D6B0E :PULL COMPLETE 9575FA89C765:PULL  COMPLETE DIGEST: SHA256:E9748879AF76B68235AGEC66CE28B048323AC31+7F33065D83727CACB3998E05 STATUS:DOWNLOADED NEWER IMAGE FOR AREA39/PIKACHU:LATEST DOCKER.IO/AREA39/PIKACHU:LATEST WHAT'S NEXT: DOCKER SCOUT QUICKVIEW AREA39/PIKACHU VIEW A SUMMARY OF IMAGE VULNERABILITIES AND RECOMMENDATIONS 13: > DOCKER RUN -ITD --NAME PIKACHU -P 8082:80 AREA39/PIKACHU F46892A32EDD664C61CE6D8BAA41E540130A18F1F6D96D794AEC077247C892BC -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/001.png"></p>
+<p>然后打开 docker 直接就能使用了：</p>
+<!-- 这是一张图片，ocr 内容为：GORDON BETA CONTAINERS GIVE FEEDBACK CONTAINERS SHOW CHARTS CONTAINER CPU USAGE CONTAINER MEMORY USAGE MAGES 0.08%/1600%(16 CPUS AVAILABLE) 263.11MB/14.98GB SEARCH ONLY SHOW RUNNING CONTAINERS R DOCKER HUB CONTAINER ID CPU(%) LAST STARTED ACTIONS IMAGE PORT(S) NAME DOCKER SCOUT C013D06C8FDA 2  DAYS AGO 0% UBUNTU24.04 GLIBC239 MCP TOOLKIT 084F49F4AD73 19999:9999 0% 2 DAYS AGO RCT2LIBC1:2.23 RET2LIBC1.TEST 图 MODELS 112307FC4A51 SHELLCODE LATEST 0% 1337:1337 18 DAYS AG SHELLCODE_CHALLENGE EXTENSIONS BE3ACC61615 19 DAYS AGO SHELLCODE LATEST 0% 日 MODEST BHASKARA FF5D7348ED8B 0% WIZORDLY_KARE 19 DAYS AGO SHELLCODE:LATEST 552D084E6A71 0% 19 DAYS AGO GIFTED_SAHA SHELLEODE LATES D1227F39CAFO 0% 9 MINUTES AGO DEADMAU5Y/YUGUESYNC:LATES YUQUE-SYNC F46892A32EDD 8082:80 C 0.08% PIKACHU AREA39/PIKACHU 1 MINUTE AGO 8 0% 9 MINUTES AGO POSLG RESQ -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/002.png"></p>
+<!-- 这是一张图片，ocr 内容为：PIKACHU漏洞练习平台 PIKA-PIKA- 系统初始化安装 系统介绍 易暴力破解 SETUP GUIDE: 第0步:请提前安装"MYSQL+PHP+中间件"的环境; L CROSS-SITE SCRIPTING 第1步:请很据实际环境修改INCICONFIG.INCPHP文件里面的参数: CSRF 第2步:点击"安装/初始化"按钮; SQL-INJECT 安装/初始化 RCE 数据库连接成功! FLLE INCLUSION 新建数据库:PIKACHU成功! UNSAFE FLLEDOWNIOAD 创建数据库数据成功! 好了,可以开搞了~点击这里进入首页 UNSAFE FLLEUPLOAD ITOVER PERMISSION @敏感信息泄露 V 兰PHP反序列化 V P XXE V CURL重定向 V R SSRF 华管理工具 -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/003.png"></p>
+<p>为了讲课，还要拉取一下源码：这样子就大功告成了</p>
+<!-- 这是一张图片，ocr 内容为：GIT CLONE HTTPS:/ S://GITHUB.COM/ZHUIFENGSHAONIANHANLU/PIKACHU.GIT D:\PIKACHU CLONING INTO 'D:\PIKACHU'. REMOTE:ENUMERATING OBJECTS:589,DONE. REMOTE:COUNTING OBJECTS:100%(83/83),DONE. REMOTE:COMPRESSING OBJECTS:100%(68/68),DONE. 1) REMOTE: TOTAL 589 (DELTA 42). REUSED 40 (DELTA 15), PACK-REUSED 506 (FROM RECEIVING OBJECTS: 100% (589/589),3.47 MIB | 5.74 MIB/S, DONE. DONE RESOLVING DELTAS: 100% (221/221), D -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/004.png"></p>
+<h3 id="题目讲解："><a href="#题目讲解：" class="headerlink" title="题目讲解："></a>题目讲解：</h3><p>采取先写，之后去了解内部逻辑的方式：</p>
+<p>先讲述一个万能密码：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/005.png"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">  <span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;username&#x27;</span>];</span><br><span class="line">  <span class="variable">$sql</span> = <span class="string">&quot;SELECT * FROM user WHERE username = &#x27;<span class="subst">$username</span>&#x27; LIMIT 0,1&quot;</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>写了两段 PHP 语句，先看第一段：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$id</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;id&#x27;</span>];</span><br><span class="line"><span class="variable">$sql</span> = <span class="string">&quot;SELECT * FROM user WHERE id = <span class="subst">$id</span> LIMIT 0,1&quot;</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>get 传参给到 id</p>
+<p>数字型注入就是注入点的数据类型是数字型，没有用单引号或者双引号引起来，而是直接拼接到了后面，$id这个SQL语句的子句中，这样的注入就是典型的数字型注入。</p>
+<p>判断数字型注入的方法如下：</p>
+<ol>
+<li>输入单引号，不正常返回。</li>
+</ol>
+<p>如果用户提交<code>index.php?id=1&#39;</code>，那么后面的 SQL 语句就变为 <code>SELECT * FROM users WHERE id=1&#39; LIMIT 0,1</code>，SQL语句本身存在语法错误，会有不正常的结果返回。</p>
+<ol start="2">
+<li>输入<code>and 1=1</code>，正常返回。</li>
+</ol>
+<p>如果用户提交 <code>index.php?id=1 and 1=1</code>，那么后面的 SQL 语句就变为<code>SELECT * FROM users WHERE id=1 and 1=1 LIMIT 0,1</code>，会有正常的结果返回。</p>
+<ol start="3">
+<li>输入<code>and 1=2</code>，不正常返回。</li>
+</ol>
+<p>如果用户提交 <code>index.php?id=1 and 1=2</code>，那么后面的 SQL 语句就变为 <code>SELECT * FROM users WHERE id=1 and 1=2 LIMIT 0,1</code>，会有不正常的结果返回。</p>
+<p>数字型注入的注入点主要通过上面3个语句来判断，如果输入的返回结果与上面相符，说明测试语句中的恶意SQL语句被带入数据库中并且成功执行，那么就可能存在数字型注入。具体有没有数字型注入，是否可以通过数字型注入获取有效信息，还需要大量的测试来验证。</p>
+<p><strong>字符型同理</strong><code>**&#39; and &#39;1&#39;=&#39;1**</code></p>
+<p><strong>那么说到这里，基本上注入大概就知道是个什么东西了，我们接下来来看数据库：</strong></p>
+<h3 id="MySQL-注入："><a href="#MySQL-注入：" class="headerlink" title="MySQL 注入："></a>MySQL 注入：</h3><p>MySQL 使用最常用的 SQL 管理语言进行数据库管理</p>
+<h4 id="information-schema-数据库："><a href="#information-schema-数据库：" class="headerlink" title="information_schema 数据库："></a>information_schema 数据库：</h4><p>win+r 启动一下命令行：登录 sql 数据库：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>u root <span class="operator">-</span>p</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/006.png"></p>
+<p>从 MySQL5 开始，MySQL 自带 information_schema 数据库。information_schema 数据库存储 SCHEMATA 表、TABLES 表和 COLUMNS 表，我们主要是要理解这三个表的用途：<font style="color:#DF2A3F;">&lt; 一些 SQL 语句自己去了解了解 &gt;</font><br>先切换到 information_schema：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">USE information_schema;</span><br><span class="line"><span class="keyword">SHOW</span> TABLES;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/007.png"></p>
+<h5 id="SCHEMATA："><a href="#SCHEMATA：" class="headerlink" title="SCHEMATA："></a>SCHEMATA：</h5><p>SCHEMATA 表提供了当前 MySQL 实例中所有数据库的信息，show databases 命令的结果就取自其表：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/008.png"></p>
+<p>查询 SCHEMATA 表存储所有的数据库名：可以看到和上面的图片内容是一致的：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/009.png"></p>
+<h5 id="TABLES："><a href="#TABLES：" class="headerlink" title="TABLES："></a>TABLES：</h5><p>TABLES 表提供了关于数据库中的表的信息，包括某个表属于哪个 schema</p>
+<p> 由于<code>SELECT * FROM information_schema.TABLES</code> 没有 <code>WHERE</code> 条件，这会导致 MySQL 去扫描<strong>所有数据库、所有表的元数据</strong>。在 MySQL 5.7 上，<code>information_schema</code> 的性能并不好，遇到数据库数量多或表数量庞大的情况，容易耗尽内存或超过资源限制，从而被服务器强制杀掉连接，因此我们去单个查找：</p>
+<p>查找 mysql 库里的表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TABLE_NAME <span class="keyword">FROM</span> information_schema.TABLES <span class="keyword">WHERE</span> TABLE_SCHEMA <span class="operator">=</span> <span class="string">&#x27;mysql&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/010.png"></p>
+<h5 id="COLUMNS："><a href="#COLUMNS：" class="headerlink" title="COLUMNS："></a>COLUMNS：</h5><p>查 <code>mysql</code> 库里<strong>所有表的列名</strong>，用 <code>information_schema.COLUMNS</code>，条件里同时限定库名即可。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> TABLE_NAME, COLUMN_NAME <span class="keyword">FROM</span> information_schema.COLUMNS <span class="keyword">WHERE</span> TABLE_SCHEMA <span class="operator">=</span> <span class="string">&#x27;mysql&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/011.png"></p>
+<h4 id="简而言之："><a href="#简而言之：" class="headerlink" title="简而言之："></a>简而言之：</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SCHEMATA	所有数据库的信息</span><br><span class="line">TABLES	所有表的信息</span><br><span class="line">COLUMNS	所有列（字段）的信息</span><br></pre></td></tr></table></figure>
+
+<p>有了初步的了解，我们就可以去打 pikachu 的靶场，上面的知识不要求立刻吸收，知道有主要的那三个表即可。</p>
+<h5 id="基本的查询语法："><a href="#基本的查询语法：" class="headerlink" title="基本的查询语法："></a>基本的查询语法：</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">SELECT 列</span><br><span class="line">FROM 表</span><br><span class="line">WHERE 条件</span><br><span class="line">GROUP BY 分组列</span><br><span class="line">HAVING 分组后条件</span><br><span class="line">ORDER BY 排序列</span><br><span class="line">LIMIT 数量;</span><br></pre></td></tr></table></figure>
+
+<p>从 mysql.user 表中找 user 和 host 列：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.user;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/012.png"></p>
+<p>加限制，只查找 root：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.user <span class="keyword">WHERE</span> <span class="keyword">user</span> <span class="operator">=</span> <span class="string">&#x27;root&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/013.png"></p>
+<p>排序 user 这一列按照升序排列：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/014.png"></p>
+<p>降序加上 DESC：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.user <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">user</span> <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/015.png"></p>
+<p>限制行数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.user <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">user</span> <span class="keyword">DESC</span> LIMIT <span class="number">1</span>,<span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LIMIT <span class="number">2</span>        <span class="comment">-- 从第 0 行开始，取 2 行（等价于 LIMIT 0,2）</span></span><br><span class="line">LIMIT <span class="number">1</span>,<span class="number">2</span>      <span class="comment">-- 从第 1 行开始，取 2 行</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/016.png"></p>
+<p>Union 联合查询：全部输出，</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.user</span><br><span class="line"><span class="keyword">UNION</span> <span class="keyword">ALL</span>                       <span class="comment">-- 不去重</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">user</span>, host <span class="keyword">FROM</span> mysql.db;</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/017.png"></p>
+<h3 id="Pikachu："><a href="#Pikachu：" class="headerlink" title="Pikachu："></a>Pikachu：</h3><h4 id="sqli-数字型注入"><a href="#sqli-数字型注入" class="headerlink" title="sqli-数字型注入"></a>sqli-数字型注入</h4><!-- 这是一张图片，ocr 内容为：系统介绍 SQLI>  数字型注入 暴力破解 SELECT YOUR USERID? 查询 L CROSS-SITE SORIPTING GCSRF SQL-INJECT 概述 数字型注入(POST) 字符型注入(GET) 搜索型注入 XX型注入 "INSERT/UPDATE"注入 "DELETE"注入 "HTTP HEADER"注入 盲注(BASE ON BOOLLAN) 官注(BASE ON TIME) 宽字节注入 -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/018.png"></p>
+<p>随意查找一个 2，然后去抓包：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/019.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/020.png"></p>
+<p>然后放到 repeater，发送看看渲染：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/021.png"></p>
+<p>这里直接 and 1&#x3D;1 发包看一看：发现没有报错</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/022.png"></p>
+<p>试一下 and 1&#x3D;2 发包看一看，结果报错了，这里和我们上面讲述的数字型注入是一样的，证明是数字型注入</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/023.png"></p>
+<p>接下来我们可以使用 order by 来判断可以显示的列：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/024.png"></p>
+<p>我们看到查询字段数为 2 的时候显示正常，为 3 就报错了，证明数据只有 2 列</p>
+<p>接着我们利用 union 查询两列的内容</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/025.png"></p>
+<p>还可以去查数据库和数据库版本：</p>
+<p><code>id=-2 union select database(),version()</code></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/web/mysql-injection/026.png"></p>
+<p>到这里我感觉就差不多了，没必要继续往下查下去了，其实还有很多内容，但是感觉一下讲这么多没办法吸收</p>
+<p>暂且到这里吧，有余力的可以看：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_65165505/article/details/131568188">https://blog.csdn.net/qq_65165505&#x2F;article&#x2F;details&#x2F;131568188</a></p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/cve-2018-5767-tenda-ac15.jpg" data-sizes="auto" alt="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)" class="lazyload">
+      <a href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" aria-label="后一篇: CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)"  title="后一篇: CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        286.7k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        23:41
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Pikachu-%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">Pikachu 环境搭建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A2%98%E7%9B%AE%E8%AE%B2%E8%A7%A3%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">题目讲解：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-%E6%B3%A8%E5%85%A5%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">MySQL 注入：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#information-schema-%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">information_schema 数据库：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#SCHEMATA%EF%BC%9A"><span class="toc-number">3.1.1.</span> <span class="toc-text">SCHEMATA：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TABLES%EF%BC%9A"><span class="toc-number">3.1.2.</span> <span class="toc-text">TABLES：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#COLUMNS%EF%BC%9A"><span class="toc-number">3.1.3.</span> <span class="toc-text">COLUMNS：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E8%80%8C%E8%A8%80%E4%B9%8B%EF%BC%9A"><span class="toc-number">3.2.</span> <span class="toc-text">简而言之：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E7%9A%84%E6%9F%A5%E8%AF%A2%E8%AF%AD%E6%B3%95%EF%BC%9A"><span class="toc-number">3.2.1.</span> <span class="toc-text">基本的查询语法：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pikachu%EF%BC%9A"><span class="toc-number">4.</span> <span class="toc-text">Pikachu：</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#sqli-%E6%95%B0%E5%AD%97%E5%9E%8B%E6%B3%A8%E5%85%A5"><span class="toc-number">4.1.</span> <span class="toc-text">sqli-数字型注入</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">150</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="/HFTTC.github.io/js/lazyload-local.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "简单的 MySQL 注入",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/",
+          excerpt: "",
+          description: "",
+          stripContent: "前言：有一段时间没有更新博客了，正好遇到新生培训，和前几天整理的 IOT 一起上传博客。 总结一点 SQL 和抓包 的知识，也当作是复习了，已经大概半年没有碰这些东西了。  Pikachu 环境搭建之前一直懒得搭建 pikachu，给新生培训也不想再重新拉了，直接起一个 docker 得了： 12docker pull area39/pikachu   docker run -itd --name pikachu -p 8082:80 area39/pikachu          然后打开 d",
+          date: "Sat Sep 26 2026 15:30:49 GMT+0800",
+          updated: "Sat Sep 26 2026 15:31:00 GMT+0800",
+          cover: "/HFTTC.github.io/images/web/covers/mysql-injection.jpg",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

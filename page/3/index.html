@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">149</div>
+    <div class="sidebar-state-number">150</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" title="简单的 MySQL 注入">简单的 MySQL 注入</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" title="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)">CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)</a>
             </li>
             <li>
@@ -355,9 +358,6 @@
             <li>
               <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" title="湾区杯 2025 PWN">湾区杯 2025 PWN</a>
-            </li>
         </ul>
       </div>
     </div>
@@ -367,7 +367,7 @@
     <div class="widget-wrap" data-aos="fade-up">
       <h3 class="widget-title">归档</h3>
       <div class="widget">
-        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/08/">八月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/07/">七月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/06/">六月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/05/">五月 2026</a></li></ul>
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/09/">九月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/08/">八月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/07/">七月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/06/">六月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/HFTTC.github.io/archives/2026/05/">五月 2026</a></li></ul>
       </div>
     </div>
   </div>
@@ -378,8 +378,31 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" aria-label="[2024CISCN 初赛]ez_heap" title="[2024CISCN 初赛]ez_heap"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5BCISCN%202022%20%E5%8D%8E%E4%B8%9C%E5%8C%97%5Dbigduck-2.33%E5%8F%8C%E6%89%93%E6%B3%95/" aria-label="[CISCN 2022 华东北]bigduck-2.33双打法" title="[CISCN 2022 华东北]bigduck-2.33双打法"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2022-bigduck.jpg" data-sizes="auto" alt="[CISCN 2022 华东北]bigduck-2.33双打法" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-06-09</span>
+          <span><span class="icon-calendar-plus"></span>2026-06-09</span>
+        <span><span class="icon-pencil"></span>3.9k 字</span>
+        <span><span class="icon-clock"></span>21 分钟</span>
+      </div>
+      <h2 class="post-title">[CISCN 2022 华东北]bigduck-2.33双打法</h2>
+      <article class="post-article">
+          前言：emmmm 最近有点道心破碎，京麒 2026CTF 遇到了一个 V8 的题目，之前没学过，就想着学习一下，结果发现自己配置环境配了两天还没有配好，又本来说是想要复现一个 webpwn 的，发现到最后需要时间盲注，自己不会写脚本，让 ai 帮忙写了一份，但总归不是自己写的，心里还是有点空虚，如果没有 ai 那不就还是相当于 0 吗。总而言之就是忙了很久没忙出来什么成果，于是还是复习几道题目巩固一下基础。
+
+本题的难点我觉得在于打 Tcachebin 结构体和 setcontext 的那一块儿，主要是很多地址和堆块，很容易搞混。
+不过其实这种题目逻辑性非常强，一个地址都不能写错。不过相比之下
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/06/09/%5B2024CISCN%20%E5%88%9D%E8%B5%9B%5Dez_heap/" aria-label="[2024CISCN 初赛]ez_heap" title="[2024CISCN 初赛]ez_heap"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/2024ciscn-ez-heap.jpg" data-sizes="auto" alt="[2024CISCN 初赛]ez_heap" class="lazyload">
     </div>
     <div class="post-info">
@@ -405,9 +428,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/LLVM-PWN/LLVM-PWN%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E4%B8%8Egdb%E8%B0%83%E8%AF%95/" aria-label="LLVM-PWN环境搭建与gdb调试" title="LLVM-PWN环境搭建与gdb调试"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/llvm-pwn-gdb.jpg" data-sizes="auto" alt="LLVM-PWN环境搭建与gdb调试" class="lazyload">
     </div>
     <div class="post-info">
@@ -428,9 +451,9 @@ LLVM PASS :LLVM 是 C++编写的构架编译器的框架系统，可用
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/09/LLVM-PWN/CISCN-2021%20satool/" aria-label="CISCN-2021 satool" title="CISCN-2021 satool"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ciscn-2021-satool.jpg" data-sizes="auto" alt="CISCN-2021 satool" class="lazyload">
     </div>
     <div class="post-info">
@@ -468,9 +491,9 @@ r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/06/01/WEB-PWN/%5BCISCN%202026%E5%88%9D%E8%B5%9B%5Dminihttpd(47%E8%A7%A3)/" aria-label="[CISCN 2026初赛]minihttpd(47解)" title="[CISCN 2026初赛]minihttpd(47解)"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/ciscnminihttpd-home.jpg" data-sizes="auto" alt="[CISCN 2026初赛]minihttpd(47解)" class="lazyload">
     </div>
     <div class="post-info">
@@ -496,9 +519,9 @@ r0oDkc4B 本身是小端序的十六进制的数值，转换成字符串之后�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/VMpwn/" aria-label="VMpwn" title="VMpwn"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="VMpwn" class="lazyload">
     </div>
     <div class="post-info">
@@ -521,9 +544,9 @@ https://zikh26.github.io/posts/ccd7886.html#ciscn-2019-qual-virtual
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/KernelPWN/%5BCISCN2017%5Dkernel-babydriver/" aria-label="[CISCN 2017]kernel-babydriver" title="[CISCN 2017]kernel-babydriver"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2017]kernel-babydriver" class="lazyload">
     </div>
     <div class="post-info">
@@ -546,9 +569,9 @@ cat boot.sh
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/KernelPWN/%E5%88%9D%E8%AF%86KernelPWN/" aria-label="初识 KernelPWN" title="初识 KernelPWN"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="初识 KernelPWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -571,9 +594,9 @@ bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/KernelPWN/index/" aria-label="Kernel PWN" title="Kernel PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Kernel PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -592,9 +615,9 @@ bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/mini-mqtt/" aria-label="mini-mqtt" title="mini-mqtt"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="mini-mqtt" class="lazyload">
     </div>
     <div class="post-info">
@@ -609,30 +632,6 @@ bzImage – Linux 镜像文件，是编译出来的 Linux 内核二进制文件�
           mini-mqttmqtt 的题目也是第一次见，PolarisCTF 的质量确实很高，有 WEBPWN的复现环境也是很好了
 
 程序分析：main1234567891011121314151617181920212223242526272829303132333435363738394041424344454647int __fastcall main(int argc, const char **argv, const char **envp)&amp;#123;    const char *v3; // rax    const char *v5; // [rsp+18h] [rbp-8h]   
-      </article>
-    </div>
-  </div>
-</div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/PolarisCTF_2026_WEBPWN/httpd/" aria-label="httpd" title="httpd"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="httpd" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>6.4k 字</span>
-        <span><span class="icon-clock"></span>33 分钟</span>
-      </div>
-      <h2 class="post-title">httpd</h2>
-      <article class="post-article">
-          httpd不是很了解 http 服务以及这种 WEBPWN 的具体流程，逆向难度还是蛮大的，审计代码就用了不少时间：
-EXP 难写也是因为用到了一堆非常规堆 PWN 的 python 写法，导致很难去进行漏洞利用
-
-程序分析：main是典型的 Linux C 多进程网络服务器 TCP Server 的主函数 main 反编译结果。它建立了一个监听在 9999 端口的 Web 服务器，并且每收到一个用户的 HTTP 请求，就会 fork 出一个子进程去处理。
-123456789101112131415161718192021222324252627282930313233343536373839
       </article>
     </div>
   </div>
@@ -660,10 +659,10 @@ EXP 难写也是因为用到了一堆非常规堆 PWN 的 python 写法，导致
       </div>
       <div>
         <span class="icon-brush"></span>
-        285.3k
+        286.7k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:35
+        23:41
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -691,7 +690,7 @@ EXP 难写也是因为用到了一堆非常规堆 PWN 的 python 写法，导致
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">149</div>
+    <div class="sidebar-state-number">150</div>
   </div>
 </div>
 <div class="sidebar-social" >
