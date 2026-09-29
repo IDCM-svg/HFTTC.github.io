@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/" title="Vivotek 摄像头 HTTP 缓冲区溢出漏洞">Vivotek 摄像头 HTTP 缓冲区溢出漏洞</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" title="简单的 MySQL 注入">简单的 MySQL 注入</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,44 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" aria-label="简单的 MySQL 注入" title="简单的 MySQL 注入"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/" aria-label="Vivotek 摄像头 HTTP 缓冲区溢出漏洞" title="Vivotek 摄像头 HTTP 缓冲区溢出漏洞"></a>
     <div class="post-cover left">
+        <img data-src="/HFTTC.github.io/images/iot/covers/vivotek-cc8160-content-length.jpg" data-sizes="auto" alt="Vivotek 摄像头 HTTP 缓冲区溢出漏洞" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-09-29</span>
+          <span><span class="icon-calendar-plus"></span>2026-09-29</span>
+        <span><span class="icon-pencil"></span>2.1k 字</span>
+        <span><span class="icon-clock"></span>9 分钟</span>
+      </div>
+      <h2 class="post-title">Vivotek 摄像头 HTTP 缓冲区溢出漏洞</h2>
+      <article class="post-article">
+          Vivotek CC8160 是一款网络摄像机，在 VVTK-0113b 版本之前的固件中存在一个缓冲区溢出漏洞。
+可以在这里下载固件：CC8160-VVTK-0100d.flash.zip
+
+
+下载之后解压拿到 CC8160-VVTK-0100d.flash.pkg 附件，然后利用 binwalk 提取固件：
+1binwalk -Me CC8160-VVTK-0100d.flash.pkg
+
+解压后有四个.extracted看一看内容：
+
+
+进入找到 squashfs-root：
+
+
+可以现在启动脚本中查找相关信息：
+1cat ./etc/init.d/rcS
+
+/etc/init.d/rc
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" aria-label="简单的 MySQL 注入" title="简单的 MySQL 注入"></a>
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/web/covers/mysql-injection.jpg" data-sizes="auto" alt="简单的 MySQL 注入" class="lazyload">
     </div>
     <div class="post-info">
@@ -413,9 +449,9 @@ Pikachu 环境搭建之前一直懒得搭建 pikachu，给新生培训也不想�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/29/CVE-2018-5767(Tenda%20AC15%2015.03.1.16_multi)/" aria-label="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)" title="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/cve-2018-5767-tenda-ac15.jpg" data-sizes="auto" alt="CVE-2018-5767 (Tenda AC15 15.03.1.16_multi)" class="lazyload">
     </div>
     <div class="post-info">
@@ -445,9 +481,9 @@ binwalk 解包固件：
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/27/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-3/" aria-label="PWN 新生基础知识 3" title="PWN 新生基础知识 3"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-3.jpg" data-sizes="auto" alt="PWN 新生基础知识 3" class="lazyload">
     </div>
     <div class="post-info">
@@ -468,9 +504,9 @@ ropper 的使用(寻找 gadgets)1ropper -f
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" aria-label="网鼎杯 2024 半决赛 PWN" title="网鼎杯 2024 半决赛 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/wangdingbei-2024-semifinal-pwn.jpg" data-sizes="auto" alt="网鼎杯 2024 半决赛 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -496,9 +532,9 @@ PWN1-cardmaster
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" aria-label="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/ningbo-xihu-2026-pwn.jpg" data-sizes="auto" alt="第九届宁波市网络安全&amp;西湖论剑 PWN 2026" class="lazyload">
     </div>
     <div class="post-info">
@@ -530,9 +566,9 @@ size 会存入dword_4060[idx] 这个数组，chunk 地址会放在(_QWORD *)&amp
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/17/%E6%B9%BE%E5%8C%BA%E6%9D%AF2025-pwn/" aria-label="湾区杯 2025 PWN" title="湾区杯 2025 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/wanqubei-2025-pwn.jpg" data-sizes="auto" alt="湾区杯 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -554,9 +590,9 @@ digtal_bomb：
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/12/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91%202025-pwn/" aria-label="西湖论剑 2025 PWN" title="西湖论剑 2025 PWN"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/xihulunjian-2025-pwn.jpg" data-sizes="auto" alt="西湖论剑 2025 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -581,9 +617,9 @@ Vpwn：
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/10/%E9%BB%84%E9%B9%A4%E6%9D%AF2026-pwn/" aria-label="黄鹤杯 2026 PWN" title="黄鹤杯 2026 PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
         <img data-src="/HFTTC.github.io/images/pwn/covers/huanghecup-2026-pwn.jpg" data-sizes="auto" alt="黄鹤杯 2026 PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -611,9 +647,9 @@ dest 是 bss 段上的，也就是说最开始会在 dest 存放 .&amp;#x2F;flag
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/08/05/PWN-%E6%96%B0%E7%94%9F%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86-2/" aria-label="PWN 新生基础知识 2" title="PWN 新生基础知识 2"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
         <img data-src="/HFTTC.github.io/images/pwn/covers/pwn-newbie-basics-2.jpg" data-sizes="auto" alt="PWN 新生基础知识 2" class="lazyload">
     </div>
     <div class="post-info">
@@ -632,30 +668,8 @@ dest 是 bss 段上的，也就是说最开始会在 dest 存放 .&amp;#x2F;flag
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/08/05/lexington-informatics-tournament-ctf-2026/" aria-label="Lexington Informatics Tournament CTF 2026" title="Lexington Informatics Tournament CTF 2026"></a>
-    <div class="post-cover right">
-        <img data-src="/HFTTC.github.io/images/pwn/covers/lexington-informatics-tournament-ctf-2026.jpg" data-sizes="auto" alt="Lexington Informatics Tournament CTF 2026" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-08-05</span>
-          <span><span class="icon-calendar-plus"></span>2026-08-05</span>
-        <span><span class="icon-pencil"></span>733 字</span>
-        <span><span class="icon-clock"></span>4 分钟</span>
-      </div>
-      <h2 class="post-title">Lexington Informatics Tournament CTF 2026</h2>
-      <article class="post-article">
-          前言：一个入门级的国外比赛，有一种很久违的感觉。都是一些简单题，直接用 wsl 写了，懒得开虚拟机了
-
-pwn&amp;#x2F;long division题目描述：I made a calculator for dividing two 32-bit integers! I made sure that division by 0 doesn’t happen and that the inputs fit in 32-bit integers. Since division only makes numbers smaller, surely it can’t overflow … right? 
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <span class="page-number current">1</span><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/15/">15</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/2/">下一页 &raquo;</a>
+    <span class="page-number current">1</span><a class="page-number" href="/HFTTC.github.io/page/2/">2</a><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/16/">16</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/2/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -677,10 +691,10 @@ pwn&amp;#x2F;long division题目描述：I made a calculator for dividing two 32
       </div>
       <div>
         <span class="icon-brush"></span>
-        286.7k
+        288.8k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:41
+        23:50
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -708,7 +722,7 @@ pwn&amp;#x2F;long division题目描述：I made a calculator for dividing two 32
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >

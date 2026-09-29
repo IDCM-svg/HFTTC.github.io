@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/" title="Vivotek 摄像头 HTTP 缓冲区溢出漏洞">Vivotek 摄像头 HTTP 缓冲区溢出漏洞</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" title="简单的 MySQL 注入">简单的 MySQL 注入</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,50 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Protobuf%E8%84%B1%E5%A3%B3%E4%BA%8C%E8%BF%9B%E5%88%B6/index/" aria-label="Protobuf脱壳二进制" title="Protobuf脱壳二进制"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Protobuf%E8%84%B1%E5%A3%B3%E4%BA%8C%E8%BF%9B%E5%88%B6/%5BCISCN2024%5Dez_buf/" aria-label="[CISCN 2024] ez_buf" title="[CISCN 2024] ez_buf"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2024] ez_buf" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>2.7k 字</span>
+        <span><span class="icon-clock"></span>14 分钟</span>
+      </div>
+      <h2 class="post-title">[CISCN 2024] ez_buf</h2>
+      <article class="post-article">
+          [CISCN 2024] ez_buf
+逆向 protobuf 结构体：看一下字符串，发现有很多以 what 开头的字符串
+
+典型的 protobuf 结构体，我们看一下 whatcon 的内容：
+
+这里 0xBAE8 (+0x8)的地方就是 idx，+0x10 偏移的地方就是结构体元素类型：0xF 对应的是 bytes
+123message pwn &amp;#123;  optional bytes whatcon = 1;&amp;#125;
+
+
+
+
+内存数值 (Dec)
+内存数值 (Hex)
+对应 Proto 类型
+底层 Wire Type
+实战内存占用特征
+
+
+
+0
+0x00
+int32
+0 (Va
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Protobuf%E8%84%B1%E5%A3%B3%E4%BA%8C%E8%BF%9B%E5%88%B6/index/" aria-label="Protobuf脱壳二进制" title="Protobuf脱壳二进制"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Protobuf脱壳二进制" class="lazyload">
     </div>
     <div class="post-info">
@@ -399,9 +441,9 @@
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Dnovel1/" aria-label="[长城杯 2024] novel1" title="[长城杯 2024] novel1"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[长城杯 2024] novel1" class="lazyload">
     </div>
     <div class="post-info">
@@ -424,9 +466,9 @@ main
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/C++PWN/%5B%E9%95%BF%E5%9F%8E%E6%9D%AF2024%5Danote/" aria-label="[长城杯 2024] anote" title="[长城杯 2024] anote"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[长城杯 2024] anote" class="lazyload">
     </div>
     <div class="post-info">
@@ -446,9 +488,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041424
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/C++PWN/index/" aria-label="C++PWN" title="C++PWN"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="C++PWN" class="lazyload">
     </div>
     <div class="post-info">
@@ -468,9 +510,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041424
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfMuney/%5BCISCN2023%5Dmuney/" aria-label="[CISCN 2023]muney" title="[CISCN 2023]muney"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2023]muney" class="lazyload">
     </div>
     <div class="post-info">
@@ -491,9 +533,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041424
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfEmma/%5B%E6%B9%96%E6%B9%98%E6%9D%AF2021%5Dhouse_of_emma/" aria-label="[湖湘杯 2021]house_of_emma" title="[湖湘杯 2021]house_of_emma"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[湖湘杯 2021]house_of_emma" class="lazyload">
     </div>
     <div class="post-info">
@@ -512,9 +554,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041424
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfMuney/index/" aria-label="House Of Muney" title="House Of Muney"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Muney" class="lazyload">
     </div>
     <div class="post-info">
@@ -537,9 +579,9 @@ main1234567891011121314151617181920212223242526272829303132333435363738394041424
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfEmma/index/" aria-label="House Of Emma" title="House Of Emma"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Emma" class="lazyload">
     </div>
     <div class="post-info">
@@ -559,9 +601,9 @@ House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfCat/%5B%E5%BC%BA%E7%BD%91%E6%9D%AF2022%5DHouseofCat/" aria-label="[强网杯 2022]House of Cat" title="[强网杯 2022]House of Cat"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[强网杯 2022]House of Cat" class="lazyload">
     </div>
     <div class="post-info">
@@ -580,29 +622,8 @@ House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseOfCat/index/" aria-label="House Of Cat" title="House Of Cat"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House Of Cat" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>1.1k 字</span>
-        <span><span class="icon-clock"></span>5 分钟</span>
-      </div>
-      <h2 class="post-title">House Of Cat</h2>
-      <article class="post-article">
-          House Of CatHouse Of Cat 利用背景：House of Cat 被广泛使用，主要是因为它可以解决传统 FSOP 在某些苛刻题目环境下面临的限制：
-1. 应对极端的长度限制与堆块大小限制 House of Apple 2 虽然强大，但通常需要走 _IO_wfile_overflow 或 underflow 逻辑，这要求攻击者在堆上伪造相对完整的 _IO_FILE 结构体以及它所指向的 _wide_data 结构体（通常需要连续控制 0xe0 字节以上的内存）。而 House of Cat 将执行流劫持的目标转移到了 _IO_switch_to_wget_mode 函数（通过
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/4/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><a class="page-number" href="/HFTTC.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/15/">15</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/6/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/4/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/3/">3</a><a class="page-number" href="/HFTTC.github.io/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/16/">16</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/6/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -624,10 +645,10 @@ House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们
       </div>
       <div>
         <span class="icon-brush"></span>
-        286.7k
+        288.8k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:41
+        23:50
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -655,7 +676,7 @@ House Of Kiwi 可以说是和 Emma 一脉相承的一个利用手法吧，我们
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >

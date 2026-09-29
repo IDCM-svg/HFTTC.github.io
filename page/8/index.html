@@ -206,7 +206,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >
@@ -344,6 +344,9 @@
       <div class="widget">
         <ul>
             <li>
+              <a href="/HFTTC.github.io/2026/09/29/Vivotek%20%E6%91%84%E5%83%8F%E5%A4%B4%20HTTP%20%E7%BC%93%E5%86%B2%E5%8C%BA%E6%BA%A2%E5%87%BA%E6%BC%8F%E6%B4%9E/" title="Vivotek 摄像头 HTTP 缓冲区溢出漏洞">Vivotek 摄像头 HTTP 缓冲区溢出漏洞</a>
+            </li>
+            <li>
               <a href="/HFTTC.github.io/2026/09/26/%E7%AE%80%E5%8D%95%E7%9A%84MySQL%E6%B3%A8%E5%85%A5/" title="简单的 MySQL 注入">简单的 MySQL 注入</a>
             </li>
             <li>
@@ -354,9 +357,6 @@
             </li>
             <li>
               <a href="/HFTTC.github.io/2026/08/27/%E7%BD%91%E9%BC%8E%E6%9D%AF2024%E5%8D%8A%E5%86%B3%E8%B5%9Bpwn/" title="网鼎杯 2024 半决赛 PWN">网鼎杯 2024 半决赛 PWN</a>
-            </li>
-            <li>
-              <a href="/HFTTC.github.io/2026/08/26/%E7%AC%AC%E4%B9%9D%E5%B1%8A%E5%AE%81%E6%B3%A2%E5%B8%82%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8&%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91pwn-2026/" title="第九届宁波市网络安全&amp;西湖论剑 PWN 2026">第九届宁波市网络安全&amp;西湖论剑 PWN 2026</a>
             </li>
         </ul>
       </div>
@@ -378,8 +378,32 @@
 
           <section id="main" aria-label="Main content">      <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofApple2libc-2.35/index/" aria-label="House of Apple2 libc-2.35" title="House of Apple2 libc-2.35"></a>
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/realloc_hook%E5%8A%AB%E6%8C%81%E7%AF%A1%E6%94%B9gadgets/" aria-label="__realloc_hook 劫持篡改 gadgets" title="__realloc_hook 劫持篡改 gadgets"></a>
     <div class="post-cover left">
+          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="__realloc_hook 劫持篡改 gadgets" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-05-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
+        <span><span class="icon-pencil"></span>1.5k 字</span>
+        <span><span class="icon-clock"></span>8 分钟</span>
+      </div>
+      <h2 class="post-title">__realloc_hook 劫持篡改 gadgets</h2>
+      <article class="post-article">
+          __realloc_hook 劫持篡改 gadgets参考资料：https://zhuanlan.zhihu.com/p/269126935
+劫持  __realloc_hook 的背景：我们在写堆溢出的时候经常会用到篡改 hook 为 gadgets 的手法去获取shellcode，不过相应的也存在一些问题
+One_gadgets 虽然可以一键获取 shell，但是他对执行时的寄存器和栈环境有及其严苛的要求：
+
+比如它可能要求 [rsp+0x40] == NULL 或者 rcx == NULL。 当我们通过劫持 __malloc_hook，在调用 malloc 时直接跳向 one_gadge
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/HFTTC.github.io/2026/05/23/HouseofApple2libc-2.35/index/" aria-label="House of Apple2 libc-2.35" title="House of Apple2 libc-2.35"></a>
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="House of Apple2 libc-2.35" class="lazyload">
     </div>
     <div class="post-info">
@@ -400,9 +424,9 @@ House of Apple 攻击的调用背景：Libc
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95%E8%AE%A1%E7%AE%97main_arena%E5%92%8Cenviron%E4%B9%8B%E9%97%B4%E7%9A%84%E5%81%8F%E7%A7%BB/" aria-label="两种方法计算main_arena和environ之间的偏移" title="两种方法计算main_arena和environ之间的偏移"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="两种方法计算main_arena和environ之间的偏移" class="lazyload">
     </div>
     <div class="post-info">
@@ -423,9 +447,9 @@ House of Apple 攻击的调用背景：Libc
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/glibc-2.32malloc()_unalignedtcachechunkdetected/" aria-label="glibc-2.32 malloc(): unaligned tcache chunk detected" title="glibc-2.32 malloc(): unaligned tcache chunk detected"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.32 malloc(): unaligned tcache chunk detected" class="lazyload">
     </div>
     <div class="post-info">
@@ -446,9 +470,9 @@ House of Apple 攻击的调用背景：Libc
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/%5BISCC2024%5Dchaos_plus(%E5%A0%86%E6%A0%88%E7%BB%93%E5%90%88)/" aria-label="[ISCC 2024] chaos_plus(堆栈结合)" title="[ISCC 2024] chaos_plus(堆栈结合)"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[ISCC 2024] chaos_plus(堆栈结合)" class="lazyload">
     </div>
     <div class="post-info">
@@ -469,9 +493,9 @@ chaos_plus(UAF libc-2.35)
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/%5BCISCN2021%E5%88%9D%E8%B5%9B%5Dlonelywolf/" aria-label="[CISCN 2021 初赛]lonelywolf" title="[CISCN 2021 初赛]lonelywolf"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="[CISCN 2021 初赛]lonelywolf" class="lazyload">
     </div>
     <div class="post-info">
@@ -493,9 +517,9 @@ main 函数
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/glibc-2.35%E6%96%B0%E5%A2%9E%E4%BF%9D%E6%8A%A4%E6%9C%BA%E5%88%B6/index/" aria-label="glibc-2.35 新增保护机制" title="glibc-2.35 新增保护机制"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="glibc-2.35 新增保护机制" class="lazyload">
     </div>
     <div class="post-info">
@@ -517,9 +541,9 @@ main 函数
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcache_perthread_corruption/index/" aria-label="Tcache_perthread_corruption" title="Tcache_perthread_corruption"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache_perthread_corruption" class="lazyload">
     </div>
     <div class="post-info">
@@ -538,9 +562,9 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
+  <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/TcachePoisoning/" aria-label="Tcache Poisoning" title="Tcache Poisoning"></a>
-    <div class="post-cover right">
+    <div class="post-cover left">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache Poisoning" class="lazyload">
     </div>
     <div class="post-info">
@@ -561,9 +585,9 @@ Tcache_perthread_corruption 概述在堆题中，我们常见的一种泄露地�
   </div>
 </div>
       <div class="post-wrapper">
-  <div class="post-wrap left" data-aos="fade-up">
+  <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/HFTTC.github.io/2026/05/23/TcachebinAttack%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/" aria-label="Tcachebin Attack 基本介绍" title="Tcachebin Attack 基本介绍"></a>
-    <div class="post-cover left">
+    <div class="post-cover right">
           <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcachebin Attack 基本介绍" class="lazyload">
     </div>
     <div class="post-info">
@@ -583,31 +607,8 @@ tcachebin 和 unso
     </div>
   </div>
 </div>
-      <div class="post-wrapper">
-  <div class="post-wrap right" data-aos="fade-up">
-      <a class="post-link" href="/HFTTC.github.io/2026/05/23/Tcachedup/" aria-label="Tcache dup" title="Tcache dup"></a>
-    <div class="post-cover right">
-          <img data-src="/HFTTC.github.io/images/banner.webp" data-sizes="auto" alt="Tcache dup" class="lazyload">
-    </div>
-    <div class="post-info">
-      <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-05-23</span>
-          <span><span class="icon-calendar-plus"></span>2026-05-23</span>
-        <span><span class="icon-pencil"></span>19 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
-      </div>
-      <h2 class="post-title">Tcache dup</h2>
-      <article class="post-article">
-          Tcache dup
-更新: 2026-04-08 19:12:44原文: https://www.yuque.com/idcm/wnemg9/ro1d3xm9z0b5h6eu
-
-
-      </article>
-    </div>
-  </div>
-</div>
   <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
-    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/7/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/HFTTC.github.io/page/9/">9</a><a class="page-number" href="/HFTTC.github.io/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/15/">15</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/9/">下一页 &raquo;</a>
+    <a class="extend prev" rel="prev" href="/HFTTC.github.io/page/7/">&laquo; 上一页</a><a class="page-number" href="/HFTTC.github.io/">1</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/6/">6</a><a class="page-number" href="/HFTTC.github.io/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/HFTTC.github.io/page/9/">9</a><a class="page-number" href="/HFTTC.github.io/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/HFTTC.github.io/page/16/">16</a><a class="extend next" rel="next" href="/HFTTC.github.io/page/9/">下一页 &raquo;</a>
   </nav>
 
 </section>
@@ -629,10 +630,10 @@ tcachebin 和 unso
       </div>
       <div>
         <span class="icon-brush"></span>
-        286.7k
+        288.8k
         &nbsp;|&nbsp;
         <span class="icon-coffee"></span>
-        23:41
+        23:50
       </div>
       <div>
         <span class="icon-eye"></span>
@@ -660,7 +661,7 @@ tcachebin 和 unso
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">150</div>
+    <div class="sidebar-state-number">151</div>
   </div>
 </div>
 <div class="sidebar-social" >
